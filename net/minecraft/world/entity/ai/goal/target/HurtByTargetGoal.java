@@ -59,7 +59,7 @@ public class HurtByTargetGoal extends TargetGoal {
 
     @Override
     public void start() {
-        this.mob.setTarget(this.mob.getLastHurtByMob());
+        this.mob.setTarget(this.mob.getLastHurtByMob(), org.bukkit.event.entity.EntityTargetEvent.TargetReason.TARGET_ATTACKED_ENTITY, true); // CraftBukkit - reason
         this.targetMob = this.mob.getTarget();
         this.timestamp = this.mob.getLastHurtByMobTimestamp();
         this.unseenMemoryTicks = 300;
@@ -114,6 +114,6 @@ public class HurtByTargetGoal extends TargetGoal {
     }
 
     protected void alertOther(Mob mob, LivingEntity target) {
-        mob.setTarget(target);
+        mob.setTarget(target, org.bukkit.event.entity.EntityTargetEvent.TargetReason.TARGET_ATTACKED_NEARBY_ENTITY, true); // CraftBukkit - reason
     }
 }

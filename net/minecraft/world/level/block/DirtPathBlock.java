@@ -60,6 +60,11 @@ public class DirtPathBlock extends Block {
 
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        // CraftBukkit start - do not fade if the block is valid here
+        if (state.canSurvive(level, pos)) {
+            return;
+        }
+        // CraftBukkit end
         FarmBlock.turnToDirt(null, state, level, pos);
     }
 

@@ -58,6 +58,7 @@ public class PowderSnowBlock extends Block implements BucketPickup {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        if (!new io.papermc.paper.event.entity.EntityInsideBlockEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.block.CraftBlock.at(level, pos)).callEvent()) { return; } // Paper - Add EntityInsideBlockEvent
         if (!(entity instanceof LivingEntity) || entity.getInBlockState().is(this)) {
             entity.makeStuckInBlock(state, new Vec3(0.9F, 1.5, 0.9F));
             if (level.isClientSide) {
@@ -80,8 +81,13 @@ public class PowderSnowBlock extends Block implements BucketPickup {
         entity.setIsInPowderSnow(true);
         if (level instanceof ServerLevel serverLevel) {
             if (entity.isOnFire()
-                && (serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) || entity instanceof Player)
+                // CraftBukkit - move down
                 && entity.mayInteract(serverLevel, pos)) {
+                // CraftBukkit start
+                if (!org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(entity, pos, Blocks.AIR.defaultBlockState(), !(serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) || entity instanceof Player))) {
+                    return;
+                }
+                // CraftBukkit end
                 level.destroyBlock(pos, false);
             }
 

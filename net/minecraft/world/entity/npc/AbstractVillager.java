@@ -37,7 +37,20 @@ import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
+// CraftBukkit start
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.inventory.CraftMerchant;
+import org.bukkit.craftbukkit.inventory.CraftMerchantRecipe;
+import org.bukkit.event.entity.VillagerAcquireTradeEvent;
+// CraftBukkit end
+
 public abstract class AbstractVillager extends AgeableMob implements InventoryCarrier, Npc, Merchant {
+    // CraftBukkit start
+    @Override
+    public CraftMerchant getCraftMerchant() {
+        return (org.bukkit.craftbukkit.entity.CraftAbstractVillager) this.getBukkitEntity();
+    }
+    // CraftBukkit end
     private static final EntityDataAccessor<Integer> DATA_UNHAPPY_COUNTER = SynchedEntityData.defineId(AbstractVillager.class, EntityDataSerializers.INT);
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final int VILLAGER_SLOT_OFFSET = 300;
@@ -46,7 +59,7 @@ public abstract class AbstractVillager extends AgeableMob implements InventoryCa
     private Player tradingPlayer;
     @Nullable
     protected MerchantOffers offers;
-    private final SimpleContainer inventory = new SimpleContainer(8);
+    private final SimpleContainer inventory = new SimpleContainer(8, (org.bukkit.craftbukkit.entity.CraftAbstractVillager) this.getBukkitEntity()); // CraftBukkit - add argument
 
     public AbstractVillager(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);
@@ -99,6 +112,13 @@ public abstract class AbstractVillager extends AgeableMob implements InventoryCa
         return this.tradingPlayer != null;
     }
 
+    // Paper start - Villager#resetOffers
+    public void resetOffers() {
+        this.offers = new MerchantOffers();
+        this.updateTrades();
+    }
+    // Paper end - Villager#resetOffers
+
     @Override
     public MerchantOffers getOffers() {
         if (this.level().isClientSide) {
@@ -121,11 +141,24 @@ public abstract class AbstractVillager extends AgeableMob implements InventoryCa
     public void overrideXp(int xp) {
     }
 
+    // Paper start - Add PlayerTradeEvent and PlayerPurchaseEvent
+    @Override
+    public void processTrade(MerchantOffer offer, @Nullable io.papermc.paper.event.player.PlayerPurchaseEvent event) { // The MerchantRecipe passed in here is the one set by the PlayerPurchaseEvent
+        if (event == null || event.willIncreaseTradeUses()) {
+            offer.increaseUses();
+        }
+        if (event == null || event.isRewardingExp()) {
+            this.rewardTradeXp(offer);
+        }
+        this.notifyTrade(offer);
+    }
+    // Paper end - Add PlayerTradeEvent and PlayerPurchaseEvent
+
     @Override
     public void notifyTrade(MerchantOffer offer) {
-        offer.increaseUses();
+        // offer.increaseUses(); // Paper - Add PlayerTradeEvent and PlayerPurchaseEvent
         this.ambientSoundTime = -this.getAmbientSoundInterval();
-        this.rewardTradeXp(offer);
+        // this.rewardTradeXp(offer); // Paper - Add PlayerTradeEvent and PlayerPurchaseEvent
         if (this.tradingPlayer instanceof ServerPlayer) {
             CriteriaTriggers.TRADE.trigger((ServerPlayer)this.tradingPlayer, this, offer.getResult());
         }
@@ -236,7 +269,20 @@ public abstract class AbstractVillager extends AgeableMob implements InventoryCa
         while (i < maxNumbers && !list.isEmpty()) {
             MerchantOffer offer = list.remove(this.random.nextInt(list.size())).getOffer(this, this.random);
             if (offer != null) {
-                givenMerchantOffers.add(offer);
+                // CraftBukkit start
+                VillagerAcquireTradeEvent event = new VillagerAcquireTradeEvent((org.bukkit.entity.AbstractVillager) this.getBukkitEntity(), offer.asBukkit());
+                // Suppress during worldgen
+                if (this.valid) {
+                    Bukkit.getPluginManager().callEvent(event);
+                }
+                if (!event.isCancelled()) {
+                    // Paper start - Fix crash from invalid ingredient list
+                    final CraftMerchantRecipe craftMerchantRecipe = CraftMerchantRecipe.fromBukkit(event.getRecipe());
+                    if (craftMerchantRecipe.getIngredients().isEmpty()) return;
+                    givenMerchantOffers.add(craftMerchantRecipe.toMinecraft());
+                    // Paper end - Fix crash from invalid ingredient list
+                }
+                // CraftBukkit end
                 i++;
             }
         }

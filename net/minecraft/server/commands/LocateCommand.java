@@ -202,6 +202,6 @@ public class LocateCommand {
     private static float dist(int x1, int z1, int x2, int z2) {
         int i = x2 - x1;
         int i1 = z2 - z1;
-        return Mth.sqrt(i * i + i1 * i1);
+        return (float) Math.hypot(i, i1); // Paper - Fix MC-177381
     }
 }

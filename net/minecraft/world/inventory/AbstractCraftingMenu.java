@@ -12,14 +12,17 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 public abstract class AbstractCraftingMenu extends RecipeBookMenu {
     private final int width;
     private final int height;
-    public final CraftingContainer craftSlots;
+    public final TransientCraftingContainer craftSlots; // CraftBukkit
     public final ResultContainer resultSlots = new ResultContainer();
 
-    public AbstractCraftingMenu(MenuType<?> menuType, int containerId, int width, int height) {
+    public AbstractCraftingMenu(MenuType<?> menuType, int containerId, int width, int height, Inventory playerInventory) { // CraftBukkit
         super(menuType, containerId);
         this.width = width;
         this.height = height;
-        this.craftSlots = new TransientCraftingContainer(this, width, height);
+        // CraftBukkit start
+        this.craftSlots = new TransientCraftingContainer(this, width, height, playerInventory.player); // CraftBukkit - pass player
+        this.craftSlots.resultInventory = this.resultSlots; // CraftBukkit - let InventoryCrafting know about its result slot
+        // CraftBukkit end
     }
 
     protected Slot addResultSlot(Player player, int x, int y) {

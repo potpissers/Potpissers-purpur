@@ -109,7 +109,7 @@ public class EvokerFangs extends Entity implements TraceableEntity {
             }
 
             if (--this.lifeTicks < 0) {
-                this.discard();
+                this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
             }
         }
     }
@@ -118,7 +118,7 @@ public class EvokerFangs extends Entity implements TraceableEntity {
         LivingEntity owner = this.getOwner();
         if (target.isAlive() && !target.isInvulnerable() && target != owner) {
             if (owner == null) {
-                target.hurt(this.damageSources().magic(), 6.0F);
+                target.hurt(this.damageSources().magic().customEventDamager(this), 6.0F); // CraftBukkit // Paper - fix DamageSource API
             } else {
                 if (owner.isAlliedTo(target)) {
                     return;

@@ -21,7 +21,7 @@ public class ClipContext {
     private final CollisionContext collisionContext;
 
     public ClipContext(Vec3 from, Vec3 to, ClipContext.Block block, ClipContext.Fluid fluid, Entity entity) {
-        this(from, to, block, fluid, CollisionContext.of(entity));
+        this(from, to, block, fluid, (entity == null) ? CollisionContext.empty() : CollisionContext.of(entity)); // CraftBukkit
     }
 
     public ClipContext(Vec3 from, Vec3 to, ClipContext.Block block, ClipContext.Fluid fluid, CollisionContext collisionContext) {

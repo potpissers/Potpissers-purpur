@@ -74,6 +74,14 @@ public class HoneycombItem extends Item implements SignApplicator {
         return getWaxed(blockState).<InteractionResult>map(blockState1 -> {
             Player player = context.getPlayer();
             ItemStack itemInHand = context.getItemInHand();
+            // Paper start - EntityChangeBlockEvent
+            if (!org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(player, clickedPos, blockState)) {
+                if (!player.isCreative()) {
+                    player.containerMenu.sendAllDataToRemote();
+                }
+                return InteractionResult.PASS;
+            }
+            // Paper end
             if (player instanceof ServerPlayer serverPlayer) {
                 CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(serverPlayer, clickedPos, itemInHand);
             }

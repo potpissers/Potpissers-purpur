@@ -88,8 +88,25 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
             int age = this.getAge(state);
             if (age < this.getMaxAge()) {
                 float growthSpeed = getGrowthSpeed(this, level, pos);
-                if (random.nextInt((int)(25.0F / growthSpeed) + 1) == 0) {
-                    level.setBlock(pos, this.getStateForAge(age + 1), 2);
+                // Spigot start
+                int modifier = 100;
+                if (this == Blocks.BEETROOTS) {
+                    modifier = level.spigotConfig.beetrootModifier;
+                } else if (this == Blocks.CARROTS) {
+                    modifier = level.spigotConfig.carrotModifier;
+                } else if (this == Blocks.POTATOES) {
+                    modifier = level.spigotConfig.potatoModifier;
+                // Paper start - Fix Spigot growth modifiers
+                } else if (this == Blocks.TORCHFLOWER_CROP) {
+                    modifier = level.spigotConfig.torchFlowerModifier;
+                // Paper end - Fix Spigot growth modifiers
+                } else if (this == Blocks.WHEAT) {
+                    modifier = level.spigotConfig.wheatModifier;
+                }
+
+                if (random.nextFloat() < (modifier / (100.0f * (Math.floor((25.0F / growthSpeed) + 1))))) { // Spigot - SPIGOT-7159: Better modifier resolution
+                    // Spigot end
+                    org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, pos, this.getStateForAge(age + 1), 2); // CraftBukkit
                 }
             }
         }
@@ -102,7 +119,7 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
             i = maxAge;
         }
 
-        level.setBlock(pos, this.getStateForAge(i), 2);
+        org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, pos, this.getStateForAge(i), 2); // CraftBukkit
     }
 
     protected int getBonemealAgeIncrease(Level level) {
@@ -164,7 +181,8 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (level instanceof ServerLevel serverLevel && entity instanceof Ravager && serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+        if (!new io.papermc.paper.event.entity.EntityInsideBlockEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.block.CraftBlock.at(level, pos)).callEvent()) { return; } // Paper - Add EntityInsideBlockEvent
+        if (level instanceof ServerLevel serverLevel && entity instanceof Ravager && org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(entity, pos, Blocks.AIR.defaultBlockState(), !serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))) { // CraftBukkit
             serverLevel.destroyBlock(pos, true, entity);
         }
 

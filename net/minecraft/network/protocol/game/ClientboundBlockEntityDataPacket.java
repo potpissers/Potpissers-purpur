@@ -29,7 +29,7 @@ public class ClientboundBlockEntityDataPacket implements Packet<ClientGamePacket
 
     public static ClientboundBlockEntityDataPacket create(BlockEntity blockEntity, BiFunction<BlockEntity, RegistryAccess, CompoundTag> dataGetter) {
         RegistryAccess registryAccess = blockEntity.getLevel().registryAccess();
-        return new ClientboundBlockEntityDataPacket(blockEntity.getBlockPos(), blockEntity.getType(), dataGetter.apply(blockEntity, registryAccess));
+        return new ClientboundBlockEntityDataPacket(blockEntity.getBlockPos(), blockEntity.getType(), blockEntity.sanitizeSentNbt(dataGetter.apply(blockEntity, registryAccess))); // Paper - Sanitize sent data
     }
 
     public static ClientboundBlockEntityDataPacket create(BlockEntity blockEntity) {

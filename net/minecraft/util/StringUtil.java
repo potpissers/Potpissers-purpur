@@ -85,6 +85,25 @@ public class StringUtil {
         return stringBuilder.toString();
     }
 
+    // Paper start - Username validation
+    public static boolean isReasonablePlayerName(final String name) {
+        if (name.isEmpty() || name.length() > 16) {
+            return false;
+        }
+
+        for (int i = 0, len = name.length(); i < len; ++i) {
+            final char c = name.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || (c == '_' || c == '.')) {
+                continue;
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+    // Paper end - Username validation
+
     public static boolean isWhitespace(int character) {
         return Character.isWhitespace(character) || Character.isSpaceChar(character);
     }

@@ -59,7 +59,7 @@ public abstract class ThrowableProjectile extends Projectile {
         this.applyEffectsFromBlocks();
         super.tick();
         if (hitResultOnMoveVector.getType() != HitResult.Type.MISS && this.isAlive()) {
-            this.hitTargetOrDeflectSelf(hitResultOnMoveVector);
+            this.preHitTargetOrDeflectSelf(hitResultOnMoveVector); // CraftBukkit - projectile hit event
         }
     }
 

@@ -170,8 +170,18 @@ public class ComparatorBlock extends DiodeBlock implements EntityBlock {
             boolean shouldTurnOn = this.shouldTurnOn(level, pos, state);
             boolean poweredValue = state.getValue(POWERED);
             if (poweredValue && !shouldTurnOn) {
+                // CraftBukkit start
+                if (org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(level, pos, 15, 0).getNewCurrent() != 0) {
+                    return;
+                }
+                // CraftBukkit end
                 level.setBlock(pos, state.setValue(POWERED, Boolean.valueOf(false)), 2);
             } else if (!poweredValue && shouldTurnOn) {
+                // CraftBukkit start
+                if (org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(level, pos, 0, 15).getNewCurrent() != 15) {
+                    return;
+                }
+                // CraftBukkit end
                 level.setBlock(pos, state.setValue(POWERED, Boolean.valueOf(true)), 2);
             }
 

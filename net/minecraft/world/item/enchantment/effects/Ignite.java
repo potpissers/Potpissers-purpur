@@ -15,7 +15,21 @@ public record Ignite(LevelBasedValue duration) implements EnchantmentEntityEffec
 
     @Override
     public void apply(ServerLevel level, int enchantmentLevel, EnchantedItemInUse item, Entity entity, Vec3 origin) {
-        entity.igniteForSeconds(this.duration.calculate(enchantmentLevel));
+        // CraftBukkit start - Call a combust event when somebody hits with a fire enchanted item
+        org.bukkit.event.entity.EntityCombustEvent entityCombustEvent;
+        if (item.owner() != null) {
+            entityCombustEvent = new org.bukkit.event.entity.EntityCombustByEntityEvent(item.owner().getBukkitEntity(), entity.getBukkitEntity(), this.duration.calculate(enchantmentLevel));
+        } else {
+            entityCombustEvent = new org.bukkit.event.entity.EntityCombustEvent(entity.getBukkitEntity(), this.duration.calculate(enchantmentLevel));
+        }
+
+        org.bukkit.Bukkit.getPluginManager().callEvent(entityCombustEvent);
+        if (entityCombustEvent.isCancelled()) {
+            return;
+        }
+
+        entity.igniteForSeconds(entityCombustEvent.getDuration(), false);
+        // CraftBukkit end
     }
 
     @Override

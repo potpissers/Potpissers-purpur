@@ -85,7 +85,7 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
         @Override
         public Optional<MenuProvider> acceptDouble(final ChestBlockEntity first, final ChestBlockEntity second) {
             final Container container = new CompoundContainer(first, second);
-            return Optional.of(new MenuProvider() {
+            return Optional.of(DoubleInventory.wrap(new MenuProvider() { // CraftBukkit - wrap for identification
                 @Nullable
                 @Override
                 public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
@@ -106,7 +106,7 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
                         return (Component)(second.hasCustomName() ? second.getDisplayName() : Component.translatable("container.chestDouble"));
                     }
                 }
-            });
+            }, (CompoundContainer) container)); // CraftBukkit - wrap for identification
         }
 
         @Override
@@ -119,6 +119,34 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
             return Optional.empty();
         }
     };
+
+    // CraftBukkit start
+    public static class DoubleInventory implements MenuProvider {
+
+        private final MenuProvider delegate;
+        public final CompoundContainer container; // expose to api
+
+        private DoubleInventory(MenuProvider delegate, CompoundContainer container) {
+            this.delegate = delegate;
+            this.container = container;
+        }
+
+        public static DoubleInventory wrap(MenuProvider delegate, CompoundContainer container) {
+            return new DoubleInventory(delegate, container);
+        }
+
+        @Nullable
+        @Override
+        public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
+            return this.delegate.createMenu(syncId, playerInventory, player);
+        }
+
+        @Override
+        public Component getDisplayName() {
+            return this.delegate.getDisplayName();
+        }
+    }
+    // CraftBukkit end
 
     @Override
     public MapCodec<? extends ChestBlock> codec() {
@@ -245,8 +273,7 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (level instanceof ServerLevel serverLevel) {
             MenuProvider menuProvider = this.getMenuProvider(state, level, pos);
-            if (menuProvider != null) {
-                player.openMenu(menuProvider);
+            if (menuProvider != null && player.openMenu(menuProvider).isPresent()) { // Paper - Fix InventoryOpenEvent cancellation
                 player.awardStat(this.getOpenChestStat());
                 PiglinAi.angerNearbyPiglins(serverLevel, player, true);
             }
@@ -285,7 +312,14 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
     @Nullable
     @Override
     public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
-        return this.combine(state, level, pos, false).apply(MENU_PROVIDER_COMBINER).orElse(null);
+    // CraftBukkit start
+        return this.getMenuProvider(state, level, pos, false);
+    }
+
+    @Nullable
+    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos, boolean ignoreObstructions) {
+        return this.combine(state, level, pos, ignoreObstructions).apply(MENU_PROVIDER_COMBINER).orElse(null);
+    // CraftBukkit end
     }
 
     public static DoubleBlockCombiner.Combiner<ChestBlockEntity, Float2FloatFunction> opennessCombiner(final LidBlockEntity lid) {
@@ -328,6 +362,11 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
     }
 
     private static boolean isCatSittingOnChest(LevelAccessor level, BlockPos pos) {
+        // Paper start - Option to disable chest cat detection
+        if (level.getMinecraftWorld().paperConfig().entities.behavior.disableChestCatDetection) {
+            return false;
+        }
+        // Paper end - Option to disable chest cat detection
         List<Cat> entitiesOfClass = level.getEntitiesOfClass(
             Cat.class, new AABB(pos.getX(), pos.getY() + 1, pos.getZ(), pos.getX() + 1, pos.getY() + 2, pos.getZ() + 1)
         );

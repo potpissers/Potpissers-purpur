@@ -52,7 +52,7 @@ public class ClientboundLevelChunkPacketData {
             throw new RuntimeException("Can't read heightmap in packet for [" + x + ", " + z + "]");
         } else {
             int varInt = buffer.readVarInt();
-            if (varInt > 2097152) {
+            if (varInt > 2097152) { // Paper - diff on change - if this changes, update PacketEncoder
                 throw new RuntimeException("Chunk Packet trying to allocate too much memory on read.");
             } else {
                 this.buffer = new byte[varInt];
@@ -154,6 +154,7 @@ public class ClientboundLevelChunkPacketData {
             CompoundTag updateTag = blockEntity.getUpdateTag(blockEntity.getLevel().registryAccess());
             BlockPos blockPos = blockEntity.getBlockPos();
             int i = SectionPos.sectionRelative(blockPos.getX()) << 4 | SectionPos.sectionRelative(blockPos.getZ());
+            blockEntity.sanitizeSentNbt(updateTag); // Paper - Sanitize sent data
             return new ClientboundLevelChunkPacketData.BlockEntityInfo(i, blockPos.getY(), blockEntity.getType(), updateTag.isEmpty() ? null : updateTag);
         }
     }

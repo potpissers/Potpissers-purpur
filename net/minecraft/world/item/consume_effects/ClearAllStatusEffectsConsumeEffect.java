@@ -18,7 +18,9 @@ public record ClearAllStatusEffectsConsumeEffect() implements ConsumeEffect {
     }
 
     @Override
-    public boolean apply(Level level, ItemStack stack, LivingEntity entity) {
-        return entity.removeAllEffects();
+    // CraftBukkit start
+    public boolean apply(Level level, ItemStack stack, LivingEntity entity, org.bukkit.event.entity.EntityPotionEffectEvent.Cause cause) {
+        return entity.removeAllEffects(cause);
+        // CraftBukkit end
     }
 }

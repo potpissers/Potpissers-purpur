@@ -139,6 +139,8 @@ public class GameTestServer extends MinecraftServer {
         BlockPos spawnPos
     ) {
         super(
+            null, // Paper
+            null, // Paper
             serverThread,
             storageSource,
             packRepository,
@@ -154,8 +156,15 @@ public class GameTestServer extends MinecraftServer {
 
     @Override
     public boolean initServer() {
-        this.setPlayerList(new PlayerList(this, this.registries(), this.playerDataStorage, 1) {});
-        this.loadLevel();
+        // Paper start
+        this.setPlayerList(new PlayerList(this, this.registries(), this.playerDataStorage, 1) {
+            @Override
+            public void loadAndSaveFiles() {
+                throw new UnsupportedOperationException("Should not be called in a GameTestServer");
+            }
+        });
+        this.loadLevel("blah");
+        // Paper end
         ServerLevel serverLevel = this.overworld();
         this.testBatches = Lists.newArrayList(GameTestBatchFactory.fromTestFunction(this.testFunctions, serverLevel));
         serverLevel.setDefaultSpawnPos(this.spawnPos, 0.0F);
@@ -303,6 +312,13 @@ public class GameTestServer extends MinecraftServer {
     public boolean shouldInformAdmins() {
         return false;
     }
+
+    // Paper start
+    @Override
+    public org.bukkit.command.CommandSender getBukkitSender(final net.minecraft.commands.CommandSourceStack wrapper) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+    // Paper end
 
     @Override
     public boolean isSingleplayerOwner(GameProfile profile) {

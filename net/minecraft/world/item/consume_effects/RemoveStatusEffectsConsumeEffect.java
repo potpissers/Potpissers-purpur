@@ -35,11 +35,11 @@ public record RemoveStatusEffectsConsumeEffect(HolderSet<MobEffect> effects) imp
     }
 
     @Override
-    public boolean apply(Level level, ItemStack stack, LivingEntity entity) {
+    public boolean apply(Level level, ItemStack stack, LivingEntity entity, org.bukkit.event.entity.EntityPotionEffectEvent.Cause cause) { // CraftBukkit
         boolean flag = false;
 
         for (Holder<MobEffect> holder : this.effects) {
-            if (entity.removeEffect(holder)) {
+            if (entity.removeEffect(holder, cause)) { // CraftBukkit
                 flag = true;
             }
         }

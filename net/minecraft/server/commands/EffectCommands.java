@@ -180,7 +180,7 @@ public class EffectCommands {
         for (Entity entity : targets) {
             if (entity instanceof LivingEntity) {
                 MobEffectInstance mobEffectInstance = new MobEffectInstance(effect, i1, amplifier, false, showParticles);
-                if (((LivingEntity)entity).addEffect(mobEffectInstance, source.getEntity())) {
+                if (((LivingEntity)entity).addEffect(mobEffectInstance, source.getEntity(), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.COMMAND)) { // CraftBukkit
                     i++;
                 }
             }
@@ -210,7 +210,7 @@ public class EffectCommands {
         int i = 0;
 
         for (Entity entity : targets) {
-            if (entity instanceof LivingEntity && ((LivingEntity)entity).removeAllEffects()) {
+            if (entity instanceof LivingEntity && ((LivingEntity)entity).removeAllEffects(org.bukkit.event.entity.EntityPotionEffectEvent.Cause.COMMAND)) { // CraftBukkit
                 i++;
             }
         }
@@ -235,7 +235,7 @@ public class EffectCommands {
         int i = 0;
 
         for (Entity entity : targets) {
-            if (entity instanceof LivingEntity && ((LivingEntity)entity).removeEffect(effect)) {
+            if (entity instanceof LivingEntity && ((LivingEntity)entity).removeEffect(effect, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.COMMAND)) { // CraftBukkit
                 i++;
             }
         }

@@ -35,7 +35,7 @@ public class PistonMovingBlockEntity extends BlockEntity {
     private static final double PUSH_OFFSET = 0.01;
     public static final double TICK_MOVEMENT = 0.51;
     private BlockState movedState = Blocks.AIR.defaultBlockState();
-    private Direction direction;
+    private Direction direction = Direction.DOWN; // Paper - default to first value to avoid NPE
     private boolean extending;
     private boolean isSourcePiston;
     private static final ThreadLocal<Direction> NOCLIP = ThreadLocal.withInitial(() -> null);
@@ -299,7 +299,7 @@ public class PistonMovingBlockEntity extends BlockEntity {
                 if (level.getBlockState(pos).is(Blocks.MOVING_PISTON)) {
                     BlockState blockState = Block.updateFromNeighbourShapes(blockEntity.movedState, level, pos);
                     if (blockState.isAir()) {
-                        level.setBlock(pos, blockEntity.movedState, 84);
+                        level.setBlock(pos, blockEntity.movedState, io.papermc.paper.configuration.GlobalConfiguration.get().unsupportedSettings.allowPistonDuplication ? 84 : (84 | Block.UPDATE_CLIENTS)); // Paper - fix a variety of piston desync dupes; force notify (flag 2), it's possible the set type by the piston block (which doesn't notify) set this block to air
                         Block.updateOrDestroy(blockEntity.movedState, blockState, level, pos, 3);
                     } else {
                         if (blockState.hasProperty(BlockStateProperties.WATERLOGGED) && blockState.getValue(BlockStateProperties.WATERLOGGED)) {

@@ -46,8 +46,7 @@ public class BeaconBlock extends BaseEntityBlock implements BeaconBeamBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof BeaconBlockEntity beaconBlockEntity) {
-            player.openMenu(beaconBlockEntity);
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof BeaconBlockEntity beaconBlockEntity && player.openMenu(beaconBlockEntity).isPresent()) { // Paper - Fix InventoryOpenEvent cancellation
             player.awardStat(Stats.INTERACT_WITH_BEACON);
         }
 

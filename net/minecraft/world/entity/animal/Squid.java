@@ -46,7 +46,7 @@ public class Squid extends AgeableWaterCreature {
 
     public Squid(EntityType<? extends Squid> entityType, Level level) {
         super(entityType, level);
-        this.random.setSeed(this.getId());
+        //this.random.setSeed(this.getId()); // Paper - Share random for entities to make them more random
         this.tentacleSpeed = 1.0F / (this.random.nextFloat() + 1.0F) * 0.2F;
     }
 

@@ -56,14 +56,16 @@ public class CactusBlock extends Block {
                 i++;
             }
 
-            if (i < 3) {
+            if (i < level.paperConfig().maxGrowthHeight.cactus) { // Paper - Configurable cactus/bamboo/reed growth height
                 int ageValue = state.getValue(AGE);
-                if (ageValue == 15) {
-                    level.setBlockAndUpdate(blockPos, this.defaultBlockState());
+
+                int modifier = level.spigotConfig.cactusModifier; // Spigot - SPIGOT-7159: Better modifier resolution
+                if (ageValue >= 15 || (modifier != 100 && random.nextFloat() < (modifier / (100.0f * 16)))) { // Spigot - SPIGOT-7159: Better modifier
+                    org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, blockPos, this.defaultBlockState()); // CraftBukkit
                     BlockState blockState = state.setValue(AGE, Integer.valueOf(0));
                     level.setBlock(pos, blockState, 4);
                     level.neighborChanged(blockState, blockPos, this, null, false);
-                } else {
+                } else if (modifier == 100 || random.nextFloat() < (modifier / (100.0f * 16))) { // Spigot - SPIGOT-7159: Better modifier resolution
                     level.setBlock(pos, state.setValue(AGE, Integer.valueOf(ageValue + 1)), 4);
                 }
             }
@@ -113,7 +115,8 @@ public class CactusBlock extends Block {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        entity.hurt(level.damageSources().cactus(), 1.0F);
+        if (!new io.papermc.paper.event.entity.EntityInsideBlockEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.block.CraftBlock.at(level, pos)).callEvent()) { return; } // Paper - Add EntityInsideBlockEvent
+        entity.hurt(level.damageSources().cactus().directBlock(level, pos), 1.0F); // CraftBukkit
     }
 
     @Override

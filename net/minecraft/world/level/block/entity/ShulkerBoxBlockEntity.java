@@ -49,6 +49,37 @@ public class ShulkerBoxBlockEntity extends RandomizableContainerBlockEntity impl
     @Nullable
     private final DyeColor color;
 
+    // CraftBukkit start - add fields and methods
+    public List<org.bukkit.entity.HumanEntity> transaction = new java.util.ArrayList<>();
+    private int maxStack = MAX_STACK;
+    public boolean opened;
+
+    public List<ItemStack> getContents() {
+        return this.itemStacks;
+    }
+
+    public void onOpen(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+        this.transaction.add(player);
+    }
+
+    public void onClose(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+        this.transaction.remove(player);
+    }
+
+    public List<org.bukkit.entity.HumanEntity> getViewers() {
+        return this.transaction;
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return this.maxStack;
+    }
+
+    public void setMaxStackSize(int size) {
+        this.maxStack = size;
+    }
+    // CraftBukkit end
+
     public ShulkerBoxBlockEntity(@Nullable DyeColor color, BlockPos pos, BlockState blockState) {
         super(BlockEntityType.SHULKER_BOX, pos, blockState);
         this.color = color;
@@ -167,6 +198,7 @@ public class ShulkerBoxBlockEntity extends RandomizableContainerBlockEntity impl
             }
 
             this.openCount++;
+            if (this.opened) return; // CraftBukkit - only animate if the ShulkerBox hasn't been forced open already by an API call
             this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.openCount);
             if (this.openCount == 1) {
                 this.level.gameEvent(player, GameEvent.CONTAINER_OPEN, this.worldPosition);
@@ -180,6 +212,7 @@ public class ShulkerBoxBlockEntity extends RandomizableContainerBlockEntity impl
     public void stopOpen(Player player) {
         if (!this.remove && !player.isSpectator()) {
             this.openCount--;
+            if (this.opened) return; // CraftBukkit - only animate if the ShulkerBox hasn't been forced open already by an API call.
             this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.openCount);
             if (this.openCount <= 0) {
                 this.level.gameEvent(player, GameEvent.CONTAINER_CLOSE, this.worldPosition);

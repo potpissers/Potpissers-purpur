@@ -14,6 +14,7 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
     private long endTimestamp;
     private final int minDuration;
     private final int maxDuration;
+    private final String configKey; // Paper - configurable behavior tick rate and timings
 
     public Behavior(Map<MemoryModuleType<?>, MemoryStatus> entryCondition) {
         this(entryCondition, 60);
@@ -27,6 +28,14 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
         this.minDuration = minDuration;
         this.maxDuration = maxDuration;
         this.entryCondition = entryCondition;
+        // Paper start - configurable behavior tick rate and timings
+        String key = io.papermc.paper.util.MappingEnvironment.reobf() ? io.papermc.paper.util.ObfHelper.INSTANCE.deobfClassName(this.getClass().getName()) : this.getClass().getName();
+        int lastSeparator = key.lastIndexOf('.');
+        if (lastSeparator != -1) {
+            key = key.substring(lastSeparator + 1);
+        }
+        this.configKey = key.toLowerCase(java.util.Locale.ROOT);
+        // Paper end - configurable behavior tick rate and timings
     }
 
     @Override
@@ -36,6 +45,12 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
 
     @Override
     public final boolean tryStart(ServerLevel level, E owner, long gameTime) {
+        // Paper start - configurable behavior tick rate and timings
+        int tickRate = java.util.Objects.requireNonNullElse(level.paperConfig().tickRates.behavior.get(owner.getType(), this.configKey), -1);
+        if (tickRate > -1 && gameTime < this.endTimestamp + tickRate) {
+            return false;
+        }
+        // Paper end - configurable behavior tick rate and timings
         if (this.hasRequiredMemories(owner) && this.checkExtraStartConditions(level, owner)) {
             this.status = Behavior.Status.RUNNING;
             int i = this.minDuration + level.getRandom().nextInt(this.maxDuration + 1 - this.minDuration);

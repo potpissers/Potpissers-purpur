@@ -33,6 +33,25 @@ public final class Ingredient implements StackedContents.IngredientInfo<Holder<I
     public static final Codec<Ingredient> CODEC = ExtraCodecs.nonEmptyHolderSet(NON_AIR_HOLDER_SET_CODEC)
         .xmap(Ingredient::new, ingredient -> ingredient.values);
     private final HolderSet<Item> values;
+    // CraftBukkit start
+    @javax.annotation.Nullable
+    private java.util.List<ItemStack> itemStacks;
+
+    public boolean isExact() {
+        return this.itemStacks != null;
+    }
+
+    @javax.annotation.Nullable
+    public java.util.List<ItemStack> itemStacks() {
+        return this.itemStacks;
+    }
+
+    public static Ingredient ofStacks(java.util.List<ItemStack> stacks) {
+        Ingredient recipe = Ingredient.of(stacks.stream().map(ItemStack::getItem));
+        recipe.itemStacks = stacks;
+        return recipe;
+    }
+    // CraftBukkit end
 
     private Ingredient(HolderSet<Item> values) {
         values.unwrap().ifRight(list -> {
@@ -60,6 +79,17 @@ public final class Ingredient implements StackedContents.IngredientInfo<Holder<I
 
     @Override
     public boolean test(ItemStack stack) {
+        // CraftBukkit start
+        if (this.isExact()) {
+            for (ItemStack itemstack1 : this.itemStacks()) {
+                if (itemstack1.getItem() == stack.getItem() && ItemStack.isSameItemSameComponents(stack, itemstack1)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        // CraftBukkit end
         return stack.is(this.values);
     }
 
@@ -70,7 +100,7 @@ public final class Ingredient implements StackedContents.IngredientInfo<Holder<I
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof Ingredient ingredient && Objects.equals(this.values, ingredient.values);
+        return other instanceof Ingredient ingredient && Objects.equals(this.values, ingredient.values) && Objects.equals(this.itemStacks, ingredient.itemStacks); // CraftBukkit
     }
 
     public static Ingredient of(ItemLike item) {

@@ -70,6 +70,11 @@ public class EyeOfEnder extends Entity implements ItemSupplier {
     }
 
     public void signalTo(BlockPos pos) {
+        // Paper start - Change EnderEye target without changing other things
+        this.signalTo(pos, true);
+    }
+    public void signalTo(BlockPos pos, boolean update) {
+        // Paper end - Change EnderEye target without changing other things
         double d = pos.getX();
         int y = pos.getY();
         double d1 = pos.getZ();
@@ -86,8 +91,10 @@ public class EyeOfEnder extends Entity implements ItemSupplier {
             this.tz = d1;
         }
 
+        if (update) { // Paper - Change EnderEye target without changing other things
         this.life = 0;
         this.surviveAfterDeath = this.random.nextInt(5) > 0;
+        } // Paper - Change EnderEye target without changing other things
     }
 
     @Override
@@ -161,7 +168,7 @@ public class EyeOfEnder extends Entity implements ItemSupplier {
             this.life++;
             if (this.life > 80 && !this.level().isClientSide) {
                 this.playSound(SoundEvents.ENDER_EYE_DEATH, 1.0F, 1.0F);
-                this.discard();
+                this.discard(this.surviveAfterDeath ? org.bukkit.event.entity.EntityRemoveEvent.Cause.DROP : org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
                 if (this.surviveAfterDeath) {
                     this.level().addFreshEntity(new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), this.getItem()));
                 } else {
@@ -181,7 +188,12 @@ public class EyeOfEnder extends Entity implements ItemSupplier {
     @Override
     public void readAdditionalSaveData(CompoundTag compound) {
         if (compound.contains("Item", 10)) {
-            this.setItem(ItemStack.parse(this.registryAccess(), compound.getCompound("Item")).orElse(this.getDefaultItem()));
+            // CraftBukkit start - SPIGOT-6103 summon, see also SPIGOT-5474
+            ItemStack itemStack = ItemStack.parse(this.registryAccess(), compound.getCompound("Item")).orElse(this.getDefaultItem());
+            if (!itemStack.isEmpty()) {
+                this.setItem(itemStack);
+            }
+            // CraftBukkit end
         } else {
             this.setItem(this.getDefaultItem());
         }

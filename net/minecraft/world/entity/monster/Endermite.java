@@ -121,7 +121,7 @@ public class Endermite extends Monster {
             }
 
             if (this.life >= 2400) {
-                this.discard();
+                this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
             }
         }
     }

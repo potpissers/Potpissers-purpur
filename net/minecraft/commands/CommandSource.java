@@ -22,6 +22,13 @@ public interface CommandSource {
         public boolean shouldInformAdmins() {
             return false;
         }
+
+        // CraftBukkit start
+        @Override
+        public org.bukkit.command.CommandSender getBukkitSender(CommandSourceStack stack) {
+            return io.papermc.paper.brigadier.NullCommandSender.INSTANCE; // Paper - expose a no-op CommandSender
+        }
+        // CraftBukkit end
     };
 
     void sendSystemMessage(Component component);
@@ -35,4 +42,6 @@ public interface CommandSource {
     default boolean alwaysAccepts() {
         return false;
     }
+
+    org.bukkit.command.CommandSender getBukkitSender(CommandSourceStack wrapper); // CraftBukkit
 }

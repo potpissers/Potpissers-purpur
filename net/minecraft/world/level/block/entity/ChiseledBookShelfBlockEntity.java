@@ -27,6 +27,42 @@ public class ChiseledBookShelfBlockEntity extends BlockEntity implements Contain
     private final NonNullList<ItemStack> items = NonNullList.withSize(6, ItemStack.EMPTY);
     public int lastInteractedSlot = -1;
 
+    // CraftBukkit start - add fields and methods
+    public java.util.List<org.bukkit.entity.HumanEntity> transaction = new java.util.ArrayList<>();
+    private int maxStack = 1;
+
+    @Override
+    public java.util.List<net.minecraft.world.item.ItemStack> getContents() {
+        return this.items;
+    }
+
+    @Override
+    public void onOpen(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+        this.transaction.add(player);
+    }
+
+    @Override
+    public void onClose(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+        this.transaction.remove(player);
+    }
+
+    @Override
+    public java.util.List<org.bukkit.entity.HumanEntity> getViewers() {
+        return this.transaction;
+    }
+
+    @Override
+    public void setMaxStackSize(int size) {
+        this.maxStack = size;
+    }
+
+    @Override
+    public org.bukkit.Location getLocation() {
+        if (this.level == null) return null;
+        return io.papermc.paper.util.MCUtil.toLocation(this.level, this.worldPosition);
+    }
+    // CraftBukkit end
+
     public ChiseledBookShelfBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntityType.CHISELED_BOOKSHELF, pos, state);
     }
@@ -93,7 +129,7 @@ public class ChiseledBookShelfBlockEntity extends BlockEntity implements Contain
         ItemStack itemStack = Objects.requireNonNullElse(this.items.get(slot), ItemStack.EMPTY);
         this.items.set(slot, ItemStack.EMPTY);
         if (!itemStack.isEmpty()) {
-            this.updateState(slot);
+            if (this.level != null) this.updateState(slot); // CraftBukkit - SPIGOT-7381: check for null world
         }
 
         return itemStack;
@@ -108,7 +144,7 @@ public class ChiseledBookShelfBlockEntity extends BlockEntity implements Contain
     public void setItem(int slot, ItemStack stack) {
         if (stack.is(ItemTags.BOOKSHELF_BOOKS)) {
             this.items.set(slot, stack);
-            this.updateState(slot);
+            if (this.level != null) this.updateState(slot); // CraftBukkit - SPIGOT-7381: check for null world
         } else if (stack.isEmpty()) {
             this.removeItem(slot, 1);
         }
@@ -124,7 +160,7 @@ public class ChiseledBookShelfBlockEntity extends BlockEntity implements Contain
 
     @Override
     public int getMaxStackSize() {
-        return 1;
+        return this.maxStack; // CraftBukkit
     }
 
     @Override

@@ -55,7 +55,7 @@ public class BanPlayerCommands {
                 );
                 ServerPlayer player = source.getServer().getPlayerList().getPlayer(gameProfile.getId());
                 if (player != null) {
-                    player.connection.disconnect(Component.translatable("multiplayer.disconnect.banned"));
+                    player.connection.disconnect(Component.translatable("multiplayer.disconnect.banned"), org.bukkit.event.player.PlayerKickEvent.Cause.BANNED); // Paper - kick event cause
                 }
             }
         }

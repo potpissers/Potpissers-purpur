@@ -16,7 +16,7 @@ public class ReloadCommand {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static void reloadPacks(Collection<String> selectedIds, CommandSourceStack source) {
-        source.getServer().reloadResources(selectedIds).exceptionally(throwable -> {
+        source.getServer().reloadResources(selectedIds, io.papermc.paper.event.server.ServerResourcesReloadedEvent.Cause.COMMAND).exceptionally(throwable -> { // Paper - Add ServerResourcesReloadedEvent
             LOGGER.warn("Failed to execute reload", throwable);
             source.sendFailure(Component.translatable("commands.reload.failure"));
             return null;
@@ -24,7 +24,7 @@ public class ReloadCommand {
     }
 
     private static Collection<String> discoverNewPacks(PackRepository packRepository, WorldData worldData, Collection<String> selectedIds) {
-        packRepository.reload();
+        packRepository.reload(true); // Paper - will perform a full reload
         Collection<String> list = Lists.newArrayList(selectedIds);
         Collection<String> disabled = worldData.getDataConfiguration().dataPacks().getDisabled();
 
@@ -36,6 +36,16 @@ public class ReloadCommand {
 
         return list;
     }
+
+    // CraftBukkit start
+    public static void reload(MinecraftServer server) {
+        PackRepository packRepository = server.getPackRepository();
+        WorldData worldData = server.getWorldData();
+        Collection<String> selectedIds = packRepository.getSelectedIds();
+        Collection<String> collection = discoverNewPacks(packRepository, worldData, selectedIds);
+        server.reloadResources(collection, io.papermc.paper.event.server.ServerResourcesReloadedEvent.Cause.PLUGIN); // Paper - Add ServerResourcesReloadedEvent
+    }
+    // CraftBukkit end
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("reload").requires(source -> source.hasPermission(2)).executes(context -> {

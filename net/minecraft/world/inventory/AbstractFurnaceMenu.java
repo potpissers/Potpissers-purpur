@@ -34,6 +34,21 @@ public abstract class AbstractFurnaceMenu extends RecipeBookMenu {
     private final RecipeType<? extends AbstractCookingRecipe> recipeType;
     private final RecipePropertySet acceptedInputs;
     private final RecipeBookType recipeBookType;
+    // CraftBukkit start
+    private org.bukkit.craftbukkit.inventory.view.CraftFurnaceView bukkitEntity = null;
+    private Inventory player;
+
+    @Override
+    public org.bukkit.craftbukkit.inventory.view.CraftFurnaceView getBukkitView() {
+        if (this.bukkitEntity != null) {
+            return this.bukkitEntity;
+        }
+
+        org.bukkit.craftbukkit.inventory.CraftInventoryFurnace inventory = new org.bukkit.craftbukkit.inventory.CraftInventoryFurnace((net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity) this.container);
+        this.bukkitEntity = new org.bukkit.craftbukkit.inventory.view.CraftFurnaceView(this.player.player.getBukkitEntity(), inventory, this);
+        return this.bukkitEntity;
+    }
+    // CraftBukkit end
 
     protected AbstractFurnaceMenu(
         MenuType<?> menuType,
@@ -68,6 +83,7 @@ public abstract class AbstractFurnaceMenu extends RecipeBookMenu {
         this.addSlot(new Slot(container, 0, 56, 17));
         this.addSlot(new FurnaceFuelSlot(this, container, 1, 56, 53));
         this.addSlot(new FurnaceResultSlot(inventory.player, container, 2, 116, 35));
+        this.player = inventory; // CraftBukkit - save player
         this.addStandardInventorySlots(inventory, 8, 84);
         this.addDataSlots(data);
     }
@@ -85,6 +101,7 @@ public abstract class AbstractFurnaceMenu extends RecipeBookMenu {
 
     @Override
     public boolean stillValid(Player player) {
+        if (!this.checkReachable) return true; // CraftBukkit
         return this.container.stillValid(player);
     }
 

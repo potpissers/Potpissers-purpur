@@ -32,8 +32,10 @@ public class CrashReport {
     private final SystemReport systemReport = new SystemReport();
 
     public CrashReport(String title, Throwable exception) {
+        io.papermc.paper.util.StacktraceDeobfuscator.INSTANCE.deobfuscateThrowable(exception); // Paper
         this.title = title;
         this.exception = exception;
+        this.systemReport.setDetail("CraftBukkit Information", new org.bukkit.craftbukkit.CraftCrashReport()); // CraftBukkit
     }
 
     public String getTitle() {
@@ -218,7 +220,7 @@ public class CrashReport {
     }
 
     public static void preload() {
-        MemoryReserve.allocate();
+        //MemoryReserve.allocate(); // Paper - Disable memory reserve allocating
         new CrashReport("Don't panic!", new Throwable()).getFriendlyReport(ReportType.CRASH);
     }
 }

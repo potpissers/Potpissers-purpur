@@ -68,8 +68,7 @@ public class BrewingStandBlock extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof BrewingStandBlockEntity brewingStandBlockEntity) {
-            player.openMenu(brewingStandBlockEntity);
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof BrewingStandBlockEntity brewingStandBlockEntity && player.openMenu(brewingStandBlockEntity).isPresent()) { // Paper - Fix InventoryOpenEvent cancellation
             player.awardStat(Stats.INTERACT_WITH_BREWINGSTAND);
         }
 

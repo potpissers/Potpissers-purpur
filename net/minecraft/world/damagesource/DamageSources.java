@@ -42,9 +42,15 @@ public class DamageSources {
     private final DamageSource stalagmite;
     private final DamageSource outsideBorder;
     private final DamageSource genericKill;
+    // CraftBukkit start
+    private final DamageSource melting;
+    private final DamageSource poison;
 
     public DamageSources(RegistryAccess registry) {
         this.damageTypes = registry.lookupOrThrow(Registries.DAMAGE_TYPE);
+        this.melting = this.source(DamageTypes.ON_FIRE).melting();
+        this.poison = this.source(DamageTypes.MAGIC).poison();
+        // CraftBukkit end
         this.inFire = this.source(DamageTypes.IN_FIRE);
         this.campfire = this.source(DamageTypes.CAMPFIRE);
         this.lightningBolt = this.source(DamageTypes.LIGHTNING_BOLT);
@@ -83,6 +89,16 @@ public class DamageSources {
     private DamageSource source(ResourceKey<DamageType> damageTypeKey, @Nullable Entity causingEntity, @Nullable Entity directEntity) {
         return new DamageSource(this.damageTypes.getOrThrow(damageTypeKey), causingEntity, directEntity);
     }
+
+    // CraftBukkit start
+    public DamageSource melting() {
+        return this.melting;
+    }
+
+    public DamageSource poison() {
+        return this.poison;
+    }
+    // CraftBukkit end
 
     public DamageSource inFire() {
         return this.inFire;
@@ -261,7 +277,13 @@ public class DamageSources {
     }
 
     public DamageSource badRespawnPointExplosion(Vec3 position) {
-        return new DamageSource(this.damageTypes.getOrThrow(DamageTypes.BAD_RESPAWN_POINT), position);
+        // CraftBukkit start
+        return this.badRespawnPointExplosion(position, null);
+    }
+
+    public DamageSource badRespawnPointExplosion(Vec3 position, org.bukkit.block.BlockState blockState) {
+        return new DamageSource(this.damageTypes.getOrThrow(DamageTypes.BAD_RESPAWN_POINT), position).directBlockState(blockState);
+        // CraftBukkit end
     }
 
     public DamageSource outOfBorder() {

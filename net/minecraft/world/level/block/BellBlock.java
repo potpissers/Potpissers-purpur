@@ -142,6 +142,11 @@ public class BellBlock extends BaseEntityBlock {
                 direction = level.getBlockState(pos).getValue(FACING);
             }
 
+            // CraftBukkit start
+            if (!org.bukkit.craftbukkit.event.CraftEventFactory.handleBellRingEvent(level, pos, direction, entity)) {
+                return false;
+            }
+            // CraftBukkit end
             ((BellBlockEntity)blockEntity).onHit(direction);
             level.playSound(null, pos, SoundEvents.BELL_BLOCK, SoundSource.BLOCKS, 2.0F, 1.0F);
             level.gameEvent(entity, GameEvent.BLOCK_CHANGE, pos);

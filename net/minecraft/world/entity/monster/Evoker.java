@@ -264,7 +264,7 @@ public class Evoker extends SpellcasterIllager {
                         serverLevel.getScoreboard().addPlayerToTeam(vex.getScoreboardName(), team);
                     }
 
-                    serverLevel.addFreshEntityWithPassengers(vex);
+                    serverLevel.addFreshEntityWithPassengers(vex, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.SPELL); // CraftBukkit - Add SpawnReason
                     serverLevel.gameEvent(GameEvent.ENTITY_PLACE, blockPos, GameEvent.Context.of(Evoker.this));
                 }
             }

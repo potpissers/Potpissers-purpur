@@ -31,10 +31,10 @@ public class DifficultyCommand {
 
     public static int setDifficulty(CommandSourceStack source, Difficulty difficulty) throws CommandSyntaxException {
         MinecraftServer server = source.getServer();
-        if (server.getWorldData().getDifficulty() == difficulty) {
+        if (source.getLevel().getDifficulty() == difficulty) { // CraftBukkit
             throw ERROR_ALREADY_DIFFICULT.create(difficulty.getKey());
         } else {
-            server.setDifficulty(difficulty, true);
+            server.setDifficulty(source.getLevel(), difficulty, true); // Paper - per level difficulty; don't skip other difficulty-changing logic (fix upstream's fix)
             source.sendSuccess(() -> Component.translatable("commands.difficulty.success", difficulty.getDisplayName()), true);
             return 0;
         }

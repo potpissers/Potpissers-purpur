@@ -216,6 +216,7 @@ public class MobEffectInstance implements Comparable<MobEffectInstance> {
             int i = this.isInfiniteDuration() ? entity.tickCount : this.duration;
             if (entity.level() instanceof ServerLevel serverLevel
                 && this.effect.value().shouldApplyEffectTickThisTick(i, this.amplifier)
+                && new io.papermc.paper.event.entity.EntityEffectTickEvent(entity.getBukkitLivingEntity(), org.bukkit.craftbukkit.potion.CraftPotionEffectType.minecraftHolderToBukkit(this.effect), this.amplifier).callEvent() // Paper - Add EntityEffectTickEvent
                 && !this.effect.value().applyEffectTick(serverLevel, entity, this.amplifier)) {
                 entity.removeEffect(this.effect);
             }

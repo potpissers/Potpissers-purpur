@@ -30,7 +30,7 @@ public record ReplaceBlock(Vec3i offset, Optional<BlockPredicate> predicate, Blo
     public void apply(ServerLevel level, int enchantmentLevel, EnchantedItemInUse item, Entity entity, Vec3 origin) {
         BlockPos blockPos = BlockPos.containing(origin).offset(this.offset);
         if (this.predicate.map(blockPredicate -> blockPredicate.test(level, blockPos)).orElse(true)
-            && level.setBlockAndUpdate(blockPos, this.blockState.getState(entity.getRandom(), blockPos))) {
+            && org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockFormEvent(level, blockPos, this.blockState.getState(entity.getRandom(), blockPos), entity)) { // CraftBukkit - Call EntityBlockFormEvent
             this.triggerGameEvent.ifPresent(holder -> level.gameEvent(entity, (Holder<GameEvent>)holder, blockPos));
         }
     }

@@ -19,7 +19,7 @@ public abstract class ShoulderRidingEntity extends TamableAnimal {
         compoundTag.putString("id", this.getEncodeId());
         this.saveWithoutId(compoundTag);
         if (player.setEntityOnShoulder(compoundTag)) {
-            this.discard();
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.PICKUP); // CraftBukkit - add Bukkit remove cause
             return true;
         } else {
             return false;

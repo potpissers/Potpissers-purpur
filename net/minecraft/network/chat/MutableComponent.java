@@ -94,6 +94,11 @@ public class MutableComponent implements Component {
 
     @Override
     public boolean equals(Object other) {
+        // Paper start - make AdventureComponent equivalent
+        if (other instanceof io.papermc.paper.adventure.AdventureComponent adventureComponent) {
+            other = adventureComponent.deepConverted();
+        }
+        // Paper end - make AdventureComponent equivalent
         return this == other
             || other instanceof MutableComponent mutableComponent
                 && this.contents.equals(mutableComponent.contents)

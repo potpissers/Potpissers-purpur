@@ -86,7 +86,9 @@ public class WorkAtComposter extends WorkAtPoi {
                 inventory.removeItemType(Items.WHEAT, i3);
                 ItemStack itemStack = inventory.addItem(new ItemStack(Items.BREAD, min));
                 if (!itemStack.isEmpty()) {
+                    villager.forceDrops = true; // Paper - Add missing forceDrop toggles
                     villager.spawnAtLocation(level, itemStack, 0.5F);
+                    villager.forceDrops = false; // Paper - Add missing forceDrop toggles
                 }
             }
         }

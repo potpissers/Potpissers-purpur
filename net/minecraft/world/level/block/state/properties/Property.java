@@ -72,7 +72,7 @@ public abstract class Property<T extends Comparable<T>> {
 
     @Override
     public boolean equals(Object other) {
-        return this == other || other instanceof Property<?> property && this.clazz.equals(property.clazz) && this.name.equals(property.name);
+        return this == other; // Paper - Perf: Optimize hashCode/equals
     }
 
     @Override

@@ -14,6 +14,12 @@ public class StatsCounter {
 
     public void increment(Player player, Stat<?> stat, int amount) {
         int i = (int)Math.min((long)this.getValue(stat) + amount, 2147483647L);
+        // CraftBukkit start - fire Statistic events
+        org.bukkit.event.Cancellable cancellable = org.bukkit.craftbukkit.event.CraftEventFactory.handleStatisticsIncrease(player, stat, this.getValue(stat), i);
+        if (cancellable != null && cancellable.isCancelled()) {
+            return;
+        }
+        // CraftBukkit end
         this.setValue(player, stat, i);
     }
 

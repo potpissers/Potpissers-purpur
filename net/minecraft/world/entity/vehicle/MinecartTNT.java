@@ -33,6 +33,7 @@ public class MinecartTNT extends AbstractMinecart {
     public int fuse = -1;
     public float explosionPowerBase = 4.0F;
     public float explosionSpeedFactor = 1.0F;
+    public boolean isIncendiary = false; // CraftBukkit - add field
 
     public MinecartTNT(EntityType<? extends MinecartTNT> entityType, Level level) {
         super(entityType, level);
@@ -47,6 +48,12 @@ public class MinecartTNT extends AbstractMinecart {
     public void tick() {
         super.tick();
         if (this.fuse > 0) {
+            // Paper start - Configurable TNT height nerf
+            if (this.level().paperConfig().fixes.tntEntityHeightNerf.test(v -> this.getY() > v)) {
+                this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.OUT_OF_WORLD);
+                return;
+            }
+            // Paper end - Configurable TNT height nerf
             this.fuse--;
             this.level().addParticle(ParticleTypes.SMOKE, this.getX(), this.getY() + 0.5, this.getZ(), 0.0, 0.0, 0.0);
         } else if (this.fuse == 0) {
@@ -101,6 +108,17 @@ public class MinecartTNT extends AbstractMinecart {
     protected void explode(@Nullable DamageSource damageSource, double radiusModifier) {
         if (this.level() instanceof ServerLevel serverLevel) {
             double min = Math.min(Math.sqrt(radiusModifier), 5.0);
+            // CraftBukkit start
+            org.bukkit.event.entity.ExplosionPrimeEvent event = new org.bukkit.event.entity.ExplosionPrimeEvent(
+                this.getBukkitEntity(),
+                (float) (this.explosionPowerBase + this.explosionSpeedFactor * this.random.nextDouble() * 1.5 * min),
+                this.isIncendiary
+            );
+            if (!event.callEvent()) {
+                this.fuse = -1;
+                return;
+            }
+            // CraftBukkit end
             serverLevel.explode(
                 this,
                 damageSource,
@@ -108,11 +126,11 @@ public class MinecartTNT extends AbstractMinecart {
                 this.getX(),
                 this.getY(),
                 this.getZ(),
-                (float)(this.explosionPowerBase + this.explosionSpeedFactor * this.random.nextDouble() * 1.5 * min),
-                false,
+                event.getRadius(), // CraftBukkit - explosion prime event
+                event.getFire(), // CraftBukkit - explosion prime event
                 Level.ExplosionInteraction.TNT
             );
-            this.discard();
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.EXPLODE); // CraftBukkit - add Bukkit remove cause
         }
     }
 

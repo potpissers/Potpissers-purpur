@@ -97,7 +97,7 @@ public class SwampHutPiece extends ScatteredFeaturePiece {
                         witch.setPersistenceRequired();
                         witch.moveTo(worldPos.getX() + 0.5, worldPos.getY(), worldPos.getZ() + 0.5, 0.0F, 0.0F);
                         witch.finalizeSpawn(level, level.getCurrentDifficultyAt(worldPos), EntitySpawnReason.STRUCTURE, null);
-                        level.addFreshEntityWithPassengers(witch);
+                        level.addFreshEntityWithPassengers(witch, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CHUNK_GEN); // CraftBukkit - add SpawnReason
                     }
                 }
             }
@@ -116,7 +116,7 @@ public class SwampHutPiece extends ScatteredFeaturePiece {
                     cat.setPersistenceRequired();
                     cat.moveTo(worldPos.getX() + 0.5, worldPos.getY(), worldPos.getZ() + 0.5, 0.0F, 0.0F);
                     cat.finalizeSpawn(level, level.getCurrentDifficultyAt(worldPos), EntitySpawnReason.STRUCTURE, null);
-                    level.addFreshEntityWithPassengers(cat);
+                    level.addFreshEntityWithPassengers(cat, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CHUNK_GEN); // CraftBukkit - add SpawnReason
                 }
             }
         }

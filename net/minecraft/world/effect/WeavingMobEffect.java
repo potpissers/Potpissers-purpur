@@ -25,11 +25,11 @@ class WeavingMobEffect extends MobEffect {
     @Override
     public void onMobRemoved(ServerLevel level, LivingEntity entity, int amplifier, Entity.RemovalReason reason) {
         if (reason == Entity.RemovalReason.KILLED && (entity instanceof Player || level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))) {
-            this.spawnCobwebsRandomlyAround(level, entity.getRandom(), entity.blockPosition());
+            this.spawnCobwebsRandomlyAround(level, entity.getRandom(), entity.blockPosition(), entity); // Paper - Fire EntityChangeBlockEvent in more places
         }
     }
 
-    private void spawnCobwebsRandomlyAround(ServerLevel level, RandomSource random, BlockPos pos) {
+    private void spawnCobwebsRandomlyAround(ServerLevel level, RandomSource random, BlockPos pos, LivingEntity entity) { // Paper - Fire EntityChangeBlockEvent in more places
         Set<BlockPos> set = Sets.newHashSet();
         int i = this.maxCobwebs.applyAsInt(random);
 
@@ -46,6 +46,7 @@ class WeavingMobEffect extends MobEffect {
         }
 
         for (BlockPos blockPosx : set) {
+            if (!org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(entity, blockPosx, Blocks.COBWEB.defaultBlockState())) continue; // Paper - Fire EntityChangeBlockEvent in more places
             level.setBlock(blockPosx, Blocks.COBWEB.defaultBlockState(), 3);
             level.levelEvent(3018, blockPosx, 0);
         }

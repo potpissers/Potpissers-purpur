@@ -414,8 +414,22 @@ public class OldMinecartBehavior extends MinecartBehavior {
                         && !(entity instanceof AbstractMinecart)
                         && !this.minecart.isVehicle()
                         && !entity.isPassenger()) {
+                        // CraftBukkit start
+                        org.bukkit.event.vehicle.VehicleEntityCollisionEvent collisionEvent = new org.bukkit.event.vehicle.VehicleEntityCollisionEvent(
+                            (org.bukkit.entity.Vehicle) this.minecart.getBukkitEntity(), entity.getBukkitEntity()
+                        );
+                        if (!collisionEvent.callEvent()) continue;
+                        // CraftBukkit end
                         entity.startRiding(this.minecart);
                     } else {
+                        // CraftBukkit start
+                        if (!this.minecart.isPassengerOfSameVehicle(entity)) {
+                            org.bukkit.event.vehicle.VehicleEntityCollisionEvent collisionEvent = new org.bukkit.event.vehicle.VehicleEntityCollisionEvent(
+                                (org.bukkit.entity.Vehicle) this.minecart.getBukkitEntity(), entity.getBukkitEntity()
+                            );
+                            if (!collisionEvent.callEvent()) continue;
+                        }
+                        // CraftBukkit end
                         entity.push(this.minecart);
                     }
                 }
@@ -423,6 +437,12 @@ public class OldMinecartBehavior extends MinecartBehavior {
         } else {
             for (Entity entity1 : this.level().getEntities(this.minecart, aabb)) {
                 if (!this.minecart.hasPassenger(entity1) && entity1.isPushable() && entity1 instanceof AbstractMinecart) {
+                    // CraftBukkit start
+                    org.bukkit.event.vehicle.VehicleEntityCollisionEvent collisionEvent = new org.bukkit.event.vehicle.VehicleEntityCollisionEvent(
+                        (org.bukkit.entity.Vehicle) this.minecart.getBukkitEntity(), entity1.getBukkitEntity()
+                    );
+                    if (!collisionEvent.callEvent()) continue;
+                    // CraftBukkit end
                     entity1.push(this.minecart);
                 }
             }
@@ -443,11 +463,18 @@ public class OldMinecartBehavior extends MinecartBehavior {
 
     @Override
     public double getMaxSpeed(ServerLevel level) {
+        // CraftBukkit start
+        Double maxSpeed = this.minecart.maxSpeed;
+        if (maxSpeed != null) {
+            return (this.minecart.isInWater() ? maxSpeed / 2.0D : maxSpeed);
+        }
+        // CraftBukkit end
         return this.minecart.isInWater() ? 0.2 : 0.4;
     }
 
     @Override
     public double getSlowdownFactor() {
-        return this.minecart.isVehicle() ? 0.997 : 0.96;
+        if (this.minecart.frictionState == net.kyori.adventure.util.TriState.FALSE) return 1; // Paper
+        return this.minecart.isVehicle() || !this.minecart.slowWhenEmpty ? 0.997 : 0.96; // CraftBukkit - add !this.slowWhenEmpty
     }
 }

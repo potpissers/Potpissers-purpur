@@ -262,7 +262,12 @@ public class Hoglin extends Animal implements Enemy, HoglinBase {
     }
 
     private void finishConversion() {
-        this.convertTo(EntityType.ZOGLIN, ConversionParams.single(this, true, false), mob -> mob.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0)));
+        final Entity converted = this.convertTo(EntityType.ZOGLIN, ConversionParams.single(this, true, false),  mob -> {mob.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0));}, org.bukkit.event.entity.EntityTransformEvent.TransformReason.PIGLIN_ZOMBIFIED, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.PIGLIN_ZOMBIFIED); // CraftBukkit - add spawn and transform reasons
+        // Paper start - Fix issues with mob conversion; reset to prevent event spam
+        if (converted == null) {
+            this.timeInOverworld = 0;
+        }
+        // Paper end - Fix issues with mob conversion
     }
 
     @Override

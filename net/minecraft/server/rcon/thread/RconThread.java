@@ -57,7 +57,7 @@ public class RconThread extends GenericThread {
     @Nullable
     public static RconThread create(ServerInterface serverInterface) {
         DedicatedServerProperties properties = serverInterface.getProperties();
-        String serverIp = serverInterface.getServerIp();
+        String serverIp = properties.rconIp; // Paper - Configurable rcon ip
         if (serverIp.isEmpty()) {
             serverIp = "0.0.0.0";
         }
@@ -104,6 +104,14 @@ public class RconThread extends GenericThread {
 
         this.clients.clear();
     }
+    // Paper start - don't wait for remote connections
+    public void stopNonBlocking() {
+        this.running = false;
+        for (RconClient client : this.clients) {
+            client.running = false;
+        }
+    }
+    // Paper end - don't wait for remote connections
 
     private void closeSocket(ServerSocket socket) {
         LOGGER.debug("closeSocket: {}", socket);

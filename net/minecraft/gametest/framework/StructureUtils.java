@@ -187,7 +187,7 @@ public class StructureUtils {
         level.clearBlockEvents(boundingBox1);
         AABB aabb = AABB.of(boundingBox1);
         List<Entity> entitiesOfClass = level.getEntitiesOfClass(Entity.class, aabb, entity -> !(entity instanceof Player));
-        entitiesOfClass.forEach(Entity::discard);
+        entitiesOfClass.forEach(entity -> entity.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DISCARD)); // Paper
     }
 
     public static BlockPos getTransformedFarCorner(BlockPos pos, Vec3i offset, Rotation rotation) {

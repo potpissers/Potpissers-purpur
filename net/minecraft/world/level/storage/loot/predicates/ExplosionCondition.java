@@ -30,7 +30,8 @@ public class ExplosionCondition implements LootItemCondition {
         if (_float != null) {
             RandomSource random = context.getRandom();
             float f = 1.0F / _float;
-            return random.nextFloat() <= f;
+            // CraftBukkit - <= to < to allow for plugins to completely disable block drops from explosions
+            return random.nextFloat() < f;
         } else {
             return true;
         }

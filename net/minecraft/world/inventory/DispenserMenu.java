@@ -13,6 +13,10 @@ public class DispenserMenu extends AbstractContainerMenu {
     private static final int USE_ROW_SLOT_START = 36;
     private static final int USE_ROW_SLOT_END = 45;
     public final Container dispenser;
+    // CraftBukkit start
+    private org.bukkit.craftbukkit.inventory.CraftInventoryView bukkitEntity = null;
+    private Inventory player;
+    // CraftBukkit end
 
     public DispenserMenu(int containerId, Inventory playerInventory) {
         this(containerId, playerInventory, new SimpleContainer(9));
@@ -20,6 +24,9 @@ public class DispenserMenu extends AbstractContainerMenu {
 
     public DispenserMenu(int containerId, Inventory playerInventory, Container container) {
         super(MenuType.GENERIC_3x3, containerId);
+        // CraftBukkit start - Save player
+        this.player = playerInventory;
+        // CraftBukkit end
         checkContainerSize(container, 9);
         this.dispenser = container;
         container.startOpen(playerInventory.player);
@@ -38,6 +45,7 @@ public class DispenserMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
+        if (!this.checkReachable) return true; // CraftBukkit
         return this.dispenser.stillValid(player);
     }
 
@@ -77,4 +85,17 @@ public class DispenserMenu extends AbstractContainerMenu {
         super.removed(player);
         this.dispenser.stopOpen(player);
     }
+
+    // CraftBukkit start
+    @Override
+    public org.bukkit.craftbukkit.inventory.CraftInventoryView getBukkitView() {
+        if (this.bukkitEntity != null) {
+            return this.bukkitEntity;
+        }
+
+        org.bukkit.craftbukkit.inventory.CraftInventory inventory = new org.bukkit.craftbukkit.inventory.CraftInventory(this.dispenser);
+        this.bukkitEntity = new org.bukkit.craftbukkit.inventory.CraftInventoryView(this.player.player.getBukkitEntity(), inventory, this);
+        return this.bukkitEntity;
+    }
+    // CraftBukkit end
 }

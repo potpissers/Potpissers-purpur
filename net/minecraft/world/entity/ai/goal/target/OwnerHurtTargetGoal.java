@@ -37,7 +37,7 @@ public class OwnerHurtTargetGoal extends TargetGoal {
 
     @Override
     public void start() {
-        this.mob.setTarget(this.ownerLastHurt);
+        this.mob.setTarget(this.ownerLastHurt, org.bukkit.event.entity.EntityTargetEvent.TargetReason.OWNER_ATTACKED_TARGET, true); // CraftBukkit - reason
         LivingEntity owner = this.tameAnimal.getOwner();
         if (owner != null) {
             this.timestamp = owner.getLastHurtMobTimestamp();

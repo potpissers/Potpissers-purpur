@@ -278,7 +278,7 @@ public class TestCommand {
     }
 
     private static int resetGameTestInfo(GameTestInfo gameTestInfo) {
-        gameTestInfo.getLevel().getEntities(null, gameTestInfo.getStructureBounds()).stream().forEach(entity -> entity.remove(Entity.RemovalReason.DISCARDED));
+        gameTestInfo.getLevel().getEntities(null, gameTestInfo.getStructureBounds()).stream().forEach(entity -> entity.remove(Entity.RemovalReason.DISCARDED, org.bukkit.event.entity.EntityRemoveEvent.Cause.DISCARD)); // Paper
         gameTestInfo.getStructureBlockEntity().placeStructure(gameTestInfo.getLevel());
         StructureUtils.removeBarriers(gameTestInfo.getStructureBounds(), gameTestInfo.getLevel());
         say(gameTestInfo.getLevel(), "Reset succeded for: " + gameTestInfo.getTestName(), ChatFormatting.GREEN);

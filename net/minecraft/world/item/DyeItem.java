@@ -28,6 +28,17 @@ public class DyeItem extends Item implements SignApplicator {
             sheep.level().playSound(player, sheep, SoundEvents.DYE_USE, SoundSource.PLAYERS, 1.0F, 1.0F);
             if (!player.level().isClientSide) {
                 sheep.setColor(this.dyeColor);
+                // CraftBukkit start
+                byte bColor = (byte) this.dyeColor.getId();
+                org.bukkit.event.entity.SheepDyeWoolEvent event = new org.bukkit.event.entity.SheepDyeWoolEvent((org.bukkit.entity.Sheep) sheep.getBukkitEntity(), org.bukkit.DyeColor.getByWoolData(bColor), (org.bukkit.entity.Player) player.getBukkitEntity());
+                sheep.level().getCraftServer().getPluginManager().callEvent(event);
+
+                if (event.isCancelled()) {
+                    return InteractionResult.PASS;
+                }
+
+                sheep.setColor(DyeColor.byId((byte) event.getColor().getWoolData()));
+                // CraftBukkit end
                 stack.shrink(1);
             }
 

@@ -27,9 +27,9 @@ public class CarvingContext extends WorldGenerationContext {
         LevelHeightAccessor level,
         NoiseChunk noiseChunk,
         RandomState randomState,
-        SurfaceRules.RuleSource surfaceRule
+        SurfaceRules.RuleSource surfaceRule, @javax.annotation.Nullable net.minecraft.world.level.Level serverLevel  // Paper - Flat bedrock generator settings
     ) {
-        super(generator, level);
+        super(generator, level, serverLevel); // Paper - Flat bedrock generator settings
         this.registryAccess = registryAccess;
         this.noiseChunk = noiseChunk;
         this.randomState = randomState;

@@ -17,7 +17,16 @@ public class DefaultRedstoneWireEvaluator extends RedstoneWireEvaluator {
     @Override
     public void updatePowerStrength(Level level, BlockPos pos, BlockState state, @Nullable Orientation orientation, boolean updateShape) {
         int i = this.calculateTargetStrength(level, pos);
-        if (state.getValue(RedStoneWireBlock.POWER) != i) {
+        // CraftBukkit start
+        int oldPower = state.getValue(RedStoneWireBlock.POWER);
+        if (oldPower != i) {
+            org.bukkit.event.block.BlockRedstoneEvent event = new org.bukkit.event.block.BlockRedstoneEvent(org.bukkit.craftbukkit.block.CraftBlock.at(level, pos), oldPower, i);
+            level.getCraftServer().getPluginManager().callEvent(event);
+
+            i = event.getNewCurrent();
+        }
+        if (oldPower != i) {
+            // CraftBukkit end
             if (level.getBlockState(pos) == state) {
                 level.setBlock(pos, state.setValue(RedStoneWireBlock.POWER, Integer.valueOf(i)), 2);
             }

@@ -62,12 +62,29 @@ public abstract class ProjectileWeaponItem extends Item {
                 float f4 = f2 + f3 * ((i + 1) / 2) * f1;
                 f3 = -f3;
                 int i1 = i;
-                Projectile.spawnProjectile(
-                    this.createProjectile(level, shooter, weapon, itemStack, isCrit),
-                    level,
-                    itemStack,
-                    projectile -> this.shootProjectile(shooter, projectile, i1, velocity, inaccuracy, f4, target)
-                );
+                // CraftBukkit start
+                Projectile projectile = this.createProjectile(level, shooter, weapon, itemStack, isCrit);
+                this.shootProjectile(shooter, projectile, i1, velocity, inaccuracy, f4, target);
+
+                org.bukkit.event.entity.EntityShootBowEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callEntityShootBowEvent(shooter, weapon, itemStack, projectile, hand, velocity, true);
+                if (event.isCancelled()) {
+                    event.getProjectile().remove();
+                    return;
+                }
+
+                if (event.getProjectile() == projectile.getBukkitEntity()) {
+                    if (Projectile.spawnProjectile(
+                        projectile,
+                        level,
+                        itemStack
+                    ).isRemoved()) {
+                        if (shooter instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                            serverPlayer.getBukkitEntity().updateInventory();
+                        }
+                        return;
+                    }
+                }
+                // CraftBukkit end
                 weapon.hurtAndBreak(this.getDurabilityUse(itemStack), shooter, LivingEntity.getSlotForHand(hand));
                 if (weapon.isEmpty()) {
                     break;
@@ -95,6 +112,11 @@ public abstract class ProjectileWeaponItem extends Item {
     }
 
     protected static List<ItemStack> draw(ItemStack weapon, ItemStack ammo, LivingEntity shooter) {
+        // Paper start
+        return draw(weapon, ammo, shooter, true);
+    }
+    protected static List<ItemStack> draw(ItemStack weapon, ItemStack ammo, LivingEntity shooter, boolean consume) {
+        // Paper end
         if (ammo.isEmpty()) {
             return List.of();
         } else {
@@ -103,7 +125,7 @@ public abstract class ProjectileWeaponItem extends Item {
             ItemStack itemStack = ammo.copy();
 
             for (int i1 = 0; i1 < i; i1++) {
-                ItemStack itemStack1 = useAmmo(weapon, i1 == 0 ? ammo : itemStack, shooter, i1 > 0);
+                ItemStack itemStack1 = useAmmo(weapon, i1 == 0 ? ammo : itemStack, shooter, i1 > 0 || !consume); // Paper
                 if (!itemStack1.isEmpty()) {
                     list.add(itemStack1);
                 }

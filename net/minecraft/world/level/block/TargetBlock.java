@@ -42,6 +42,10 @@ public class TargetBlock extends Block {
     @Override
     protected void onProjectileHit(Level level, BlockState state, BlockHitResult hit, Projectile projectile) {
         int i = updateRedstoneOutput(level, state, hit, projectile);
+        // Paper start - Add TargetHitEvent
+    }
+    private static void awardTargetHitCriteria(Projectile projectile, BlockHitResult hit, int i) {
+        // Paper end - Add TargetHitEvent
         if (projectile.getOwner() instanceof ServerPlayer serverPlayer) {
             serverPlayer.awardStat(Stats.TARGET_HIT);
             CriteriaTriggers.TARGET_BLOCK_HIT.trigger(serverPlayer, projectile, hit.getLocation(), i);
@@ -51,9 +55,29 @@ public class TargetBlock extends Block {
     private static int updateRedstoneOutput(LevelAccessor level, BlockState state, BlockHitResult hit, Entity projectile) {
         int redstoneStrength = getRedstoneStrength(hit, hit.getLocation());
         int i = projectile instanceof AbstractArrow ? 20 : 8;
+        // Paper start - Add TargetHitEvent
+        boolean shouldAward = false;
+        if (projectile instanceof Projectile) {
+            final org.bukkit.craftbukkit.block.CraftBlock craftBlock = org.bukkit.craftbukkit.block.CraftBlock.at(level, hit.getBlockPos());
+            final org.bukkit.block.BlockFace blockFace = org.bukkit.craftbukkit.block.CraftBlock.notchToBlockFace(hit.getDirection());
+            final io.papermc.paper.event.block.TargetHitEvent targetHitEvent = new io.papermc.paper.event.block.TargetHitEvent((org.bukkit.entity.Projectile) projectile.getBukkitEntity(), craftBlock, blockFace, redstoneStrength);
+            if (targetHitEvent.callEvent()) {
+                redstoneStrength = targetHitEvent.getSignalStrength();
+                shouldAward = true;
+            } else {
+                return redstoneStrength;
+            }
+        }
+        // Paper end - Add TargetHitEvent
         if (!level.getBlockTicks().hasScheduledTick(hit.getBlockPos(), state.getBlock())) {
             setOutputPower(level, state, redstoneStrength, hit.getBlockPos(), i);
         }
+
+        // Paper start - Award Hit Criteria after Block Update
+        if (shouldAward) {
+            awardTargetHitCriteria((Projectile) projectile, hit, redstoneStrength);
+        }
+        // Paper end - Award Hit Criteria after Block Update
 
         return redstoneStrength;
     }

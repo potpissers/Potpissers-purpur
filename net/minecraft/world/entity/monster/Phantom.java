@@ -47,6 +47,11 @@ public class Phantom extends FlyingMob implements Enemy {
     Vec3 moveTargetPoint = Vec3.ZERO;
     public BlockPos anchorPoint = BlockPos.ZERO;
     Phantom.AttackPhase attackPhase = Phantom.AttackPhase.CIRCLE;
+    // Paper start
+    @Nullable
+    public java.util.UUID spawningEntity;
+    public boolean shouldBurnInDay = true;
+    // Paper end
 
     public Phantom(EntityType<? extends Phantom> entityType, Level level) {
         super(entityType, level);
@@ -141,7 +146,7 @@ public class Phantom extends FlyingMob implements Enemy {
 
     @Override
     public void aiStep() {
-        if (this.isAlive() && this.isSunBurnTick()) {
+        if (this.isAlive() && this.shouldBurnInDay && this.isSunBurnTick()) { // Paper - shouldBurnInDay API
             this.igniteForSeconds(8.0F);
         }
 
@@ -165,6 +170,15 @@ public class Phantom extends FlyingMob implements Enemy {
         }
 
         this.setPhantomSize(compound.getInt("Size"));
+
+        // Paper start
+        if (compound.hasUUID("Paper.SpawningEntity")) {
+            this.spawningEntity = compound.getUUID("Paper.SpawningEntity");
+        }
+        if (compound.contains("Paper.ShouldBurnInDay")) {
+            this.shouldBurnInDay = compound.getBoolean("Paper.ShouldBurnInDay");
+        }
+        // Paper end
     }
 
     @Override
@@ -174,6 +188,12 @@ public class Phantom extends FlyingMob implements Enemy {
         compound.putInt("AY", this.anchorPoint.getY());
         compound.putInt("AZ", this.anchorPoint.getZ());
         compound.putInt("Size", this.getPhantomSize());
+        // Paper start
+        if (this.spawningEntity != null) {
+            compound.putUUID("Paper.SpawningEntity", this.spawningEntity);
+        }
+        compound.putBoolean("Paper.ShouldBurnInDay", this.shouldBurnInDay);
+        // Paper end
     }
 
     @Override
@@ -247,7 +267,8 @@ public class Phantom extends FlyingMob implements Enemy {
 
                     for (Player player : nearbyPlayers) {
                         if (Phantom.this.canAttack(serverLevel, player, TargetingConditions.DEFAULT)) {
-                            Phantom.this.setTarget(player);
+                            if (!level().paperConfig().entities.behavior.phantomsOnlyAttackInsomniacs || EntitySelector.IS_INSOMNIAC.test(player)) // Paper - Add phantom creative and insomniac controls
+                            Phantom.this.setTarget(player, org.bukkit.event.entity.EntityTargetEvent.TargetReason.CLOSEST_PLAYER, true); // CraftBukkit - reason
                             return true;
                         }
                     }

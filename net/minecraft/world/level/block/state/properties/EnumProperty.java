@@ -59,8 +59,7 @@ public final class EnumProperty<T extends Enum<T> & StringRepresentable> extends
         return this.ordinalToIndex[value.ordinal()];
     }
 
-    @Override
-    public boolean equals(Object other) {
+    public boolean equals_unused(Object other) { // Paper - Perf: Optimize hashCode/equals
         return this == other || other instanceof EnumProperty<?> enumProperty && super.equals(other) && this.values.equals(enumProperty.values);
     }
 

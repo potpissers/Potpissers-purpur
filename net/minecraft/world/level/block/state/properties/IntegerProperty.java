@@ -28,8 +28,7 @@ public final class IntegerProperty extends Property<Integer> {
         return this.values;
     }
 
-    @Override
-    public boolean equals(Object other) {
+    public boolean equals_unused(Object other) { // Paper - Perf: Optimize hashCode/equals
         return this == other || other instanceof IntegerProperty integerProperty && super.equals(other) && this.values.equals(integerProperty.values);
     }
 

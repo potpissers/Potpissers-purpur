@@ -118,6 +118,11 @@ public class NbtIo {
     }
 
     public static CompoundTag read(DataInput input, NbtAccounter accounter) throws IOException {
+        // Spigot start
+        if (input instanceof io.netty.buffer.ByteBufInputStream byteBufInputStream) {
+            input = new DataInputStream(new org.spigotmc.LimitStream(byteBufInputStream, accounter));
+        }
+        // Spigot end
         Tag unnamedTag = readUnnamedTag(input, accounter);
         if (unnamedTag instanceof CompoundTag) {
             return (CompoundTag)unnamedTag;

@@ -18,7 +18,14 @@ public class ResetProfession {
                             && villagerData.getProfession() != VillagerProfession.NITWIT
                             && villager.getVillagerXp() == 0
                             && villagerData.getLevel() <= 1) {
-                            villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.NONE));
+                            // CraftBukkit start
+                            org.bukkit.event.entity.VillagerCareerChangeEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callVillagerCareerChangeEvent(villager, org.bukkit.craftbukkit.entity.CraftVillager.CraftProfession.minecraftToBukkit(VillagerProfession.NONE), org.bukkit.event.entity.VillagerCareerChangeEvent.ChangeReason.LOSING_JOB);
+                            if (event.isCancelled()) {
+                                return false;
+                            }
+
+                            villager.setVillagerData(villager.getVillagerData().setProfession(org.bukkit.craftbukkit.entity.CraftVillager.CraftProfession.bukkitToMinecraft(event.getProfession())));
+                            // CraftBukkit end
                             villager.refreshBrain(level);
                             return true;
                         } else {

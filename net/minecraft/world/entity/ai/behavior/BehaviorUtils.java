@@ -80,6 +80,7 @@ public class BehaviorUtils {
     }
 
     public static void throwItem(LivingEntity entity, ItemStack stack, Vec3 offset, Vec3 speedMultiplier, float yOffset) {
+        if (stack.isEmpty()) return; // CraftBukkit - SPIGOT-4940: no empty loot
         double d = entity.getEyeY() - yOffset;
         ItemEntity itemEntity = new ItemEntity(entity.level(), entity.getX(), d, entity.getZ(), stack);
         itemEntity.setThrower(entity);
@@ -87,6 +88,13 @@ public class BehaviorUtils {
         vec3 = vec3.normalize().multiply(speedMultiplier.x, speedMultiplier.y, speedMultiplier.z);
         itemEntity.setDeltaMovement(vec3);
         itemEntity.setDefaultPickUpDelay();
+        // CraftBukkit start
+        org.bukkit.event.entity.EntityDropItemEvent event = new org.bukkit.event.entity.EntityDropItemEvent(entity.getBukkitEntity(), (org.bukkit.entity.Item) itemEntity.getBukkitEntity());
+        itemEntity.level().getCraftServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return;
+        }
+        // CraftBukkit end
         entity.level().addFreshEntity(itemEntity);
     }
 

@@ -44,8 +44,7 @@ public class SmokerBlock extends AbstractFurnaceBlock {
     @Override
     protected void openContainer(Level level, BlockPos pos, Player player) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof SmokerBlockEntity) {
-            player.openMenu((MenuProvider)blockEntity);
+        if (blockEntity instanceof SmokerBlockEntity smoker && player.openMenu(smoker).isPresent()) { // Paper - Fix InventoryOpenEvent cancellation
             player.awardStat(Stats.INTERACT_WITH_SMOKER);
         }
     }

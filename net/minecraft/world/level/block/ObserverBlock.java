@@ -50,8 +50,18 @@ public class ObserverBlock extends DirectionalBlock {
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (state.getValue(POWERED)) {
+            // CraftBukkit start
+            if (org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(level, pos, 15, 0).getNewCurrent() != 0) {
+                return;
+            }
+            // CraftBukkit end
             level.setBlock(pos, state.setValue(POWERED, Boolean.valueOf(false)), 2);
         } else {
+            // CraftBukkit start
+            if (org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(level, pos, 0, 15).getNewCurrent() != 15) {
+                return;
+            }
+            // CraftBukkit end
             level.setBlock(pos, state.setValue(POWERED, Boolean.valueOf(true)), 2);
             level.scheduleTick(pos, this, 2);
         }

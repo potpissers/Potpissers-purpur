@@ -43,6 +43,7 @@ public class FireworkRocketEntity extends Projectile implements ItemSupplier {
     public int lifetime;
     @Nullable
     public LivingEntity attachedToEntity;
+    @Nullable public java.util.UUID spawningEntity; // Paper
 
     public FireworkRocketEntity(EntityType<? extends FireworkRocketEntity> entityType, Level level) {
         super(entityType, level);
@@ -158,7 +159,7 @@ public class FireworkRocketEntity extends Projectile implements ItemSupplier {
         }
 
         if (!this.noPhysics && this.isAlive() && hitResultOnMoveVector.getType() != HitResult.Type.MISS) {
-            this.hitTargetOrDeflectSelf(hitResultOnMoveVector);
+            this.preHitTargetOrDeflectSelf(hitResultOnMoveVector); // CraftBukkit - projectile hit event
             this.hasImpulse = true;
         }
 
@@ -182,7 +183,11 @@ public class FireworkRocketEntity extends Projectile implements ItemSupplier {
         }
 
         if (this.life > this.lifetime && this.level() instanceof ServerLevel serverLevel) {
-            this.explode(serverLevel);
+            // CraftBukkit start
+            if (!org.bukkit.craftbukkit.event.CraftEventFactory.callFireworkExplodeEvent(this).isCancelled()) {
+                this.explode(serverLevel);
+            }
+            // CraftBukkit end
         }
     }
 
@@ -190,14 +195,18 @@ public class FireworkRocketEntity extends Projectile implements ItemSupplier {
         level.broadcastEntityEvent(this, (byte)17);
         this.gameEvent(GameEvent.EXPLODE, this.getOwner());
         this.dealExplosionDamage(level);
-        this.discard();
+        this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.EXPLODE); // CraftBukkit - add Bukkit remove cause
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         if (this.level() instanceof ServerLevel serverLevel) {
-            this.explode(serverLevel);
+            // CraftBukkit start
+            if (!org.bukkit.craftbukkit.event.CraftEventFactory.callFireworkExplodeEvent(this).isCancelled()) {
+                this.explode(serverLevel);
+            }
+            // CraftBukkit end
         }
     }
 
@@ -206,7 +215,11 @@ public class FireworkRocketEntity extends Projectile implements ItemSupplier {
         BlockPos blockPos = new BlockPos(result.getBlockPos());
         this.level().getBlockState(blockPos).entityInside(this.level(), blockPos, this);
         if (this.level() instanceof ServerLevel serverLevel && this.hasExplosion()) {
-            this.explode(serverLevel);
+            // CraftBukkit start
+            if (!org.bukkit.craftbukkit.event.CraftEventFactory.callFireworkExplodeEvent(this).isCancelled()) {
+                this.explode(serverLevel);
+            }
+            // CraftBukkit end
         }
 
         super.onHitBlock(result);
@@ -278,6 +291,11 @@ public class FireworkRocketEntity extends Projectile implements ItemSupplier {
         compound.putInt("LifeTime", this.lifetime);
         compound.put("FireworksItem", this.getItem().save(this.registryAccess()));
         compound.putBoolean("ShotAtAngle", this.entityData.get(DATA_SHOT_AT_ANGLE));
+        // Paper start
+        if (this.spawningEntity != null) {
+            compound.putUUID("SpawningEntity", this.spawningEntity);
+        }
+        // Paper end
     }
 
     @Override
@@ -298,6 +316,11 @@ public class FireworkRocketEntity extends Projectile implements ItemSupplier {
         if (compound.contains("ShotAtAngle")) {
             this.entityData.set(DATA_SHOT_AT_ANGLE, compound.getBoolean("ShotAtAngle"));
         }
+        // Paper start
+        if (compound.hasUUID("SpawningEntity")) {
+            this.spawningEntity = compound.getUUID("SpawningEntity");
+        }
+        // Paper end
     }
 
     private List<FireworkExplosion> getExplosions() {

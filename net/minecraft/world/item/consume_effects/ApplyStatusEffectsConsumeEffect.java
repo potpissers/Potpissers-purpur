@@ -46,14 +46,14 @@ public record ApplyStatusEffectsConsumeEffect(List<MobEffectInstance> effects, f
     }
 
     @Override
-    public boolean apply(Level level, ItemStack stack, LivingEntity entity) {
+    public boolean apply(Level level, ItemStack stack, LivingEntity entity, org.bukkit.event.entity.EntityPotionEffectEvent.Cause cause) { // CraftBukkit
         if (entity.getRandom().nextFloat() >= this.probability) {
             return false;
         } else {
             boolean flag = false;
 
             for (MobEffectInstance mobEffectInstance : this.effects) {
-                if (entity.addEffect(new MobEffectInstance(mobEffectInstance))) {
+                if (entity.addEffect(new MobEffectInstance(mobEffectInstance), cause)) { // CraftBukkit
                     flag = true;
                 }
             }

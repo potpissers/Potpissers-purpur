@@ -83,6 +83,15 @@ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
     private Leashable.LeashData leashData;
     private final Supplier<Item> dropItem;
 
+    // CraftBukkit start
+    // PAIL: Some of these haven't worked since a few updates, and since 1.9 they are less and less applicable.
+    public double maxSpeed = 0.4D;
+    public double occupiedDeceleration = 0.2D;
+    public double unoccupiedDeceleration = -1;
+    public boolean landBoats = false;
+    private org.bukkit.Location lastLocation;
+    // CraftBukkit end
+
     public AbstractBoat(EntityType<? extends AbstractBoat> entityType, Level level, Supplier<Item> dropItem) {
         super(entityType, level);
         this.dropItem = dropItem;
@@ -124,7 +133,7 @@ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
     }
 
     @Override
-    public boolean isPushable() {
+    public boolean isCollidable(boolean ignoreClimbing) { // Paper - Climbing should not bypass cramming gamerule
         return true;
     }
 
@@ -177,11 +186,30 @@ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
 
     @Override
     public void push(Entity entity) {
+        if (!this.level().paperConfig().collisions.allowVehicleCollisions && this.level().paperConfig().collisions.onlyPlayersCollide && !(entity instanceof Player)) return; // Paper - Collision option for requiring a player participant
         if (entity instanceof AbstractBoat) {
             if (entity.getBoundingBox().minY < this.getBoundingBox().maxY) {
+                // CraftBukkit start
+                if (!this.isPassengerOfSameVehicle(entity)) {
+                    org.bukkit.event.vehicle.VehicleEntityCollisionEvent event = new org.bukkit.event.vehicle.VehicleEntityCollisionEvent(
+                        (org.bukkit.entity.Vehicle) this.getBukkitEntity(),
+                        entity.getBukkitEntity()
+                    );
+                    if (!event.callEvent()) return;
+                }
+                // CraftBukkit end
                 super.push(entity);
             }
         } else if (entity.getBoundingBox().minY <= this.getBoundingBox().minY) {
+            // CraftBukkit start
+            if (!this.isPassengerOfSameVehicle(entity)) {
+                org.bukkit.event.vehicle.VehicleEntityCollisionEvent event = new org.bukkit.event.vehicle.VehicleEntityCollisionEvent(
+                    (org.bukkit.entity.Vehicle) this.getBukkitEntity(),
+                    entity.getBukkitEntity()
+                );
+                if (!event.callEvent()) return;
+            }
+            // CraftBukkit end
             super.push(entity);
         }
     }
@@ -283,6 +311,18 @@ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
             this.setDeltaMovement(Vec3.ZERO);
         }
 
+        // CraftBukkit start
+        org.bukkit.Location to = org.bukkit.craftbukkit.util.CraftLocation.toBukkit(this.position(), this.level().getWorld(), this.getYRot(), this.getXRot());
+        org.bukkit.entity.Vehicle vehicle = (org.bukkit.entity.Vehicle) this.getBukkitEntity();
+
+        new org.bukkit.event.vehicle.VehicleUpdateEvent(vehicle).callEvent();
+
+        if (this.lastLocation != null && !this.lastLocation.equals(to)) {
+            org.bukkit.event.vehicle.VehicleMoveEvent event = new org.bukkit.event.vehicle.VehicleMoveEvent(vehicle, this.lastLocation, to);
+            event.callEvent();
+        }
+        this.lastLocation = vehicle.getLocation();
+        // CraftBukkit end
         this.applyEffectsFromBlocks();
         this.applyEffectsFromBlocks();
         this.tickBubbleColumn();
@@ -598,7 +638,7 @@ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
             this.waterLevel = this.getY(1.0);
             double d2 = this.getWaterLevelAbove() - this.getBbHeight() + 0.101;
             if (this.level().noCollision(this, this.getBoundingBox().move(0.0, d2 - this.getY(), 0.0))) {
-                this.setPos(this.getX(), d2, this.getZ());
+                this.move(MoverType.SELF, new Vec3(0.0D, d2 - this.getY(), 0.0D)); // Paper - Fix some exploit with boats // TODO Still needed?
                 this.setDeltaMovement(this.getDeltaMovement().multiply(1.0, 0.0, 1.0));
                 this.lastYd = 0.0;
             }
@@ -762,11 +802,18 @@ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
 
     @Override
     public void remove(Entity.RemovalReason reason) {
+        // CraftBukkit start - add Bukkit remove cause
+        this.remove(reason, null);
+    }
+
+    @Override
+    public void remove(Entity.RemovalReason reason, org.bukkit.event.entity.EntityRemoveEvent.Cause eventCause) {
+        // CraftBukkit end
         if (!this.level().isClientSide && reason.shouldDestroy() && this.isLeashed()) {
             this.dropLeash();
         }
 
-        super.remove(reason);
+        super.remove(reason, eventCause); // CraftBukkit - add Bukkit remove cause
     }
 
     @Override

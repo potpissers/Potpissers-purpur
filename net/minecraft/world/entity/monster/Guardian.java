@@ -59,6 +59,7 @@ public class Guardian extends Monster {
     private boolean clientSideTouchedGround;
     @Nullable
     public RandomStrollGoal randomStrollGoal;
+    public Guardian.GuardianAttackGoal guardianAttackGoal; // CraftBukkit - add field
 
     public Guardian(EntityType<? extends Guardian> entityType, Level level) {
         super(entityType, level);
@@ -73,7 +74,7 @@ public class Guardian extends Monster {
     protected void registerGoals() {
         MoveTowardsRestrictionGoal moveTowardsRestrictionGoal = new MoveTowardsRestrictionGoal(this, 1.0);
         this.randomStrollGoal = new RandomStrollGoal(this, 1.0, 80);
-        this.goalSelector.addGoal(4, new Guardian.GuardianAttackGoal(this));
+        this.goalSelector.addGoal(4, this.guardianAttackGoal = new Guardian.GuardianAttackGoal(this)); // CraftBukkit - assign field
         this.goalSelector.addGoal(5, moveTowardsRestrictionGoal);
         this.goalSelector.addGoal(7, this.randomStrollGoal);
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));

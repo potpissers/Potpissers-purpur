@@ -45,6 +45,12 @@ public class ArmorStandItem extends Item {
 
                     float f = Mth.floor((Mth.wrapDegrees(context.getRotation() - 180.0F) + 22.5F) / 45.0F) * 45.0F;
                     armorStand.moveTo(armorStand.getX(), armorStand.getY(), armorStand.getZ(), f, 0.0F);
+                    // CraftBukkit start
+                    if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityPlaceEvent(context, armorStand).isCancelled()) {
+                        if (context.getPlayer() != null) context.getPlayer().containerMenu.sendAllDataToRemote(); // Paper - Fix inventory desync
+                        return InteractionResult.FAIL;
+                    }
+                    // CraftBukkit end
                     serverLevel.addFreshEntityWithPassengers(armorStand);
                     level.playSound(
                         null, armorStand.getX(), armorStand.getY(), armorStand.getZ(), SoundEvents.ARMOR_STAND_PLACE, SoundSource.BLOCKS, 0.75F, 0.8F

@@ -12,9 +12,22 @@ import net.minecraft.world.level.block.entity.EnderChestBlockEntity;
 public class PlayerEnderChestContainer extends SimpleContainer {
     @Nullable
     private EnderChestBlockEntity activeChest;
+    // CraftBukkit start
+    private final Player owner;
 
-    public PlayerEnderChestContainer() {
+    public org.bukkit.inventory.InventoryHolder getBukkitOwner() {
+        return this.owner.getBukkitEntity();
+    }
+
+    @Override
+    public org.bukkit.Location getLocation() {
+        return this.activeChest != null ? org.bukkit.craftbukkit.util.CraftLocation.toBukkit(this.activeChest.getBlockPos(), this.activeChest.getLevel().getWorld()) : null;
+    }
+
+    public PlayerEnderChestContainer(Player owner) {
         super(27);
+        this.owner = owner;
+        // CraftBukkit end
     }
 
     public void setActiveChest(EnderChestBlockEntity enderChestBlockEntity) {

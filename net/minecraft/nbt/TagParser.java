@@ -49,6 +49,7 @@ public class TagParser {
     }, CompoundTag::toString);
     public static final Codec<CompoundTag> LENIENT_CODEC = Codec.withAlternative(AS_CODEC, CompoundTag.CODEC);
     private final StringReader reader;
+    private int depth; // Paper
 
     public static CompoundTag parseTag(String text) throws CommandSyntaxException {
         return new TagParser(new StringReader(text)).readSingleStruct();
@@ -159,6 +160,7 @@ public class TagParser {
 
     public CompoundTag readStruct() throws CommandSyntaxException {
         this.expect('{');
+        this.increaseDepth(); // Paper
         CompoundTag compoundTag = new CompoundTag();
         this.reader.skipWhitespace();
 
@@ -182,6 +184,7 @@ public class TagParser {
         }
 
         this.expect('}');
+        this.depth--; // Paper
         return compoundTag;
     }
 
@@ -191,6 +194,7 @@ public class TagParser {
         if (!this.reader.canRead()) {
             throw ERROR_EXPECTED_VALUE.createWithContext(this.reader);
         } else {
+            this.increaseDepth(); // Paper
             ListTag listTag = new ListTag();
             TagType<?> tagType = null;
 
@@ -216,6 +220,7 @@ public class TagParser {
             }
 
             this.expect(']');
+            this.depth--; // Paper
             return listTag;
         }
     }
@@ -287,5 +292,11 @@ public class TagParser {
     private void expect(char expected) throws CommandSyntaxException {
         this.reader.skipWhitespace();
         this.reader.expect(expected);
+    }
+    private void increaseDepth() throws CommandSyntaxException {
+        this.depth++;
+        if (this.depth > 512) {
+            throw new io.papermc.paper.brigadier.TagParseCommandSyntaxException("NBT tag is too complex, depth > 512");
+        }
     }
 }

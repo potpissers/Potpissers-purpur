@@ -7,6 +7,12 @@ public interface OutgoingChatMessage {
 
     void sendToPlayer(ServerPlayer player, boolean filtered, ChatType.Bound boundType);
 
+    // Paper start
+    default void sendToPlayer(ServerPlayer sender, boolean filterMaskEnabled, ChatType.Bound params, @javax.annotation.Nullable Component unsigned) {
+        this.sendToPlayer(sender, filterMaskEnabled, params);
+    }
+    // Paper end
+
     static OutgoingChatMessage create(PlayerChatMessage message) {
         return (OutgoingChatMessage)(message.isSystem()
             ? new OutgoingChatMessage.Disguised(message.decoratedContent())
@@ -16,7 +22,12 @@ public interface OutgoingChatMessage {
     public record Disguised(@Override Component content) implements OutgoingChatMessage {
         @Override
         public void sendToPlayer(ServerPlayer player, boolean filtered, ChatType.Bound boundType) {
-            player.connection.sendDisguisedChatMessage(this.content, boundType);
+            // Paper start
+            this.sendToPlayer(player, filtered, boundType, null);
+        }
+        public void sendToPlayer(ServerPlayer player, boolean filtered, ChatType.Bound boundType, @javax.annotation.Nullable Component unsigned) {
+            player.connection.sendDisguisedChatMessage(unsigned != null ? unsigned : this.content, boundType);
+            // Paper end
         }
     }
 
@@ -28,7 +39,13 @@ public interface OutgoingChatMessage {
 
         @Override
         public void sendToPlayer(ServerPlayer player, boolean filtered, ChatType.Bound boundType) {
+            // Paper start
+            this.sendToPlayer(player, filtered, boundType, null);
+        }
+        public void sendToPlayer(ServerPlayer player, boolean filtered, ChatType.Bound boundType, @javax.annotation.Nullable Component unsigned) {
+            // Paper end
             PlayerChatMessage playerChatMessage = this.message.filter(filtered);
+            playerChatMessage = unsigned != null ? playerChatMessage.withUnsignedContent(unsigned) : playerChatMessage; // Paper
             if (!playerChatMessage.isFullyFiltered()) {
                 player.connection.sendPlayerChatMessage(playerChatMessage, boundType);
             }

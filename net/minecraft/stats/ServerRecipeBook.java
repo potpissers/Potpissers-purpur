@@ -67,7 +67,7 @@ public class ServerRecipeBook extends RecipeBook {
 
         for (RecipeHolder<?> recipeHolder : recipes) {
             ResourceKey<Recipe<?>> resourceKey = recipeHolder.id();
-            if (!this.known.contains(resourceKey) && !recipeHolder.value().isSpecial()) {
+            if (!this.known.contains(resourceKey) && !recipeHolder.value().isSpecial() && org.bukkit.craftbukkit.event.CraftEventFactory.handlePlayerRecipeListUpdateEvent(player, resourceKey.location())) { // CraftBukkit
                 this.add(resourceKey);
                 this.addHighlight(resourceKey);
                 this.displayResolver
@@ -78,7 +78,7 @@ public class ServerRecipeBook extends RecipeBook {
             }
         }
 
-        if (!list.isEmpty()) {
+        if (!list.isEmpty() && player.connection != null) { // SPIGOT-4478 during PlayerLoginEvent
             player.connection.send(new ClientboundRecipeBookAddPacket(list, false));
         }
 
@@ -96,7 +96,7 @@ public class ServerRecipeBook extends RecipeBook {
             }
         }
 
-        if (!list.isEmpty()) {
+        if (!list.isEmpty() && player.connection != null) { // SPIGOT-4478 during PlayerLoginEvent
             player.connection.send(new ClientboundRecipeBookRemovePacket(list));
         }
 

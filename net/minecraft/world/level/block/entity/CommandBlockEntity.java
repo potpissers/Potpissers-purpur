@@ -21,6 +21,13 @@ public class CommandBlockEntity extends BlockEntity {
     private boolean auto;
     private boolean conditionMet;
     private final BaseCommandBlock commandBlock = new BaseCommandBlock() {
+        // CraftBukkit start
+        @Override
+        public org.bukkit.command.CommandSender getBukkitSender(CommandSourceStack wrapper) {
+            return new org.bukkit.craftbukkit.command.CraftBlockCommandSender(wrapper, CommandBlockEntity.this);
+        }
+        // CraftBukkit end
+
         @Override
         public void setCommand(String command) {
             super.setCommand(command);
@@ -51,7 +58,7 @@ public class CommandBlockEntity extends BlockEntity {
                 Vec3.atCenterOf(CommandBlockEntity.this.worldPosition),
                 new Vec2(0.0F, direction.toYRot()),
                 this.getLevel(),
-                2,
+                this.getLevel().paperConfig().commandBlocks.permissionsLevel, // Paper - configurable command block perm level
                 this.getName().getString(),
                 this.getName(),
                 this.getLevel().getServer(),

@@ -138,6 +138,7 @@ public class CrashReportCategory {
         } else {
             this.stackTrace = new StackTraceElement[stackTrace.length - 3 - size];
             System.arraycopy(stackTrace, 3 + size, this.stackTrace, 0, this.stackTrace.length);
+            this.stackTrace = io.papermc.paper.util.StacktraceDeobfuscator.INSTANCE.deobfuscateStacktrace(this.stackTrace); // Paper
             return this.stackTrace.length;
         }
     }

@@ -76,7 +76,7 @@ public class OminousItemSpawner extends Entity {
                     entity = this.spawnProjectile(serverLevel, projectileItem, item);
                 } else {
                     entity = new ItemEntity(serverLevel, this.getX(), this.getY(), this.getZ(), item);
-                    serverLevel.addFreshEntity(entity);
+                    serverLevel.addFreshEntity(entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.OMINOUS_ITEM_SPAWNER); // Paper - fixes and addition to spawn reason API
                 }
 
                 serverLevel.levelEvent(3021, this.blockPosition(), 1);
@@ -90,7 +90,7 @@ public class OminousItemSpawner extends Entity {
         ProjectileItem.DispenseConfig dispenseConfig = projectileItem.createDispenseConfig();
         dispenseConfig.overrideDispenseEvent().ifPresent(i -> level.levelEvent(i, this.blockPosition(), 0));
         Direction direction = Direction.DOWN;
-        Projectile projectile = Projectile.spawnProjectileUsingShoot(
+        Projectile projectile = Projectile.spawnProjectileUsingShootDelayed( // Paper - fixes and addition to spawn reason API
             projectileItem.asProjectile(level, this.position(), stack, direction),
             level,
             stack,
@@ -99,7 +99,7 @@ public class OminousItemSpawner extends Entity {
             direction.getStepZ(),
             dispenseConfig.power(),
             dispenseConfig.uncertainty()
-        );
+        ).spawn(org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.OMINOUS_ITEM_SPAWNER); // Paper - fixes and addition to spawn reason API
         projectile.setOwner(this);
         return projectile;
     }

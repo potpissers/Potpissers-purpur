@@ -24,6 +24,10 @@ public class LingeringPotionItem extends ThrowablePotionItem {
 
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
+        // Paper start - PlayerLaunchProjectileEvent
+        final InteractionResult wrapper = super.use(level, player, hand);
+        if (wrapper instanceof InteractionResult.Fail) return wrapper;
+        // Paper end - PlayerLaunchProjectileEvent
         level.playSound(
             null,
             player.getX(),
@@ -34,6 +38,6 @@ public class LingeringPotionItem extends ThrowablePotionItem {
             0.5F,
             0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F)
         );
-        return super.use(level, player, hand);
+        return wrapper; // Paper - PlayerLaunchProjectileEvent
     }
 }

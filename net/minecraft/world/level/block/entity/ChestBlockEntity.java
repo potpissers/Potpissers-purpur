@@ -56,6 +56,36 @@ public class ChestBlockEntity extends RandomizableContainerBlockEntity implement
     };
     private final ChestLidController chestLidController = new ChestLidController();
 
+    // CraftBukkit start - add fields and methods
+    public java.util.List<org.bukkit.entity.HumanEntity> transaction = new java.util.ArrayList<>();
+    private int maxStack = MAX_STACK;
+
+    public java.util.List<net.minecraft.world.item.ItemStack> getContents() {
+        return this.items;
+    }
+
+    public void onOpen(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+        this.transaction.add(player);
+    }
+
+    public void onClose(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+        this.transaction.remove(player);
+    }
+
+    public java.util.List<org.bukkit.entity.HumanEntity> getViewers() {
+        return this.transaction;
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return this.maxStack;
+    }
+
+    public void setMaxStackSize(int size) {
+        this.maxStack = size;
+    }
+    // CraftBukkit end
+
     protected ChestBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
     }

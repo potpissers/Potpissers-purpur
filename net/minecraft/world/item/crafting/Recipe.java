@@ -44,4 +44,6 @@ public interface Recipe<T extends RecipeInput> {
     }
 
     RecipeBookCategory recipeBookCategory();
+
+    org.bukkit.inventory.Recipe toBukkitRecipe(org.bukkit.NamespacedKey id); // CraftBukkit
 }

@@ -23,6 +23,16 @@ public class CustomBossEvent extends ServerBossEvent {
     private final Set<UUID> players = Sets.newHashSet();
     private int value;
     private int max = 100;
+    // CraftBukkit start
+    private org.bukkit.boss.KeyedBossBar bossBar;
+
+    public org.bukkit.boss.KeyedBossBar getBukkitEntity() {
+        if (this.bossBar == null) {
+            this.bossBar = new org.bukkit.craftbukkit.boss.CraftKeyedBossbar(this);
+        }
+        return this.bossBar;
+    }
+    // CraftBukkit end
 
     public CustomBossEvent(ResourceLocation id, Component name) {
         super(name, BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);

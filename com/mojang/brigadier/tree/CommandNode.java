@@ -27,11 +27,21 @@ public abstract class CommandNode<S> implements Comparable<CommandNode<S>> {
     private final Map<String, CommandNode<S>> children = new LinkedHashMap<>();
     private final Map<String, LiteralCommandNode<S>> literals = new LinkedHashMap<>();
     private final Map<String, ArgumentCommandNode<S, ?>> arguments = new LinkedHashMap<>();
-    private final Predicate<S> requirement;
+    public Predicate<S> requirement; // Paper - public-f
     private final CommandNode<S> redirect;
     private final RedirectModifier<S> modifier;
     private final boolean forks;
     private Command<S> command;
+    public CommandNode<net.minecraft.commands.CommandSourceStack> clientNode; // Paper - Brigadier API
+    public CommandNode<io.papermc.paper.command.brigadier.CommandSourceStack> unwrappedCached = null; // Paper - Brigadier Command API
+    public CommandNode<io.papermc.paper.command.brigadier.CommandSourceStack> wrappedCached = null; // Paper - Brigadier Command API
+    // CraftBukkit start
+    public void removeCommand(String name) {
+        this.children.remove(name);
+        this.literals.remove(name);
+        this.arguments.remove(name);
+    }
+    // CraftBukkit end
 
     protected CommandNode(final Command<S> command, final Predicate<S> requirement, final CommandNode<S> redirect, final RedirectModifier<S> modifier, final boolean forks) {
         this.command = command;
@@ -61,7 +71,17 @@ public abstract class CommandNode<S> implements Comparable<CommandNode<S>> {
         return modifier;
     }
 
-    public boolean canUse(final S source) {
+    // CraftBukkit start
+    public synchronized boolean canUse(final S source) {
+        if (source instanceof final net.minecraft.commands.CommandSourceStack css) {
+            try {
+                css.currentCommand.put(Thread.currentThread(), this); // Paper - Thread Safe Vanilla Command permission checking
+                return this.requirement.test(source);
+            } finally {
+                css.currentCommand.remove(Thread.currentThread()); // Paper - Thread Safe Vanilla Command permission checking
+            }
+        }
+        // CraftBukkit end
         return requirement.test(source);
     }
 
@@ -151,6 +171,12 @@ public abstract class CommandNode<S> implements Comparable<CommandNode<S>> {
     protected abstract String getSortedKey();
 
     public Collection<? extends CommandNode<S>> getRelevantNodes(final StringReader input) {
+    // Paper start - prioritize mc commands in function parsing
+        return this.getRelevantNodes(input, null);
+    }
+    @org.jetbrains.annotations.ApiStatus.Internal
+    public Collection<? extends CommandNode<S>> getRelevantNodes(final StringReader input, final Object source) {
+     // Paper end - prioritize mc commands in function parsing
         if (literals.size() > 0) {
             final int cursor = input.getCursor();
             while (input.canRead() && input.peek() != ' ') {
@@ -158,7 +184,21 @@ public abstract class CommandNode<S> implements Comparable<CommandNode<S>> {
             }
             final String text = input.getString().substring(cursor, input.getCursor());
             input.setCursor(cursor);
-            final LiteralCommandNode<S> literal = literals.get(text);
+            // Paper start - prioritize mc commands in function parsing
+            LiteralCommandNode<S> literal = null;
+            if (source instanceof net.minecraft.commands.CommandSourceStack css && css.source == net.minecraft.commands.CommandSource.NULL) {
+                if (!text.contains(":")) {
+                    literal = this.literals.get("minecraft:" + text);
+                }
+            } else if (source instanceof net.minecraft.commands.CommandSourceStack css && css.source instanceof net.minecraft.world.level.BaseCommandBlock) {
+                if (css.getServer().server.getCommandBlockOverride(text) && !text.contains(":")) {
+                    literal = this.literals.get("minecraft:" + text);
+                }
+            }
+            if (literal == null) {
+                literal = this.literals.get(text);
+            }
+            // Paper end - prioritize mc commands in function parsing
             if (literal != null) {
                 return Collections.singleton(literal);
             } else {
@@ -183,4 +223,11 @@ public abstract class CommandNode<S> implements Comparable<CommandNode<S>> {
     }
 
     public abstract Collection<String> getExamples();
+    // Paper start - Brigadier Command API
+    public void clearAll() {
+        this.children.clear();
+        this.literals.clear();
+        this.arguments.clear();
+    }
+    // Paper end - Brigadier Command API
 }

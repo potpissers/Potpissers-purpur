@@ -74,7 +74,13 @@ public abstract class WaterFluid extends FlowingFluid {
     protected boolean canConvertToSource(ServerLevel level) {
         return level.getGameRules().getBoolean(GameRules.RULE_WATER_SOURCE_CONVERSION);
     }
-
+    // Paper start - Add BlockBreakBlockEvent
+     @Override
+    protected void beforeDestroyingBlock(LevelAccessor level, BlockPos pos, BlockState state, BlockPos source) {
+        BlockEntity tileentity = state.hasBlockEntity() ? level.getBlockEntity(pos) : null;
+        Block.dropResources(state, level, pos, tileentity, source);
+    }
+    // Paper end - Add BlockBreakBlockEvent
     @Override
     protected void beforeDestroyingBlock(LevelAccessor level, BlockPos pos, BlockState state) {
         BlockEntity blockEntity = state.hasBlockEntity() ? level.getBlockEntity(pos) : null;
@@ -113,7 +119,7 @@ public abstract class WaterFluid extends FlowingFluid {
 
     @Override
     protected float getExplosionResistance() {
-        return 100.0F;
+        return Blocks.WATER.getExplosionResistance(); // Paper - Get explosion resistance from actual block
     }
 
     @Override

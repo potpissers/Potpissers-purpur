@@ -28,9 +28,13 @@ public class DefaultGameModeCommands {
         GameType forcedGameType = server.getForcedGameType();
         if (forcedGameType != null) {
             for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
-                if (serverPlayer.setGameMode(forcedGameType)) {
-                    i++;
+                // Paper start - Expand PlayerGameModeChangeEvent
+                org.bukkit.event.player.PlayerGameModeChangeEvent event = serverPlayer.setGameMode(gamemode, org.bukkit.event.player.PlayerGameModeChangeEvent.Cause.DEFAULT_GAMEMODE, net.kyori.adventure.text.Component.empty());
+                if (event != null && event.isCancelled()) {
+                    commandSource.sendSuccess(() -> io.papermc.paper.adventure.PaperAdventure.asVanilla(event.cancelMessage()), false);
                 }
+                // Paper end - Expand PlayerGameModeChangeEvent
+                    i++;
             }
         }
 

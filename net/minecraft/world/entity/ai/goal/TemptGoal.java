@@ -21,7 +21,7 @@ public class TemptGoal extends Goal {
     private double pRotX;
     private double pRotY;
     @Nullable
-    protected Player player;
+    protected LivingEntity player; // CraftBukkit
     private int calmDown;
     private boolean isRunning;
     private final Predicate<ItemStack> items;
@@ -44,6 +44,15 @@ public class TemptGoal extends Goal {
         } else {
             this.player = getServerLevel(this.mob)
                 .getNearestPlayer(this.targetingConditions.range(this.mob.getAttributeValue(Attributes.TEMPT_RANGE)), this.mob);
+            // CraftBukkit start
+            if (this.player != null) {
+                org.bukkit.event.entity.EntityTargetLivingEntityEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTargetLivingEvent(this.mob, this.player, org.bukkit.event.entity.EntityTargetEvent.TargetReason.TEMPT);
+                if (event.isCancelled()) {
+                    return false;
+                }
+                this.player = (event.getTarget() == null) ? null : ((org.bukkit.craftbukkit.entity.CraftLivingEntity) event.getTarget()).getHandle();
+            }
+            // CraftBukkit end
             return this.player != null;
         }
     }

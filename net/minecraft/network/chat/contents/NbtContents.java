@@ -115,7 +115,7 @@ public class NbtContents implements ComponentContents {
             }).map(Tag::getAsString);
             if (this.interpreting) {
                 Component component = DataFixUtils.orElse(
-                    ComponentUtils.updateForEntity(nbtPathPattern, this.separator, entity, recursionDepth), ComponentUtils.DEFAULT_NO_STYLE_SEPARATOR
+                    ComponentUtils.updateSeparatorForEntity(nbtPathPattern, this.separator, entity, recursionDepth), ComponentUtils.DEFAULT_NO_STYLE_SEPARATOR // Paper - validate separator
                 );
                 return stream.flatMap(text -> {
                     try {
@@ -127,7 +127,7 @@ public class NbtContents implements ComponentContents {
                     }
                 }).reduce((mutableComponent, component1) -> mutableComponent.append(component).append(component1)).orElseGet(Component::empty);
             } else {
-                return ComponentUtils.updateForEntity(nbtPathPattern, this.separator, entity, recursionDepth)
+                return ComponentUtils.updateSeparatorForEntity(nbtPathPattern, this.separator, entity, recursionDepth) // Paper - validate separator
                     .map(
                         mutableComponent -> stream.map(Component::literal)
                             .reduce((mutableComponent1, otherMutableComponent) -> mutableComponent1.append(mutableComponent).append(otherMutableComponent))

@@ -131,7 +131,12 @@ public class JigsawBlockEntity extends BlockEntity {
     public void generate(ServerLevel level, int maxDepth, boolean keepJigsaws) {
         BlockPos blockPos = this.getBlockPos().relative(this.getBlockState().getValue(JigsawBlock.ORIENTATION).front());
         Registry<StructureTemplatePool> registry = level.registryAccess().lookupOrThrow(Registries.TEMPLATE_POOL);
-        Holder<StructureTemplatePool> orThrow = registry.getOrThrow(this.pool);
+        // Paper start - Replace getHolderOrThrow with a null check
+        Holder<StructureTemplatePool> orThrow = registry.get(this.pool).orElse(null);
+        if (orThrow == null) {
+            return;
+        }
+        // Paper end - Replace getHolderOrThrow with a null check
         JigsawPlacement.generateJigsaw(level, orThrow, this.target, maxDepth, blockPos, keepJigsaws);
     }
 

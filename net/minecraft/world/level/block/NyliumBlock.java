@@ -39,6 +39,11 @@ public class NyliumBlock extends Block implements BonemealableBlock {
     @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!canBeNylium(state, level, pos)) {
+            // CraftBukkit start
+            if (org.bukkit.craftbukkit.event.CraftEventFactory.callBlockFadeEvent(level, pos, Blocks.NETHERRACK.defaultBlockState()).isCancelled()) {
+                return;
+            }
+            // CraftBukkit end
             level.setBlockAndUpdate(pos, Blocks.NETHERRACK.defaultBlockState());
         }
     }

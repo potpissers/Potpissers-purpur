@@ -48,7 +48,13 @@ public class StructureManager {
     }
 
     public List<StructureStart> startsForStructure(ChunkPos chunkPos, Predicate<Structure> structurePredicate) {
-        Map<Structure, LongSet> allReferences = this.level.getChunk(chunkPos.x, chunkPos.z, ChunkStatus.STRUCTURE_REFERENCES).getAllReferences();
+        // Paper start - Fix swamp hut cat generation deadlock
+        return this.startsForStructure(chunkPos, structurePredicate, null);
+    }
+
+    public List<StructureStart> startsForStructure(ChunkPos chunkPos, Predicate<Structure> structurePredicate, @Nullable ServerLevelAccessor levelAccessor) {
+        Map<Structure, LongSet> allReferences = (levelAccessor == null ? this.level : levelAccessor).getChunk(chunkPos.x, chunkPos.z, ChunkStatus.STRUCTURE_REFERENCES).getAllReferences();
+        // Paper end - Fix swamp hut cat generation deadlock
         Builder<StructureStart> builder = ImmutableList.builder();
 
         for (Entry<Structure, LongSet> entry : allReferences.entrySet()) {
@@ -118,10 +124,20 @@ public class StructureManager {
     }
 
     public StructureStart getStructureWithPieceAt(BlockPos pos, Predicate<Holder<Structure>> predicate) {
+        // Paper start - Fix swamp hut cat generation deadlock
+        return this.getStructureWithPieceAt(pos, predicate, null);
+    }
+
+    public StructureStart getStructureWithPieceAt(BlockPos pos, TagKey<Structure> tag, @Nullable ServerLevelAccessor levelAccessor) {
+        return this.getStructureWithPieceAt(pos, structure -> structure.is(tag), levelAccessor);
+    }
+
+    public StructureStart getStructureWithPieceAt(BlockPos pos, Predicate<Holder<Structure>> predicate, @Nullable ServerLevelAccessor levelAccessor) {
+        // Paper end - Fix swamp hut cat generation deadlock
         Registry<Structure> registry = this.registryAccess().lookupOrThrow(Registries.STRUCTURE);
 
         for (StructureStart structureStart : this.startsForStructure(
-            new ChunkPos(pos), structure -> registry.get(registry.getId(structure)).map(predicate::test).orElse(false)
+            new ChunkPos(pos), structure -> registry.get(registry.getId(structure)).map(predicate::test).orElse(false), levelAccessor // Paper - Fix swamp hut cat generation deadlock
         )) {
             if (this.structureHasPieceAt(pos, structureStart)) {
                 return structureStart;

@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SignItem extends StandingAndWallBlockItem {
+    public static BlockPos openSign; // CraftBukkit
     public SignItem(Block standingBlock, Block wallBlock, Item.Properties properties) {
         super(standingBlock, wallBlock, Direction.DOWN, properties);
     }
@@ -27,7 +28,10 @@ public class SignItem extends StandingAndWallBlockItem {
             && player != null
             && level.getBlockEntity(pos) instanceof SignBlockEntity signBlockEntity
             && level.getBlockState(pos).getBlock() instanceof SignBlock signBlock) {
-            signBlock.openTextEdit(player, signBlockEntity, true);
+            // CraftBukkit start - SPIGOT-4678
+            // signBlock.openTextEdit(player, signBlockEntity, true);
+            SignItem.openSign = pos;
+            // CraftBukkit end
         }
 
         return flag;

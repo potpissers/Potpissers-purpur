@@ -38,6 +38,14 @@ public abstract class VehicleEntity extends Entity {
         } else if (this.isInvulnerableToBase(damageSource)) {
             return false;
         } else {
+            // CraftBukkit start
+            org.bukkit.entity.Vehicle vehicle = (org.bukkit.entity.Vehicle) this.getBukkitEntity();
+            org.bukkit.entity.Entity attacker = (damageSource.getEntity() == null) ? null : damageSource.getEntity().getBukkitEntity();
+
+            org.bukkit.event.vehicle.VehicleDamageEvent event = new org.bukkit.event.vehicle.VehicleDamageEvent(vehicle, attacker, amount);
+            if (!event.callEvent()) return false;
+            amount = (float) event.getDamage();
+            // CraftBukkit end
             this.setHurtDir(-this.getHurtDir());
             this.setHurtTime(10);
             this.markHurt();
@@ -46,9 +54,23 @@ public abstract class VehicleEntity extends Entity {
             boolean flag = damageSource.getEntity() instanceof Player player && player.getAbilities().instabuild;
             if ((flag || !(this.getDamage() > 40.0F)) && !this.shouldSourceDestroy(damageSource)) {
                 if (flag) {
-                    this.discard();
+                    // CraftBukkit start
+                    org.bukkit.event.vehicle.VehicleDestroyEvent destroyEvent = new org.bukkit.event.vehicle.VehicleDestroyEvent(vehicle, attacker);
+                    if (!destroyEvent.callEvent()) {
+                        this.setDamage(40.0F); // Maximize damage so this doesn't get triggered again right away
+                        return true;
+                    }
+                    // CraftBukkit end
+                    this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DEATH); // CraftBukkit - add Bukkit remove cause
                 }
             } else {
+                // CraftBukkit start
+                org.bukkit.event.vehicle.VehicleDestroyEvent destroyEvent = new org.bukkit.event.vehicle.VehicleDestroyEvent(vehicle, attacker);
+                if (!destroyEvent.callEvent()) {
+                    this.setDamage(40.0F); // Maximize damage so this doesn't get triggered again right away
+                    return true;
+                }
+                // CraftBukkit end
                 this.destroy(level, damageSource);
             }
 

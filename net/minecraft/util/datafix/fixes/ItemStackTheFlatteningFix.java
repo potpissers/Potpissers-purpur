@@ -423,7 +423,7 @@ public class ItemStackTheFlatteningFix extends DataFix {
                 if (DAMAGE_IDS.contains(optional.get().getSecond())) {
                     Typed<?> typed2 = typed.getOrCreateTyped(opticFinder1);
                     Dynamic<?> dynamic1 = typed2.get(DSL.remainderFinder());
-                    dynamic1 = dynamic1.set("Damage", dynamic1.createInt(_int));
+                    if (_int != 0) dynamic1 = dynamic1.set("Damage", dynamic1.createInt(_int)); // CraftBukkit
                     typed1 = typed1.set(opticFinder1, typed2.set(DSL.remainderFinder(), dynamic1));
                 }
 

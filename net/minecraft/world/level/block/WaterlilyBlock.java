@@ -29,8 +29,14 @@ public class WaterlilyBlock extends BushBlock {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        if (!new io.papermc.paper.event.entity.EntityInsideBlockEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.block.CraftBlock.at(level, pos)).callEvent()) { return; } // Paper - Add EntityInsideBlockEvent
         super.entityInside(state, level, pos, entity);
         if (level instanceof ServerLevel && entity instanceof AbstractBoat) {
+            // CraftBukkit start
+            if (!org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(entity, pos, state.getFluidState().createLegacyBlock())) { // Paper - fix wrong block state
+                return;
+            }
+            // CraftBukkit end
             level.destroyBlock(new BlockPos(pos), true, entity);
         }
     }

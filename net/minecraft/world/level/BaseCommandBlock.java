@@ -32,6 +32,11 @@ public abstract class BaseCommandBlock implements CommandSource {
     private String command = "";
     @Nullable
     private Component customName;
+    // CraftBukkit start
+    @Override
+    public abstract org.bukkit.command.CommandSender getBukkitSender(CommandSourceStack wrapper);
+    // CraftBukkit end
+
 
     public int getSuccessCount() {
         return this.successCount;
@@ -126,7 +131,7 @@ public abstract class BaseCommandBlock implements CommandSource {
                             this.successCount++;
                         }
                     });
-                    server.getCommands().performPrefixedCommand(commandSourceStack, this.command);
+                    server.getCommands().dispatchServerCommand(commandSourceStack, this.command); // CraftBukkit
                 } catch (Throwable var6) {
                     CrashReport crashReport = CrashReport.forThrowable(var6, "Executing command block");
                     CrashReportCategory crashReportCategory = crashReport.addCategory("Command to be executed");
@@ -162,6 +167,7 @@ public abstract class BaseCommandBlock implements CommandSource {
     @Override
     public void sendSystemMessage(Component component) {
         if (this.trackOutput) {
+            org.spigotmc.AsyncCatcher.catchOp("sendSystemMessage to a command block"); // Paper - Don't broadcast messages to command blocks
             this.lastOutput = Component.literal("[" + TIME_FORMAT.format(new Date()) + "] ").append(component);
             this.onUpdated();
         }
@@ -184,7 +190,7 @@ public abstract class BaseCommandBlock implements CommandSource {
     }
 
     public InteractionResult usedBy(Player player) {
-        if (!player.canUseGameMasterBlocks()) {
+        if (!player.canUseGameMasterBlocks() && (!player.isCreative() || !player.getBukkitEntity().hasPermission("minecraft.commandblock"))) { // Paper - command block permission
             return InteractionResult.PASS;
         } else {
             if (player.getCommandSenderWorld().isClientSide) {

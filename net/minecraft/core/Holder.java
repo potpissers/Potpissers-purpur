@@ -230,7 +230,7 @@ public interface Holder<T> {
         }
 
         void bindTags(Collection<TagKey<T>> tags) {
-            this.tags = Set.copyOf(tags);
+            this.tags = it.unimi.dsi.fastutil.objects.ReferenceSets.unmodifiable(new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<>(tags)); // Paper - use reference set because TagKey are interned
         }
 
         @Override

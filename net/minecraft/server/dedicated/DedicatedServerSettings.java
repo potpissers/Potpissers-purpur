@@ -7,9 +7,11 @@ public class DedicatedServerSettings {
     private final Path source;
     private DedicatedServerProperties properties;
 
-    public DedicatedServerSettings(Path source) {
-        this.source = source;
-        this.properties = DedicatedServerProperties.fromFile(source);
+    // CraftBukkit start
+    public DedicatedServerSettings(joptsimple.OptionSet optionset) {
+        this.source = ((java.io.File) optionset.valueOf("config")).toPath();
+        this.properties = DedicatedServerProperties.fromFile(this.source, optionset);
+        // CraftBukkit end
     }
 
     public DedicatedServerProperties getProperties() {

@@ -390,7 +390,10 @@ public class EndCityPieces {
             if (name.startsWith("Chest")) {
                 BlockPos blockPos = pos.below();
                 if (box.isInside(blockPos)) {
-                    RandomizableContainer.setBlockEntityLootTable(level, random, blockPos, BuiltInLootTables.END_CITY_TREASURE);
+                    // CraftBukkit start - ensure block transformation
+                    // RandomizableContainer.setBlockEntityLootTable(level, random, blockPos, BuiltInLootTables.END_CITY_TREASURE);
+                    this.setCraftLootTable(level, blockPos, random, BuiltInLootTables.END_CITY_TREASURE);
+                    // CraftBukkit end
                 }
             } else if (box.isInside(pos) && Level.isInSpawnableBounds(pos)) {
                 if (name.startsWith("Sentry")) {

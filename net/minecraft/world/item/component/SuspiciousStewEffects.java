@@ -41,6 +41,15 @@ public record SuspiciousStewEffects(List<SuspiciousStewEffects.Entry> effects) i
         }
     }
 
+    // CraftBukkit start
+    @Override
+    public void cancelUsingItem(net.minecraft.server.level.ServerPlayer player, ItemStack stack, List<net.minecraft.network.protocol.Packet<? super net.minecraft.network.protocol.game.ClientGamePacketListener>> collectedPackets) { // Paper - properly resend entities - collect packets for bundle
+        for (SuspiciousStewEffects.Entry entry : this.effects) {
+            collectedPackets.add(new net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket(player.getId(), entry.effect())); // Paper - bundlize packets
+        }
+    }
+    // CraftBukkit end
+
     @Override
     public void addToTooltip(Item.TooltipContext context, Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag) {
         if (tooltipFlag.isCreative()) {

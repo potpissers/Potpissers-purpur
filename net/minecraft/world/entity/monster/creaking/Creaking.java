@@ -190,9 +190,9 @@ public class Creaking extends Monster {
     }
 
     @Override
-    public void push(double x, double y, double z) {
+    public void push(double x, double y, double z, @Nullable Entity pushingEntity) { // Paper - add push source entity param
         if (this.canMove()) {
-            super.push(x, y, z);
+            super.push(x, y, z, pushingEntity); // Paper - add push source entity param
         }
     }
 
@@ -317,7 +317,7 @@ public class Creaking extends Monster {
         }
 
         this.makeSound(this.getDeathSound());
-        this.remove(Entity.RemovalReason.DISCARDED);
+        this.remove(Entity.RemovalReason.DISCARDED, null); // CraftBukkit - add Bukkit remove cause
     }
 
     public void creakingDeathEffects(DamageSource damageSource) {
@@ -480,9 +480,9 @@ public class Creaking extends Monster {
     }
 
     @Override
-    public void knockback(double strength, double x, double z) {
+    public void knockback(double strength, double x, double z, @Nullable Entity attacker, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause cause) { // Paper - knockback events
         if (this.canMove()) {
-            super.knockback(strength, x, z);
+            super.knockback(strength, x, z, attacker, cause); // Paper - knockback events
         }
     }
 

@@ -121,7 +121,10 @@ public class ShipwreckPieces {
         protected void handleDataMarker(String name, BlockPos pos, ServerLevelAccessor level, RandomSource random, BoundingBox box) {
             ResourceKey<LootTable> resourceKey = ShipwreckPieces.MARKERS_TO_LOOT.get(name);
             if (resourceKey != null) {
-                RandomizableContainer.setBlockEntityLootTable(level, random, pos.below(), resourceKey);
+                // CraftBukkit start
+                // RandomizableContainer.setBlockEntityLootTable(level, random, pos.below(), resourceKey);
+                this.setCraftLootTable(level, pos.below(), random, resourceKey);
+                // CraftBukkit end
             }
         }
 

@@ -61,8 +61,16 @@ public class SculkCatalystBlock extends BaseEntityBlock {
     @Override
     protected void spawnAfterBreak(BlockState state, ServerLevel level, BlockPos pos, ItemStack stack, boolean dropExperience) {
         super.spawnAfterBreak(state, level, pos, stack, dropExperience);
-        if (dropExperience) {
-            this.tryDropExperience(level, pos, stack, this.xpRange);
-        }
+        // CraftBukkit start - Delegate to getExpDrop
     }
+
+    @Override
+    public int getExpDrop(BlockState state, ServerLevel level, BlockPos pos, ItemStack stack, boolean dropExperience) {
+        if (dropExperience) {
+            return this.tryDropExperience(level, pos, stack, this.xpRange);
+        }
+
+        return 0;
+        // CraftBukkit end
+     }
 }

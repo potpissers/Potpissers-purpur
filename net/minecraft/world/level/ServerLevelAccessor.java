@@ -7,6 +7,17 @@ public interface ServerLevelAccessor extends LevelAccessor {
     ServerLevel getLevel();
 
     default void addFreshEntityWithPassengers(Entity entity) {
-        entity.getSelfAndPassengers().forEach(this::addFreshEntity);
+        // CraftBukkit start
+        this.addFreshEntityWithPassengers(entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.DEFAULT);
     }
+
+    default void addFreshEntityWithPassengers(Entity entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
+        entity.getSelfAndPassengers().forEach((e) -> this.addFreshEntity(e, reason));
+    }
+
+    @Override
+    default ServerLevel getMinecraftWorld() {
+        return this.getLevel();
+    }
+    // CraftBukkit end
 }

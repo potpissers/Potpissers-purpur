@@ -66,7 +66,12 @@ public class VaultServerData {
 
     @VisibleForTesting
     public void addToRewardedPlayers(Player player) {
-        this.rewardedPlayers.add(player.getUUID());
+    // Paper start - Vault API
+        addToRewardedPlayers(player.getUUID());
+    }
+    public boolean addToRewardedPlayers(final java.util.UUID player) {
+        final boolean removed = this.rewardedPlayers.add(player);
+    // Paper end - Vault API
         if (this.rewardedPlayers.size() > 128) {
             Iterator<UUID> iterator = this.rewardedPlayers.iterator();
             if (iterator.hasNext()) {
@@ -76,6 +81,7 @@ public class VaultServerData {
         }
 
         this.markChanged();
+        return removed; // Paper - Vault API
     }
 
     public long stateUpdatingResumesAt() {
@@ -131,4 +137,15 @@ public class VaultServerData {
     public float ejectionProgress() {
         return this.totalEjectionsNeeded == 1 ? 1.0F : 1.0F - Mth.inverseLerp((float)this.getItemsToEject().size(), 1.0F, (float)this.totalEjectionsNeeded);
     }
+
+    // Paper start - Vault API
+    public boolean removeFromRewardedPlayers(final UUID uuid) {
+        if (this.rewardedPlayers.remove(uuid)) {
+            this.markChanged();
+            return true;
+        }
+
+        return false;
+    }
+    // Paper end - Vault API
 }

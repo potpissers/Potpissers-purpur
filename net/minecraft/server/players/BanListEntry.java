@@ -26,7 +26,7 @@ public abstract class BanListEntry<T> extends StoredUserEntry<T> {
     }
 
     protected BanListEntry(@Nullable T user, JsonObject entryData) {
-        super(user);
+        super(BanListEntry.checkExpiry(user, entryData)); // CraftBukkit
 
         Date date;
         try {
@@ -80,4 +80,22 @@ public abstract class BanListEntry<T> extends StoredUserEntry<T> {
         data.addProperty("expires", this.expires == null ? "forever" : DATE_FORMAT.format(this.expires));
         data.addProperty("reason", this.reason);
     }
+
+    // CraftBukkit start
+    private static <T> T checkExpiry(T object, JsonObject jsonobject) {
+        Date expires = null;
+
+        try {
+            expires = jsonobject.has("expires") ? BanListEntry.DATE_FORMAT.parse(jsonobject.get("expires").getAsString()) : null;
+        } catch (ParseException ex) {
+            // Guess we don't have a date
+        }
+
+        if (expires == null || expires.after(new Date())) {
+            return object;
+        } else {
+            return null;
+        }
+    }
+    // CraftBukkit end
 }

@@ -208,6 +208,11 @@ public abstract class SpellcasterIllager extends AbstractIllager {
         public void tick() {
             this.attackWarmupDelay--;
             if (this.attackWarmupDelay == 0) {
+                // CraftBukkit start
+                if (!org.bukkit.craftbukkit.event.CraftEventFactory.handleEntitySpellCastEvent(SpellcasterIllager.this, this.getSpell())) {
+                    return;
+                }
+                // CraftBukkit end
                 this.performSpellCasting();
                 SpellcasterIllager.this.playSound(SpellcasterIllager.this.getCastingSoundEvent(), 1.0F, 1.0F);
             }

@@ -34,6 +34,18 @@ public class Rotations {
         this(tag.getFloat(0), tag.getFloat(1), tag.getFloat(2));
     }
 
+    // Paper start - faster alternative constructor
+    private Rotations(float x, float y, float z, Void dummy_var) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    public static Rotations createWithoutValidityChecks(float x, float y, float z) {
+        return new Rotations(x, y, z, null);
+    }
+    // Paper end - faster alternative constructor
+
     public ListTag save() {
         ListTag listTag = new ListTag();
         listTag.add(FloatTag.valueOf(this.x));

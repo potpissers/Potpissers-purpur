@@ -12,4 +12,11 @@ public record ConversionParams(ConversionType type, boolean keepEquipment, boole
     public interface AfterConversion<T extends Mob> {
         void finalizeConversion(T mob);
     }
+
+    // Paper start - entity zap event - allow conversion to be cancelled during finalization
+    @FunctionalInterface
+    public interface CancellingAfterConversion<T extends Mob> {
+        boolean finalizeConversionOrCancel(final T convertedEntity);
+    }
+    // Paper start - entity zap event - allow conversion to be cancelled during finalization
 }

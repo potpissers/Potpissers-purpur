@@ -85,7 +85,7 @@ public abstract class AbstractWindCharge extends AbstractHurtingProjectile imple
     }
 
     @Override
-    public void push(double x, double y, double z) {
+    public void push(double x, double y, double z, @Nullable Entity pushingEntity) { // Paper - Add EntityKnockbackByEntityEvent and EntityPushedByEntityAttackEvent
     }
 
     public abstract void explode(Vec3 pos);
@@ -98,7 +98,7 @@ public abstract class AbstractWindCharge extends AbstractHurtingProjectile imple
             Vec3 vec3 = Vec3.atLowerCornerOf(unitVec3i).multiply(0.25, 0.25, 0.25);
             Vec3 vec31 = result.getLocation().add(vec3);
             this.explode(vec31);
-            this.discard();
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause
         }
     }
 
@@ -106,7 +106,7 @@ public abstract class AbstractWindCharge extends AbstractHurtingProjectile imple
     protected void onHit(HitResult result) {
         super.onHit(result);
         if (!this.level().isClientSide) {
-            this.discard();
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause
         }
     }
 
@@ -140,7 +140,7 @@ public abstract class AbstractWindCharge extends AbstractHurtingProjectile imple
     public void tick() {
         if (!this.level().isClientSide && this.getBlockY() > this.level().getMaxY() + 30) {
             this.explode(this.position());
-            this.discard();
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.OUT_OF_WORLD); // CraftBukkit - add Bukkit remove cause
         } else {
             super.tick();
         }

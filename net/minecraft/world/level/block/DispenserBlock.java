@@ -50,6 +50,7 @@ public class DispenserBlock extends BaseEntityBlock {
     private static final DefaultDispenseItemBehavior DEFAULT_BEHAVIOR = new DefaultDispenseItemBehavior();
     public static final Map<Item, DispenseItemBehavior> DISPENSER_REGISTRY = new IdentityHashMap<>();
     private static final int TRIGGER_DURATION = 4;
+    public static boolean eventFired = false; // CraftBukkit
 
     @Override
     public MapCodec<? extends DispenserBlock> codec() {
@@ -71,8 +72,7 @@ public class DispenserBlock extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof DispenserBlockEntity dispenserBlockEntity) {
-            player.openMenu(dispenserBlockEntity);
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof DispenserBlockEntity dispenserBlockEntity && player.openMenu(dispenserBlockEntity).isPresent()) { // Paper - Fix InventoryOpenEvent cancellation
             player.awardStat(dispenserBlockEntity instanceof DropperBlockEntity ? Stats.INSPECT_DROPPER : Stats.INSPECT_DISPENSER);
         }
 
@@ -87,18 +87,27 @@ public class DispenserBlock extends BaseEntityBlock {
             BlockSource blockSource = new BlockSource(level, pos, state, dispenserBlockEntity);
             int randomSlot = dispenserBlockEntity.getRandomSlot(level.random);
             if (randomSlot < 0) {
+                if (org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockFailedDispenseEvent(level, pos)) { // Paper - Add BlockFailedDispenseEvent
                 level.levelEvent(1001, pos, 0);
                 level.gameEvent(GameEvent.BLOCK_ACTIVATE, pos, GameEvent.Context.of(dispenserBlockEntity.getBlockState()));
+                } // Paper - Add BlockFailedDispenseEvent
             } else {
                 ItemStack item = dispenserBlockEntity.getItem(randomSlot);
                 DispenseItemBehavior dispenseMethod = this.getDispenseMethod(level, item);
                 if (dispenseMethod != DispenseItemBehavior.NOOP) {
+                    if (!org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockPreDispenseEvent(level, pos, item, randomSlot)) return; // Paper - Add BlockPreDispenseEvent
+                    DispenserBlock.eventFired = false; // CraftBukkit - reset event status
                     dispenserBlockEntity.setItem(randomSlot, dispenseMethod.dispense(blockSource, item));
                 }
             }
         }
     }
 
+    // Paper start - Fix NPE with equippable and items without behavior
+    public static DispenseItemBehavior getDispenseBehavior(BlockSource pointer, ItemStack stack) {
+        return ((DispenserBlock) pointer.state().getBlock()).getDispenseMethod(pointer.level(), stack);
+    }
+    // Paper end - Fix NPE with equippable and items without behavior
     protected DispenseItemBehavior getDispenseMethod(Level level, ItemStack item) {
         if (!item.isItemEnabled(level.enabledFeatures())) {
             return DEFAULT_BEHAVIOR;

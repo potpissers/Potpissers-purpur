@@ -38,7 +38,7 @@ public class SpectralArrow extends AbstractArrow {
     protected void doPostHurtEffects(LivingEntity living) {
         super.doPostHurtEffects(living);
         MobEffectInstance mobEffectInstance = new MobEffectInstance(MobEffects.GLOWING, this.duration, 0);
-        living.addEffect(mobEffectInstance, this.getEffectSource());
+        living.addEffect(mobEffectInstance, this.getEffectSource(), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.ARROW); // CraftBukkit
     }
 
     @Override

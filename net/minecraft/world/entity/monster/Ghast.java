@@ -63,6 +63,12 @@ public class Ghast extends FlyingMob implements Enemy {
         return this.explosionPower;
     }
 
+    // Paper start
+    public void setExplosionPower(int explosionPower) {
+        this.explosionPower = explosionPower;
+    }
+    // Paper end
+
     @Override
     protected boolean shouldDespawnInPeaceful() {
         return true;
@@ -277,6 +283,7 @@ public class Ghast extends FlyingMob implements Enemy {
                         }
 
                         LargeFireball largeFireball = new LargeFireball(level, this.ghast, vec3.normalize(), this.ghast.getExplosionPower());
+                        largeFireball.bukkitYield = largeFireball.explosionPower = this.ghast.getExplosionPower(); // CraftBukkit - set bukkitYield when setting explosionPower
                         largeFireball.setPos(this.ghast.getX() + viewVector.x * 4.0, this.ghast.getY(0.5) + 0.5, largeFireball.getZ() + viewVector.z * 4.0);
                         level.addFreshEntity(largeFireball);
                         this.chargeTime = -40;

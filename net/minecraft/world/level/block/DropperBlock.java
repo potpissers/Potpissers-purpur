@@ -8,6 +8,7 @@ import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.CompoundContainer;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -23,7 +24,7 @@ import org.slf4j.Logger;
 public class DropperBlock extends DispenserBlock {
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final MapCodec<DropperBlock> CODEC = simpleCodec(DropperBlock::new);
-    private static final DispenseItemBehavior DISPENSE_BEHAVIOUR = new DefaultDispenseItemBehavior();
+    private static final DispenseItemBehavior DISPENSE_BEHAVIOUR = new DefaultDispenseItemBehavior(true); // CraftBukkit
 
     @Override
     public MapCodec<DropperBlock> codec() {
@@ -53,6 +54,7 @@ public class DropperBlock extends DispenserBlock {
             BlockSource blockSource = new BlockSource(level, pos, state, dispenserBlockEntity);
             int randomSlot = dispenserBlockEntity.getRandomSlot(level.random);
             if (randomSlot < 0) {
+                if (org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockFailedDispenseEvent(level, pos)) // Paper - Add BlockFailedDispenseEvent
                 level.levelEvent(1001, pos, 0);
             } else {
                 ItemStack item = dispenserBlockEntity.getItem(randomSlot);
@@ -61,10 +63,29 @@ public class DropperBlock extends DispenserBlock {
                     Container containerAt = HopperBlockEntity.getContainerAt(level, pos.relative(direction));
                     ItemStack itemStack;
                     if (containerAt == null) {
+                        if (!org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockPreDispenseEvent(level, pos, item, randomSlot)) return; // Paper - Add BlockPreDispenseEvent
                         itemStack = DISPENSE_BEHAVIOUR.dispense(blockSource, item);
                     } else {
-                        itemStack = HopperBlockEntity.addItem(dispenserBlockEntity, containerAt, item.copyWithCount(1), direction.getOpposite());
-                        if (itemStack.isEmpty()) {
+                        // CraftBukkit start - Fire event when pushing items into other inventories
+                        org.bukkit.craftbukkit.inventory.CraftItemStack oitemstack = org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(item.copyWithCount(1));
+
+                        org.bukkit.inventory.Inventory destinationInventory;
+                        // Have to special case large chests as they work oddly
+                        if (containerAt instanceof CompoundContainer compoundContainer) {
+                            destinationInventory = new org.bukkit.craftbukkit.inventory.CraftInventoryDoubleChest(compoundContainer);
+                        } else {
+                            destinationInventory = containerAt.getOwner().getInventory();
+                        }
+
+                        org.bukkit.event.inventory.InventoryMoveItemEvent event = new org.bukkit.event.inventory.InventoryMoveItemEvent(dispenserBlockEntity.getOwner().getInventory(), oitemstack, destinationInventory, true);
+                        level.getCraftServer().getPluginManager().callEvent(event);
+                        if (event.isCancelled()) {
+                            return;
+                        }
+                        itemStack = HopperBlockEntity.addItem(dispenserBlockEntity, containerAt, org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getItem()), direction.getOpposite());
+                        if (event.getItem().equals(oitemstack) && itemStack.isEmpty()) {
+                            // CraftBukkit end
+
                             itemStack = item.copy();
                             itemStack.shrink(1);
                         } else {

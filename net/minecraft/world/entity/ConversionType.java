@@ -21,7 +21,7 @@ public enum ConversionType {
 
                 for (Entity entity : newMob.getPassengers()) {
                     entity.stopRiding();
-                    entity.remove(Entity.RemovalReason.DISCARDED);
+                    entity.remove(Entity.RemovalReason.DISCARDED, org.bukkit.event.entity.EntityRemoveEvent.Cause.TRANSFORMATION); // CraftBukkit - add Bukkit remove cause
                 }
 
                 firstPassenger.startRiding(newMob);

@@ -26,6 +26,7 @@ public class CocoaDecorator extends TreeDecorator {
 
     @Override
     public void place(TreeDecorator.Context context) {
+        if (context.logs().isEmpty()) return; // Paper - Fix crash when trying to generate without logs
         RandomSource randomSource = context.random();
         if (!(randomSource.nextFloat() >= this.probability)) {
             List<BlockPos> list = context.logs();

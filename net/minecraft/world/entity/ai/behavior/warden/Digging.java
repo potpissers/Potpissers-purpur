@@ -39,7 +39,7 @@ public class Digging<E extends Warden> extends Behavior<E> {
     @Override
     protected void stop(ServerLevel level, E entity, long gameTime) {
         if (entity.getRemovalReason() == null) {
-            entity.remove(Entity.RemovalReason.DISCARDED);
+            entity.remove(Entity.RemovalReason.DISCARDED, org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - Add bukkit remove cause
         }
     }
 }

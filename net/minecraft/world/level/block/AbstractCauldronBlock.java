@@ -58,7 +58,7 @@ public abstract class AbstractCauldronBlock extends Block {
         ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult
     ) {
         CauldronInteraction cauldronInteraction = this.interactions.map().get(stack.getItem());
-        return cauldronInteraction.interact(state, level, pos, player, hand, stack);
+        return cauldronInteraction.interact(state, level, pos, player, hand, stack, hitResult.getDirection()); // Paper - pass hit direction
     }
 
     @Override

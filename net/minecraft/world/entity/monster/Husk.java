@@ -57,7 +57,7 @@ public class Husk extends Zombie {
         boolean flag = super.doHurtTarget(level, source);
         if (flag && this.getMainHandItem().isEmpty() && source instanceof LivingEntity) {
             float effectiveDifficulty = this.level().getCurrentDifficultyAt(this.blockPosition()).getEffectiveDifficulty();
-            ((LivingEntity)source).addEffect(new MobEffectInstance(MobEffects.HUNGER, 140 * (int)effectiveDifficulty), this);
+            ((LivingEntity)source).addEffect(new MobEffectInstance(MobEffects.HUNGER, 140 * (int)effectiveDifficulty), this, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.ATTACK); // CraftBukkit
         }
 
         return flag;

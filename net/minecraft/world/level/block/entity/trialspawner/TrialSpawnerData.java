@@ -206,7 +206,7 @@ public class TrialSpawnerData {
                     mob.dropPreservedEquipment(level);
                 }
 
-                entity.remove(Entity.RemovalReason.DISCARDED);
+                entity.remove(Entity.RemovalReason.DISCARDED, org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - Add bukkit remove cause;
             }
         });
         if (!spawner.getOminousConfig().spawnPotentialsDefinition().isEmpty()) {

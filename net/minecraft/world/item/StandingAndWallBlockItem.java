@@ -42,7 +42,20 @@ public class StandingAndWallBlockItem extends BlockItem {
             }
         }
 
-        return blockState != null && level.isUnobstructed(blockState, clickedPos, CollisionContext.empty()) ? blockState : null;
+        // return blockState != null && level.isUnobstructed(blockState, clickedPos, CollisionContext.empty()) ? blockState : null;
+        // CraftBukkit start
+        if (blockState != null) {
+            boolean defaultReturn = level.isUnobstructed(blockState, clickedPos, CollisionContext.empty());
+            org.bukkit.entity.Player player = (context.getPlayer() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) ? serverPlayer.getBukkitEntity() : null;
+
+            org.bukkit.event.block.BlockCanBuildEvent event = new org.bukkit.event.block.BlockCanBuildEvent(org.bukkit.craftbukkit.block.CraftBlock.at(context.getLevel(), clickedPos), player, org.bukkit.craftbukkit.block.data.CraftBlockData.fromData(blockState), defaultReturn, org.bukkit.craftbukkit.CraftEquipmentSlot.getHand(context.getHand())); // Paper - Expose hand in BlockCanBuildEvent
+            context.getLevel().getCraftServer().getPluginManager().callEvent(event);
+
+            return (event.isBuildable()) ? blockState : null;
+        } else {
+            return null;
+        }
+        // CraftBukkit end
     }
 
     @Override

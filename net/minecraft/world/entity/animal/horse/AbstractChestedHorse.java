@@ -69,6 +69,12 @@ public abstract class AbstractChestedHorse extends AbstractHorse {
         super.dropEquipment(level);
         if (this.hasChest()) {
             this.spawnAtLocation(level, Blocks.CHEST);
+            // Paper start - moved to post death logic
+        }
+    }
+    protected void postDeathDropItems(org.bukkit.event.entity.EntityDeathEvent event) {
+        if (this.hasChest() && !event.isCancelled()) {
+            // Paper end - moved to post death logic
             this.setChest(false);
         }
     }

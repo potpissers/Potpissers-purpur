@@ -67,6 +67,11 @@ public class AxeItem extends DiggerItem {
                 return InteractionResult.PASS;
             } else {
                 ItemStack itemInHand = context.getItemInHand();
+                // Paper start - EntityChangeBlockEvent
+                if (!org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(player, clickedPos, optional.get())) {
+                    return InteractionResult.PASS;
+                }
+                // Paper end
                 if (player instanceof ServerPlayer) {
                     CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer)player, clickedPos, itemInHand);
                 }

@@ -71,6 +71,7 @@ public abstract class BaseRailBlock extends Block implements SimpleWaterloggedBl
         state = this.updateDir(level, pos, state, true);
         if (this.isStraight) {
             level.neighborChanged(state, pos, this, null, movedByPiston);
+            state = level.getBlockState(pos); // Paper - Fix some rails connecting improperly
         }
 
         return state;

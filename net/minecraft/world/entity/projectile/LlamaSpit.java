@@ -43,16 +43,16 @@ public class LlamaSpit extends Projectile {
         super.tick();
         Vec3 deltaMovement = this.getDeltaMovement();
         HitResult hitResultOnMoveVector = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
-        this.hitTargetOrDeflectSelf(hitResultOnMoveVector);
+        this.preHitTargetOrDeflectSelf(hitResultOnMoveVector); // CraftBukkit - projectile hit event
         double d = this.getX() + deltaMovement.x;
         double d1 = this.getY() + deltaMovement.y;
         double d2 = this.getZ() + deltaMovement.z;
         this.updateRotation();
         float f = 0.99F;
         if (this.level().getBlockStates(this.getBoundingBox()).noneMatch(BlockBehaviour.BlockStateBase::isAir)) {
-            this.discard();
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
         } else if (this.isInWaterOrBubble()) {
-            this.discard();
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
         } else {
             this.setDeltaMovement(deltaMovement.scale(0.99F));
             this.applyGravity();
@@ -76,7 +76,7 @@ public class LlamaSpit extends Projectile {
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
         if (!this.level().isClientSide) {
-            this.discard();
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause
         }
     }
 

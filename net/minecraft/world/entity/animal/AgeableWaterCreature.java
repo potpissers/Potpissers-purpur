@@ -68,6 +68,10 @@ public abstract class AgeableWaterCreature extends AgeableMob {
     ) {
         int seaLevel = level.getSeaLevel();
         int i = seaLevel - 13;
+        // Paper start - Make water animal spawn height configurable
+        seaLevel = level.getMinecraftWorld().paperConfig().entities.spawning.wateranimalSpawnHeight.maximum.or(seaLevel);
+        i = level.getMinecraftWorld().paperConfig().entities.spawning.wateranimalSpawnHeight.minimum.or(i);
+        // Paper end - Make water animal spawn height configurable
         return pos.getY() >= i
             && pos.getY() <= seaLevel
             && level.getFluidState(pos.below()).is(FluidTags.WATER)

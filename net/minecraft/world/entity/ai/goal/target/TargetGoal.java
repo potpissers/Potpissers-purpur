@@ -63,7 +63,7 @@ public abstract class TargetGoal extends Goal {
                         }
                     }
 
-                    this.mob.setTarget(target);
+                    this.mob.setTarget(target, org.bukkit.event.entity.EntityTargetEvent.TargetReason.CLOSEST_ENTITY, true); // CraftBukkit
                     return true;
                 }
             }
@@ -83,7 +83,7 @@ public abstract class TargetGoal extends Goal {
 
     @Override
     public void stop() {
-        this.mob.setTarget(null);
+        this.mob.setTarget(null, org.bukkit.event.entity.EntityTargetEvent.TargetReason.FORGOT_TARGET, true); // CraftBukkit
         this.targetMob = null;
     }
 

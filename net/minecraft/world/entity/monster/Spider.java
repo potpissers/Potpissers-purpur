@@ -79,7 +79,7 @@ public class Spider extends Monster {
     public void tick() {
         super.tick();
         if (!this.level().isClientSide) {
-            this.setClimbing(this.horizontalCollision);
+            this.setClimbing(this.horizontalCollision && (this.level().paperConfig().entities.behavior.allowSpiderWorldBorderClimbing || !(io.papermc.paper.FeatureHooks.isSpiderCollidingWithWorldBorder(this) && this.level().getWorldBorder().isInsideCloseToBorder(this, this.getBoundingBox())))); // Paper - Add config option for spider worldborder climbing (Inflate by +EPSILON as collision will just barely place us outside border)
         }
     }
 
@@ -121,7 +121,7 @@ public class Spider extends Monster {
 
     @Override
     public boolean canBeAffected(MobEffectInstance potioneffect) {
-        return !potioneffect.is(MobEffects.POISON) && super.canBeAffected(potioneffect);
+        return (!potioneffect.is(MobEffects.POISON) || !this.level().paperConfig().entities.mobEffects.spidersImmuneToPoisonEffect) && super.canBeAffected(potioneffect); // Paper - Add config for mobs immune to default effects
     }
 
     public boolean isClimbing() {
@@ -165,7 +165,7 @@ public class Spider extends Monster {
         if (spawnGroupData instanceof Spider.SpiderEffectsGroupData spiderEffectsGroupData) {
             Holder<MobEffect> holder = spiderEffectsGroupData.effect;
             if (holder != null) {
-                this.addEffect(new MobEffectInstance(holder, -1));
+                this.addEffect(new MobEffectInstance(holder, -1), null, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.SPIDER_SPAWN, level instanceof net.minecraft.server.level.ServerLevel); // CraftBukkit
             }
         }
 

@@ -76,6 +76,7 @@ public class MobEffect implements FeatureElement {
     public void applyInstantenousEffect(
         ServerLevel level, @Nullable Entity source, @Nullable Entity indirectSource, LivingEntity entity, int amplifier, double health
     ) {
+        if (!new io.papermc.paper.event.entity.EntityEffectTickEvent(entity.getBukkitLivingEntity(), org.bukkit.craftbukkit.potion.CraftPotionEffectType.minecraftToBukkit(this), amplifier).callEvent()) { return; } // Paper - Add EntityEffectTickEvent
         this.applyEffectTick(level, entity, amplifier);
     }
 

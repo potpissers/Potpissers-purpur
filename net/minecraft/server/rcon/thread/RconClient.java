@@ -23,11 +23,14 @@ public class RconClient extends GenericThread {
     private final Socket client;
     private final byte[] buf = new byte[1460];
     private final String rconPassword;
-    private final ServerInterface serverInterface;
+    // CraftBukkit start
+    private final net.minecraft.server.dedicated.DedicatedServer serverInterface;
+    private final net.minecraft.server.rcon.RconConsoleSource rconConsoleSource;
+    // CraftBukkit end
 
     RconClient(ServerInterface serverInterface, String rconPassword, Socket client) {
         super("RCON Client " + client.getInetAddress());
-        this.serverInterface = serverInterface;
+        this.serverInterface = (net.minecraft.server.dedicated.DedicatedServer) serverInterface; // CraftBukkit
         this.client = client;
 
         try {
@@ -37,6 +40,7 @@ public class RconClient extends GenericThread {
         }
 
         this.rconPassword = rconPassword;
+        this.rconConsoleSource = new net.minecraft.server.rcon.RconConsoleSource(this.serverInterface, client.getRemoteSocketAddress()); // CraftBukkit
     }
 
     @Override
@@ -67,7 +71,7 @@ public class RconClient extends GenericThread {
                                 String string1 = PktUtils.stringFromByteArray(this.buf, i1, i);
 
                                 try {
-                                    this.sendCmdResponse(i3, this.serverInterface.runCommand(string1));
+                                    this.sendCmdResponse(i3, this.serverInterface.runCommand(this.rconConsoleSource, string1)); // CraftBukkit
                                 } catch (Exception var15) {
                                     this.sendCmdResponse(i3, "Error executing: " + string1 + " (" + var15.getMessage() + ")");
                                 }

@@ -123,7 +123,7 @@ public class MangrovePropaguleBlock extends SaplingBlock implements SimpleWaterl
     @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!isHanging(state)) {
-            if (random.nextInt(7) == 0) {
+            if (random.nextFloat() < (level.spigotConfig.saplingModifier / (100.0F * 7))) { // Paper - Fix Spigot growth modifiers
                 this.advanceTree(level, pos, state, random);
             }
         } else {

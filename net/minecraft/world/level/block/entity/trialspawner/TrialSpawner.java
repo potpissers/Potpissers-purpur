@@ -237,7 +237,14 @@ public final class TrialSpawner {
                                 nextSpawnData.getEquipment().ifPresent(mob::equip);
                             }
 
-                            if (!level.tryAddFreshEntityWithPassengers(entity)) {
+                            entity.spawnedViaMobSpawner = true; // Paper
+                            entity.spawnReason = org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.TRIAL_SPAWNER; // Paper - Entity#getEntitySpawnReason
+                            // CraftBukkit start
+                            if (org.bukkit.craftbukkit.event.CraftEventFactory.callTrialSpawnerSpawnEvent(entity, pos).isCancelled()) {
+                                return Optional.empty();
+                            }
+                            if (!level.tryAddFreshEntityWithPassengers(entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.TRIAL_SPAWNER)) {
+                                // CraftBukkit end
                                 return Optional.empty();
                             } else {
                                 TrialSpawner.FlameParticle flameParticle = this.isOminous
@@ -260,6 +267,19 @@ public final class TrialSpawner {
         LootParams lootParams = new LootParams.Builder(level).create(LootContextParamSets.EMPTY);
         ObjectArrayList<ItemStack> randomItems = lootTable1.getRandomItems(lootParams);
         if (!randomItems.isEmpty()) {
+            // CraftBukkit start
+            org.bukkit.event.block.BlockDispenseLootEvent spawnerDispenseLootEvent = org.bukkit.craftbukkit.event.CraftEventFactory.callBlockDispenseLootEvent(
+                level,
+                pos,
+                null,
+                randomItems
+            );
+            if (spawnerDispenseLootEvent.isCancelled()) {
+                return;
+            }
+
+            randomItems = new ObjectArrayList<>(spawnerDispenseLootEvent.getDispensedLoot().stream().map(org.bukkit.craftbukkit.inventory.CraftItemStack::asNMSCopy).toList());
+            // CraftBukkit end
             for (ItemStack itemStack : randomItems) {
                 DefaultDispenseItemBehavior.spawnItem(level, itemStack, 2, Direction.UP, Vec3.atBottomCenterOf(pos).relative(Direction.UP, 1.2));
             }

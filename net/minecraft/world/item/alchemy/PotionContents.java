@@ -158,7 +158,7 @@ public record PotionContents(Optional<Holder<Potion>> potion, Optional<Integer> 
                 if (mobEffectInstance.getEffect().value().isInstantenous()) {
                     mobEffectInstance.getEffect().value().applyInstantenousEffect(serverLevel, player1, player1, entity, mobEffectInstance.getAmplifier(), 1.0);
                 } else {
-                    entity.addEffect(mobEffectInstance);
+                    entity.addEffect(mobEffectInstance, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.POTION_DRINK); // CraftBukkit
                 }
             });
         }

@@ -34,7 +34,12 @@ public class DoubleBlockCombiner {
                 return new DoubleBlockCombiner.NeighborCombineResult.Single<>(blockEntity);
             } else {
                 BlockPos blockPos = pos.relative(directionGetter.apply(state));
-                BlockState blockState = level.getBlockState(blockPos);
+                // Paper start - Don't load Chunks from Hoppers and other things
+                BlockState blockState = level.getBlockStateIfLoaded(blockPos);
+                if (blockState == null) {
+                    return new DoubleBlockCombiner.NeighborCombineResult.Single<>(blockEntity);
+                }
+                // Paper end - Don't load Chunks from Hoppers and other things
                 if (blockState.is(state.getBlock())) {
                     DoubleBlockCombiner.BlockType blockType1 = doubleBlockTypeGetter.apply(blockState);
                     if (blockType1 != DoubleBlockCombiner.BlockType.SINGLE

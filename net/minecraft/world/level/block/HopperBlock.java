@@ -125,8 +125,7 @@ public class HopperBlock extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof HopperBlockEntity hopperBlockEntity) {
-            player.openMenu(hopperBlockEntity);
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof HopperBlockEntity hopperBlockEntity && player.openMenu(hopperBlockEntity).isPresent()) { // Paper - Fix InventoryOpenEvent cancellation
             player.awardStat(Stats.INSPECT_HOPPER);
         }
 
@@ -178,6 +177,7 @@ public class HopperBlock extends BaseEntityBlock {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        if (!new io.papermc.paper.event.entity.EntityInsideBlockEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.block.CraftBlock.at(level, pos)).callEvent()) { return; } // Paper - Add EntityInsideBlockEvent
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof HopperBlockEntity) {
             HopperBlockEntity.entityInside(level, pos, state, entity, (HopperBlockEntity)blockEntity);

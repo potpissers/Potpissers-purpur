@@ -118,6 +118,7 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
     private float dancingAnimationTicks;
     private float spinningAnimationTicks;
     private float spinningAnimationTicks0;
+    public boolean forceDancing = false; // CraftBukkit
 
     public Allay(EntityType<? extends Allay> entityType, Level level) {
         super(entityType, level);
@@ -130,6 +131,12 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
             new Allay.JukeboxListener(this.vibrationUser.getPositionSource(), GameEvent.JUKEBOX_PLAY.value().notificationRadius())
         );
     }
+
+    // CraftBukkit start
+    public void setCanDuplicate(boolean canDuplicate) {
+        this.entityData.set(Allay.DATA_CAN_DUPLICATE, canDuplicate);
+    }
+    // CraftBukkit end
 
     @Override
     protected Brain.Provider<Allay> brainProvider() {
@@ -252,7 +259,7 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
     public void aiStep() {
         super.aiStep();
         if (!this.level().isClientSide && this.isAlive() && this.tickCount % 10 == 0) {
-            this.heal(1.0F);
+            this.heal(1.0F, org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.REGEN); // CraftBukkit
         }
 
         if (this.isDancing() && this.shouldStopDancing() && this.tickCount % 20 == 0) {
@@ -320,7 +327,12 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
         ItemStack itemInHand = player.getItemInHand(hand);
         ItemStack itemInHand1 = this.getItemInHand(InteractionHand.MAIN_HAND);
         if (this.isDancing() && itemInHand.is(ItemTags.DUPLICATES_ALLAYS) && this.canDuplicate()) {
-            this.duplicateAllay();
+            // CraftBukkit start - handle cancel duplication
+            Allay allay = this.duplicateAllay();
+            if (allay == null) {
+                return InteractionResult.SUCCESS;
+            }
+            // CraftBukkit end
             this.level().broadcastEntityEvent(this, (byte)18);
             this.level().playSound(player, this, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.NEUTRAL, 2.0F, 1.0F);
             this.removeInteractionItem(player, itemInHand);
@@ -425,6 +437,7 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
     }
 
     private boolean shouldStopDancing() {
+        if (this.forceDancing) {return false;} // CraftBukkit
         return this.jukeboxPos == null
             || !this.jukeboxPos.closerToCenterThan(this.position(), GameEvent.JUKEBOX_PLAY.value().notificationRadius())
             || !this.level().getBlockState(this.jukeboxPos).is(Blocks.JUKEBOX);
@@ -489,7 +502,7 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
                 .ifPresent(data -> this.vibrationData = data);
         }
 
-        this.duplicationCooldown = compound.getInt("DuplicationCooldown");
+        this.duplicationCooldown = compound.getLong("DuplicationCooldown"); // Paper - Load as long
         this.entityData.set(DATA_CAN_DUPLICATE, compound.getBoolean("CanDuplicate"));
     }
 
@@ -508,15 +521,17 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
         }
     }
 
-    public void duplicateAllay() {
+    @Nullable public Allay duplicateAllay() { // CraftBukkit - return allay
         Allay allay = EntityType.ALLAY.create(this.level(), EntitySpawnReason.BREEDING);
         if (allay != null) {
             allay.moveTo(this.position());
             allay.setPersistenceRequired();
             allay.resetDuplicationCooldown();
             this.resetDuplicationCooldown();
-            this.level().addFreshEntity(allay);
+            this.level().addFreshEntity(allay, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.DUPLICATION); // CraftBukkit - reason for duplicated allay
         }
+
+        return allay; // CraftBukkit
     }
 
     public void resetDuplicationCooldown() {

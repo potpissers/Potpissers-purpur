@@ -48,7 +48,7 @@ public class DefendVillageTargetGoal extends TargetGoal {
 
     @Override
     public void start() {
-        this.golem.setTarget(this.potentialTarget);
+        this.golem.setTarget(this.potentialTarget, org.bukkit.event.entity.EntityTargetEvent.TargetReason.DEFEND_VILLAGE, true); // CraftBukkit - reason
         super.start();
     }
 }

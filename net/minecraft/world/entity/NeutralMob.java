@@ -39,18 +39,11 @@ public interface NeutralMob {
             } else {
                 UUID uuid = tag.getUUID("AngryAt");
                 this.setPersistentAngerTarget(uuid);
-                Entity entity = ((ServerLevel)level).getEntity(uuid);
-                if (entity != null) {
-                    if (entity instanceof Mob mob) {
-                        this.setTarget(mob);
-                        this.setLastHurtByMob(mob);
-                    }
-
-                    if (entity instanceof Player player) {
-                        this.setTarget(player);
-                        this.setLastHurtByPlayer(player);
-                    }
-                }
+                // Paper - Prevent entity loading causing async lookups; Moved diff to separate method
+                // If this entity already survived its first tick, e.g. is loaded and ticked in sync, actively
+                // tick the initial persistent anger.
+                // If not, let the first tick on the baseTick call the method later down the line.
+                if (this instanceof Entity entity && !entity.firstTick) this.tickInitialPersistentAnger(level);
             }
         }
     }
@@ -104,7 +97,7 @@ public interface NeutralMob {
     default void stopBeingAngry() {
         this.setLastHurtByMob(null);
         this.setPersistentAngerTarget(null);
-        this.setTarget(null);
+        this.setTarget(null, org.bukkit.event.entity.EntityTargetEvent.TargetReason.FORGOT_TARGET, true); // CraftBukkit
         this.setRemainingPersistentAngerTime(0);
     }
 
@@ -117,8 +110,33 @@ public interface NeutralMob {
 
     void setTarget(@Nullable LivingEntity livingEntity);
 
+    boolean setTarget(@Nullable LivingEntity entityliving, org.bukkit.event.entity.EntityTargetEvent.TargetReason reason, boolean fireEvent); // CraftBukkit
+
     boolean canAttack(LivingEntity entity);
 
     @Nullable
     LivingEntity getTarget();
+
+    // Paper start - Prevent entity loading causing async lookups
+    // Update last hurt when ticking
+    default void tickInitialPersistentAnger(Level level) {
+        UUID uuid = getPersistentAngerTarget();
+        if (uuid == null) {
+            return;
+        }
+
+        Entity entity = ((ServerLevel)level).getEntity(uuid);
+        if (entity != null) {
+            if (entity instanceof Mob mob) {
+                this.setTarget(mob, org.bukkit.event.entity.EntityTargetEvent.TargetReason.UNKNOWN, false); // CraftBukkit
+                this.setLastHurtByMob(mob);
+            }
+
+            if (entity instanceof Player player) {
+                this.setTarget(player, org.bukkit.event.entity.EntityTargetEvent.TargetReason.UNKNOWN, false); // CraftBukkit
+                this.setLastHurtByPlayer(player);
+            }
+        }
+    }
+    // Paper end - Prevent entity loading causing async lookups
 }

@@ -62,6 +62,7 @@ public class Tadpole extends AbstractFish {
         MemoryModuleType.BREED_TARGET,
         MemoryModuleType.IS_PANICKING
     );
+    public boolean ageLocked; // Paper
 
     public Tadpole(EntityType<? extends AbstractFish> entityType, Level level) {
         super(entityType, level);
@@ -113,7 +114,7 @@ public class Tadpole extends AbstractFish {
     @Override
     public void aiStep() {
         super.aiStep();
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide && !this.ageLocked) { // Paper
             this.setAge(this.age + 1);
         }
     }
@@ -122,12 +123,14 @@ public class Tadpole extends AbstractFish {
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("Age", this.age);
+        compound.putBoolean("AgeLocked", this.ageLocked); // Paper
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         this.setAge(compound.getInt("Age"));
+        this.ageLocked = compound.getBoolean("AgeLocked"); // Paper
     }
 
     @Nullable
@@ -177,7 +180,12 @@ public class Tadpole extends AbstractFish {
     @Override
     public void saveToBucketTag(ItemStack stack) {
         Bucketable.saveDefaultDataToBucketTag(this, stack);
-        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, stack, compoundTag -> compoundTag.putInt("Age", this.getAge()));
+        // Paper start - Save tadpole age
+        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, stack, compoundTag -> {
+            compoundTag.putInt("Age", this.getAge());
+            compoundTag.putBoolean("AgeLocked", this.ageLocked);
+        });
+        // Paper end - Save tadpole age
     }
 
     @Override
@@ -186,6 +194,7 @@ public class Tadpole extends AbstractFish {
         if (tag.contains("Age")) {
             this.setAge(tag.getInt("Age"));
         }
+        this.ageLocked = tag.getBoolean("AgeLocked"); // Paper
     }
 
     @Override
@@ -217,6 +226,7 @@ public class Tadpole extends AbstractFish {
     }
 
     private void ageUp(int offset) {
+        if (this.ageLocked) return; // Paper
         this.setAge(this.age + offset * 20);
     }
 
@@ -229,12 +239,17 @@ public class Tadpole extends AbstractFish {
 
     private void ageUp() {
         if (this.level() instanceof ServerLevel serverLevel) {
-            this.convertTo(EntityType.FROG, ConversionParams.single(this, false, false), mob -> {
+            Frog converted = this.convertTo(EntityType.FROG, ConversionParams.single(this, false, false), mob -> { // CraftBukkit
                 mob.finalizeSpawn(serverLevel, this.level().getCurrentDifficultyAt(mob.blockPosition()), EntitySpawnReason.CONVERSION, null);
                 mob.setPersistenceRequired();
                 mob.fudgePositionAfterSizeChange(this.getDimensions(this.getPose()));
                 this.playSound(SoundEvents.TADPOLE_GROW_UP, 0.15F, 1.0F);
-            });
+            // CraftBukkit start
+            }, org.bukkit.event.entity.EntityTransformEvent.TransformReason.METAMORPHOSIS, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.METAMORPHOSIS);
+            if (converted == null) {
+                this.setAge(0); // Sets the age to 0 for avoid a loop if the event is canceled
+            }
+            // CraftBukkit end
         }
     }
 

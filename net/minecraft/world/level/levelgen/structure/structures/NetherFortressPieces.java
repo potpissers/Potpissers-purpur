@@ -1265,10 +1265,13 @@ public class NetherFortressPieces {
                 BlockPos worldPos = this.getWorldPos(3, 5, 5);
                 if (box.isInside(worldPos)) {
                     this.hasPlacedSpawner = true;
-                    level.setBlock(worldPos, Blocks.SPAWNER.defaultBlockState(), 2);
-                    if (level.getBlockEntity(worldPos) instanceof SpawnerBlockEntity spawnerBlockEntity) {
-                        spawnerBlockEntity.setEntityId(EntityType.BLAZE, random);
-                    }
+                    // CraftBukkit start
+                    // level.setBlock(worldPos, Blocks.SPAWNER.defaultBlockState(), 2);
+                    // if (level.getBlockEntity(worldPos) instanceof SpawnerBlockEntity spawnerBlockEntity) {
+                    //     spawnerBlockEntity.setEntityId(EntityType.BLAZE, random);
+                    // }
+                    this.placeCraftSpawner(level, worldPos, org.bukkit.entity.EntityType.BLAZE, 2);
+                    // CraftBukkit end
                 }
             }
 

@@ -29,7 +29,7 @@ public record LodestoneTracker(Optional<GlobalPos> target, boolean tracked) {
                 return this;
             } else {
                 BlockPos blockPos = this.target.get().pos();
-                return level.isInWorldBounds(blockPos) && level.getPoiManager().existsAtPosition(PoiTypes.LODESTONE, blockPos)
+                return level.isInWorldBounds(blockPos) && (!level.hasChunkAt(blockPos) || level.getPoiManager().existsAtPosition(PoiTypes.LODESTONE, blockPos)) // Paper - Prevent compass from loading chunks
                     ? this
                     : new LodestoneTracker(Optional.empty(), true);
             }

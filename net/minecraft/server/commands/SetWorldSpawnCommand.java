@@ -33,7 +33,7 @@ public class SetWorldSpawnCommand {
 
     private static int setSpawn(CommandSourceStack source, BlockPos pos, float angle) {
         ServerLevel level = source.getLevel();
-        if (level.dimension() != Level.OVERWORLD) {
+        if (false && level.dimension() != Level.OVERWORLD) { // CraftBukkit - SPIGOT-7649: allow in all worlds
             source.sendFailure(Component.translatable("commands.setworldspawn.failure.not_overworld"));
             return 0;
         } else {

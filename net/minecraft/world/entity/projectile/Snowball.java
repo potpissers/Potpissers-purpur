@@ -61,7 +61,7 @@ public class Snowball extends ThrowableItemProjectile {
         super.onHit(result);
         if (!this.level().isClientSide) {
             this.level().broadcastEntityEvent(this, (byte)3);
-            this.discard();
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause
         }
     }
 }

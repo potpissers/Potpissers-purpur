@@ -55,7 +55,13 @@ public record TeleportRandomlyConsumeEffect(float diameter) implements ConsumeEf
             }
 
             Vec3 vec3 = entity.position();
-            if (entity.randomTeleport(d, d1, d2, true)) {
+            // CraftBukkit start - handle canceled status of teleport event
+            java.util.Optional<Boolean> status = entity.randomTeleport(d, d1, d2, true, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT);
+
+            // teleport event was canceled, no more tries
+            if (status.isEmpty()) break;
+            if (status.get()) {
+                // CraftBukkit end
                 level.gameEvent(GameEvent.TELEPORT, vec3, GameEvent.Context.of(entity));
                 SoundSource soundSource;
                 SoundEvent soundEvent;

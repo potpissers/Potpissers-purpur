@@ -101,4 +101,6 @@ public interface LevelAccessor extends CommonLevelAccessor, LevelTimeAccess, Sch
     default void gameEvent(ResourceKey<GameEvent> gameEvent, BlockPos pos, GameEvent.Context context) {
         this.gameEvent(this.registryAccess().lookupOrThrow(Registries.GAME_EVENT).getOrThrow(gameEvent), pos, context);
     }
+
+    net.minecraft.server.level.ServerLevel getMinecraftWorld(); // CraftBukkit
 }

@@ -141,10 +141,12 @@ public class Armadillo extends Animal {
         ArmadilloAi.updateActivity(this);
         profilerFiller.pop();
         if (this.isAlive() && !this.isBaby() && --this.scuteTime <= 0) {
+            this.forceDrops = true; // CraftBukkit
             if (this.dropFromGiftLootTable(level, BuiltInLootTables.ARMADILLO_SHED, this::spawnAtLocation)) {
                 this.playSound(SoundEvents.ARMADILLO_SCUTE_DROP, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
                 this.gameEvent(GameEvent.ENTITY_PLACE);
             }
+            this.forceDrops = false; // CraftBukkit
 
             this.scuteTime = this.pickNextScuteDropTime();
         }
@@ -283,8 +285,11 @@ public class Armadillo extends Animal {
     }
 
     @Override
-    protected void actuallyHurt(ServerLevel level, DamageSource damageSource, float amount) {
-        super.actuallyHurt(level, damageSource, amount);
+    // CraftBukkit start - void -> boolean
+    public boolean actuallyHurt(ServerLevel level, DamageSource damageSource, float amount, org.bukkit.event.entity.EntityDamageEvent event) {
+        boolean damageResult = super.actuallyHurt(level, damageSource, amount, event);
+        if (!damageResult) return false;
+        // CraftBukkit end
         if (!this.isNoAi() && !this.isDeadOrDying()) {
             if (damageSource.getEntity() instanceof LivingEntity) {
                 this.getBrain().setMemoryWithExpiry(MemoryModuleType.DANGER_DETECTED_RECENTLY, true, 80L);
@@ -295,6 +300,7 @@ public class Armadillo extends Animal {
                 this.rollOut();
             }
         }
+        return true; // CraftBukkit
     }
 
     @Override
@@ -313,7 +319,9 @@ public class Armadillo extends Animal {
             return false;
         } else {
             if (this.level() instanceof ServerLevel serverLevel) {
+                this.forceDrops = true; // CraftBukkit
                 this.spawnAtLocation(serverLevel, new ItemStack(Items.ARMADILLO_SCUTE));
+                this.forceDrops = false; // CraftBukkit
                 this.gameEvent(GameEvent.ENTITY_INTERACT);
                 this.playSound(SoundEvents.ARMADILLO_BRUSH);
             }

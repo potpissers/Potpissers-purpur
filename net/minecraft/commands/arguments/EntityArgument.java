@@ -105,9 +105,14 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
     }
 
     private EntitySelector parse(StringReader reader, boolean allowSelectors) throws CommandSyntaxException {
+        // CraftBukkit start
+        return this.parse(reader, allowSelectors, false);
+    }
+    public EntitySelector parse(StringReader reader, boolean allowSelectors, boolean overridePermissions) throws CommandSyntaxException {
+        // CraftBukkit end
         int i = 0;
         EntitySelectorParser entitySelectorParser = new EntitySelectorParser(reader, allowSelectors);
-        EntitySelector entitySelector = entitySelectorParser.parse();
+        EntitySelector entitySelector = entitySelectorParser.parse(overridePermissions); // CraftBukkit
         if (entitySelector.getMaxResults() > 1 && this.single) {
             if (this.playersOnly) {
                 reader.setCursor(0);
@@ -129,7 +134,12 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
         if (context.getSource() instanceof SharedSuggestionProvider sharedSuggestionProvider) {
             StringReader stringReader = new StringReader(builder.getInput());
             stringReader.setCursor(builder.getStart());
-            EntitySelectorParser entitySelectorParser = new EntitySelectorParser(stringReader, EntitySelectorParser.allowSelectors(sharedSuggestionProvider));
+            // Paper start - Fix EntityArgument permissions
+            final boolean permission = sharedSuggestionProvider instanceof CommandSourceStack stack
+                ? stack.bypassSelectorPermissions || stack.hasPermission(2, "minecraft.command.selector")
+                : sharedSuggestionProvider.hasPermission(2);
+            EntitySelectorParser entitySelectorParser = new EntitySelectorParser(stringReader, permission);
+            // Paper end - Fix EntityArgument permissions
 
             try {
                 entitySelectorParser.parse();

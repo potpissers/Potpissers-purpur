@@ -342,7 +342,7 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
         TagKey<CatVariant> tagKey = flag ? CatVariantTags.FULL_MOON_SPAWNS : CatVariantTags.DEFAULT_SPAWNS;
         BuiltInRegistries.CAT_VARIANT.getRandomElementOf(tagKey, level.getRandom()).ifPresent(this::setVariant);
         ServerLevel level1 = level.getLevel();
-        if (level1.structureManager().getStructureWithPieceAt(this.blockPosition(), StructureTags.CATS_SPAWN_AS_BLACK).isValid()) {
+        if (level1.structureManager().getStructureWithPieceAt(this.blockPosition(), StructureTags.CATS_SPAWN_AS_BLACK, level).isValid()) { // Paper - Fix swamp hut cat generation deadlock
             this.setVariant(BuiltInRegistries.CAT_VARIANT.getOrThrow(CatVariant.ALL_BLACK));
             this.setPersistenceRequired();
         }
@@ -359,6 +359,11 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
                 if (item instanceof DyeItem dyeItem) {
                     DyeColor dyeColor = dyeItem.getDyeColor();
                     if (dyeColor != this.getCollarColor()) {
+                        // Paper start - Add EntityDyeEvent and CollarColorable interface
+                        final io.papermc.paper.event.entity.EntityDyeEvent event = new io.papermc.paper.event.entity.EntityDyeEvent(this.getBukkitEntity(), org.bukkit.DyeColor.getByWoolData((byte) dyeColor.getId()), ((net.minecraft.server.level.ServerPlayer) player).getBukkitEntity());
+                        if (!event.callEvent()) return InteractionResult.FAIL;
+                        dyeColor = DyeColor.byId(event.getColor().getWoolData());
+                        // Paper end - Add EntityDyeEvent and CollarColorable interface
                         if (!this.level().isClientSide()) {
                             this.setCollarColor(dyeColor);
                             itemInHand.consume(1, player);
@@ -371,7 +376,7 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
                     if (!this.level().isClientSide()) {
                         this.usePlayerItem(player, hand, itemInHand);
                         FoodProperties foodProperties = itemInHand.get(DataComponents.FOOD);
-                        this.heal(foodProperties != null ? foodProperties.nutrition() : 1.0F);
+                        this.heal(foodProperties != null ? foodProperties.nutrition() : 1.0F, org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.EATING); // Paper - Add missing regain reason
                         this.playEatingSound();
                     }
 
@@ -433,7 +438,7 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
     }
 
     private void tryToTame(Player player) {
-        if (this.random.nextInt(3) == 0) {
+        if (this.random.nextInt(3) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit
             this.tame(player);
             this.setOrderedToSit(true);
             this.level().broadcastEntityEvent(this, (byte)7);
@@ -567,15 +572,20 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
                 .dropFromGiftLootTable(
                     getServerLevel(this.cat),
                     BuiltInLootTables.CAT_MORNING_GIFT,
-                    (serverLevel, itemStack) -> serverLevel.addFreshEntity(
-                        new ItemEntity(
+                    (serverLevel, itemStack) -> {
+                        // CraftBukkit start
+                        ItemEntity item = new ItemEntity(
                             serverLevel,
                             (double)mutableBlockPos.getX() - Mth.sin(this.cat.yBodyRot * (float) (Math.PI / 180.0)),
                             mutableBlockPos.getY(),
                             (double)mutableBlockPos.getZ() + Mth.cos(this.cat.yBodyRot * (float) (Math.PI / 180.0)),
                             itemStack
-                        )
-                    )
+                        );
+                        org.bukkit.event.entity.EntityDropItemEvent event = new org.bukkit.event.entity.EntityDropItemEvent(this.cat.getBukkitEntity(), (org.bukkit.entity.Item) item.getBukkitEntity());
+                        if (!event.callEvent()) return;
+                        serverLevel.addFreshEntity(item);
+                        // CraftBukkit end
+                    }
                 );
         }
 
@@ -602,7 +612,7 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
 
     static class CatTemptGoal extends TemptGoal {
         @Nullable
-        private Player selectedPlayer;
+        private LivingEntity selectedPlayer; // CraftBukkit
         private final Cat cat;
 
         public CatTemptGoal(Cat cat, double speedModifier, Predicate<ItemStack> items, boolean canScare) {

@@ -43,7 +43,7 @@ public class BambooSaplingBlock extends Block implements BonemealableBlock {
 
     @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (random.nextInt(3) == 0 && level.isEmptyBlock(pos.above()) && level.getRawBrightness(pos.above(), 0) >= 9) {
+        if (random.nextFloat() < (level.spigotConfig.bambooModifier / (100.0f * 3)) && level.isEmptyBlock(pos.above()) && level.getRawBrightness(pos.above(), 0) >= 9) { // Spigot - SPIGOT-7159: Better modifier resolution
             this.growBamboo(level, pos);
         }
     }
@@ -99,6 +99,6 @@ public class BambooSaplingBlock extends Block implements BonemealableBlock {
     }
 
     protected void growBamboo(Level level, BlockPos state) {
-        level.setBlock(state.above(), Blocks.BAMBOO.defaultBlockState().setValue(BambooStalkBlock.LEAVES, BambooLeaves.SMALL), 3);
+        org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockSpreadEvent(level, state, state.above(), Blocks.BAMBOO.defaultBlockState().setValue(BambooStalkBlock.LEAVES, BambooLeaves.SMALL), 3); // CraftBukkit - BlockSpreadEvent
     }
 }

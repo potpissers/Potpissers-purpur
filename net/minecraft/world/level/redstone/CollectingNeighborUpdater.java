@@ -133,7 +133,7 @@ public class CollectingNeighborUpdater implements NeighborUpdater {
                 orientation = this.orientation.withFront(direction);
             }
 
-            NeighborUpdater.executeUpdate(level, blockState, blockPos, this.sourceBlock, orientation, false);
+            NeighborUpdater.executeUpdate(level, blockState, blockPos, this.sourceBlock, orientation, false, this.sourcePos); // Paper - Add source block to BlockPhysicsEvent
             if (this.idx < NeighborUpdater.UPDATE_ORDER.length && NeighborUpdater.UPDATE_ORDER[this.idx] == this.skipDirection) {
                 this.idx++;
             }

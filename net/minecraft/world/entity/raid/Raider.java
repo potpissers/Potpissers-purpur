@@ -212,17 +212,24 @@ public abstract class Raider extends PatrollingMonster {
         if (this.hasActiveRaid()
             && !flag
             && ItemStack.matches(item, Raid.getOminousBannerInstance(this.registryAccess().lookupOrThrow(Registries.BANNER_PATTERN)))) {
+            // Paper start - EntityPickupItemEvent fixes
+            if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityPickupItemEvent(this, entity, 0, false).isCancelled()) {
+                return;
+            }
+            // Paper end - EntityPickupItemEvent fixes
             EquipmentSlot equipmentSlot = EquipmentSlot.HEAD;
             ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
             double d = this.getEquipmentDropChance(equipmentSlot);
             if (!itemBySlot.isEmpty() && Math.max(this.random.nextFloat() - 0.1F, 0.0F) < d) {
+                this.forceDrops = true; // Paper - Add missing forceDrop toggles
                 this.spawnAtLocation(level, itemBySlot);
+                this.forceDrops = false; // Paper - Add missing forceDrop toggles
             }
 
             this.onItemPickup(entity);
             this.setItemSlot(equipmentSlot, item);
             this.take(entity, item.getCount());
-            entity.discard();
+            entity.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.PICKUP); // CraftBukkit - add Bukkit remove cause
             this.getCurrentRaid().setLeader(this.getWave(), this);
             this.setPatrolLeader(true);
         } else {
@@ -296,7 +303,7 @@ public abstract class Raider extends PatrollingMonster {
 
             for (Raider raider : getServerLevel(this.mob)
                 .getNearbyEntities(Raider.class, this.shoutTargeting, this.mob, this.mob.getBoundingBox().inflate(8.0, 8.0, 8.0))) {
-                raider.setTarget(this.mob.getTarget());
+                raider.setTarget(this.mob.getTarget(), org.bukkit.event.entity.EntityTargetEvent.TargetReason.FOLLOW_LEADER, true); // CraftBukkit
             }
         }
 
@@ -307,7 +314,7 @@ public abstract class Raider extends PatrollingMonster {
             if (target != null) {
                 for (Raider raider : getServerLevel(this.mob)
                     .getNearbyEntities(Raider.class, this.shoutTargeting, this.mob, this.mob.getBoundingBox().inflate(8.0, 8.0, 8.0))) {
-                    raider.setTarget(target);
+                    raider.setTarget(target, org.bukkit.event.entity.EntityTargetEvent.TargetReason.FOLLOW_LEADER, true); // CraftBukkit
                     raider.setAggressive(true);
                 }
 
@@ -392,6 +399,7 @@ public abstract class Raider extends PatrollingMonster {
         }
 
         private boolean cannotPickUpBanner() {
+            if (!getServerLevel(this.mob).getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING) || !this.mob.canPickUpLoot()) return false; // Paper - respect game and entity rules for picking up items
             if (!this.mob.hasActiveRaid()) {
                 return true;
             } else if (this.mob.getCurrentRaid().isOver()) {

@@ -7,6 +7,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.level.ChunkPos;
 
 public class TicketType<T> {
+    public static final TicketType<Long> FUTURE_AWAIT = create("future_await", Long::compareTo); // Paper
     private final String name;
     private final Comparator<T> comparator;
     public long timeout;
@@ -17,6 +18,9 @@ public class TicketType<T> {
     public static final TicketType<BlockPos> PORTAL = create("portal", Vec3i::compareTo, 300);
     public static final TicketType<ChunkPos> ENDER_PEARL = create("ender_pearl", Comparator.comparingLong(ChunkPos::toLong), 40);
     public static final TicketType<ChunkPos> UNKNOWN = create("unknown", Comparator.comparingLong(ChunkPos::toLong), 1);
+    public static final TicketType<Unit> PLUGIN = TicketType.create("plugin", (a, b) -> 0); // CraftBukkit
+    public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET = TicketType.create("plugin_ticket", (plugin1, plugin2) -> plugin1.getClass().getName().compareTo(plugin2.getClass().getName())); // CraftBukkit
+    public static final TicketType<Integer> POST_TELEPORT = TicketType.create("post_teleport", Integer::compare, 5); // Paper - post teleport ticket type
 
     public static <T> TicketType<T> create(String name, Comparator<T> comparator) {
         return new TicketType<>(name, comparator, 0L);

@@ -111,6 +111,7 @@ public enum OctahedralGroup implements StringRepresentable {
         this.permutation = permutation;
         this.transformation = new Matrix3f().scaling(invertX ? -1.0F : 1.0F, invertY ? -1.0F : 1.0F, invertZ ? -1.0F : 1.0F);
         this.transformation.mul(permutation.transformation());
+        this.initializeRotationDirections(); // Paper - Avoid Lazy Initialization for Enum Fields
     }
 
     private BooleanList packInversions() {
@@ -139,7 +140,7 @@ public enum OctahedralGroup implements StringRepresentable {
         return this.name;
     }
 
-    public Direction rotate(Direction direction) {
+    public void initializeRotationDirections() { // Paper - Avoid Lazy Initialization for Enum Fields
         if (this.rotatedDirections == null) {
             this.rotatedDirections = Maps.newEnumMap(Direction.class);
             Direction.Axis[] axiss = Direction.Axis.values();
@@ -154,6 +155,10 @@ public enum OctahedralGroup implements StringRepresentable {
             }
         }
 
+    // Paper start - Avoid Lazy Initialization for Enum Fields
+    }
+    public Direction rotate(Direction direction) {
+    // Paper end - Avoid Lazy Initialization for Enum Fields
         return this.rotatedDirections.get(direction);
     }
 

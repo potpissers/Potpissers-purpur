@@ -41,6 +41,12 @@ public class Varint21FrameDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext context, ByteBuf in, List<Object> out) {
+        // Paper start - Perf: Optimize exception handling; if channel is not active just discard the packet
+        if (!context.channel().isActive()) {
+            in.skipBytes(in.readableBytes());
+            return;
+        }
+        // Paper end - Perf: Optimize exception handling
         in.markReaderIndex();
         this.helperBuf.clear();
         if (!copyVarint(in, this.helperBuf)) {

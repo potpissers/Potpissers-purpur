@@ -14,6 +14,7 @@ public class ServerboundUseItemPacket implements Packet<ServerGamePacketListener
     private final int sequence;
     private final float yRot;
     private final float xRot;
+    public long timestamp; // Spigot
 
     public ServerboundUseItemPacket(InteractionHand hand, int sequence, float yRot, float xRot) {
         this.hand = hand;
@@ -23,6 +24,7 @@ public class ServerboundUseItemPacket implements Packet<ServerGamePacketListener
     }
 
     private ServerboundUseItemPacket(FriendlyByteBuf buffer) {
+        this.timestamp = System.currentTimeMillis(); // Spigot
         this.hand = buffer.readEnum(InteractionHand.class);
         this.sequence = buffer.readVarInt();
         this.yRot = buffer.readFloat();

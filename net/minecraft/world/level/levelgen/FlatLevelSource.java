@@ -33,17 +33,22 @@ public class FlatLevelSource extends ChunkGenerator {
     private final FlatLevelGeneratorSettings settings;
 
     public FlatLevelSource(FlatLevelGeneratorSettings settings) {
-        super(new FixedBiomeSource(settings.getBiome()), Util.memoize(settings::adjustGenerationSettings));
+        // CraftBukkit start
+        this(settings, new FixedBiomeSource(settings.getBiome()));
+    }
+    public FlatLevelSource(FlatLevelGeneratorSettings settings, net.minecraft.world.level.biome.BiomeSource biomeSource) {
+        super(biomeSource, Util.memoize(settings::adjustGenerationSettings));
+        // CraftBukkit end
         this.settings = settings;
     }
 
     @Override
-    public ChunkGeneratorStructureState createState(HolderLookup<StructureSet> structureSetLookup, RandomState randomState, long seed) {
+    public ChunkGeneratorStructureState createState(HolderLookup<StructureSet> structureSetLookup, RandomState randomState, long seed, org.spigotmc.SpigotWorldConfig conf) { // Spigot
         Stream<Holder<StructureSet>> stream = this.settings
             .structureOverrides()
             .map(HolderSet::stream)
             .orElseGet(() -> structureSetLookup.listElements().map(reference -> (Holder<StructureSet>)reference));
-        return ChunkGeneratorStructureState.createForFlat(randomState, seed, this.biomeSource, stream);
+        return ChunkGeneratorStructureState.createForFlat(randomState, seed, this.biomeSource, stream, conf); // Spigot
     }
 
     @Override

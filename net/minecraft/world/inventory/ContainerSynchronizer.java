@@ -11,4 +11,6 @@ public interface ContainerSynchronizer {
     void sendCarriedChange(AbstractContainerMenu containerMenu, ItemStack stack);
 
     void sendDataChange(AbstractContainerMenu container, int id, int value);
+
+    default void sendOffHandSlotChange() {} // Paper - Sync offhand slot in menus
 }

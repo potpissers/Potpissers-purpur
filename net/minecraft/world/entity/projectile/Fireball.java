@@ -60,7 +60,12 @@ public abstract class Fireball extends AbstractHurtingProjectile implements Item
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         if (compound.contains("Item", 10)) {
-            this.setItem(ItemStack.parse(this.registryAccess(), compound.getCompound("Item")).orElse(this.getDefaultItem()));
+            // CraftBukkit start - SPIGOT-5474 probably came from bugged earlier versions
+            final ItemStack itemStack = ItemStack.parse(this.registryAccess(), compound.getCompound("Item")).orElse(this.getDefaultItem());
+            if (!itemStack.isEmpty()) {
+                this.setItem(itemStack);
+            }
+            // CraftBukkit end
         } else {
             this.setItem(this.getDefaultItem());
         }

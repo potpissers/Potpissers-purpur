@@ -71,6 +71,12 @@ public interface EntityGetter {
         }
     }
 
+    // Paper start - Affects Spawning API
+    default @Nullable Player findNearbyPlayer(Entity entity, double maxDistance, @Nullable Predicate<Entity> predicate) {
+        return this.getNearestPlayer(entity.getX(), entity.getY(), entity.getZ(), maxDistance, predicate);
+    }
+    // Paper end - Affects Spawning API
+
     @Nullable
     default Player getNearestPlayer(double x, double y, double z, double distance, @Nullable Predicate<Entity> predicate) {
         double d = -1.0;
@@ -89,6 +95,28 @@ public interface EntityGetter {
         return player;
     }
 
+    // Paper start
+    default List<org.bukkit.entity.HumanEntity> findNearbyBukkitPlayers(double x, double y, double z, double radius, boolean notSpectator) {
+        return findNearbyBukkitPlayers(x, y, z, radius, notSpectator ? EntitySelector.NO_SPECTATORS : net.minecraft.world.entity.EntitySelector.NO_CREATIVE_OR_SPECTATOR);
+    }
+
+    default List<org.bukkit.entity.HumanEntity> findNearbyBukkitPlayers(double x, double y, double z, double radius, @Nullable Predicate<Entity> predicate) {
+        com.google.common.collect.ImmutableList.Builder<org.bukkit.entity.HumanEntity> builder = com.google.common.collect.ImmutableList.builder();
+
+        for (Player human : this.players()) {
+            if (predicate == null || predicate.test(human)) {
+                double distanceSquared = human.distanceToSqr(x, y, z);
+
+                if (radius < 0.0D || distanceSquared < radius * radius) {
+                    builder.add(human.getBukkitEntity());
+                }
+            }
+        }
+
+        return builder.build();
+    }
+    // Paper end
+
     @Nullable
     default Player getNearestPlayer(Entity entity, double distance) {
         return this.getNearestPlayer(entity.getX(), entity.getY(), entity.getZ(), distance, false);
@@ -99,6 +127,20 @@ public interface EntityGetter {
         Predicate<Entity> predicate = creativePlayers ? EntitySelector.NO_CREATIVE_OR_SPECTATOR : EntitySelector.NO_SPECTATORS;
         return this.getNearestPlayer(x, y, z, distance, predicate);
     }
+
+    // Paper start - Affects Spawning API
+    default boolean hasNearbyAlivePlayerThatAffectsSpawning(double x, double y, double z, double range) {
+        for (Player player : this.players()) {
+            if (EntitySelector.PLAYER_AFFECTS_SPAWNING.test(player)) { // combines NO_SPECTATORS and LIVING_ENTITY_STILL_ALIVE with an "affects spawning" check
+                double distanceSqr = player.distanceToSqr(x, y, z);
+                if (range < 0.0D || distanceSqr < range * range) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    // Paper end - Affects Spawning API
 
     default boolean hasNearbyAlivePlayer(double x, double y, double z, double distance) {
         for (Player player : this.players()) {
@@ -124,4 +166,11 @@ public interface EntityGetter {
 
         return null;
     }
+
+    // Paper start - check global player list where appropriate
+    @Nullable
+    default Player getGlobalPlayerByUUID(UUID uuid) {
+        return this.getPlayerByUUID(uuid);
+    }
+    // Paper end - check global player list where appropriate
 }

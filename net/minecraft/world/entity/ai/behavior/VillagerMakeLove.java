@@ -111,11 +111,17 @@ public class VillagerMakeLove extends Behavior<Villager> {
         if (breedOffspring == null) {
             return Optional.empty();
         } else {
-            parent.setAge(6000);
-            partner.setAge(6000);
             breedOffspring.setAge(-24000);
             breedOffspring.moveTo(parent.getX(), parent.getY(), parent.getZ(), 0.0F, 0.0F);
-            level.addFreshEntityWithPassengers(breedOffspring);
+            // CraftBukkit start - call EntityBreedEvent
+            if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityBreedEvent(breedOffspring, parent, partner, null, null, 0).isCancelled()) {
+                return Optional.empty();
+            }
+            // Move age setting down
+            parent.setAge(6000);
+            partner.setAge(6000);
+            level.addFreshEntityWithPassengers(breedOffspring, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.BREEDING);
+            // CraftBukkit end - call EntityBreedEvent
             level.broadcastEntityEvent(breedOffspring, (byte)12);
             return Optional.of(breedOffspring);
         }

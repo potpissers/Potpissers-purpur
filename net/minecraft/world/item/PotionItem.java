@@ -42,6 +42,12 @@ public class PotionItem extends Item {
         PotionContents potionContents = itemInHand.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
         BlockState blockState = level.getBlockState(clickedPos);
         if (context.getClickedFace() != Direction.DOWN && blockState.is(BlockTags.CONVERTABLE_TO_MUD) && potionContents.is(Potions.WATER)) {
+            // Paper start
+            if (!org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(player, clickedPos, Blocks.MUD.defaultBlockState())) {
+                player.containerMenu.sendAllDataToRemote();
+                return InteractionResult.PASS;
+            }
+            // Paper end
             level.playSound(null, clickedPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 1.0F, 1.0F);
             player.setItemInHand(context.getHand(), ItemUtils.createFilledResult(itemInHand, player, new ItemStack(Items.GLASS_BOTTLE)));
             player.awardStat(Stats.ITEM_USED.get(itemInHand.getItem()));

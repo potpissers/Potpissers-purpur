@@ -75,6 +75,16 @@ public class PrepareRamNearestTarget<E extends PathfinderMob> extends Behavior<E
             .flatMap(
                 nearestVisibleLivingEntities -> nearestVisibleLivingEntities.findClosest(livingEntity -> this.ramTargeting.test(level, entity, livingEntity))
             )
+            // CraftBukkit start
+            .map((livingEntity) -> {
+                org.bukkit.event.entity.EntityTargetEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTargetLivingEvent(entity, livingEntity, (livingEntity instanceof net.minecraft.server.level.ServerPlayer) ? org.bukkit.event.entity.EntityTargetEvent.TargetReason.CLOSEST_PLAYER : org.bukkit.event.entity.EntityTargetEvent.TargetReason.CLOSEST_ENTITY);
+                if (event.isCancelled() || event.getTarget() == null) {
+                    return null;
+                }
+                livingEntity = ((org.bukkit.craftbukkit.entity.CraftLivingEntity) event.getTarget()).getHandle();
+                return livingEntity;
+            })
+            // CraftBukkit end
             .ifPresent(entity1 -> this.chooseRamPosition(entity, entity1));
     }
 

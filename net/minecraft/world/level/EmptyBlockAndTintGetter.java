@@ -39,6 +39,18 @@ public enum EmptyBlockAndTintGetter implements BlockAndTintGetter {
         return Blocks.AIR.defaultBlockState();
     }
 
+    // Paper start
+    @Override
+    public @org.jetbrains.annotations.Nullable BlockState getBlockStateIfLoaded(final BlockPos blockposition) {
+        return null;
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable FluidState getFluidIfLoaded(final BlockPos blockposition) {
+        return null;
+    }
+    // Paper end
+
     @Override
     public FluidState getFluidState(BlockPos pos) {
         return Fluids.EMPTY.defaultFluidState();

@@ -38,7 +38,14 @@ public class AssignProfessionFromJobSite {
                                             .findFirst()
                                     )
                                     .ifPresent(profession -> {
-                                        villager.setVillagerData(villager.getVillagerData().setProfession(profession));
+                                        // CraftBukkit start - Fire VillagerCareerChangeEvent where Villager gets employed
+                                        org.bukkit.event.entity.VillagerCareerChangeEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callVillagerCareerChangeEvent(villager, org.bukkit.craftbukkit.entity.CraftVillager.CraftProfession.minecraftToBukkit(profession), org.bukkit.event.entity.VillagerCareerChangeEvent.ChangeReason.EMPLOYED);
+                                        if (event.isCancelled()) {
+                                            return;
+                                        }
+
+                                        villager.setVillagerData(villager.getVillagerData().setProfession(org.bukkit.craftbukkit.entity.CraftVillager.CraftProfession.bukkitToMinecraft(event.getProfession())));
+                                        // CraftBukkit end
                                         villager.refreshBrain(level);
                                     });
                                 return true;

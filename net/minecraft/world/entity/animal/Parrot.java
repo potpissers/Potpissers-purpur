@@ -257,7 +257,7 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
             }
 
             if (!this.level().isClientSide) {
-                if (this.random.nextInt(10) == 0) {
+                if (this.random.nextInt(10) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit
                     this.tame(player);
                     this.level().broadcastEntityEvent(this, (byte)7);
                 } else {
@@ -278,7 +278,7 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
             }
         } else {
             this.usePlayerItem(player, hand, itemInHand);
-            this.addEffect(new MobEffectInstance(MobEffects.POISON, 900));
+            this.addEffect(new MobEffectInstance(MobEffects.POISON, 900), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.FOOD); // CraftBukkit
             if (player.isCreative() || !this.isInvulnerable()) {
                 this.hurt(this.damageSources().playerAttack(player), Float.MAX_VALUE);
             }
@@ -373,8 +373,8 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
     }
 
     @Override
-    public boolean isPushable() {
-        return true;
+    public boolean isCollidable(boolean ignoreClimbing) { // Paper - Climbing should not bypass cramming gamerule
+        return super.isCollidable(ignoreClimbing); // CraftBukkit - collidable API // Paper - Climbing should not bypass cramming gamerule
     }
 
     @Override
@@ -389,8 +389,13 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
         if (this.isInvulnerableTo(level, damageSource)) {
             return false;
         } else {
+            // CraftBukkit start
+            if (!super.hurtServer(level, damageSource, amount)) {
+                return false;
+            }
             this.setOrderedToSit(false);
-            return super.hurtServer(level, damageSource, amount);
+            return true;
+            // CraftBukkit
         }
     }
 

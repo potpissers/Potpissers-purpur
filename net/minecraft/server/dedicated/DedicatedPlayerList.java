@@ -18,6 +18,11 @@ public class DedicatedPlayerList extends PlayerList {
         this.setViewDistance(properties.viewDistance);
         this.setSimulationDistance(properties.simulationDistance);
         super.setUsingWhiteList(properties.whiteList.get());
+        // Paper start - fix converting txt to json file; moved from constructor
+    }
+    @Override
+    public void loadAndSaveFiles() {
+        // Paper end - fix converting txt to json file
         this.loadUserBanList();
         this.saveUserBanList();
         this.loadIpBanList();

@@ -33,12 +33,17 @@ public class BoneMealItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
+        // CraftBukkit start - extract bonemeal application logic to separate, static method
+        return BoneMealItem.applyBonemeal(context);
+    }
+    public static InteractionResult applyBonemeal(UseOnContext context) {
+        // CraftBukkit end
         Level level = context.getLevel();
         BlockPos clickedPos = context.getClickedPos();
         BlockPos blockPos = clickedPos.relative(context.getClickedFace());
         if (growCrop(context.getItemInHand(), level, clickedPos)) {
             if (!level.isClientSide) {
-                context.getPlayer().gameEvent(GameEvent.ITEM_INTERACT_FINISH);
+                if (context.getPlayer() != null) context.getPlayer().gameEvent(GameEvent.ITEM_INTERACT_FINISH); // CraftBukkit - SPIGOT-7518
                 level.levelEvent(1505, clickedPos, 15);
             }
 
@@ -48,7 +53,7 @@ public class BoneMealItem extends Item {
             boolean isFaceSturdy = blockState.isFaceSturdy(level, clickedPos, context.getClickedFace());
             if (isFaceSturdy && growWaterPlant(context.getItemInHand(), level, blockPos, context.getClickedFace())) {
                 if (!level.isClientSide) {
-                    context.getPlayer().gameEvent(GameEvent.ITEM_INTERACT_FINISH);
+                    if (context.getPlayer() != null) context.getPlayer().gameEvent(GameEvent.ITEM_INTERACT_FINISH); // CraftBukkit - SPIGOT-7518
                     level.levelEvent(1505, blockPos, 15);
                 }
 

@@ -91,10 +91,12 @@ public class Chicken extends Animal {
 
         this.flap = this.flap + this.flapping * 2.0F;
         if (this.level() instanceof ServerLevel serverLevel && this.isAlive() && !this.isBaby() && !this.isChickenJockey() && --this.eggTime <= 0) {
+            this.forceDrops = true; // CraftBukkit
             if (this.dropFromGiftLootTable(serverLevel, BuiltInLootTables.CHICKEN_LAY, this::spawnAtLocation)) {
                 this.playSound(SoundEvents.CHICKEN_EGG, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
                 this.gameEvent(GameEvent.ENTITY_PLACE);
             }
+            this.forceDrops = false; // CraftBukkit
 
             this.eggTime = this.random.nextInt(6000) + 6000;
         }

@@ -12,6 +12,12 @@ public interface ContainerLevelAccess {
         public <T> Optional<T> evaluate(BiFunction<Level, BlockPos, T> levelPosConsumer) {
             return Optional.empty();
         }
+        // Paper start - fix menus with empty level accesses
+        @Override
+        public org.bukkit.Location getLocation() {
+            return null;
+        }
+        // Paper end - fix menus with empty level accesses
     };
 
     static ContainerLevelAccess create(final Level level, final BlockPos pos) {
@@ -20,6 +26,23 @@ public interface ContainerLevelAccess {
             public <T> Optional<T> evaluate(BiFunction<Level, BlockPos, T> levelPosConsumer) {
                 return Optional.of(levelPosConsumer.apply(level, pos));
             }
+            // CraftBukkit start
+            @Override
+            public Level getWorld() {
+                return level;
+            }
+
+            @Override
+            public BlockPos getPosition() {
+                return pos;
+            }
+            // CraftBukkit end
+            // Paper start - Add missing InventoryHolders
+            @Override
+            public boolean isBlock() {
+                return true;
+            }
+            // Paper end - Add missing InventoryHolders
         };
     }
 
@@ -35,4 +58,29 @@ public interface ContainerLevelAccess {
             return Optional.empty();
         });
     }
+    // CraftBukkit start
+    default Level getWorld() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    default BlockPos getPosition() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    default org.bukkit.Location getLocation() {
+        return new org.bukkit.Location(this.getWorld().getWorld(), this.getPosition().getX(), this.getPosition().getY(), this.getPosition().getZ());
+    }
+    // CraftBukkit end
+    // Paper start - Add missing InventoryHolders
+    default boolean isBlock() {
+        return false;
+    }
+
+    default org.bukkit.inventory.@org.jetbrains.annotations.Nullable BlockInventoryHolder createBlockHolder(AbstractContainerMenu menu) {
+        if (!this.isBlock()) {
+            return null;
+        }
+        return new org.bukkit.craftbukkit.inventory.CraftBlockInventoryHolder(this, menu.getBukkitView().getTopInventory());
+    }
+    // Paper end - Add missing InventoryHolders
 }

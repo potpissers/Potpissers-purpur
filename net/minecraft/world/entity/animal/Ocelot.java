@@ -125,7 +125,7 @@ public class Ocelot extends Animal {
 
     @Override
     public boolean removeWhenFarAway(double distanceToClosestPlayer) {
-        return !this.isTrusting() && this.tickCount > 2400;
+        return !this.isTrusting() && this.tickCount > 2400 && !this.hasCustomName() && !this.isLeashed(); // Paper - honor name and leash
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -159,7 +159,7 @@ public class Ocelot extends Animal {
         if ((this.temptGoal == null || this.temptGoal.isRunning()) && !this.isTrusting() && this.isFood(itemInHand) && player.distanceToSqr(this) < 9.0) {
             this.usePlayerItem(player, hand, itemInHand);
             if (!this.level().isClientSide) {
-                if (this.random.nextInt(3) == 0) {
+                if (this.random.nextInt(3) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit - added event call and isCancelled check
                     this.setTrusting(true);
                     this.spawnTrustingParticles(true);
                     this.level().broadcastEntityEvent(this, (byte)41);

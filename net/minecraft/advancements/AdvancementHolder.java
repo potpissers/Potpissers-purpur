@@ -26,4 +26,10 @@ public record AdvancementHolder(ResourceLocation id, Advancement value) {
     public String toString() {
         return this.id.toString();
     }
+
+    // CraftBukkit start
+    public final org.bukkit.advancement.Advancement toBukkit() {
+        return new org.bukkit.craftbukkit.advancement.CraftAdvancement(this);
+    }
+    // CraftBukkit end
 }

@@ -45,7 +45,7 @@ public interface HoglinBase {
             double d3 = d * (hoglin.level().random.nextFloat() * 0.5F + 0.2F);
             Vec3 vec3 = new Vec3(d1, 0.0, d2).normalize().scale(d3).yRot(f);
             double d4 = d * hoglin.level().random.nextFloat() * 0.5;
-            target.push(vec3.x, d4, vec3.z);
+            target.push(vec3.x, d4, vec3.z, hoglin); // Paper - Add EntityKnockbackByEntityEvent and EntityPushedByEntityAttackEvent
             target.hurtMarked = true;
         }
     }

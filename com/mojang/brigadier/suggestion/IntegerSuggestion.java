@@ -53,7 +53,7 @@ public class IntegerSuggestion extends Suggestion {
 
     @Override
     public int compareTo(final Suggestion o) {
-        if (o instanceof IntegerSuggestion) {
+        if (false && o instanceof IntegerSuggestion) { // Paper - fix unstable Suggestion comparison
             return Integer.compare(value, ((IntegerSuggestion) o).value);
         }
         return super.compareTo(o);
@@ -61,6 +61,6 @@ public class IntegerSuggestion extends Suggestion {
 
     @Override
     public int compareToIgnoreCase(final Suggestion b) {
-        return compareTo(b);
+        return super.compareToIgnoreCase(b); // Paper - fix unstable Suggestion comparison
     }
 }

@@ -45,6 +45,7 @@ public class HugeMushroomBlock extends Block {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
+        if (io.papermc.paper.configuration.GlobalConfiguration.get().blockUpdates.disableMushroomBlockUpdates) return this.defaultBlockState(); // Paper - add option to disable block updates
         BlockGetter level = context.getLevel();
         BlockPos clickedPos = context.getClickedPos();
         return this.defaultBlockState()
@@ -67,6 +68,7 @@ public class HugeMushroomBlock extends Block {
         BlockState neighborState,
         RandomSource random
     ) {
+        if (io.papermc.paper.configuration.GlobalConfiguration.get().blockUpdates.disableMushroomBlockUpdates) return state; // Paper - add option to disable block updates
         return neighborState.is(this)
             ? state.setValue(PROPERTY_BY_DIRECTION.get(direction), Boolean.valueOf(false))
             : super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
@@ -74,6 +76,7 @@ public class HugeMushroomBlock extends Block {
 
     @Override
     protected BlockState rotate(BlockState state, Rotation rot) {
+        if (io.papermc.paper.configuration.GlobalConfiguration.get().blockUpdates.disableMushroomBlockUpdates) return state; // Paper - add option to disable block updates
         return state.setValue(PROPERTY_BY_DIRECTION.get(rot.rotate(Direction.NORTH)), state.getValue(NORTH))
             .setValue(PROPERTY_BY_DIRECTION.get(rot.rotate(Direction.SOUTH)), state.getValue(SOUTH))
             .setValue(PROPERTY_BY_DIRECTION.get(rot.rotate(Direction.EAST)), state.getValue(EAST))
@@ -84,6 +87,7 @@ public class HugeMushroomBlock extends Block {
 
     @Override
     protected BlockState mirror(BlockState state, Mirror mirror) {
+        if (io.papermc.paper.configuration.GlobalConfiguration.get().blockUpdates.disableMushroomBlockUpdates) return state; // Paper - add option to disable block updates
         return state.setValue(PROPERTY_BY_DIRECTION.get(mirror.mirror(Direction.NORTH)), state.getValue(NORTH))
             .setValue(PROPERTY_BY_DIRECTION.get(mirror.mirror(Direction.SOUTH)), state.getValue(SOUTH))
             .setValue(PROPERTY_BY_DIRECTION.get(mirror.mirror(Direction.EAST)), state.getValue(EAST))

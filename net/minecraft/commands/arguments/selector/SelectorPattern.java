@@ -13,7 +13,7 @@ public record SelectorPattern(String pattern, EntitySelector resolved) {
             EntitySelectorParser entitySelectorParser = new EntitySelectorParser(new StringReader(pattern), true);
             return DataResult.success(new SelectorPattern(pattern, entitySelectorParser.parse()));
         } catch (CommandSyntaxException var2) {
-            return DataResult.error(() -> "Invalid selector component: " + pattern + ": " + var2.getMessage());
+            return DataResult.error(() -> "Invalid selector component"); // Paper - limit selector error message
         }
     }
 

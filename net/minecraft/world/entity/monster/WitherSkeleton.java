@@ -105,7 +105,7 @@ public class WitherSkeleton extends AbstractSkeleton {
             return false;
         } else {
             if (source instanceof LivingEntity) {
-                ((LivingEntity)source).addEffect(new MobEffectInstance(MobEffects.WITHER, 200), this);
+                ((LivingEntity)source).addEffect(new MobEffectInstance(MobEffects.WITHER, 200), this, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.ATTACK); // CraftBukkit
             }
 
             return true;
@@ -121,6 +121,6 @@ public class WitherSkeleton extends AbstractSkeleton {
 
     @Override
     public boolean canBeAffected(MobEffectInstance potioneffect) {
-        return !potioneffect.is(MobEffects.WITHER) && super.canBeAffected(potioneffect);
+        return potioneffect.is(MobEffects.WITHER) && this.level().paperConfig().entities.mobEffects.immuneToWitherEffect.witherSkeleton ? false : super.canBeAffected(potioneffect); // Paper - Add config for mobs immune to default effects
     }
 }

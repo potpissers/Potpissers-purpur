@@ -24,9 +24,7 @@ public interface Container extends Clearable {
 
     void setItem(int slot, ItemStack stack);
 
-    default int getMaxStackSize() {
-        return 99;
-    }
+    int getMaxStackSize(); // CraftBukkit
 
     default int getMaxStackSize(ItemStack stack) {
         return Math.min(this.getMaxStackSize(), stack.getMaxStackSize());
@@ -87,4 +85,22 @@ public interface Container extends Clearable {
         BlockPos blockPos = blockEntity.getBlockPos();
         return level != null && level.getBlockEntity(blockPos) == blockEntity && player.canInteractWithBlock(blockPos, distance);
     }
+
+    // CraftBukkit start
+    java.util.List<ItemStack> getContents();
+
+    void onOpen(org.bukkit.craftbukkit.entity.CraftHumanEntity player);
+
+    void onClose(org.bukkit.craftbukkit.entity.CraftHumanEntity player);
+
+    java.util.List<org.bukkit.entity.HumanEntity> getViewers();
+
+    org.bukkit.inventory.@org.jetbrains.annotations.Nullable InventoryHolder getOwner();
+
+    void setMaxStackSize(int size);
+
+    org.bukkit.Location getLocation();
+
+    int MAX_STACK = Item.ABSOLUTE_MAX_STACK_SIZE;
+    // CraftBukkit end
 }

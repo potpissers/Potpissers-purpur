@@ -10,6 +10,12 @@ public record RecipeHolder<T extends Recipe<?>>(ResourceKey<Recipe<?>> id, T val
         ResourceKey.streamCodec(Registries.RECIPE), RecipeHolder::id, Recipe.STREAM_CODEC, RecipeHolder::value, RecipeHolder::new
     );
 
+    // CraftBukkit start
+    public final org.bukkit.inventory.Recipe toBukkitRecipe() {
+        return this.value.toBukkitRecipe(org.bukkit.craftbukkit.util.CraftNamespacedKey.fromMinecraft(this.id.location()));
+    }
+    // CraftBukkit end
+
     @Override
     public boolean equals(Object other) {
         return this == other || other instanceof RecipeHolder<?> recipeHolder && this.id == recipeHolder.id;

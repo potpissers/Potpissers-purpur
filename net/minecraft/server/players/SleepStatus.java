@@ -14,8 +14,11 @@ public class SleepStatus {
     }
 
     public boolean areEnoughDeepSleeping(int requiredSleepPercentage, List<ServerPlayer> sleepingPlayers) {
-        int i = (int)sleepingPlayers.stream().filter(Player::isSleepingLongEnough).count();
-        return i >= this.sleepersNeeded(requiredSleepPercentage);
+        // CraftBukkit start
+        int i = (int) sleepingPlayers.stream().filter(player -> player.isSleepingLongEnough() || player.fauxSleeping).count();
+        boolean anyDeepSleep = sleepingPlayers.stream().anyMatch(Player::isSleepingLongEnough);
+        return anyDeepSleep && i >= this.sleepersNeeded(requiredSleepPercentage);
+        // CraftBukkit end
     }
 
     public int sleepersNeeded(int requiredSleepPercentage) {
@@ -35,16 +38,22 @@ public class SleepStatus {
         int i1 = this.sleepingPlayers;
         this.activePlayers = 0;
         this.sleepingPlayers = 0;
+        boolean anySleep = false; // CraftBukkit
 
         for (ServerPlayer serverPlayer : players) {
             if (!serverPlayer.isSpectator()) {
                 this.activePlayers++;
-                if (serverPlayer.isSleeping()) {
+                if (serverPlayer.isSleeping() || serverPlayer.fauxSleeping) { // CraftBukkit
                     this.sleepingPlayers++;
                 }
+                // CraftBukkit start
+                if (serverPlayer.isSleeping()) {
+                    anySleep = true;
+                }
+                // CraftBukkit end
             }
         }
 
-        return (i1 > 0 || this.sleepingPlayers > 0) && (i != this.activePlayers || i1 != this.sleepingPlayers);
+        return anySleep && (i1 > 0 || this.sleepingPlayers > 0) && (i != this.activePlayers || i1 != this.sleepingPlayers); // CraftBukkit
     }
 }

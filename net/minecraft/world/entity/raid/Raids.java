@@ -112,11 +112,23 @@ public class Raids extends SavedData {
                 }
 
                 Raid raid = this.getOrCreateRaid(player.serverLevel(), blockPos);
+                /* CraftBukkit - moved down
                 if (!raid.isStarted() && !this.raidMap.containsKey(raid.getId())) {
                     this.raidMap.put(raid.getId(), raid);
                 }
+                */
 
-                if (!raid.isStarted() || raid.getRaidOmenLevel() < raid.getMaxRaidOmenLevel()) {
+                if (!raid.isStarted() || (raid.isInProgress() && raid.getRaidOmenLevel() < raid.getMaxRaidOmenLevel())) { // CraftBukkit - fixed a bug with raid: players could add up Bad Omen level even when the raid had finished
+                    // CraftBukkit start
+                    if (!org.bukkit.craftbukkit.event.CraftEventFactory.callRaidTriggerEvent(raid, player)) {
+                        player.removeEffect(net.minecraft.world.effect.MobEffects.RAID_OMEN);
+                        return null;
+                    }
+
+                    if (!raid.isStarted() && !this.raidMap.containsKey(raid.getId())) {
+                        this.raidMap.put(raid.getId(), raid);
+                    }
+                    // CraftBukkit end
                     raid.absorbRaidOmen(player);
                 }
 

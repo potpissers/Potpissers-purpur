@@ -176,7 +176,7 @@ public final class Biome {
     }
 
     public boolean shouldSnow(LevelReader level, BlockPos pos) {
-        if (this.warmEnoughToRain(pos, level.getSeaLevel())) {
+        if (this.getPrecipitationAt(pos, level.getSeaLevel()) != Precipitation.SNOW) { // Paper - Fixes MC-248212
             return false;
         } else {
             if (level.isInsideBuildHeight(pos.getY()) && level.getBrightness(LightLayer.BLOCK, pos) < 10) {

@@ -82,8 +82,8 @@ public class CatSpawner implements CustomSpawner {
         if (cat == null) {
             return 0;
         } else {
+            cat.moveTo(pos, 0.0F, 0.0F); // Paper - move up - Fix MC-147659
             cat.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(pos), EntitySpawnReason.NATURAL, null);
-            cat.moveTo(pos, 0.0F, 0.0F);
             serverLevel.addFreshEntityWithPassengers(cat);
             return 1;
         }

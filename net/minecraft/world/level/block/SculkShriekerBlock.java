@@ -66,6 +66,7 @@ public class SculkShriekerBlock extends BaseEntityBlock implements SimpleWaterlo
         if (level instanceof ServerLevel serverLevel) {
             ServerPlayer serverPlayer = SculkShriekerBlockEntity.tryGetPlayer(entity);
             if (serverPlayer != null) {
+                if (org.bukkit.craftbukkit.event.CraftEventFactory.callPlayerInteractEvent(serverPlayer, org.bukkit.event.block.Action.PHYSICAL, pos, null, null, null).isCancelled()) return; // CraftBukkit
                 serverLevel.getBlockEntity(pos, BlockEntityType.SCULK_SHRIEKER).ifPresent(sculkShrieker -> sculkShrieker.tryShriek(serverLevel, serverPlayer));
             }
         }
@@ -144,9 +145,16 @@ public class SculkShriekerBlock extends BaseEntityBlock implements SimpleWaterlo
     @Override
     protected void spawnAfterBreak(BlockState state, ServerLevel level, BlockPos pos, ItemStack stack, boolean dropExperience) {
         super.spawnAfterBreak(state, level, pos, stack, dropExperience);
+        // CraftBukkit start - Delegate to getExpDrop
+    }
+
+    @Override
+    public int getExpDrop(BlockState state, ServerLevel level, BlockPos pos, ItemStack stack, boolean dropExperience) {
         if (dropExperience) {
-            this.tryDropExperience(level, pos, stack, ConstantInt.of(5));
+            return this.tryDropExperience(level, pos, stack, ConstantInt.of(5));
         }
+        return 0;
+        // CraftBukkit end
     }
 
     @Nullable

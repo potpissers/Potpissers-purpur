@@ -23,6 +23,7 @@ public class IntArrayTag extends CollectionTag<IntTag> {
         private static int[] readAccounted(DataInput input, NbtAccounter accounter) throws IOException {
             accounter.accountBytes(24L);
             int _int = input.readInt();
+            com.google.common.base.Preconditions.checkArgument(_int < 1 << 24); // Spigot
             accounter.accountBytes(4L, _int);
             int[] ints = new int[_int];
 

@@ -73,7 +73,7 @@ public class NearestAttackableTargetGoal<T extends LivingEntity> extends TargetG
 
     @Override
     public void start() {
-        this.mob.setTarget(this.target);
+        this.mob.setTarget(this.target, this.target instanceof ServerPlayer ? org.bukkit.event.entity.EntityTargetEvent.TargetReason.CLOSEST_PLAYER : org.bukkit.event.entity.EntityTargetEvent.TargetReason.CLOSEST_ENTITY, true); // CraftBukkit - reason
         super.start();
     }
 

@@ -84,6 +84,18 @@ public class LightningRodBlock extends RodBlock implements SimpleWaterloggedBloc
     }
 
     public void onLightningStrike(BlockState state, Level level, BlockPos pos) {
+        // CraftBukkit start
+        boolean powered = state.getValue(LightningRodBlock.POWERED);
+        int old = (powered) ? 15 : 0;
+        int current = (!powered) ? 15 : 0;
+
+        org.bukkit.event.block.BlockRedstoneEvent eventRedstone = new org.bukkit.event.block.BlockRedstoneEvent(org.bukkit.craftbukkit.block.CraftBlock.at(level, pos), old, current);
+        level.getCraftServer().getPluginManager().callEvent(eventRedstone);
+
+        if (eventRedstone.getNewCurrent() <= 0) {
+            return;
+        }
+        // CraftBukkit end
         level.setBlock(pos, state.setValue(POWERED, Boolean.valueOf(true)), 3);
         this.updateNeighbours(state, level, pos);
         level.scheduleTick(pos, this, 8);

@@ -505,6 +505,18 @@ public class DataFixers {
         Schema schema44 = builder.addSchema(1456, SAME_NAMESPACED);
         builder.addFixer(new EntityItemFrameDirectionFix(schema44, false));
         Schema schema45 = builder.addSchema(1458, SAME_NAMESPACED);
+        // CraftBukkit start
+        builder.addFixer(new com.mojang.datafixers.DataFix(schema45, false) {
+            @Override
+            protected com.mojang.datafixers.TypeRewriteRule makeRule() {
+                return this.fixTypeEverywhereTyped("Player CustomName", this.getInputSchema().getType(References.PLAYER), (typed) -> {
+                    return typed.update(DSL.remainderFinder(), (dynamic) -> {
+                        return EntityCustomNameToComponentFix.fixTagCustomName(dynamic);
+                    });
+                });
+            }
+        });
+        // CraftBukkit end
         builder.addFixer(new EntityCustomNameToComponentFix(schema45, false));
         builder.addFixer(new ItemCustomNameToComponentFix(schema45, false));
         builder.addFixer(new BlockEntityCustomNameToComponentFix(schema45, false));

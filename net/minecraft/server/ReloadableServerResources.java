@@ -39,6 +39,7 @@ public class ReloadableServerResources {
         this.postponedTags = postponedTags;
         this.recipes = new RecipeManager(registries);
         this.commands = new Commands(commandSelection, CommandBuildContext.simple(registries, enabledFeatures));
+        io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.setDispatcher(this.commands, CommandBuildContext.simple(registries, enabledFeatures)); // Paper - Brigadier Command API
         this.advancements = new ServerAdvancementManager(registries);
         this.functionLibrary = new ServerFunctionLibrary(functionCompilationLevel, this.commands.getDispatcher());
     }
@@ -83,6 +84,14 @@ public class ReloadableServerResources {
                     ReloadableServerResources reloadableServerResources = new ReloadableServerResources(
                         loadResult.layers(), loadResult.lookupWithUpdatedTags(), enabledFeatures, commandSelection, postponedTags, functionCompilationLevel
                     );
+                    // Paper start - call commands event for bootstraps
+                    //noinspection ConstantValue
+                    io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callReloadableRegistrarEvent(
+                        io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents.COMMANDS,
+                        io.papermc.paper.command.brigadier.PaperCommands.INSTANCE,
+                        io.papermc.paper.plugin.bootstrap.BootstrapContext.class,
+                        MinecraftServer.getServer() == null ? io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent.Cause.INITIAL : io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent.Cause.RELOAD);
+                    // Paper end - call commands event
                     return SimpleReloadInstance.create(
                             resourceManager,
                             reloadableServerResources.listeners(),

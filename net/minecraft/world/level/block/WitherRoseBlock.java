@@ -63,11 +63,12 @@ public class WitherRoseBlock extends FlowerBlock {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        if (!new io.papermc.paper.event.entity.EntityInsideBlockEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.block.CraftBlock.at(level, pos)).callEvent()) { return; } // Paper - Add EntityInsideBlockEvent
         if (level instanceof ServerLevel serverLevel
             && level.getDifficulty() != Difficulty.PEACEFUL
             && entity instanceof LivingEntity livingEntity
             && !livingEntity.isInvulnerableTo(serverLevel, level.damageSources().wither())) {
-            livingEntity.addEffect(this.getBeeInteractionEffect());
+            livingEntity.addEffect(this.getBeeInteractionEffect(), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.WITHER_ROSE); // CraftBukkit
         }
     }
 

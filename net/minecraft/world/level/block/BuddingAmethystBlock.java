@@ -44,7 +44,13 @@ public class BuddingAmethystBlock extends AmethystBlock {
                 BlockState blockState1 = block.defaultBlockState()
                     .setValue(AmethystClusterBlock.FACING, direction)
                     .setValue(AmethystClusterBlock.WATERLOGGED, Boolean.valueOf(blockState.getFluidState().getType() == Fluids.WATER));
-                level.setBlockAndUpdate(blockPos, blockState1);
+                // Paper start - Have Amethyst throw both spread and grow events
+                if (block == Blocks.SMALL_AMETHYST_BUD) {
+                    org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockSpreadEvent(level, pos, blockPos, blockState1, 3); // CraftBukkit
+                } else {
+                    org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, blockPos, blockState1);
+                }
+                // Paper end - Have Amethyst throw both spread and grow events
             }
         }
     }

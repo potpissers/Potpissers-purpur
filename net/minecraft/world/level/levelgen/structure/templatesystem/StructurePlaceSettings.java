@@ -21,7 +21,7 @@ public class StructurePlaceSettings {
     private LiquidSettings liquidSettings = LiquidSettings.APPLY_WATERLOGGING;
     @Nullable
     private RandomSource random;
-    private int palette;
+    public int palette = -1; // CraftBukkit - Set initial value so we know if the palette has been set forcefully
     private final List<StructureProcessor> processors = Lists.newArrayList();
     private boolean knownShape;
     private boolean finalizeEntities;
@@ -142,6 +142,13 @@ public class StructurePlaceSettings {
         int size = palettes.size();
         if (size == 0) {
             throw new IllegalStateException("No palettes");
+        // CraftBukkit start
+        } else if (this.palette >= 0) {
+            if (this.palette >= size) {
+                throw new IllegalArgumentException("Palette index out of bounds. Got " + this.palette + " where there are only " + size + " palettes available.");
+            }
+            return palettes.get(this.palette);
+        // CraftBukkit end
         } else {
             return palettes.get(this.getRandom(pos).nextInt(size));
         }

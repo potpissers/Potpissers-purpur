@@ -45,8 +45,7 @@ public class FurnaceBlock extends AbstractFurnaceBlock {
     @Override
     protected void openContainer(Level level, BlockPos pos, Player player) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof FurnaceBlockEntity) {
-            player.openMenu((MenuProvider)blockEntity);
+        if (blockEntity instanceof FurnaceBlockEntity && player.openMenu((MenuProvider)blockEntity).isPresent()) { // Paper - Fix InventoryOpenEvent cancellation
             player.awardStat(Stats.INTERACT_WITH_FURNACE);
         }
     }

@@ -38,8 +38,9 @@ public class SmithingTableBlock extends CraftingTableBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (!level.isClientSide) {
-            player.openMenu(state.getMenuProvider(level, pos));
+            if (player.openMenu(state.getMenuProvider(level, pos)).isPresent()) { // Paper - Fix InventoryOpenEvent cancellation
             player.awardStat(Stats.INTERACT_WITH_SMITHING_TABLE);
+            } // Paper - Fix InventoryOpenEvent cancellation
         }
 
         return InteractionResult.SUCCESS;

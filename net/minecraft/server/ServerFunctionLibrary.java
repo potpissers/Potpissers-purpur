@@ -113,7 +113,7 @@ public class ServerFunctionLibrary implements PreparableReloadListener {
                         return null;
                     }).join());
                     this.functions = builder.build();
-                    this.tags = this.tagsLoader.build((Map<ResourceLocation, List<TagLoader.EntryWithSource>>)pair.getFirst());
+                    this.tags = this.tagsLoader.build((Map<ResourceLocation, List<TagLoader.EntryWithSource>>)pair.getFirst(), null); // Paper - command function tags are not implemented yet
                 },
                 gameExecutor
             );

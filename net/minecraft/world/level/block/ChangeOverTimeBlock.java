@@ -16,7 +16,7 @@ public interface ChangeOverTimeBlock<T extends Enum<T>> {
     default void changeOverTime(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         float f = 0.05688889F;
         if (random.nextFloat() < 0.05688889F) {
-            this.getNextState(state, level, pos, random).ifPresent(blockState -> level.setBlockAndUpdate(pos, blockState));
+            this.getNextState(state, level, pos, random).ifPresent(blockState -> org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockFormEvent(level, pos, blockState)); // CraftBukkit
         }
     }
 

@@ -130,9 +130,16 @@ public class Interaction extends Entity implements Attackable, Targeting {
     @Override
     public boolean skipAttackInteraction(Entity entity) {
         if (entity instanceof Player player) {
+            // CraftBukkit start
+            DamageSource source = player.damageSources().playerAttack(player);
+            org.bukkit.event.entity.EntityDamageEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callNonLivingEntityDamageEvent(this, source, 1.0F, false);
+            if (event.isCancelled()) {
+                return true;
+            }
+            // CraftBukkit end
             this.attack = new Interaction.PlayerAction(player.getUUID(), this.level().getGameTime());
             if (player instanceof ServerPlayer serverPlayer) {
-                CriteriaTriggers.PLAYER_HURT_ENTITY.trigger(serverPlayer, this, player.damageSources().generic(), 1.0F, 1.0F, false);
+                CriteriaTriggers.PLAYER_HURT_ENTITY.trigger(serverPlayer, this, player.damageSources().generic(), 1.0F, (float) event.getFinalDamage(), false); // CraftBukkit // Paper - use correct source and fix taken/dealt param order
             }
 
             return !this.getResponse();

@@ -19,7 +19,15 @@ public interface ConsumeEffect {
 
     ConsumeEffect.Type<? extends ConsumeEffect> getType();
 
-    boolean apply(Level level, ItemStack stack, LivingEntity entity);
+    // CraftBukkit start
+    default boolean apply(Level level, ItemStack stack, LivingEntity entity) {
+        return this.apply(level, stack, entity, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.UNKNOWN);
+    }
+
+    default boolean apply(Level level, ItemStack stack, LivingEntity entity, org.bukkit.event.entity.EntityPotionEffectEvent.Cause cause) {
+        return this.apply(level, stack, entity);
+    }
+    // CraftBukkit end
 
     public record Type<T extends ConsumeEffect>(MapCodec<T> codec, StreamCodec<RegistryFriendlyByteBuf, T> streamCodec) {
         public static final ConsumeEffect.Type<ApplyStatusEffectsConsumeEffect> APPLY_EFFECTS = register(

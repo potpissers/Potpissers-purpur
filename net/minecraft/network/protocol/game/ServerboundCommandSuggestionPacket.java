@@ -19,7 +19,7 @@ public class ServerboundCommandSuggestionPacket implements Packet<ServerGamePack
 
     private ServerboundCommandSuggestionPacket(FriendlyByteBuf buffer) {
         this.id = buffer.readVarInt();
-        this.command = buffer.readUtf(32500);
+        this.command = buffer.readUtf(2048); // Paper
     }
 
     private void write(FriendlyByteBuf buffer) {

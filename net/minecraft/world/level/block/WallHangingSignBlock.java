@@ -187,6 +187,6 @@ public class WallHangingSignBlock extends SignBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return createTickerHelper(blockEntityType, BlockEntityType.HANGING_SIGN, SignBlockEntity::tick);
+        return null; // CraftBukkit - remove unnecessary sign ticking
     }
 }

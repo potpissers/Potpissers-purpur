@@ -30,6 +30,19 @@ public abstract class CustomRecipe implements CraftingRecipe {
     @Override
     public abstract RecipeSerializer<? extends CustomRecipe> getSerializer();
 
+    // CraftBukkit start
+    @Override
+    public org.bukkit.inventory.Recipe toBukkitRecipe(org.bukkit.NamespacedKey id) {
+        org.bukkit.craftbukkit.inventory.CraftItemStack result = org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(net.minecraft.world.item.ItemStack.EMPTY);
+
+        org.bukkit.craftbukkit.inventory.CraftComplexRecipe recipe = new org.bukkit.craftbukkit.inventory.CraftComplexRecipe(id, result, this);
+        recipe.setGroup(this.group());
+        recipe.setCategory(org.bukkit.craftbukkit.inventory.CraftRecipe.getCategory(this.category()));
+
+        return recipe;
+    }
+    // CraftBukkit end
+
     public static class Serializer<T extends CraftingRecipe> implements RecipeSerializer<T> {
         private final MapCodec<T> codec;
         private final StreamCodec<RegistryFriendlyByteBuf, T> streamCodec;

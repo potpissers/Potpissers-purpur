@@ -41,7 +41,7 @@ public class DynamicGameEventListener<T extends GameEventListener> {
 
     private static void ifChunkExists(LevelReader level, @Nullable SectionPos sectionPos, Consumer<GameEventListenerRegistry> dispatcherConsumer) {
         if (sectionPos != null) {
-            ChunkAccess chunk = level.getChunk(sectionPos.x(), sectionPos.z(), ChunkStatus.FULL, false);
+            ChunkAccess chunk = level.getChunkIfLoadedImmediately(sectionPos.getX(), sectionPos.getZ()); // Paper - Perf: can cause sync loads while completing a chunk, resulting in deadlock
             if (chunk != null) {
                 dispatcherConsumer.accept(chunk.getListenerRegistry(sectionPos.y()));
             }

@@ -112,6 +112,19 @@ public enum ChatFormatting implements StringRepresentable {
         return friendlyName == null ? null : FORMATTING_BY_NAME.get(cleanName(friendlyName));
     }
 
+    // Paper start - add method to get by hex value
+    @Nullable
+    public static ChatFormatting getByHexValue(int i) {
+        for (ChatFormatting value : values()) {
+            if (value.getColor() != null && value.getColor() == i) {
+                return value;
+            }
+        }
+
+        return null;
+    }
+    // Paper end - add method to get by hex value
+
     @Nullable
     public static ChatFormatting getById(int index) {
         if (index < 0) {

@@ -85,7 +85,7 @@ public class Bat extends AmbientCreature {
     }
 
     @Override
-    public boolean isPushable() {
+    public boolean isCollidable(boolean ignoreClimbing) { // Paper - Climbing should not bypass cramming gamerule
         return false;
     }
 
@@ -139,13 +139,13 @@ public class Bat extends AmbientCreature {
                     this.yHeadRot = this.random.nextInt(360);
                 }
 
-                if (level.getNearestPlayer(BAT_RESTING_TARGETING, this) != null) {
+                if (level.getNearestPlayer(BAT_RESTING_TARGETING, this) != null && org.bukkit.craftbukkit.event.CraftEventFactory.handleBatToggleSleepEvent(this, true)) { // CraftBukkit - Call BatToggleSleepEvent
                     this.setResting(false);
                     if (!isSilent) {
                         level.levelEvent(null, 1025, blockPos, 0);
                     }
                 }
-            } else {
+            } else if (org.bukkit.craftbukkit.event.CraftEventFactory.handleBatToggleSleepEvent(this, true)) { // CraftBukkit - Call BatToggleSleepEvent
                 this.setResting(false);
                 if (!isSilent) {
                     level.levelEvent(null, 1025, blockPos, 0);
@@ -178,7 +178,7 @@ public class Bat extends AmbientCreature {
             float f1 = Mth.wrapDegrees(f - this.getYRot());
             this.zza = 0.5F;
             this.setYRot(this.getYRot() + f1);
-            if (this.random.nextInt(100) == 0 && level.getBlockState(blockPos1).isRedstoneConductor(level, blockPos1)) {
+            if (this.random.nextInt(100) == 0 && level.getBlockState(blockPos1).isRedstoneConductor(level, blockPos1) && org.bukkit.craftbukkit.event.CraftEventFactory.handleBatToggleSleepEvent(this, false)) { // CraftBukkit - Call BatToggleSleepEvent
                 this.setResting(true);
             }
         }
@@ -203,7 +203,7 @@ public class Bat extends AmbientCreature {
         if (this.isInvulnerableTo(level, damageSource)) {
             return false;
         } else {
-            if (this.isResting()) {
+            if (this.isResting() && org.bukkit.craftbukkit.event.CraftEventFactory.handleBatToggleSleepEvent(this, true)) { // CraftBukkit - Call BatToggleSleepEvent
                 this.setResting(false);
             }
 

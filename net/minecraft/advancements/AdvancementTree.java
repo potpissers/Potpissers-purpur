@@ -26,7 +26,7 @@ public class AdvancementTree {
             this.remove(advancementNode);
         }
 
-        LOGGER.info("Forgot about advancement {}", node.holder());
+        LOGGER.debug("Forgot about advancement {}", node.holder()); // Paper - Improve logging and errors
         this.nodes.remove(node.holder().id());
         if (node.parent() == null) {
             this.roots.remove(node);
@@ -62,7 +62,7 @@ public class AdvancementTree {
             }
         }
 
-        LOGGER.info("Loaded {} advancements", this.nodes.size());
+        // LOGGER.info("Loaded {} advancements", this.nodes.size()); // CraftBukkit - moved to AdvancementDataWorld#reload // Paper - Improve logging and errors; you say it was moved... but it wasn't :) it should be moved however, since this is called when the API creates an advancement
     }
 
     private boolean tryInsert(AdvancementHolder advancement) {

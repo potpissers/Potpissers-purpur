@@ -101,11 +101,12 @@ public class VillageSiege implements CustomSpawner {
                 zombie.finalizeSpawn(level, level.getCurrentDifficultyAt(zombie.blockPosition()), EntitySpawnReason.EVENT, null);
             } catch (Exception var5) {
                 LOGGER.warn("Failed to create zombie for village siege at {}", vec3, var5);
+                com.destroystokyo.paper.exception.ServerInternalException.reportInternalException(var5); // Paper - ServerExceptionEvent
                 return;
             }
 
             zombie.moveTo(vec3.x, vec3.y, vec3.z, level.random.nextFloat() * 360.0F, 0.0F);
-            level.addFreshEntityWithPassengers(zombie);
+            level.addFreshEntityWithPassengers(zombie, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.VILLAGE_INVASION); // CraftBukkit
         }
     }
 

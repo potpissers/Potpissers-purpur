@@ -70,6 +70,7 @@ import org.joml.Vector3f;
 public class FriendlyByteBuf extends ByteBuf {
     public static final int DEFAULT_NBT_QUOTA = 2097152;
     private final ByteBuf source;
+    @Nullable public final java.util.Locale adventure$locale; // Paper - track player's locale for server-side translations
     public static final short MAX_STRING_LENGTH = 32767;
     public static final int MAX_COMPONENT_STRING_LENGTH = 262144;
     private static final int PUBLIC_KEY_SIZE = 256;
@@ -78,6 +79,7 @@ public class FriendlyByteBuf extends ByteBuf {
     private static final Gson GSON = new Gson();
 
     public FriendlyByteBuf(ByteBuf source) {
+        this.adventure$locale = PacketEncoder.ADVENTURE_LOCALE.get(); // Paper - track player's locale for server-side translations
         this.source = source;
     }
 
@@ -106,8 +108,13 @@ public class FriendlyByteBuf extends ByteBuf {
     }
 
     public <T> void writeJsonWithCodec(Codec<T> codec, T value) {
+        // Paper start - Adventure; add max length parameter
+        this.writeJsonWithCodec(codec, value, MAX_STRING_LENGTH);
+    }
+    public <T> void writeJsonWithCodec(Codec<T> codec, T value, int maxLength) {
+        // Paper end - Adventure; add max length parameter
         DataResult<JsonElement> dataResult = codec.encodeStart(JsonOps.INSTANCE, value);
-        this.writeUtf(GSON.toJson(dataResult.getOrThrow(exception -> new EncoderException("Failed to encode: " + exception + " " + value))));
+        this.writeUtf(GSON.toJson(dataResult.getOrThrow(exception -> new EncoderException("Failed to encode: " + exception + " " + value))), maxLength); // Paper - Adventure; add max length parameter
     }
 
     public static <T> IntFunction<T> limitValue(IntFunction<T> function, int limit) {
@@ -527,7 +534,7 @@ public class FriendlyByteBuf extends ByteBuf {
 
         try {
             NbtIo.writeAnyTag(nbt, new ByteBufOutputStream(buffer));
-        } catch (IOException var3) {
+        } catch (Exception var3) { // CraftBukkit - IOException -> Exception
             throw new EncoderException(var3);
         }
     }

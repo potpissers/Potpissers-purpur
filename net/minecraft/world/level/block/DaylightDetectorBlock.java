@@ -70,6 +70,7 @@ public class DaylightDetectorBlock extends BaseEntityBlock {
 
         i = Mth.clamp(i, 0, 15);
         if (state.getValue(POWER) != i) {
+            i = org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(level, pos, state.getValue(DaylightDetectorBlock.POWER), i).getNewCurrent(); // CraftBukkit - Call BlockRedstoneEvent
             level.setBlock(pos, state.setValue(POWER, Integer.valueOf(i)), 3);
         }
     }

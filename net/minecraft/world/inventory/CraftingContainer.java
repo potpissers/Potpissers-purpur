@@ -12,6 +12,15 @@ public interface CraftingContainer extends Container, StackedContentsCompatible 
 
     List<ItemStack> getItems();
 
+    // CraftBukkit start
+    default net.minecraft.world.item.crafting.RecipeHolder<net.minecraft.world.item.crafting.CraftingRecipe> getCurrentRecipe() {
+        return null;
+    }
+
+    default void setCurrentRecipe(net.minecraft.world.item.crafting.RecipeHolder<net.minecraft.world.item.crafting.CraftingRecipe> recipe) {
+    }
+    // CraftBukkit end
+
     default CraftingInput asCraftInput() {
         return this.asPositionedCraftInput().input();
     }

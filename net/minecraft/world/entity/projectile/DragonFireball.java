@@ -52,9 +52,11 @@ public class DragonFireball extends AbstractHurtingProjectile {
                     }
                 }
 
+                if (new com.destroystokyo.paper.event.entity.EnderDragonFireballHitEvent((org.bukkit.entity.DragonFireball) this.getBukkitEntity(), entitiesOfClass.stream().map(LivingEntity::getBukkitLivingEntity).collect(java.util.stream.Collectors.toList()), (org.bukkit.entity.AreaEffectCloud) areaEffectCloud.getBukkitEntity()).callEvent()) { // Paper - EnderDragon Events
                 this.level().levelEvent(2006, this.blockPosition(), this.isSilent() ? -1 : 1);
-                this.level().addFreshEntity(areaEffectCloud);
-                this.discard();
+                this.level().addFreshEntity(areaEffectCloud, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.EXPLOSION); // Paper - use correct spawn reason
+                } else areaEffectCloud.discard(null); // Paper - EnderDragon Events
+                this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause
             }
         }
     }

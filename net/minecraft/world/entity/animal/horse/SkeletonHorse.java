@@ -122,7 +122,7 @@ public class SkeletonHorse extends AbstractHorse {
     public void aiStep() {
         super.aiStep();
         if (this.isTrap() && this.trapTime++ >= 18000) {
-            this.discard();
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
         }
     }
 

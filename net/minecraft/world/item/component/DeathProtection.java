@@ -37,7 +37,7 @@ public record DeathProtection(List<ConsumeEffect> deathEffects) {
 
     public void applyEffects(ItemStack stack, LivingEntity entity) {
         for (ConsumeEffect consumeEffect : this.deathEffects) {
-            consumeEffect.apply(entity.level(), stack, entity);
+            consumeEffect.apply(entity.level(), stack, entity, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.TOTEM); // CraftBukkit
         }
     }
 }

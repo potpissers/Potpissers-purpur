@@ -45,7 +45,7 @@ public class SynchedEntityData {
         }
     }
 
-    private <T> SynchedEntityData.DataItem<T> getItem(EntityDataAccessor<T> key) {
+    public <T> SynchedEntityData.DataItem<T> getItem(EntityDataAccessor<T> key) { // Paper - public
         return (SynchedEntityData.DataItem<T>)this.itemsById[key.id()];
     }
 
@@ -66,6 +66,13 @@ public class SynchedEntityData {
             this.isDirty = true;
         }
     }
+
+    // CraftBukkit start - add method from above
+    public <T> void markDirty(final EntityDataAccessor<T> entityDataAccessor) {
+        this.getItem(entityDataAccessor).setDirty(true);
+        this.isDirty = true;
+    }
+    // CraftBukkit end
 
     public boolean isDirty() {
         return this.isDirty;
@@ -169,6 +176,19 @@ public class SynchedEntityData {
             return new SynchedEntityData(this.entity, this.itemsById);
         }
     }
+
+    // Paper start
+    // We need to pack all as we cannot rely on "non default values" or "dirty" ones.
+    // Because these values can possibly be desynced on the client.
+    public List<SynchedEntityData.DataValue<?>> packAll() {
+        final List<SynchedEntityData.DataValue<?>> list = new ArrayList<>(this.itemsById.length);
+        for (final DataItem<?> dataItem : this.itemsById) {
+            list.add(dataItem.value());
+        }
+
+        return list;
+    }
+    // Paper end
 
     public static class DataItem<T> {
         final EntityDataAccessor<T> accessor;

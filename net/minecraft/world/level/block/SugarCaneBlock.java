@@ -56,12 +56,13 @@ public class SugarCaneBlock extends Block {
                 i++;
             }
 
-            if (i < 3) {
+            if (i < level.paperConfig().maxGrowthHeight.reeds) { // Paper - Configurable cactus/bamboo/reed growth height
                 int ageValue = state.getValue(AGE);
-                if (ageValue == 15) {
-                    level.setBlockAndUpdate(pos.above(), this.defaultBlockState());
+                int modifier = level.spigotConfig.caneModifier; // Spigot - SPIGOT-7159: Better modifier resolution
+                if (ageValue >= 15 || (modifier != 100 && random.nextFloat() < (modifier / (100.0f * 16)))) { // Spigot - SPIGOT-7159: Better modifier resolution
+                    org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, pos.above(), this.defaultBlockState()); // CraftBukkit
                     level.setBlock(pos, state.setValue(AGE, Integer.valueOf(0)), 4);
-                } else {
+                } else if (modifier == 100 || random.nextFloat() < (modifier / (100.0f * 16))) { // Spigot - SPIGOT-7159: Better modifier resolution
                     level.setBlock(pos, state.setValue(AGE, Integer.valueOf(ageValue + 1)), 4);
                 }
             }

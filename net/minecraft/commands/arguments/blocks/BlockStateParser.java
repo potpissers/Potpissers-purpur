@@ -69,7 +69,7 @@ public class BlockStateParser {
     private final StringReader reader;
     private final boolean forTesting;
     private final boolean allowNbt;
-    private final Map<Property<?>, Comparable<?>> properties = Maps.newHashMap();
+    private final Map<Property<?>, Comparable<?>> properties = Maps.newLinkedHashMap(); // CraftBukkit - stable
     private final Map<String, String> vagueProperties = Maps.newHashMap();
     private ResourceLocation id = ResourceLocation.withDefaultNamespace("");
     @Nullable

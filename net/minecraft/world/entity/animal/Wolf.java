@@ -344,8 +344,9 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
         if (this.isInvulnerableTo(level, damageSource)) {
             return false;
         } else {
+            if (!super.hurtServer(level, damageSource, amount)) return false; // CraftBukkit
             this.setOrderedToSit(false);
-            return super.hurtServer(level, damageSource, amount);
+            return true; // CraftBukkit
         }
     }
 
@@ -355,10 +356,11 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
     }
 
     @Override
-    protected void actuallyHurt(ServerLevel level, DamageSource damageSource, float amount) {
+    public boolean actuallyHurt(ServerLevel level, DamageSource damageSource, float amount, org.bukkit.event.entity.EntityDamageEvent event) { // CraftBukkit - void -> boolean
         if (!this.canArmorAbsorb(damageSource)) {
-            super.actuallyHurt(level, damageSource, amount);
+            return super.actuallyHurt(level, damageSource, amount, event); // CraftBukkit
         } else {
+            if (event.isCancelled()) return false; // CraftBukkit - SPIGOT-7815: if the damage was cancelled, no need to run the wolf armor behaviour
             ItemStack bodyArmorItem = this.getBodyArmorItem();
             int damageValue = bodyArmorItem.getDamageValue();
             int maxDamage = bodyArmorItem.getMaxDamage();
@@ -378,6 +380,7 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
                 );
             }
         }
+        return true; // CraftBukkit // Paper - return false ONLY if event was cancelled
     }
 
     private boolean canArmorAbsorb(DamageSource damageSource) {
@@ -388,7 +391,7 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
     protected void applyTamingSideEffects() {
         if (this.isTame()) {
             this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(40.0);
-            this.setHealth(40.0F);
+            this.setHealth(this.getMaxHealth()); // CraftBukkit - 40.0 -> getMaxHealth()
         } else {
             this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(8.0);
         }
@@ -408,7 +411,7 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
                 this.usePlayerItem(player, hand, itemInHand);
                 FoodProperties foodProperties = itemInHand.get(DataComponents.FOOD);
                 float f = foodProperties != null ? foodProperties.nutrition() : 1.0F;
-                this.heal(2.0F * f);
+                this.heal(2.0F * f, org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.EATING); // CraftBukkit
                 return InteractionResult.SUCCESS;
             }
 
@@ -441,7 +444,7 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
                         this.setOrderedToSit(!this.isOrderedToSit());
                         this.jumping = false;
                         this.navigation.stop();
-                        this.setTarget(null);
+                        this.setTarget(null, org.bukkit.event.entity.EntityTargetEvent.TargetReason.FORGOT_TARGET, true); // CraftBukkit - reason
                         return InteractionResult.SUCCESS.withoutItem();
                     }
 
@@ -453,7 +456,9 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
                 ItemStack bodyArmorItem = this.getBodyArmorItem();
                 this.setBodyArmorItem(ItemStack.EMPTY);
                 if (this.level() instanceof ServerLevel serverLevel) {
+                    this.forceDrops = true; // CraftBukkit
                     this.spawnAtLocation(serverLevel, bodyArmorItem);
+                    this.forceDrops = false; // CraftBukkit
                 }
 
                 return InteractionResult.SUCCESS;
@@ -461,6 +466,13 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
 
             DyeColor dyeColor = dyeItem.getDyeColor();
             if (dyeColor != this.getCollarColor()) {
+                // Paper start - Add EntityDyeEvent and CollarColorable interface
+                final io.papermc.paper.event.entity.EntityDyeEvent event = new io.papermc.paper.event.entity.EntityDyeEvent(this.getBukkitEntity(), org.bukkit.DyeColor.getByWoolData((byte) dyeColor.getId()), (org.bukkit.entity.Player) player.getBukkitEntity());
+                if (!event.callEvent()) {
+                    return InteractionResult.FAIL;
+                }
+                dyeColor = DyeColor.byId(event.getColor().getWoolData());
+                // Paper end - Add EntityDyeEvent and CollarColorable interface
                 this.setCollarColor(dyeColor);
                 itemInHand.consume(1, player);
                 return InteractionResult.SUCCESS;
@@ -475,7 +487,7 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
     }
 
     private void tryToTame(Player player) {
-        if (this.random.nextInt(3) == 0) {
+        if (this.random.nextInt(3) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit - added event call and isCancelled check.
             this.tame(player);
             this.navigation.stop();
             this.setTarget(null);

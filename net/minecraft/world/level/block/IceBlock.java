@@ -32,8 +32,13 @@ public class IceBlock extends HalfTransparentBlock {
     }
 
     @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity te, ItemStack stack) {
-        super.playerDestroy(level, player, pos, state, te, stack);
+    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity te, ItemStack stack, boolean includeDrops, boolean dropExp) { // Paper - fix drops not preventing stats/food exhaustion
+        super.playerDestroy(level, player, pos, state, te, stack, includeDrops, dropExp); // Paper - fix drops not preventing stats/food exhaustion
+        // Paper start - Improve Block#breakNaturally API
+        this.afterDestroy(level, pos, stack);
+    }
+    public void afterDestroy(Level level, BlockPos pos, ItemStack stack) {
+        // Paper end - Improve Block#breakNaturally API
         if (!EnchantmentHelper.hasTag(stack, EnchantmentTags.PREVENTS_ICE_MELTING)) {
             if (level.dimensionType().ultraWarm()) {
                 level.removeBlock(pos, false);
@@ -55,6 +60,11 @@ public class IceBlock extends HalfTransparentBlock {
     }
 
     protected void melt(BlockState state, Level level, BlockPos pos) {
+        // CraftBukkit start
+        if (org.bukkit.craftbukkit.event.CraftEventFactory.callBlockFadeEvent(level, pos, level.dimensionType().ultraWarm() ? Blocks.AIR.defaultBlockState() : Blocks.WATER.defaultBlockState()).isCancelled()) {
+            return;
+        }
+        // CraftBukkit end
         if (level.dimensionType().ultraWarm()) {
             level.removeBlock(pos, false);
         } else {

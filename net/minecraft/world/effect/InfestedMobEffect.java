@@ -44,7 +44,11 @@ class InfestedMobEffect extends MobEffect {
             Vector3f vector3f = entity.getLookAngle().toVector3f().mul(0.3F).mul(1.0F, 1.5F, 1.0F).rotateY(f1);
             silverfish.moveTo(x, y, z, level.getRandom().nextFloat() * 360.0F, 0.0F);
             silverfish.setDeltaMovement(new Vec3(vector3f));
-            level.addFreshEntity(silverfish);
+            // CraftBukkit start
+            if (!level.addFreshEntity(silverfish, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.POTION_EFFECT)) {
+                return;
+            }
+            // CraftBukkit end
             silverfish.playSound(SoundEvents.SILVERFISH_HURT);
         }
     }

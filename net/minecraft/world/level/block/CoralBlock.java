@@ -37,6 +37,11 @@ public class CoralBlock extends Block {
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!this.scanForWater(level, pos)) {
+            // CraftBukkit start
+            if (org.bukkit.craftbukkit.event.CraftEventFactory.callBlockFadeEvent(level, pos, this.deadBlock.defaultBlockState()).isCancelled()) {
+                return;
+            }
+            // CraftBukkit end
             level.setBlock(pos, this.deadBlock.defaultBlockState(), 2);
         }
     }

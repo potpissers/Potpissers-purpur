@@ -82,6 +82,7 @@ public class SummonCommand {
             ServerLevel level = source.getLevel();
             Entity entity = EntityType.loadEntityRecursive(compoundTag, level, EntitySpawnReason.COMMAND, entity1 -> {
                 entity1.moveTo(pos.x, pos.y, pos.z, entity1.getYRot(), entity1.getXRot());
+                entity1.spawnReason = org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.COMMAND; // Paper - Entity#getEntitySpawnReason
                 return entity1;
             });
             if (entity == null) {
@@ -92,7 +93,7 @@ public class SummonCommand {
                         .finalizeSpawn(source.getLevel(), source.getLevel().getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.COMMAND, null);
                 }
 
-                if (!level.tryAddFreshEntityWithPassengers(entity)) {
+                if (!level.tryAddFreshEntityWithPassengers(entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.COMMAND)) { // CraftBukkit - pass a spawn reason of "COMMAND"
                     throw ERROR_DUPLICATE_UUID.create();
                 } else {
                     return entity;

@@ -41,7 +41,7 @@ public class GroundPathNavigation extends PathNavigation {
     }
 
     @Override
-    public Path createPath(BlockPos pos, int accuracy) {
+    public Path createPath(BlockPos pos, @javax.annotation.Nullable Entity entity, int accuracy) { // Paper - EntityPathfindEvent
         LevelChunk chunkNow = this.level.getChunkSource().getChunkNow(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
         if (chunkNow == null) {
             return null;
@@ -54,7 +54,7 @@ public class GroundPathNavigation extends PathNavigation {
                 }
 
                 if (mutableBlockPos.getY() > this.level.getMinY()) {
-                    return super.createPath(mutableBlockPos.above(), accuracy);
+                    return super.createPath(mutableBlockPos.above(), entity, accuracy); // Paper - EntityPathfindEvent
                 }
 
                 mutableBlockPos.setY(pos.getY() + 1);
@@ -67,7 +67,7 @@ public class GroundPathNavigation extends PathNavigation {
             }
 
             if (!chunkNow.getBlockState(pos).isSolid()) {
-                return super.createPath(pos, accuracy);
+                return super.createPath(pos, entity, accuracy); // Paper - EntityPathfindEvent
             } else {
                 BlockPos.MutableBlockPos mutableBlockPos = pos.mutable().move(Direction.UP);
 
@@ -75,14 +75,14 @@ public class GroundPathNavigation extends PathNavigation {
                     mutableBlockPos.move(Direction.UP);
                 }
 
-                return super.createPath(mutableBlockPos.immutable(), accuracy);
+                return super.createPath(mutableBlockPos.immutable(), entity, accuracy); // Paper - EntityPathfindEvent
             }
         }
     }
 
     @Override
     public Path createPath(Entity entity, int i) {
-        return this.createPath(entity.blockPosition(), i);
+        return this.createPath(entity.blockPosition(), entity, i); // Paper - EntityPathfindEvent
     }
 
     private int getSurfaceY() {

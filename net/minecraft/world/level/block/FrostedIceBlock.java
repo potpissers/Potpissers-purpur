@@ -42,6 +42,7 @@ public class FrostedIceBlock extends IceBlock {
 
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (!level.paperConfig().environment.frostedIce.enabled) return; // Paper - Frosted ice options
         if ((random.nextInt(3) == 0 || this.fewerNeigboursThan(level, pos, 4))
             && level.getMaxLocalRawBrightness(pos) > 11 - state.getValue(AGE) - state.getLightBlock()
             && this.slightlyMelt(state, level, pos)) {
@@ -51,11 +52,11 @@ public class FrostedIceBlock extends IceBlock {
                 mutableBlockPos.setWithOffset(pos, direction);
                 BlockState blockState = level.getBlockState(mutableBlockPos);
                 if (blockState.is(this) && !this.slightlyMelt(blockState, level, mutableBlockPos)) {
-                    level.scheduleTick(mutableBlockPos, this, Mth.nextInt(random, 20, 40));
+                    level.scheduleTick(mutableBlockPos, this, Mth.nextInt(random, level.paperConfig().environment.frostedIce.delay.min, level.paperConfig().environment.frostedIce.delay.max)); // Paper - Frosted ice options
                 }
             }
         } else {
-            level.scheduleTick(pos, this, Mth.nextInt(random, 20, 40));
+            level.scheduleTick(pos, this, Mth.nextInt(random, level.paperConfig().environment.frostedIce.delay.min, level.paperConfig().environment.frostedIce.delay.max)); // Paper - Frosted ice options
         }
     }
 

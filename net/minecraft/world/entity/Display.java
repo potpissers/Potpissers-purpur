@@ -213,7 +213,7 @@ public abstract class Display extends Entity {
         if (tag.contains("transformation")) {
             Transformation.EXTENDED_CODEC
                 .decode(NbtOps.INSTANCE, tag.get("transformation"))
-                .resultOrPartial(Util.prefix("Display entity", LOGGER::error))
+                .result() // Paper - Hide text display error on spawn
                 .ifPresent(pair -> this.setTransformation(pair.getFirst()));
         }
 

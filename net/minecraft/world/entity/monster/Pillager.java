@@ -214,7 +214,7 @@ public class Pillager extends AbstractIllager implements CrossbowAttackMob, Inve
             this.onItemPickup(entity);
             ItemStack itemStack = this.inventory.addItem(item);
             if (itemStack.isEmpty()) {
-                entity.discard();
+                entity.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.PICKUP); // CraftBukkit - add Bukkit remove cause
             } else {
                 item.setCount(itemStack.getCount());
             }

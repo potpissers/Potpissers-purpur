@@ -30,14 +30,14 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
     public final IdMap<T> registry;
     private volatile PalettedContainer.Data<T> data;
     private final PalettedContainer.Strategy strategy;
-    private final ThreadingDetector threadingDetector = new ThreadingDetector("PalettedContainer");
+    //private final ThreadingDetector threadingDetector = new ThreadingDetector("PalettedContainer"); // Paper - unused
 
     public void acquire() {
-        this.threadingDetector.checkAndLock();
+        // this.threadingDetector.checkAndLock(); // Paper - disable this - use proper synchronization
     }
 
     public void release() {
-        this.threadingDetector.checkAndUnlock();
+        // this.threadingDetector.checkAndUnlock(); // Paper - disable this - use proper synchronization
     }
 
     public static <T> Codec<PalettedContainer<T>> codecRW(IdMap<T> registry, Codec<T> codec, PalettedContainer.Strategy strategy, T value) {
@@ -99,7 +99,7 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
     }
 
     @Override
-    public int onResize(int bits, T objectAdded) {
+    public synchronized int onResize(int bits, T objectAdded) { // Paper - synchronize
         PalettedContainer.Data<T> data = this.data;
         PalettedContainer.Data<T> data1 = this.createOrReuseData(data, bits);
         data1.copyFrom(data.palette, data.storage);
@@ -107,7 +107,7 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
         return data1.palette.idFor(objectAdded);
     }
 
-    public T getAndSet(int x, int y, int z, T state) {
+    public synchronized T getAndSet(int x, int y, int z, T state) { // Paper - synchronize
         this.acquire();
 
         Object var5;
@@ -130,7 +130,7 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
         return this.data.palette.valueFor(andSet);
     }
 
-    public void set(int x, int y, int z, T state) {
+    public synchronized void set(int x, int y, int z, T state) { // Paper - synchronize
         this.acquire();
 
         try {
@@ -163,7 +163,7 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
         set.forEach(id -> consumer.accept(palette.valueFor(id)));
     }
 
-    public void read(FriendlyByteBuf buffer) {
+    public synchronized void read(FriendlyByteBuf buffer) { // Paper - synchronize
         this.acquire();
 
         try {
@@ -178,7 +178,7 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
     }
 
     @Override
-    public void write(FriendlyByteBuf buffer) {
+    public synchronized void write(FriendlyByteBuf buffer) { // Paper - synchronize
         this.acquire();
 
         try {
@@ -226,7 +226,7 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
     }
 
     @Override
-    public PalettedContainerRO.PackedData<T> pack(IdMap<T> registry, PalettedContainer.Strategy strategy) {
+    public synchronized PalettedContainerRO.PackedData<T> pack(IdMap<T> registry, PalettedContainer.Strategy strategy) { // Paper - synchronize
         this.acquire();
 
         PalettedContainerRO.PackedData var12;

@@ -121,12 +121,13 @@ public class Arrow extends AbstractArrow {
                         mobEffectInstance.isVisible()
                     ),
                     effectSource
+                    , org.bukkit.event.entity.EntityPotionEffectEvent.Cause.ARROW // CraftBukkit
                 );
             }
         }
 
         for (MobEffectInstance mobEffectInstance : potionContents.customEffects()) {
-            living.addEffect(mobEffectInstance, effectSource);
+            living.addEffect(mobEffectInstance, effectSource, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.ARROW); // CraftBukkit
         }
     }
 

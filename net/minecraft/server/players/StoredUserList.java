@@ -26,7 +26,7 @@ public abstract class StoredUserList<K, V extends StoredUserEntry<K>> {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private final File file;
-    private final Map<String, V> map = Maps.newHashMap();
+    private final Map<String, V> map = Maps.newConcurrentMap(); // Paper - Use ConcurrentHashMap in JsonList
 
     public StoredUserList(File file) {
         this.file = file;
@@ -48,8 +48,11 @@ public abstract class StoredUserList<K, V extends StoredUserEntry<K>> {
 
     @Nullable
     public V get(K obj) {
-        this.removeExpired();
-        return this.map.get(this.getKeyForUser(obj));
+        // Paper start - Use ConcurrentHashMap in JsonList
+        return this.map.computeIfPresent(this.getKeyForUser(obj), (k, v) -> {
+            return v.hasExpired() ? null : v;
+        });
+        // Paper end - Use ConcurrentHashMap in JsonList
     }
 
     public void remove(K user) {
@@ -71,7 +74,7 @@ public abstract class StoredUserList<K, V extends StoredUserEntry<K>> {
     }
 
     public boolean isEmpty() {
-        return this.map.size() < 1;
+        return this.map.isEmpty(); // Paper - Use ConcurrentHashMap in JsonList
     }
 
     protected String getKeyForUser(K obj) {
@@ -79,21 +82,12 @@ public abstract class StoredUserList<K, V extends StoredUserEntry<K>> {
     }
 
     protected boolean contains(K entry) {
+        this.removeExpired(); // CraftBukkit - SPIGOT-7589: Consistently remove expired entries to mirror .get(...)
         return this.map.containsKey(this.getKeyForUser(entry));
     }
 
     private void removeExpired() {
-        List<K> list = Lists.newArrayList();
-
-        for (V storedUserEntry : this.map.values()) {
-            if (storedUserEntry.hasExpired()) {
-                list.add(storedUserEntry.getUser());
-            }
-        }
-
-        for (K object : list) {
-            this.map.remove(this.getKeyForUser(object));
-        }
+        this.map.values().removeIf(StoredUserEntry::hasExpired); // Paper - Use ConcurrentHashMap in JsonList
     }
 
     protected abstract StoredUserEntry<K> createEntry(JsonObject entryData);
@@ -103,6 +97,7 @@ public abstract class StoredUserList<K, V extends StoredUserEntry<K>> {
     }
 
     public void save() throws IOException {
+        this.removeExpired(); // Paper - remove expired values before saving
         JsonArray jsonArray = new JsonArray();
         this.map.values().stream().map(storedEntry -> Util.make(new JsonObject(), storedEntry::serialize)).forEach(jsonArray::add);
 
@@ -127,7 +122,14 @@ public abstract class StoredUserList<K, V extends StoredUserEntry<K>> {
                         this.map.put(this.getKeyForUser(storedUserEntry.getUser()), (V)storedUserEntry);
                     }
                 }
+            // Spigot start
+            } catch (com.google.gson.JsonParseException | NullPointerException ex) {
+                File backup = new File(this.file + ".backup");
+                LOGGER.warn("Unable to read file {}, backing it up to {} and creating new copy.", this.file, backup, ex);
+                this.file.renameTo(backup);
+                this.file.delete();
             }
+            // Spigot end
         }
     }
 }

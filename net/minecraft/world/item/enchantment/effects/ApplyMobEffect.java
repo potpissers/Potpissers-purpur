@@ -44,7 +44,7 @@ public record ApplyMobEffect(
                 int max = Math.max(
                     0, Math.round(Mth.randomBetween(random, this.minAmplifier.calculate(enchantmentLevel), this.maxAmplifier.calculate(enchantmentLevel)))
                 );
-                livingEntity.addEffect(new MobEffectInstance(randomElement.get(), rounded, max));
+                livingEntity.addEffect(new MobEffectInstance(randomElement.get(), rounded, max), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.ATTACK); // CraftBukkit
             }
         }
     }

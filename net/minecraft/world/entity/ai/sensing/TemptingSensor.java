@@ -16,6 +16,14 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+// CraftBukkit start
+import org.bukkit.craftbukkit.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.event.CraftEventFactory;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+// CraftBukkit end
+
 public class TemptingSensor extends Sensor<PathfinderMob> {
     private static final TargetingConditions TEMPT_TARGETING = TargetingConditions.forNonCombat().ignoreLineOfSight();
     private final Predicate<ItemStack> temptations;
@@ -38,7 +46,17 @@ public class TemptingSensor extends Sensor<PathfinderMob> {
             .collect(Collectors.toList());
         if (!list.isEmpty()) {
             Player player = list.get(0);
-            brain.setMemory(MemoryModuleType.TEMPTING_PLAYER, player);
+            // CraftBukkit start
+            EntityTargetLivingEntityEvent event = CraftEventFactory.callEntityTargetLivingEvent(entity, player, EntityTargetEvent.TargetReason.TEMPT);
+            if (event.isCancelled()) {
+                return;
+            }
+            if (event.getTarget() instanceof HumanEntity) {
+                brain.setMemory(MemoryModuleType.TEMPTING_PLAYER, ((CraftHumanEntity) event.getTarget()).getHandle());
+            } else {
+                brain.eraseMemory(MemoryModuleType.TEMPTING_PLAYER);
+            }
+            // CraftBukkit end
         } else {
             brain.eraseMemory(MemoryModuleType.TEMPTING_PLAYER);
         }

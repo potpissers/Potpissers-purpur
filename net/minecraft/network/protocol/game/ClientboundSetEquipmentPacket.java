@@ -19,6 +19,13 @@ public class ClientboundSetEquipmentPacket implements Packet<ClientGamePacketLis
     private final List<Pair<EquipmentSlot, ItemStack>> slots;
 
     public ClientboundSetEquipmentPacket(int entity, List<Pair<EquipmentSlot, ItemStack>> slots) {
+    // Paper start - data sanitization
+        this(entity, slots, false);
+    }
+    private boolean sanitize;
+    public ClientboundSetEquipmentPacket(int entity, List<Pair<EquipmentSlot, ItemStack>> slots, boolean sanitize) {
+        this.sanitize = sanitize;
+    // Paper end - data sanitization
         this.entity = entity;
         this.slots = slots;
     }
@@ -40,6 +47,7 @@ public class ClientboundSetEquipmentPacket implements Packet<ClientGamePacketLis
         buffer.writeVarInt(this.entity);
         int size = this.slots.size();
 
+        try (final io.papermc.paper.util.ItemObfuscationSession ignored = io.papermc.paper.util.ItemObfuscationSession.start(this.sanitize ? io.papermc.paper.configuration.GlobalConfiguration.get().anticheat.obfuscation.items.binding.level : io.papermc.paper.util.ItemObfuscationSession.ObfuscationLevel.NONE)) { // Paper - data sanitization
         for (int i = 0; i < size; i++) {
             Pair<EquipmentSlot, ItemStack> pair = this.slots.get(i);
             EquipmentSlot equipmentSlot = pair.getFirst();
@@ -48,6 +56,7 @@ public class ClientboundSetEquipmentPacket implements Packet<ClientGamePacketLis
             buffer.writeByte(flag ? ordinal | -128 : ordinal);
             ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, pair.getSecond());
         }
+        } // Paper - data sanitization
     }
 
     @Override

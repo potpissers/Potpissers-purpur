@@ -49,7 +49,7 @@ class OozingMobEffect extends MobEffect {
         if (slime != null) {
             slime.setSize(2, true);
             slime.moveTo(x, y, z, level.getRandom().nextFloat() * 360.0F, 0.0F);
-            level.addFreshEntity(slime);
+            level.addFreshEntity(slime, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.POTION_EFFECT); // CraftBukkit
         }
     }
 

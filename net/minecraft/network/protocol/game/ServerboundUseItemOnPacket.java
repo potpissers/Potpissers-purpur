@@ -14,6 +14,7 @@ public class ServerboundUseItemOnPacket implements Packet<ServerGamePacketListen
     private final BlockHitResult blockHit;
     private final InteractionHand hand;
     private final int sequence;
+    public long timestamp; // Spigot
 
     public ServerboundUseItemOnPacket(InteractionHand hand, BlockHitResult blockHit, int sequence) {
         this.hand = hand;
@@ -22,6 +23,7 @@ public class ServerboundUseItemOnPacket implements Packet<ServerGamePacketListen
     }
 
     private ServerboundUseItemOnPacket(FriendlyByteBuf buffer) {
+        this.timestamp = System.currentTimeMillis(); // Spigot
         this.hand = buffer.readEnum(InteractionHand.class);
         this.blockHit = buffer.readBlockHitResult();
         this.sequence = buffer.readVarInt();

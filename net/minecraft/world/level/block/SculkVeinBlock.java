@@ -90,14 +90,14 @@ public class SculkVeinBlock extends MultifaceSpreadeableBlock implements SculkBe
     public int attemptUseCharge(
         SculkSpreader.ChargeCursor cursor, LevelAccessor level, BlockPos pos, RandomSource random, SculkSpreader spreader, boolean shouldConvertBlocks
     ) {
-        if (shouldConvertBlocks && this.attemptPlaceSculk(spreader, level, cursor.getPos(), random)) {
+        if (shouldConvertBlocks && this.attemptPlaceSculk(spreader, level, cursor.getPos(), random, pos)) { // CraftBukkit - add source block
             return cursor.getCharge() - 1;
         } else {
             return random.nextInt(spreader.chargeDecayRate()) == 0 ? Mth.floor(cursor.getCharge() * 0.5F) : cursor.getCharge();
         }
     }
 
-    private boolean attemptPlaceSculk(SculkSpreader spreader, LevelAccessor level, BlockPos pos, RandomSource random) {
+    private boolean attemptPlaceSculk(SculkSpreader spreader, LevelAccessor level, BlockPos pos, RandomSource random, BlockPos sourceBlock) { // CraftBukkit
         BlockState blockState = level.getBlockState(pos);
         TagKey<Block> tagKey = spreader.replaceableBlocks();
 
@@ -107,7 +107,11 @@ public class SculkVeinBlock extends MultifaceSpreadeableBlock implements SculkBe
                 BlockState blockState1 = level.getBlockState(blockPos);
                 if (blockState1.is(tagKey)) {
                     BlockState blockState2 = Blocks.SCULK.defaultBlockState();
-                    level.setBlock(blockPos, blockState2, 3);
+                    // CraftBukkit start - Call BlockSpreadEvent
+                    if (!org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockSpreadEvent(level, sourceBlock, blockPos, blockState2, 3)) {
+                        return false;
+                    }
+                    // CraftBukkit end
                     Block.pushEntitiesUp(blockState1, blockState2, level, blockPos);
                     level.playSound(null, blockPos, SoundEvents.SCULK_BLOCK_SPREAD, SoundSource.BLOCKS, 1.0F, 1.0F);
                     this.veinSpreader.spreadAll(blockState2, level, blockPos, spreader.isWorldGeneration());

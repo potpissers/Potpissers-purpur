@@ -49,6 +49,13 @@ public class LightBlock extends Block implements SimpleWaterloggedBlock {
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(LEVEL, WATERLOGGED);
     }
+    // Paper start - prevent unintended light block manipulation
+    @Override
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hitResult) {
+        if (player.getItemInHand(hand).getItem() != Items.LIGHT || (level instanceof final net.minecraft.server.level.ServerLevel serverLevel && !player.mayInteract(serverLevel, pos)) || !player.mayUseItemAt(pos, hitResult.getDirection(), player.getItemInHand(hand))) { return net.minecraft.world.InteractionResult.PASS; } // Paper - Prevent unintended light block manipulation
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+    }
+    // Paper end - prevent unintended light block manipulation
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {

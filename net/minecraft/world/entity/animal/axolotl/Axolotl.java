@@ -226,7 +226,7 @@ public class Axolotl extends Animal implements VariantHolder<Axolotl.Variant>, B
 
     @Override
     public int getMaxAirSupply() {
-        return 6000;
+        return this.maxAirTicks; // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
     }
 
     @Override
@@ -426,10 +426,10 @@ public class Axolotl extends Animal implements VariantHolder<Axolotl.Variant>, B
         if (effect == null || effect.endsWithin(2399)) {
             int i = effect != null ? effect.getDuration() : 0;
             int min = Math.min(2400, 100 + i);
-            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, min, 0), this);
+            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, min, 0), this, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.AXOLOTL); // CraftBukkit
         }
 
-        player.removeEffect(MobEffects.DIG_SLOWDOWN);
+        player.removeEffect(MobEffects.DIG_SLOWDOWN, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.AXOLOTL); // Paper - Add missing effect cause
     }
 
     @Override
@@ -521,6 +521,13 @@ public class Axolotl extends Animal implements VariantHolder<Axolotl.Variant>, B
     ) {
         return level.getBlockState(pos.below()).is(BlockTags.AXOLOTLS_SPAWNABLE_ON);
     }
+
+    // CraftBukkit start - SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
+    @Override
+    public int getDefaultMaxAirSupply() {
+        return Axolotl.AXOLOTL_TOTAL_AIR_SUPPLY;
+    }
+    // CraftBukkit end
 
     public static enum AnimationState {
         PLAYING_DEAD,

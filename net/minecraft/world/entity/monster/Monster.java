@@ -92,7 +92,7 @@ public abstract class Monster extends PathfinderMob implements Enemy {
             return false;
         } else {
             DimensionType dimensionType = level.dimensionType();
-            int i = dimensionType.monsterSpawnBlockLightLimit();
+            int i = level.getLevel().paperConfig().entities.spawning.monsterSpawnMaxLightLevel.or(dimensionType.monsterSpawnBlockLightLimit()); // Paper - Configurable max block light for monster spawning
             if (i < 15 && level.getBrightness(LightLayer.BLOCK, pos) > i) {
                 return false;
             } else {

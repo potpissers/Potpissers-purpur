@@ -32,8 +32,9 @@ public class CartographyTableBlock extends Block {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (!level.isClientSide) {
-            player.openMenu(state.getMenuProvider(level, pos));
+            if (player.openMenu(state.getMenuProvider(level, pos)).isPresent()) { // Paper - Fix InventoryOpenEvent cancellation
             player.awardStat(Stats.INTERACT_WITH_CARTOGRAPHY_TABLE);
+            } // Paper - Fix InventoryOpenEvent cancellation
         }
 
         return InteractionResult.SUCCESS;

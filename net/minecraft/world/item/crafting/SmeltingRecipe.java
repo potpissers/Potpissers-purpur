@@ -32,4 +32,17 @@ public class SmeltingRecipe extends AbstractCookingRecipe {
             case MISC -> RecipeBookCategories.FURNACE_MISC;
         };
     }
+
+    // CraftBukkit start
+    @Override
+    public org.bukkit.inventory.Recipe toBukkitRecipe(org.bukkit.NamespacedKey id) {
+        org.bukkit.craftbukkit.inventory.CraftItemStack result = org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(this.result());
+
+        org.bukkit.craftbukkit.inventory.CraftFurnaceRecipe recipe = new org.bukkit.craftbukkit.inventory.CraftFurnaceRecipe(id, result, org.bukkit.craftbukkit.inventory.CraftRecipe.toBukkit(this.input()), this.experience(), this.cookingTime());
+        recipe.setGroup(this.group());
+        recipe.setCategory(org.bukkit.craftbukkit.inventory.CraftRecipe.getCategory(this.category()));
+
+        return recipe;
+    }
+    // CraftBukkit end
 }

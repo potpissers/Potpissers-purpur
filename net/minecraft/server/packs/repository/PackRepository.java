@@ -21,9 +21,13 @@ public class PackRepository {
     private final Set<RepositorySource> sources;
     private Map<String, Pack> available = ImmutableMap.of();
     private List<Pack> selected = ImmutableList.of();
+    private final net.minecraft.world.level.validation.DirectoryValidator validator; // Paper - add validator
 
-    public PackRepository(RepositorySource... sources) {
-        this.sources = ImmutableSet.copyOf(sources);
+    // Paper start - add validator
+    public PackRepository(net.minecraft.world.level.validation.DirectoryValidator validator, RepositorySource... providers) {
+        this.validator = validator;
+        // Paper end - add validator
+        this.sources = ImmutableSet.copyOf(providers);
     }
 
     public static String displayPackList(Collection<Pack> packs) {
@@ -31,9 +35,14 @@ public class PackRepository {
     }
 
     public void reload() {
+        // Paper start - add pendingReload flag to determine required pack loading
+        this.reload(false);
+    }
+    public void reload(final boolean pendingReload) {
+        // Paper end - add pendingReload flag to determine required pack loading
         List<String> list = this.selected.stream().map(Pack::getId).collect(ImmutableList.toImmutableList());
         this.available = this.discoverAvailable();
-        this.selected = this.rebuildSelected(list);
+        this.selected = this.rebuildSelected(list, pendingReload); // Paper - add pendingReload flag to determine required pack loading
     }
 
     private Map<String, Pack> discoverAvailable() {
@@ -43,16 +52,23 @@ public class PackRepository {
             repositorySource.loadPacks(pack -> map.put(pack.getId(), pack));
         }
 
-        return ImmutableMap.copyOf(map);
+        // Paper start - custom plugin-loaded datapacks
+        final io.papermc.paper.datapack.PaperDatapackRegistrar registrar = new io.papermc.paper.datapack.PaperDatapackRegistrar(this.validator, map);
+        io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callStaticRegistrarEvent(io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents.DATAPACK_DISCOVERY,
+            registrar,
+            io.papermc.paper.plugin.bootstrap.BootstrapContext.class
+        );
+        return ImmutableMap.copyOf(registrar.discoveredPacks);
+        // Paper end - custom plugin-loaded datapacks
     }
 
     public boolean isAbleToClearAnyPack() {
-        List<Pack> list = this.rebuildSelected(List.of());
+        List<Pack> list = this.rebuildSelected(List.of(), false); // Paper - add pendingReload flag to determine required pack loading
         return !this.selected.equals(list);
     }
 
-    public void setSelected(Collection<String> ids) {
-        this.selected = this.rebuildSelected(ids);
+    public void setSelected(Collection<String> ids, final boolean pendingReload) { // Paper - add pendingReload flag to determine required pack loading
+        this.selected = this.rebuildSelected(ids, pendingReload); // Paper - add pendingReload flag to determine required pack loading
     }
 
     public boolean addPack(String id) {
@@ -79,11 +95,11 @@ public class PackRepository {
         }
     }
 
-    private List<Pack> rebuildSelected(Collection<String> ids) {
+    private List<Pack> rebuildSelected(Collection<String> ids, boolean pendingReload) { // Paper - add pendingReload flag to determine required pack loading
         List<Pack> list = this.getAvailablePacks(ids).collect(Util.toMutableList());
 
         for (Pack pack : this.available.values()) {
-            if (pack.isRequired() && !list.contains(pack)) {
+            if (pack.isRequired() && !list.contains(pack) && pendingReload) { // Paper - add pendingReload flag to determine required pack loading
                 pack.getDefaultPosition().insert(list, pack, Pack::selectionConfig, false);
             }
         }

@@ -46,7 +46,7 @@ public class RegionFile implements AutoCloseable {
     protected final RegionBitmap usedSectors = new RegionBitmap();
 
     public RegionFile(RegionStorageInfo info, Path path, Path externalFileDir, boolean sync) throws IOException {
-        this(info, path, externalFileDir, RegionFileVersion.getSelected(), sync);
+        this(info, path, externalFileDir, RegionFileVersion.getCompressionFormat(), sync); // Paper - Configurable region compression format
     }
 
     public RegionFile(RegionStorageInfo info, Path path, Path externalFileDir, RegionFileVersion version, boolean sync) throws IOException {
@@ -82,6 +82,14 @@ public class RegionFile implements AutoCloseable {
                     if (i2 != 0) {
                         int sectorNumber = getSectorNumber(i2);
                         int numSectors = getNumSectors(i2);
+                        // Spigot start
+                        if (numSectors == 255) {
+                            // We're maxed out, so we need to read the proper length from the section
+                            ByteBuffer realLen = ByteBuffer.allocate(4);
+                            this.file.read(realLen, sectorNumber * 4096);
+                            numSectors = (realLen.getInt(0) + 4) / 4096 + 1;
+                        }
+                        // Spigot end
                         if (sectorNumber < 2) {
                             LOGGER.warn("Region file {} has invalid sector at index: {}; sector {} overlaps with header", path, i1, sectorNumber);
                             this.offsets.put(i1, 0);
@@ -117,6 +125,13 @@ public class RegionFile implements AutoCloseable {
         } else {
             int sectorNumber = getSectorNumber(offset);
             int numSectors = getNumSectors(offset);
+            // Spigot start
+            if (numSectors == 255) {
+                ByteBuffer realLen = ByteBuffer.allocate(4);
+                this.file.read(realLen, sectorNumber * 4096);
+                numSectors = (realLen.getInt(0) + 4) / 4096 + 1;
+            }
+            // Spigot end
             int i = numSectors * 4096;
             ByteBuffer byteBuffer = ByteBuffer.allocate(i);
             this.file.read(byteBuffer, sectorNumber * 4096);
@@ -260,6 +275,7 @@ public class RegionFile implements AutoCloseable {
                     return true;
                 }
             } catch (IOException var9) {
+                com.destroystokyo.paper.exception.ServerInternalException.reportInternalException(var9); // Paper - ServerExceptionEvent
                 return false;
             }
         }
@@ -331,6 +347,11 @@ public class RegionFile implements AutoCloseable {
         try (FileChannel fileChannel = FileChannel.open(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
             chunkData.position(5);
             fileChannel.write(chunkData);
+            // Paper start - ServerExceptionEvent
+        } catch (Throwable throwable) {
+            com.destroystokyo.paper.exception.ServerInternalException.reportInternalException(throwable);
+            throw throwable;
+            // Paper end - ServerExceptionEvent
         }
 
         return () -> Files.move(path, externalChunkFile, StandardCopyOption.REPLACE_EXISTING);

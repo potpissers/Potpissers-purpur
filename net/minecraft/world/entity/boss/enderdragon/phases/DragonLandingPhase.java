@@ -50,7 +50,7 @@ public class DragonLandingPhase extends AbstractDragonPhaseInstance {
     public void doServerTick(ServerLevel level) {
         if (this.targetLocation == null) {
             this.targetLocation = Vec3.atBottomCenterOf(
-                level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EndPodiumFeature.getLocation(this.dragon.getFightOrigin()))
+                level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, this.dragon.getPodium()) // Paper - Allow changing the EnderDragon podium
             );
         }
 

@@ -46,11 +46,19 @@ public class SpawnerBlock extends BaseEntityBlock {
     @Override
     protected void spawnAfterBreak(BlockState state, ServerLevel level, BlockPos pos, ItemStack stack, boolean dropExperience) {
         super.spawnAfterBreak(state, level, pos, stack, dropExperience);
+        // CraftBukkit start - Delegate to getExpDrop
+    }
+
+    @Override
+    public int getExpDrop(BlockState state, ServerLevel level, BlockPos pos, ItemStack stack, boolean dropExperience) {
         if (dropExperience) {
             int i = 15 + level.random.nextInt(15) + level.random.nextInt(15);
-            this.popExperience(level, pos, i);
+            // this.popExperience(level, pos, i);
+            return  i;
         }
-    }
+        return 0;
+        // CraftBukkit end
+     }
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {

@@ -29,7 +29,7 @@ public class ItemStackMapIdFix extends DataFix {
                 Dynamic<?> dynamic = typed.get(DSL.remainderFinder());
                 Typed<?> typed1 = typed.getOrCreateTyped(opticFinder1);
                 Dynamic<?> dynamic1 = typed1.get(DSL.remainderFinder());
-                dynamic1 = dynamic1.set("map", dynamic1.createInt(dynamic.get("Damage").asInt(0)));
+                if (dynamic1.getElement("map").result().isEmpty()) dynamic1 = dynamic1.set("map", dynamic1.createInt(dynamic.get("Damage").asInt(0))); // CraftBukkit
                 return typed.set(opticFinder1, typed1.set(DSL.remainderFinder(), dynamic1));
             } else {
                 return typed;

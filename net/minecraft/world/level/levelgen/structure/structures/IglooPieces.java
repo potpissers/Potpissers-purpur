@@ -102,10 +102,13 @@ public class IglooPieces {
         protected void handleDataMarker(String name, BlockPos pos, ServerLevelAccessor level, RandomSource random, BoundingBox box) {
             if ("chest".equals(name)) {
                 level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
-                BlockEntity blockEntity = level.getBlockEntity(pos.below());
-                if (blockEntity instanceof ChestBlockEntity) {
-                    ((ChestBlockEntity)blockEntity).setLootTable(BuiltInLootTables.IGLOO_CHEST, random.nextLong());
-                }
+                // CraftBukkit start - ensure block transformation
+                // BlockEntity blockEntity = level.getBlockEntity(pos.below());
+                // if (blockEntity instanceof ChestBlockEntity) {
+                //     ((ChestBlockEntity)blockEntity).setLootTable(BuiltInLootTables.IGLOO_CHEST, random.nextLong());
+                // }
+                this.setCraftLootTable(level, pos.below(), random, BuiltInLootTables.IGLOO_CHEST);
+                // CraftBukkit end
             }
         }
 

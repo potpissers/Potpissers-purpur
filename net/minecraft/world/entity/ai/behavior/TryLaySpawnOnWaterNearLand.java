@@ -33,6 +33,12 @@ public class TryLaySpawnOnWaterNearLand {
                                     BlockPos blockPos2 = blockPos1.above();
                                     if (level.getBlockState(blockPos2).isAir()) {
                                         BlockState blockState = spawnBlock.defaultBlockState();
+                                        // CraftBukkit start
+                                        if (!org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(entity, blockPos2, blockState)) {
+                                            isPregnant.erase();
+                                            return true;
+                                        }
+                                        // CraftBukkit end
                                         level.setBlock(blockPos2, blockState, 3);
                                         level.gameEvent(GameEvent.BLOCK_PLACE, blockPos2, GameEvent.Context.of(entity, blockState));
                                         level.playSound(null, entity, SoundEvents.FROG_LAY_SPAWN, SoundSource.BLOCKS, 1.0F, 1.0F);

@@ -44,6 +44,11 @@ public abstract class AbstractCandleBlock extends Block {
     @Override
     protected void onProjectileHit(Level level, BlockState state, BlockHitResult hit, Projectile projectile) {
         if (!level.isClientSide && projectile.isOnFire() && this.canBeLit(state)) {
+            // CraftBukkit start
+            if (org.bukkit.craftbukkit.event.CraftEventFactory.callBlockIgniteEvent(level, hit.getBlockPos(), projectile).isCancelled()) {
+                return;
+            }
+            // CraftBukkit end
             setLit(level, state, hit.getBlockPos(), true);
         }
     }

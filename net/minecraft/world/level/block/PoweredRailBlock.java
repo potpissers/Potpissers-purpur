@@ -133,6 +133,13 @@ public class PoweredRailBlock extends BaseRailBlock {
             || this.findPoweredRailSignal(level, pos, state, true, 0)
             || this.findPoweredRailSignal(level, pos, state, false, 0);
         if (flag != poweredValue) {
+            // CraftBukkit start
+            int power = flag ? 15 : 0;
+            int newPower = org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(level, pos, power, 15 - power).getNewCurrent();
+            if (newPower == power) {
+                return;
+            }
+            // CraftBukkit end
             level.setBlock(pos, state.setValue(POWERED, Boolean.valueOf(flag)), 3);
             level.updateNeighborsAt(pos.below(), this);
             if (state.getValue(SHAPE).isSlope()) {

@@ -241,7 +241,7 @@ public class GameTestInfo {
             AABB structureBounds = this.getStructureBounds();
             List<Entity> entitiesOfClass = this.getLevel()
                 .getEntitiesOfClass(Entity.class, structureBounds.inflate(1.0), entity -> !(entity instanceof Player));
-            entitiesOfClass.forEach(entity -> entity.remove(Entity.RemovalReason.DISCARDED));
+            entitiesOfClass.forEach(entity -> entity.remove(Entity.RemovalReason.DISCARDED, org.bukkit.event.entity.EntityRemoveEvent.Cause.DISCARD)); // Paper
         }
     }
 

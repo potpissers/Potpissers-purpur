@@ -86,6 +86,11 @@ public final class DataComponentPatch {
                 buffer.writeVarInt(0);
                 buffer.writeVarInt(0);
             } else {
+                // Paper start - data sanitization for items
+                final io.papermc.paper.util.ItemObfuscationSession itemObfuscationSession = value.map.isEmpty()
+                    ? null // Avoid thread local lookup of current session if it won't be needed anyway.
+                    : io.papermc.paper.util.ItemObfuscationSession.currentSession();
+                // Paper end - data sanitization for items
                 int i = 0;
                 int i1 = 0;
 
@@ -93,7 +98,7 @@ public final class DataComponentPatch {
                     value.map
                 )) {
                     if (entry.getValue().isPresent()) {
-                        i++;
+                        if (!io.papermc.paper.util.ItemComponentSanitizer.shouldDrop(itemObfuscationSession, entry.getKey())) i++; // Paper - data sanitization for items
                     } else {
                         i1++;
                     }
@@ -106,6 +111,7 @@ public final class DataComponentPatch {
                     value.map
                 )) {
                     Optional<?> optional = entryx.getValue();
+                    optional = io.papermc.paper.util.ItemComponentSanitizer.override(itemObfuscationSession, entryx.getKey(), entryx.getValue()); // Paper - data sanitization for items
                     if (optional.isPresent()) {
                         DataComponentType<?> dataComponentType = entryx.getKey();
                         DataComponentType.STREAM_CODEC.encode(buffer, dataComponentType);
@@ -125,7 +131,13 @@ public final class DataComponentPatch {
         }
 
         private static <T> void encodeComponent(RegistryFriendlyByteBuf buffer, DataComponentType<T> component, Object value) {
-            component.streamCodec().encode(buffer, (T)value);
+            // Paper start - codec errors of random anonymous classes are useless
+            try {
+                component.streamCodec().encode(buffer, (T)value);
+            } catch (final Exception e) {
+                throw new RuntimeException("Error encoding component " + component, e);
+            }
+            // Paper end - codec errors of random anonymous classes are useless
         }
     };
     private static final String REMOVED_PREFIX = "!";
@@ -230,6 +242,42 @@ public final class DataComponentPatch {
 
         Builder() {
         }
+
+        // CraftBukkit start
+        public void copy(DataComponentPatch orig) {
+            this.map.putAll(orig.map);
+        }
+
+        public void clear(DataComponentType<?> type) {
+            this.map.remove(type);
+        }
+
+        public boolean isSet(DataComponentType<?> type) {
+            return this.map.containsKey(type);
+        }
+
+        public boolean isEmpty() {
+            return this.map.isEmpty();
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+
+            if (object instanceof DataComponentPatch.Builder patch) {
+                return this.map.equals(patch.map);
+            }
+
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return this.map.hashCode();
+        }
+        // CraftBukkit end
 
         public <T> DataComponentPatch.Builder set(DataComponentType<T> component, T value) {
             this.map.put(component, Optional.of(value));

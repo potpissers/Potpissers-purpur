@@ -83,6 +83,14 @@ public abstract class BlockableEventLoop<R extends Runnable> implements Profiler
         }
     }
 
+    // Paper start
+    public void scheduleOnMain(Runnable runnable) {
+        // postToMainThread does not work the same as older versions of mc
+        // This method is actually used to create a TickTask, which can then be posted onto main
+        this.schedule(this.wrapRunnable(runnable));
+    }
+    // Paper end
+
     @Override
     public void schedule(R task) {
         this.pendingRunnables.add(task);

@@ -19,6 +19,7 @@ public interface Merchant {
 
     void overrideOffers(MerchantOffers offers);
 
+    default void processTrade(MerchantOffer merchantRecipe, @Nullable io.papermc.paper.event.player.PlayerPurchaseEvent event) { this.notifyTrade(merchantRecipe); } // Paper
     void notifyTrade(MerchantOffer offer);
 
     void notifyTradeUpdated(ItemStack stack);
@@ -50,4 +51,6 @@ public interface Merchant {
     boolean isClientSide();
 
     boolean stillValid(Player player);
+
+    org.bukkit.craftbukkit.inventory.CraftMerchant getCraftMerchant(); // CraftBukkit
 }

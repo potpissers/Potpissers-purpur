@@ -31,8 +31,16 @@ public class DropExperienceBlock extends Block {
     @Override
     protected void spawnAfterBreak(BlockState state, ServerLevel level, BlockPos pos, ItemStack stack, boolean dropExperience) {
         super.spawnAfterBreak(state, level, pos, stack, dropExperience);
+        // CraftBukkit start - Delegate to getExpDrop
+    }
+
+    @Override
+    public int getExpDrop(BlockState state, ServerLevel level, BlockPos pos, ItemStack stack, boolean dropExperience) {
         if (dropExperience) {
-            this.tryDropExperience(level, pos, stack, this.xpRange);
-        }
+            return this.tryDropExperience(level, pos, stack, this.xpRange);
+         }
+
+        return 0;
+        // CraftBukkit end
     }
 }

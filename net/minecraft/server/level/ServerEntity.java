@@ -65,13 +65,17 @@ public class ServerEntity {
     private Vec3 lastSentMovement;
     private int tickCount;
     private int teleportDelay;
-    private List<Entity> lastPassengers = Collections.emptyList();
+    private List<Entity> lastPassengers = com.google.common.collect.ImmutableList.of(); // Paper - optimize passenger checks
     private boolean wasRiding;
     private boolean wasOnGround;
     @Nullable
     private List<SynchedEntityData.DataValue<?>> trackedDataValues;
 
-    public ServerEntity(ServerLevel level, Entity entity, int updateInterval, boolean trackDelta, Consumer<Packet<?>> broadcast) {
+    // CraftBukkit start
+    private final Set<net.minecraft.server.network.ServerPlayerConnection> trackedPlayers;
+    public ServerEntity(ServerLevel level, Entity entity, int updateInterval, boolean trackDelta, Consumer<Packet<?>> broadcast, final Set<net.minecraft.server.network.ServerPlayerConnection> trackedPlayers) {
+        this.trackedPlayers = trackedPlayers;
+    // CraftBukkit end
         this.level = level;
         this.broadcast = broadcast;
         this.entity = entity;
@@ -89,7 +93,7 @@ public class ServerEntity {
     public void sendChanges() {
         List<Entity> passengers = this.entity.getPassengers();
         if (!passengers.equals(this.lastPassengers)) {
-            this.broadcast.accept(new ClientboundSetPassengersPacket(this.entity));
+            this.broadcastAndSend(new ClientboundSetPassengersPacket(this.entity)); // CraftBukkit
             removedPassengers(passengers, this.lastPassengers)
                 .forEach(
                     removedPassenger -> {
@@ -102,13 +106,14 @@ public class ServerEntity {
             this.lastPassengers = passengers;
         }
 
-        if (this.entity instanceof ItemFrame itemFrame && this.tickCount % 10 == 0) {
+        if (!this.trackedPlayers.isEmpty() && this.entity instanceof ItemFrame itemFrame /*&& this.tickCount % 10 == 0*/) { // CraftBukkit - moved tickCount below // Paper - Perf: Only tick item frames if players can see it
             ItemStack item = itemFrame.getItem();
-            if (item.getItem() instanceof MapItem) {
-                MapId mapId = item.get(DataComponents.MAP_ID);
+            if (this.level.paperConfig().maps.itemFrameCursorUpdateInterval > 0 && this.tickCount % this.level.paperConfig().maps.itemFrameCursorUpdateInterval == 0 && item.getItem() instanceof MapItem) { // CraftBukkit - Moved this.tickCounter % 10 logic here so item frames do not enter the other blocks // Paper - Make item frame map cursor update interval configurable
+                MapId mapId = itemFrame.cachedMapId; // Paper - Perf: Cache map ids on item frames
                 MapItemSavedData savedData = MapItem.getSavedData(mapId, this.level);
                 if (savedData != null) {
-                    for (ServerPlayer serverPlayer : this.level.players()) {
+                    for (final net.minecraft.server.network.ServerPlayerConnection connection : this.trackedPlayers) { // Paper
+                        final ServerPlayer serverPlayer = connection.getPlayer(); // Paper
                         savedData.tickCarriedBy(serverPlayer, item);
                         Packet<?> updatePacket = savedData.getUpdatePacket(mapId, serverPlayer);
                         if (updatePacket != null) {
@@ -141,7 +146,13 @@ public class ServerEntity {
             } else {
                 this.teleportDelay++;
                 Vec3 vec3 = this.entity.trackingPosition();
-                boolean flag1 = this.positionCodec.delta(vec3).lengthSqr() >= 7.6293945E-6F;
+                // Paper start - reduce allocation of Vec3D here
+                Vec3 base = this.positionCodec.base;
+                double vec3_dx = vec3.x - base.x;
+                double vec3_dy = vec3.y - base.y;
+                double vec3_dz = vec3.z - base.z;
+                boolean flag1 = (vec3_dx * vec3_dx + vec3_dy * vec3_dy + vec3_dz * vec3_dz) >= 7.62939453125E-6D;
+                // Paper end - reduce allocation of Vec3D here
                 Packet<?> packet = null;
                 boolean flag2 = flag1 || this.tickCount % 60 == 0;
                 boolean flag3 = false;
@@ -219,6 +230,25 @@ public class ServerEntity {
 
         this.tickCount++;
         if (this.entity.hurtMarked) {
+            // CraftBukkit start - Create PlayerVelocity event
+            boolean cancelled = false;
+
+            if (this.entity instanceof ServerPlayer) {
+                org.bukkit.entity.Player player = (org.bukkit.entity.Player) this.entity.getBukkitEntity();
+                org.bukkit.util.Vector velocity = player.getVelocity();
+
+                org.bukkit.event.player.PlayerVelocityEvent event = new org.bukkit.event.player.PlayerVelocityEvent(player, velocity.clone());
+                if (!event.callEvent()) {
+                    cancelled = true;
+                } else if (!velocity.equals(event.getVelocity())) {
+                    player.setVelocity(event.getVelocity());
+                }
+            }
+
+            if (cancelled) {
+                return;
+            }
+            // CraftBukkit end
             this.entity.hurtMarked = false;
             this.broadcastAndSend(new ClientboundSetEntityMotionPacket(this.entity));
         }
@@ -273,7 +303,10 @@ public class ServerEntity {
 
     public void sendPairingData(ServerPlayer player, Consumer<Packet<ClientGamePacketListener>> consumer) {
         if (this.entity.isRemoved()) {
-            LOGGER.warn("Fetching packet for removed entity {}", this.entity);
+            // CraftBukkit start - Remove useless error spam, just return
+            // LOGGER.warn("Fetching packet for removed entity {}", this.entity);
+            return;
+            // CraftBukkit end
         }
 
         Packet<ClientGamePacketListener> addEntityPacket = this.entity.getAddEntityPacket(this);
@@ -285,6 +318,12 @@ public class ServerEntity {
         boolean flag = this.trackDelta;
         if (this.entity instanceof LivingEntity) {
             Collection<AttributeInstance> syncableAttributes = ((LivingEntity)this.entity).getAttributes().getSyncableAttributes();
+
+            // CraftBukkit start - If sending own attributes send scaled health instead of current maximum health
+            if (this.entity.getId() == player.getId()) {
+                ((ServerPlayer) this.entity).getBukkitEntity().injectScaledMaxHealth(syncableAttributes, false);
+            }
+            // CraftBukkit end
             if (!syncableAttributes.isEmpty()) {
                 consumer.accept(new ClientboundUpdateAttributesPacket(this.entity.getId(), syncableAttributes));
             }
@@ -309,8 +348,9 @@ public class ServerEntity {
             }
 
             if (!list.isEmpty()) {
-                consumer.accept(new ClientboundSetEquipmentPacket(this.entity.getId(), list));
+                consumer.accept(new ClientboundSetEquipmentPacket(this.entity.getId(), list, true)); // Paper - data sanitization
             }
+            ((LivingEntity) this.entity).detectEquipmentUpdatesPublic(); // CraftBukkit - SPIGOT-3789: sync again immediately after sending
         }
 
         if (!this.entity.getPassengers().isEmpty()) {
@@ -357,6 +397,11 @@ public class ServerEntity {
         if (this.entity instanceof LivingEntity) {
             Set<AttributeInstance> attributesToSync = ((LivingEntity)this.entity).getAttributes().getAttributesToSync();
             if (!attributesToSync.isEmpty()) {
+                // CraftBukkit start - Send scaled max health
+                if (this.entity instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.getBukkitEntity().injectScaledMaxHealth(attributesToSync, false);
+                }
+                // CraftBukkit end
                 this.broadcastAndSend(new ClientboundUpdateAttributesPacket(this.entity.getId(), attributesToSync));
             }
 

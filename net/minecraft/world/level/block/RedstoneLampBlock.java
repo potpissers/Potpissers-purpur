@@ -41,6 +41,11 @@ public class RedstoneLampBlock extends Block {
                 if (litValue) {
                     level.scheduleTick(pos, this, 4);
                 } else {
+                    // CraftBukkit start
+                    if (org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(level, pos, 0, 15).getNewCurrent() != 15) {
+                        return;
+                    }
+                    // CraftBukkit end
                     level.setBlock(pos, state.cycle(LIT), 2);
                 }
             }
@@ -50,6 +55,11 @@ public class RedstoneLampBlock extends Block {
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (state.getValue(LIT) && !level.hasNeighborSignal(pos)) {
+            // CraftBukkit start
+            if (org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(level, pos, 15, 0).getNewCurrent() != 0) {
+                return;
+            }
+            // CraftBukkit end
             level.setBlock(pos, state.cycle(LIT), 2);
         }
     }

@@ -57,7 +57,13 @@ public class MinecartItem extends Item {
                 }
 
                 if (level instanceof ServerLevel serverLevel) {
-                    serverLevel.addFreshEntity(abstractMinecart);
+                    // CraftBukkit start
+                    if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityPlaceEvent(context, abstractMinecart).isCancelled()) {
+                        if (context.getPlayer() != null) context.getPlayer().containerMenu.sendAllDataToRemote(); // Paper - Fix inventory desync
+                        return InteractionResult.FAIL;
+                    }
+                    // CraftBukkit end
+                    if (!serverLevel.addFreshEntity(abstractMinecart)) return InteractionResult.PASS; // CraftBukkit
                     serverLevel.gameEvent(
                         GameEvent.ENTITY_PLACE, clickedPos, GameEvent.Context.of(context.getPlayer(), serverLevel.getBlockState(clickedPos.below()))
                     );

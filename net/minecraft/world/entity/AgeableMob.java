@@ -20,6 +20,7 @@ public abstract class AgeableMob extends PathfinderMob {
     protected int age;
     protected int forcedAge;
     protected int forcedAgeTimer;
+    public boolean ageLocked; // CraftBukkit
 
     protected AgeableMob(EntityType<? extends AgeableMob> entityType, Level level) {
         super(entityType, level);
@@ -66,6 +67,7 @@ public abstract class AgeableMob extends PathfinderMob {
     }
 
     public void ageUp(int amount, boolean forced) {
+        if (this.ageLocked) return; // Paper - Honor ageLock
         int age = this.getAge();
         age += amount * 20;
         if (age > 0) {
@@ -104,6 +106,7 @@ public abstract class AgeableMob extends PathfinderMob {
         super.addAdditionalSaveData(compound);
         compound.putInt("Age", this.getAge());
         compound.putInt("ForcedAge", this.forcedAge);
+        compound.putBoolean("AgeLocked", this.ageLocked); // CraftBukkit
     }
 
     @Override
@@ -111,6 +114,7 @@ public abstract class AgeableMob extends PathfinderMob {
         super.readAdditionalSaveData(compound);
         this.setAge(compound.getInt("Age"));
         this.forcedAge = compound.getInt("ForcedAge");
+        this.ageLocked = compound.getBoolean("AgeLocked"); // CraftBukkit
     }
 
     @Override
@@ -125,7 +129,7 @@ public abstract class AgeableMob extends PathfinderMob {
     @Override
     public void aiStep() {
         super.aiStep();
-        if (this.level().isClientSide) {
+        if (this.level().isClientSide || this.ageLocked) { // CraftBukkit
             if (this.forcedAgeTimer > 0) {
                 if (this.forcedAgeTimer % 4 == 0) {
                     this.level().addParticle(ParticleTypes.HAPPY_VILLAGER, this.getRandomX(1.0), this.getRandomY() + 0.5, this.getRandomZ(1.0), 0.0, 0.0, 0.0);

@@ -274,7 +274,13 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
 
     @Override
     public void stopRiding() {
-        super.stopRiding();
+        // Paper start - Force entity dismount during teleportation
+        this.stopRiding(false);
+    }
+    @Override
+    public void stopRiding(boolean suppressCancellation) {
+        super.stopRiding(suppressCancellation);
+        // Paper end - Force entity dismount during teleportation
         if (this.level().isClientSide) {
             this.clientOldAttachPosition = this.blockPosition();
         }
@@ -387,6 +393,14 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
                     && this.level().getWorldBorder().isWithinBounds(blockPos1)
                     && this.level().noCollision(this, new AABB(blockPos1).deflate(1.0E-6))) {
                     Direction direction = this.findAttachableSurface(blockPos1);
+                    // CraftBukkit start
+                    org.bukkit.event.entity.EntityTeleportEvent teleportEvent = org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTeleportEvent(this, blockPos1.getX(), blockPos1.getY(), blockPos1.getZ());
+                    if (teleportEvent.isCancelled() || teleportEvent.getTo() == null) { // Paper
+                        return false;
+                    } else {
+                        blockPos1 = org.bukkit.craftbukkit.util.CraftLocation.toBlockPosition(teleportEvent.getTo());
+                    }
+                    // CraftBukkit end
                     if (direction != null) {
                         this.unRide();
                         this.setAttachFace(direction);
@@ -453,7 +467,12 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
                 if (shulker != null) {
                     shulker.setVariant(this.getVariant());
                     shulker.moveTo(vec3);
-                    this.level().addFreshEntity(shulker);
+                    // Paper start - Shulker duplicate event
+                    if (!new io.papermc.paper.event.entity.ShulkerDuplicateEvent((org.bukkit.entity.Shulker) shulker.getBukkitEntity(), (org.bukkit.entity.Shulker) this.getBukkitEntity()).callEvent()) {
+                        return;
+                    }
+                    // Paper end - Shulker duplicate event
+                    this.level().addFreshEntity(shulker, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.BREEDING); // CraftBukkit - the mysteries of life
                 }
             }
         }

@@ -27,7 +27,7 @@ public class EndCrystalItem extends Item {
         if (!blockState.is(Blocks.OBSIDIAN) && !blockState.is(Blocks.BEDROCK)) {
             return InteractionResult.FAIL;
         } else {
-            BlockPos blockPos = clickedPos.above();
+            BlockPos blockPos = clickedPos.above(); final BlockPos aboveBlockPosition = blockPos; // Paper - OBFHELPER
             if (!level.isEmptyBlock(blockPos)) {
                 return InteractionResult.FAIL;
             } else {
@@ -41,11 +41,17 @@ public class EndCrystalItem extends Item {
                     if (level instanceof ServerLevel) {
                         EndCrystal endCrystal = new EndCrystal(level, d + 0.5, d1, d2 + 0.5);
                         endCrystal.setShowBottom(false);
+                        // CraftBukkit start
+                        if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityPlaceEvent(context, endCrystal).isCancelled()) {
+                            if (context.getPlayer() != null) context.getPlayer().containerMenu.sendAllDataToRemote(); // Paper - Fix inventory desync
+                            return InteractionResult.FAIL;
+                        }
+                        // CraftBukkit end
                         level.addFreshEntity(endCrystal);
                         level.gameEvent(context.getPlayer(), GameEvent.ENTITY_PLACE, blockPos);
                         EndDragonFight dragonFight = ((ServerLevel)level).getDragonFight();
                         if (dragonFight != null) {
-                            dragonFight.tryRespawn();
+                            dragonFight.tryRespawn(aboveBlockPosition); // Paper - Perf: Do crystal-portal proximity check before entity lookup
                         }
                     }
 

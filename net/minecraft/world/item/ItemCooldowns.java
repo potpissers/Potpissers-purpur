@@ -56,6 +56,13 @@ public class ItemCooldowns {
     }
 
     public void addCooldown(ResourceLocation group, int cooldown) {
+        // Paper start - Item cooldown events
+        this.addCooldown(group, cooldown, true);
+    }
+
+    public void addCooldown(ResourceLocation group, int cooldown, boolean callEvent) {
+        // Event called in server override
+        // Paper end - Item cooldown events
         this.cooldowns.put(group, new ItemCooldowns.CooldownInstance(this.tickCount, this.tickCount + cooldown));
         this.onCooldownStarted(group, cooldown);
     }

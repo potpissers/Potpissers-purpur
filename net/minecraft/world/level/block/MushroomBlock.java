@@ -47,7 +47,7 @@ public class MushroomBlock extends BushBlock implements BonemealableBlock {
 
     @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (random.nextInt(25) == 0) {
+        if (random.nextFloat() < (level.spigotConfig.mushroomModifier / (100.0f * 25))) { // Spigot - SPIGOT-7159: Better modifier resolution
             int i = 5;
             int i1 = 4;
 
@@ -60,6 +60,7 @@ public class MushroomBlock extends BushBlock implements BonemealableBlock {
             }
 
             BlockPos blockPos1 = pos.offset(random.nextInt(3) - 1, random.nextInt(2) - random.nextInt(2), random.nextInt(3) - 1);
+            final BlockPos sourcePos = pos; // Paper - Use correct source for mushroom block spread event
 
             for (int i2 = 0; i2 < 4; i2++) {
                 if (level.isEmptyBlock(blockPos1) && state.canSurvive(level, blockPos1)) {
@@ -70,7 +71,7 @@ public class MushroomBlock extends BushBlock implements BonemealableBlock {
             }
 
             if (level.isEmptyBlock(blockPos1) && state.canSurvive(level, blockPos1)) {
-                level.setBlock(blockPos1, state, 2);
+                org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockSpreadEvent(level, sourcePos, blockPos1, state, 2); // CraftBukkit // Paper - Use correct source for mushroom block spread event
             }
         }
     }
@@ -93,6 +94,7 @@ public class MushroomBlock extends BushBlock implements BonemealableBlock {
             return false;
         } else {
             level.removeBlock(pos, false);
+            SaplingBlock.treeType = (this == Blocks.BROWN_MUSHROOM) ? org.bukkit.TreeType.BROWN_MUSHROOM : org.bukkit.TreeType.RED_MUSHROOM; // CraftBukkit
             if (optional.get().value().place(level, level.getChunkSource().getGenerator(), random, pos)) {
                 return true;
             } else {

@@ -26,9 +26,11 @@ public final class FluidState extends StateHolder<Fluid, FluidState> {
     public static final Codec<FluidState> CODEC = codec(BuiltInRegistries.FLUID.byNameCodec(), Fluid::defaultFluidState).stable();
     public static final int AMOUNT_MAX = 9;
     public static final int AMOUNT_FULL = 8;
+    protected final boolean isEmpty; // Paper - Perf: moved from isEmpty()
 
     public FluidState(Fluid owner, Reference2ObjectArrayMap<Property<?>, Comparable<?>> values, MapCodec<FluidState> propertiesCodec) {
         super(owner, values, propertiesCodec);
+        this.isEmpty = owner.isEmpty(); // Paper - Perf: moved from isEmpty()
     }
 
     public Fluid getType() {
@@ -44,7 +46,7 @@ public final class FluidState extends StateHolder<Fluid, FluidState> {
     }
 
     public boolean isEmpty() {
-        return this.getType().isEmpty();
+        return this.isEmpty; // Paper - Perf: moved into constructor
     }
 
     public float getHeight(BlockGetter level, BlockPos pos) {

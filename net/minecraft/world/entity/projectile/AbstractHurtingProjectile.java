@@ -19,6 +19,8 @@ public abstract class AbstractHurtingProjectile extends Projectile {
     public static final double INITAL_ACCELERATION_POWER = 0.1;
     public static final double DEFLECTION_SCALE = 0.5;
     public double accelerationPower = 0.1;
+    public float bukkitYield = 1; // CraftBukkit
+    public boolean isIncendiary = true; // CraftBukkit
 
     protected AbstractHurtingProjectile(EntityType<? extends AbstractHurtingProjectile> entityType, Level level) {
         super(entityType, level);
@@ -83,12 +85,12 @@ public abstract class AbstractHurtingProjectile extends Projectile {
             }
 
             if (hitResultOnMoveVector.getType() != HitResult.Type.MISS && this.isAlive()) {
-                this.hitTargetOrDeflectSelf(hitResultOnMoveVector);
+                this.preHitTargetOrDeflectSelf(hitResultOnMoveVector); // CraftBukkit - projectile hit event
             }
 
             this.createParticleTrail();
         } else {
-            this.discard();
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
         }
     }
 

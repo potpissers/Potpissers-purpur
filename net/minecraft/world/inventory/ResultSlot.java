@@ -72,7 +72,7 @@ public class ResultSlot extends Slot {
     private NonNullList<ItemStack> getRemainingItems(CraftingInput input, Level level) {
         return level instanceof ServerLevel serverLevel
             ? serverLevel.recipeAccess()
-                .getRecipeFor(RecipeType.CRAFTING, input, serverLevel)
+                .getRecipeFor(RecipeType.CRAFTING, input, serverLevel, this.craftSlots.getCurrentRecipe()) // Paper - Perf: Improve mass crafting; check last recipe used first
                 .map(recipe -> recipe.value().getRemainingItems(input))
                 .orElseGet(() -> copyAllInputItems(input))
             : CraftingRecipe.defaultCraftingReminder(input);

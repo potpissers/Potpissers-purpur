@@ -19,6 +19,20 @@ public class CrafterMenu extends AbstractContainerMenu implements ContainerListe
     private final ContainerData containerData;
     private final Player player;
     private final CraftingContainer container;
+    // CraftBukkit start
+    private org.bukkit.craftbukkit.inventory.view.CraftCrafterView bukkitEntity = null;
+
+    @Override
+    public org.bukkit.craftbukkit.inventory.view.CraftCrafterView getBukkitView() {
+        if (this.bukkitEntity != null) {
+            return this.bukkitEntity;
+        }
+
+        org.bukkit.craftbukkit.inventory.CraftInventoryCrafter inventory = new org.bukkit.craftbukkit.inventory.CraftInventoryCrafter(this.container, this.resultContainer);
+        this.bukkitEntity = new org.bukkit.craftbukkit.inventory.view.CraftCrafterView(this.player.getBukkitEntity(), inventory, this);
+        return this.bukkitEntity;
+    }
+    // CraftBukkit end
 
     public CrafterMenu(int containerId, Inventory playerInventory) {
         super(MenuType.CRAFTER_3x3, containerId);
@@ -100,6 +114,7 @@ public class CrafterMenu extends AbstractContainerMenu implements ContainerListe
 
     @Override
     public boolean stillValid(Player player) {
+        if (!this.checkReachable) return true; // CraftBukkit
         return this.container.stillValid(player);
     }
 

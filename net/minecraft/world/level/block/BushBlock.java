@@ -35,9 +35,15 @@ public abstract class BushBlock extends Block {
         BlockState neighborState,
         RandomSource random
     ) {
-        return !state.canSurvive(level, pos)
-            ? Blocks.AIR.defaultBlockState()
-            : super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
+       // CraftBukkit start
+       if (!state.canSurvive(level, pos)) {
+           // Suppress during worldgen
+           if (!(level instanceof net.minecraft.server.level.ServerLevel serverLevel && serverLevel.hasPhysicsEvent) || !org.bukkit.craftbukkit.event.CraftEventFactory.callBlockPhysicsEvent(serverLevel, pos).isCancelled()) { // Paper
+               return Blocks.AIR.defaultBlockState();
+           }
+       }
+       return super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
+       // CraftBukkit end
     }
 
     @Override

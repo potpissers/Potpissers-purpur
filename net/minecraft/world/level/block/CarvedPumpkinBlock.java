@@ -79,9 +79,13 @@ public class CarvedPumpkinBlock extends HorizontalDirectionalBlock {
     }
 
     private static void spawnGolemInWorld(Level level, BlockPattern.BlockPatternMatch patternMatch, Entity golem, BlockPos pos) {
-        clearPatternBlocks(level, patternMatch);
+        // clearPatternBlocks(level, patternMatch); // CraftBukkit - moved down
         golem.moveTo(pos.getX() + 0.5, pos.getY() + 0.05, pos.getZ() + 0.5, 0.0F, 0.0F);
-        level.addFreshEntity(golem);
+        if (!level.addFreshEntity(golem, (golem.getType() == EntityType.SNOW_GOLEM) ? org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN : org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM)) {
+            return;
+        }
+        clearPatternBlocks(level, patternMatch); // CraftBukkit - from above
+        // CraftBukkit end
 
         for (ServerPlayer serverPlayer : level.getEntitiesOfClass(ServerPlayer.class, golem.getBoundingBox().inflate(5.0))) {
             CriteriaTriggers.SUMMONED_ENTITY.trigger(serverPlayer, golem);

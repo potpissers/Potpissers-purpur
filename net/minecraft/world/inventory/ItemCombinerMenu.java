@@ -15,12 +15,7 @@ public abstract class ItemCombinerMenu extends AbstractContainerMenu {
     protected final ContainerLevelAccess access;
     protected final Player player;
     protected final Container inputSlots;
-    protected final ResultContainer resultSlots = new ResultContainer() {
-        @Override
-        public void setChanged() {
-            ItemCombinerMenu.this.slotsChanged(this);
-        }
-    };
+    protected final ResultContainer resultSlots; // Paper - Add missing InventoryHolders; delay field init
     private final int resultSlotIndex;
 
     protected boolean mayPickup(Player player, boolean hasStack) {
@@ -36,6 +31,14 @@ public abstract class ItemCombinerMenu extends AbstractContainerMenu {
     ) {
         super(menuType, containerId);
         this.access = access;
+        // Paper start - Add missing InventoryHolders; delay field init
+        this.resultSlots = new ResultContainer(this.createBlockHolder(this.access)) {
+            @Override
+            public void setChanged() {
+                ItemCombinerMenu.this.slotsChanged(this);
+            }
+        };
+        // Paper end - Add missing InventoryHolders; delay field init
         this.player = inventory.player;
         this.inputSlots = this.createContainer(slotDefinition.getNumOfInputSlots());
         this.resultSlotIndex = slotDefinition.getResultSlotIndex();
@@ -79,7 +82,7 @@ public abstract class ItemCombinerMenu extends AbstractContainerMenu {
     public abstract void createResult();
 
     private SimpleContainer createContainer(int size) {
-        return new SimpleContainer(size) {
+        return new SimpleContainer(this.createBlockHolder(this.access), size) {
             @Override
             public void setChanged() {
                 super.setChanged();
@@ -93,6 +96,7 @@ public abstract class ItemCombinerMenu extends AbstractContainerMenu {
         super.slotsChanged(inventory);
         if (inventory == this.inputSlots) {
             this.createResult();
+            org.bukkit.craftbukkit.event.CraftEventFactory.callPrepareResultEvent(this, this instanceof SmithingMenu ? 3 : 2); // Paper - Add PrepareResultEvent
         }
     }
 
@@ -104,6 +108,7 @@ public abstract class ItemCombinerMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
+        if (!this.checkReachable) return true; // CraftBukkit
         return this.access
             .evaluate((level, blockPos) -> !this.isValidBlock(level.getBlockState(blockPos)) ? false : player.canInteractWithBlock(blockPos, 4.0), true);
     }

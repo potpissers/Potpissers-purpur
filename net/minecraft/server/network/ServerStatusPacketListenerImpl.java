@@ -36,7 +36,8 @@ public class ServerStatusPacketListenerImpl implements ServerStatusPacketListene
             this.connection.disconnect(DISCONNECT_REASON);
         } else {
             this.hasRequestedStatus = true;
-            this.connection.send(new ClientboundStatusResponsePacket(this.status));
+            // this.connection.send(new ClientboundStatusResponsePacket(this.status)); // Paper
+            com.destroystokyo.paper.network.StandardPaperServerListPingEventImpl.processRequest(net.minecraft.server.MinecraftServer.getServer(), this.connection); // Paper - handle status request
         }
     }
 

@@ -31,9 +31,14 @@ public record LootDataType<T>(ResourceKey<Registry<T>> registryKey, Codec<T> cod
     }
 
     private static LootDataType.Validator<LootTable> createLootTableValidator() {
-        return (context, key, value) -> value.validate(
-            context.setContextKeySet(value.getParamSet()).enterElement("{" + key.registry() + "/" + key.location() + "}", key)
-        );
+        // CraftBukkit start
+        return (context, key, value) -> {
+            value.validate(
+                context.setContextKeySet(value.getParamSet()).enterElement("{" + key.registry() + "/" + key.location() + "}", key)
+            );
+            value.craftLootTable = new org.bukkit.craftbukkit.CraftLootTable(org.bukkit.craftbukkit.util.CraftNamespacedKey.fromMinecraft(key.location()), value);
+            // CraftBukkit end
+        };
     }
 
     @FunctionalInterface

@@ -237,6 +237,11 @@ public class DecoratedPotBlock extends BaseEntityBlock implements SimpleWaterlog
     protected void onProjectileHit(Level level, BlockState state, BlockHitResult hit, Projectile projectile) {
         BlockPos blockPos = hit.getBlockPos();
         if (level instanceof ServerLevel serverLevel && projectile.mayInteract(serverLevel, blockPos) && projectile.mayBreak(serverLevel)) {
+            // CraftBukkit start - call EntityChangeBlockEvent
+            if (!org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(projectile, blockPos, this.getFluidState(state).createLegacyBlock())) {
+                return;
+            }
+            // CraftBukkit end
             level.setBlock(blockPos, state.setValue(CRACKED, Boolean.valueOf(true)), 4);
             level.destroyBlock(blockPos, true, projectile);
         }

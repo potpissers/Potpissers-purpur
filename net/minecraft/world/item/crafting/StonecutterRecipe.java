@@ -35,4 +35,16 @@ public class StonecutterRecipe extends SingleItemRecipe {
     public RecipeBookCategory recipeBookCategory() {
         return RecipeBookCategories.STONECUTTER;
     }
+
+    // CraftBukkit start
+    @Override
+    public org.bukkit.inventory.Recipe toBukkitRecipe(org.bukkit.NamespacedKey id) {
+        org.bukkit.craftbukkit.inventory.CraftItemStack result = org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(this.result());
+
+        org.bukkit.craftbukkit.inventory.CraftStonecuttingRecipe recipe = new org.bukkit.craftbukkit.inventory.CraftStonecuttingRecipe(id, result, org.bukkit.craftbukkit.inventory.CraftRecipe.toBukkit(this.input()));
+        recipe.setGroup(this.group());
+
+        return recipe;
+    }
+    // CraftBukkit end
 }

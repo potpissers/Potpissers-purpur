@@ -79,7 +79,7 @@ public class WorldUpgrader implements AutoCloseable {
         LevelStorageSource.LevelStorageAccess levelStorage, DataFixer dataFixer, RegistryAccess registryAccess, boolean eraseCache, boolean recreateRegionFiles
     ) {
         this.dimensions = registryAccess.lookupOrThrow(Registries.LEVEL_STEM);
-        this.levels = this.dimensions.registryKeySet().stream().map(Registries::levelStemToLevel).collect(Collectors.toUnmodifiableSet());
+        this.levels = java.util.stream.Stream.of(levelStorage.dimensionType).map(Registries::levelStemToLevel).collect(Collectors.toUnmodifiableSet()); // CraftBukkit
         this.eraseCache = eraseCache;
         this.dataFixer = dataFixer;
         this.levelStorage = levelStorage;
@@ -358,7 +358,7 @@ public class WorldUpgrader implements AutoCloseable {
                 int version = ChunkStorage.getVersion(compoundTag);
                 ChunkGenerator chunkGenerator = WorldUpgrader.this.dimensions.getValueOrThrow(Registries.levelToLevelStem(dimension)).generator();
                 CompoundTag compoundTag1 = chunkStorage.upgradeChunkTag(
-                    dimension, () -> WorldUpgrader.this.overworldDataStorage, compoundTag, chunkGenerator.getTypeNameForDataFixer()
+                    Registries.levelToLevelStem(dimension), () -> WorldUpgrader.this.overworldDataStorage, compoundTag, chunkGenerator.getTypeNameForDataFixer(), chunkPos, null // CraftBukkit
                 );
                 ChunkPos chunkPos1 = new ChunkPos(compoundTag1.getInt("xPos"), compoundTag1.getInt("zPos"));
                 if (!chunkPos1.equals(chunkPos)) {

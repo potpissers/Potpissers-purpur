@@ -23,6 +23,12 @@ public interface EntityAccess {
 
     void setRemoved(Entity.RemovalReason removalReason);
 
+    // CraftBukkit start - add Bukkit remove cause
+    default void setRemoved(Entity.RemovalReason removalReason, org.bukkit.event.entity.EntityRemoveEvent.Cause eventCause) {
+        this.setRemoved(removalReason);
+    }
+    // CraftBukkit end
+
     boolean shouldBeSaved();
 
     boolean isAlwaysTicking();

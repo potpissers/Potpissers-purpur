@@ -89,6 +89,7 @@ public class FrogspawnBlock extends Block {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        if (!new io.papermc.paper.event.entity.EntityInsideBlockEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.block.CraftBlock.at(level, pos)).callEvent()) { return; } // Paper - Add EntityInsideBlockEvent
         if (entity.getType().equals(EntityType.FALLING_BLOCK)) {
             this.destroyBlock(level, pos);
         }
@@ -101,6 +102,11 @@ public class FrogspawnBlock extends Block {
     }
 
     private void hatchFrogspawn(ServerLevel level, BlockPos pos, RandomSource random) {
+        // Paper start - Call BlockFadeEvent
+        if (org.bukkit.craftbukkit.event.CraftEventFactory.callBlockFadeEvent(level, pos, Blocks.AIR.defaultBlockState()).isCancelled()) {
+            return;
+        }
+        // Paper end - Call BlockFadeEven
         this.destroyBlock(level, pos);
         level.playSound(null, pos, SoundEvents.FROGSPAWN_HATCH, SoundSource.BLOCKS, 1.0F, 1.0F);
         this.spawnTadpoles(level, pos, random);
@@ -121,7 +127,7 @@ public class FrogspawnBlock extends Block {
                 int randomInt1 = random.nextInt(1, 361);
                 tadpole.moveTo(d, pos.getY() - 0.5, d1, randomInt1, 0.0F);
                 tadpole.setPersistenceRequired();
-                level.addFreshEntity(tadpole);
+                level.addFreshEntity(tadpole, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.EGG); // Paper - use correct spawn reason
             }
         }
     }

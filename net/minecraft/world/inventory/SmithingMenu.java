@@ -32,6 +32,9 @@ public class SmithingMenu extends ItemCombinerMenu {
     private final RecipePropertySet templateItemTest;
     private final RecipePropertySet additionItemTest;
     private final DataSlot hasRecipeError = DataSlot.standalone();
+    // CraftBukkit start
+    private org.bukkit.craftbukkit.inventory.CraftInventoryView bukkitEntity;
+    // CraftBukkit end
 
     public SmithingMenu(int containerId, Inventory playerInventory) {
         this(containerId, playerInventory, ContainerLevelAccess.NULL);
@@ -99,6 +102,7 @@ public class SmithingMenu extends ItemCombinerMenu {
         if (this.level instanceof ServerLevel) {
             boolean flag = this.getSlot(0).hasItem() && this.getSlot(1).hasItem() && this.getSlot(2).hasItem() && !this.getSlot(this.getResultSlot()).hasItem();
             this.hasRecipeError.set(flag ? 1 : 0);
+            org.bukkit.craftbukkit.event.CraftEventFactory.callPrepareResultEvent(this, RESULT_SLOT); // Paper - Add PrepareResultEvent
         }
     }
 
@@ -115,7 +119,9 @@ public class SmithingMenu extends ItemCombinerMenu {
         recipeFor.ifPresentOrElse(recipe -> {
             ItemStack itemStack = recipe.value().assemble(smithingRecipeInput, this.level.registryAccess());
             this.resultSlots.setRecipeUsed((RecipeHolder<?>)recipe);
-            this.resultSlots.setItem(0, itemStack);
+            // CraftBukkit start
+            org.bukkit.craftbukkit.event.CraftEventFactory.callPrepareSmithingEvent(this.getBukkitView(), itemStack);
+            // CraftBukkit end
         }, () -> {
             this.resultSlots.setRecipeUsed(null);
             this.resultSlots.setItem(0, ItemStack.EMPTY);
@@ -137,4 +143,18 @@ public class SmithingMenu extends ItemCombinerMenu {
     public boolean hasRecipeError() {
         return this.hasRecipeError.get() > 0;
     }
+
+    // CraftBukkit start
+    @Override
+    public org.bukkit.craftbukkit.inventory.CraftInventoryView getBukkitView() {
+        if (this.bukkitEntity != null) {
+            return this.bukkitEntity;
+        }
+
+        org.bukkit.craftbukkit.inventory.CraftInventory inventory = new org.bukkit.craftbukkit.inventory.CraftInventorySmithing(
+                this.access.getLocation(), this.inputSlots, this.resultSlots);
+        this.bukkitEntity = new org.bukkit.craftbukkit.inventory.CraftInventoryView(this.player.getBukkitEntity(), inventory, this);
+        return this.bukkitEntity;
+    }
+    // CraftBukkit end
 }

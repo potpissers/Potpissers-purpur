@@ -262,6 +262,13 @@ public class DebugCommand {
             return true;
         }
 
+        // Paper start
+        @Override
+        public org.bukkit.command.CommandSender getBukkitSender(final CommandSourceStack wrapper) {
+            throw new UnsupportedOperationException();
+        }
+        // Paper end
+
         @Override
         public void close() {
             IOUtils.closeQuietly((Writer)this.output);

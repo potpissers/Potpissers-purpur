@@ -48,6 +48,7 @@ public class BubbleColumnBlock extends Block implements BucketPickup {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        if (!new io.papermc.paper.event.entity.EntityInsideBlockEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.block.CraftBlock.at(level, pos)).callEvent()) { return; } // Paper - Add EntityInsideBlockEvent
         BlockState blockState = level.getBlockState(pos.above());
         if (blockState.isAir()) {
             entity.onAboveBubbleCol(state.getValue(DRAG_DOWN));

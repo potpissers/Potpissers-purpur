@@ -8,6 +8,10 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 
+// CraftBukkit start
+import org.bukkit.event.entity.EntityRemoveEvent;
+// CraftBukkit end
+
 public interface InventoryCarrier {
     String TAG_INVENTORY = "Inventory";
 
@@ -22,12 +26,19 @@ public interface InventoryCarrier {
                 return;
             }
 
+            // CraftBukkit start
+            ItemStack remaining = new SimpleContainer(inventory).addItem(item);
+            if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityPickupItemEvent(mob, itemEntity, remaining.getCount(), false).isCancelled()) {
+                return;
+            }
+            // CraftBukkit end
+
             mob.onItemPickup(itemEntity);
             int count = item.getCount();
             ItemStack itemStack = inventory.addItem(item);
             mob.take(itemEntity, count - itemStack.getCount());
             if (itemStack.isEmpty()) {
-                itemEntity.discard();
+                itemEntity.discard(EntityRemoveEvent.Cause.PICKUP); // CraftBukkit - add Bukkit remove cause
             } else {
                 item.setCount(itemStack.getCount());
             }

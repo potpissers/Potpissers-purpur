@@ -24,7 +24,7 @@ public record ProfilePublicKey(ProfilePublicKey.Data data) {
 
     public static ProfilePublicKey createValidated(SignatureValidator signatureValidator, UUID profileId, ProfilePublicKey.Data data) throws ProfilePublicKey.ValidationException {
         if (!data.validateSignature(signatureValidator, profileId)) {
-            throw new ProfilePublicKey.ValidationException(INVALID_SIGNATURE);
+            throw new ProfilePublicKey.ValidationException(INVALID_SIGNATURE, org.bukkit.event.player.PlayerKickEvent.Cause.INVALID_PUBLIC_KEY_SIGNATURE); // Paper - kick event causes
         } else {
             return new ProfilePublicKey(data);
         }
@@ -88,8 +88,16 @@ public record ProfilePublicKey(ProfilePublicKey.Data data) {
     }
 
     public static class ValidationException extends ThrowingComponent {
+        public final org.bukkit.event.player.PlayerKickEvent.Cause kickCause; // Paper
+        @io.papermc.paper.annotation.DoNotUse @Deprecated // Paper
         public ValidationException(Component component) {
+            // Paper start
+            this(component, org.bukkit.event.player.PlayerKickEvent.Cause.UNKNOWN);
+        }
+        public ValidationException(Component component, org.bukkit.event.player.PlayerKickEvent.Cause kickCause) {
+            // Paper end
             super(component);
+            this.kickCause = kickCause; // Paper
         }
     }
 }

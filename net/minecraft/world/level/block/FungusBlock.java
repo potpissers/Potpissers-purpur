@@ -72,6 +72,17 @@ public class FungusBlock extends BushBlock implements BonemealableBlock {
 
     @Override
     public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
-        this.getFeature(level).ifPresent(holder -> holder.value().place(level, level.getChunkSource().getGenerator(), random, pos));
+        this.getFeature(level)
+            // CraftBukkit start
+            .map((value) -> {
+                if (this == Blocks.WARPED_FUNGUS) {
+                    SaplingBlock.treeType = org.bukkit.TreeType.WARPED_FUNGUS;
+                } else if (this == Blocks.CRIMSON_FUNGUS) {
+                    SaplingBlock.treeType = org.bukkit.TreeType.CRIMSON_FUNGUS;
+                }
+                return value;
+            })
+            .ifPresent(holder -> holder.value().place(level, level.getChunkSource().getGenerator(), random, pos));
+        // CraftBukkit end
     }
 }

@@ -19,9 +19,11 @@ public record ClientboundSetEntityDataPacket(int id, List<SynchedEntityData.Data
     }
 
     private static void pack(List<SynchedEntityData.DataValue<?>> dataValues, RegistryFriendlyByteBuf buffer) {
+        try (io.papermc.paper.util.ItemObfuscationSession ignored = io.papermc.paper.util.ItemObfuscationSession.start(io.papermc.paper.configuration.GlobalConfiguration.get().anticheat.obfuscation.items.binding.level)) { // Paper - data sanitization
         for (SynchedEntityData.DataValue<?> dataValue : dataValues) {
             dataValue.write(buffer);
         }
+        } // Paper - data sanitization
 
         buffer.writeByte(255);
     }

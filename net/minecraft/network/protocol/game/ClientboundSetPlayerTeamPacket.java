@@ -30,6 +30,11 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
     private final Collection<String> players;
     private final Optional<ClientboundSetPlayerTeamPacket.Parameters> parameters;
 
+    // Paper start - Multiple Entries with Scoreboards
+    public static ClientboundSetPlayerTeamPacket createMultiplePlayerPacket(PlayerTeam team, Collection<String> players, ClientboundSetPlayerTeamPacket.Action operation) {
+        return new ClientboundSetPlayerTeamPacket(team.getName(), operation == ClientboundSetPlayerTeamPacket.Action.ADD ? 3 : 4, Optional.empty(), players);
+    }
+    // Paper end - Multiple Entries with Scoreboards
     private ClientboundSetPlayerTeamPacket(String name, int method, Optional<ClientboundSetPlayerTeamPacket.Parameters> parameters, Collection<String> players) {
         this.name = name;
         this.method = method;
@@ -198,7 +203,7 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
             ComponentSerialization.TRUSTED_STREAM_CODEC.encode(buffer, this.displayName);
             buffer.writeByte(this.options);
             buffer.writeUtf(this.nametagVisibility);
-            buffer.writeUtf(this.collisionRule);
+            buffer.writeUtf(!io.papermc.paper.configuration.GlobalConfiguration.get().collisions.enablePlayerCollisions ? PlayerTeam.CollisionRule.NEVER.name : this.collisionRule); // Paper - Configurable player collision
             buffer.writeEnum(this.color);
             ComponentSerialization.TRUSTED_STREAM_CODEC.encode(buffer, this.playerPrefix);
             ComponentSerialization.TRUSTED_STREAM_CODEC.encode(buffer, this.playerSuffix);

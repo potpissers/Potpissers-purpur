@@ -74,6 +74,21 @@ public class PrimaryLevelData implements ServerLevelData, WorldData {
     private final Set<String> removedFeatureFlags;
     private final TimerQueue<MinecraftServer> scheduledEvents;
 
+    // CraftBukkit start - Add world and pdc
+    public net.minecraft.core.Registry<net.minecraft.world.level.dimension.LevelStem> customDimensions;
+    private net.minecraft.server.level.ServerLevel world;
+    protected net.minecraft.nbt.Tag pdc;
+
+    public void setWorld(net.minecraft.server.level.ServerLevel world) {
+        if (this.world != null) {
+            return;
+        }
+        this.world = world;
+        world.getWorld().readBukkitValues(this.pdc);
+        this.pdc = null;
+    }
+    // CraftBukkit end
+
     private PrimaryLevelData(
         @Nullable CompoundTag loadedPlayerTag,
         boolean wasModded,
@@ -237,7 +252,7 @@ public class PrimaryLevelData implements ServerLevelData, WorldData {
         nbt.put("Version", compoundTag);
         NbtUtils.addCurrentDataVersion(nbt);
         DynamicOps<Tag> dynamicOps = registry.createSerializationContext(NbtOps.INSTANCE);
-        WorldGenSettings.encode(dynamicOps, this.worldOptions, registry)
+        WorldGenSettings.encode(dynamicOps, this.worldOptions, new net.minecraft.world.level.levelgen.WorldDimensions(this.customDimensions != null ? this.customDimensions : registry.lookupOrThrow(net.minecraft.core.registries.Registries.LEVEL_STEM))) // CraftBukkit
             .resultOrPartial(Util.prefix("WorldGenSettings: ", LOGGER::error))
             .ifPresent(worldOptionsTag -> nbt.put("WorldGenSettings", worldOptionsTag));
         nbt.putInt("GameType", this.settings.gameType().getId());
@@ -281,6 +296,8 @@ public class PrimaryLevelData implements ServerLevelData, WorldData {
         if (this.wanderingTraderId != null) {
             nbt.putUUID("WanderingTraderId", this.wanderingTraderId);
         }
+        nbt.putString("Bukkit.Version", org.bukkit.Bukkit.getName() + "/" + org.bukkit.Bukkit.getVersion() + "/" + org.bukkit.Bukkit.getBukkitVersion()); // CraftBukkit
+        this.world.getWorld().storeBukkitValues(nbt); // CraftBukkit - add pdc
     }
 
     private static ListTag stringCollectionToTag(Set<String> stringCollection) {
@@ -358,6 +375,25 @@ public class PrimaryLevelData implements ServerLevelData, WorldData {
 
     @Override
     public void setThundering(boolean thundering) {
+        // Paper start - Add cause to Weather/ThunderChangeEvents
+        this.setThundering(thundering, org.bukkit.event.weather.ThunderChangeEvent.Cause.UNKNOWN);
+    }
+    public void setThundering(boolean thundering, org.bukkit.event.weather.ThunderChangeEvent.Cause cause) {
+        // Paper end - Add cause to Weather/ThunderChangeEvents
+        // CraftBukkit start
+        if (this.thundering == thundering) {
+            return;
+        }
+
+        org.bukkit.World world = org.bukkit.Bukkit.getWorld(this.getLevelName());
+        if (world != null) {
+            org.bukkit.event.weather.ThunderChangeEvent thunder = new org.bukkit.event.weather.ThunderChangeEvent(world, thundering, cause); // Paper - Add cause to Weather/ThunderChangeEvents
+            org.bukkit.Bukkit.getServer().getPluginManager().callEvent(thunder);
+            if (thunder.isCancelled()) {
+                return;
+            }
+        }
+        // CraftBukkit end
         this.thundering = thundering;
     }
 
@@ -378,6 +414,26 @@ public class PrimaryLevelData implements ServerLevelData, WorldData {
 
     @Override
     public void setRaining(boolean isRaining) {
+        // Paper start - Add cause to Weather/ThunderChangeEvents
+        this.setRaining(isRaining, org.bukkit.event.weather.WeatherChangeEvent.Cause.UNKNOWN);
+    }
+
+    public void setRaining(boolean isRaining, org.bukkit.event.weather.WeatherChangeEvent.Cause cause) {
+        // Paper end - Add cause to Weather/ThunderChangeEvents
+        // CraftBukkit start
+        if (this.raining == isRaining) {
+            return;
+        }
+
+        org.bukkit.World world = org.bukkit.Bukkit.getWorld(this.getLevelName());
+        if (world != null) {
+            org.bukkit.event.weather.WeatherChangeEvent weather = new org.bukkit.event.weather.WeatherChangeEvent(world, isRaining, cause); // Paper - Add cause to Weather/ThunderChangeEvents
+            org.bukkit.Bukkit.getServer().getPluginManager().callEvent(weather);
+            if (weather.isCancelled()) {
+                return;
+            }
+        }
+        // CraftBukkit end
         this.raining = isRaining;
     }
 
@@ -444,6 +500,12 @@ public class PrimaryLevelData implements ServerLevelData, WorldData {
     @Override
     public void setDifficulty(Difficulty difficulty) {
         this.settings = this.settings.withDifficulty(difficulty);
+        // CraftBukkit start
+        net.minecraft.network.protocol.game.ClientboundChangeDifficultyPacket packet = new net.minecraft.network.protocol.game.ClientboundChangeDifficultyPacket(this.getDifficulty(), this.isDifficultyLocked());
+        for (net.minecraft.server.level.ServerPlayer player : (java.util.List<net.minecraft.server.level.ServerPlayer>) (java.util.List) this.world.players()) {
+            player.connection.send(packet);
+        }
+        // CraftBukkit end
     }
 
     @Override
@@ -579,6 +641,14 @@ public class PrimaryLevelData implements ServerLevelData, WorldData {
     public LevelSettings getLevelSettings() {
         return this.settings.copy();
     }
+
+    // CraftBukkit start - Check if the name stored in NBT is the correct one
+    public void checkName(String name) {
+        if (!this.settings.levelName.equals(name)) {
+            this.settings.levelName = name;
+        }
+    }
+    // CraftBukkit end
 
     @Deprecated
     public static enum SpecialWorldProperty {

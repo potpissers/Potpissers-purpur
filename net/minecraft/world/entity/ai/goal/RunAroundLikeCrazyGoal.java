@@ -58,7 +58,7 @@ public class RunAroundLikeCrazyGoal extends Goal {
             if (firstPassenger instanceof Player player) {
                 int temper = this.horse.getTemper();
                 int maxTemper = this.horse.getMaxTemper();
-                if (maxTemper > 0 && this.horse.getRandom().nextInt(maxTemper) < temper) {
+                if (maxTemper > 0 && this.horse.getRandom().nextInt(maxTemper) < temper && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this.horse, ((org.bukkit.craftbukkit.entity.CraftHumanEntity) this.horse.getBukkitEntity().getPassenger()).getHandle()).isCancelled()) { // CraftBukkit - fire EntityTameEvent
                     this.horse.tameWithName(player);
                     return;
                 }

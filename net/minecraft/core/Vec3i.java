@@ -16,9 +16,9 @@ public class Vec3i implements Comparable<Vec3i> {
             vec3i -> IntStream.of(vec3i.getX(), vec3i.getY(), vec3i.getZ())
         );
     public static final Vec3i ZERO = new Vec3i(0, 0, 0);
-    private int x;
-    private int y;
-    private int z;
+    protected int x; // Paper - Perf: Manually inline methods in BlockPosition; protected
+    protected int y; // Paper - Perf: Manually inline methods in BlockPosition; protected
+    protected int z; // Paper - Perf: Manually inline methods in BlockPosition; protected
 
     public static Codec<Vec3i> offsetCodec(int maxOffset) {
         return CODEC.validate(
@@ -35,12 +35,12 @@ public class Vec3i implements Comparable<Vec3i> {
     }
 
     @Override
-    public boolean equals(Object other) {
+    public final boolean equals(Object other) { // Paper - Perf: Final for inline
         return this == other || other instanceof Vec3i vec3i && this.getX() == vec3i.getX() && this.getY() == vec3i.getY() && this.getZ() == vec3i.getZ();
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() { // Paper - Perf: Final for inline
         return (this.getY() + this.getZ() * 31) * 31 + this.getX();
     }
 
@@ -53,15 +53,15 @@ public class Vec3i implements Comparable<Vec3i> {
         }
     }
 
-    public int getX() {
+    public final int getX() { // Paper - Perf: Final for inline
         return this.x;
     }
 
-    public int getY() {
+    public final int getY() { // Paper - Perf: Final for inline
         return this.y;
     }
 
-    public int getZ() {
+    public final int getZ() { // Paper - Perf: Final for inline
         return this.z;
     }
 
@@ -235,4 +235,10 @@ public class Vec3i implements Comparable<Vec3i> {
     public String toShortString() {
         return this.getX() + ", " + this.getY() + ", " + this.getZ();
     }
+
+    // Paper start - Perf: Optimize isInWorldBounds
+    public final boolean isInsideBuildHeightAndWorldBoundsHorizontal(final net.minecraft.world.level.LevelHeightAccessor levelHeightAccessor) {
+        return this.getX() >= -30000000 && this.getZ() >= -30000000 && this.getX() < 30000000 && this.getZ() < 30000000 && !levelHeightAccessor.isOutsideBuildHeight(this.getY());
+    }
+    // Paper end - Perf: Optimize isInWorldBounds
 }

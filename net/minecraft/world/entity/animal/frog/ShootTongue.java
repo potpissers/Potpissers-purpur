@@ -96,7 +96,7 @@ public class ShootTongue extends Behavior<Frog> {
             if (entity.isAlive()) {
                 frog.doHurtTarget(level, entity);
                 if (!entity.isAlive()) {
-                    entity.remove(Entity.RemovalReason.KILLED);
+                    entity.remove(Entity.RemovalReason.KILLED, org.bukkit.event.entity.EntityRemoveEvent.Cause.DEATH); // CraftBukkit - add Bukkit remove cause
                 }
             }
         }

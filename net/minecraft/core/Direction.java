@@ -57,6 +57,12 @@ public enum Direction implements StringRepresentable {
         .sorted(Comparator.comparingInt(direction -> direction.data2d))
         .toArray(Direction[]::new);
 
+    // Paper start - Perf: Inline shift direction fields
+    private final int adjX;
+    private final int adjY;
+    private final int adjZ;
+    // Paper end - Perf: Inline shift direction fields
+
     private Direction(
         final int data3d,
         final int oppositeIndex,
@@ -74,6 +80,11 @@ public enum Direction implements StringRepresentable {
         this.axisDirection = axisDirection;
         this.normal = normal;
         this.normalVec3 = Vec3.atLowerCornerOf(normal);
+        // Paper start - Perf: Inline shift direction fields
+        this.adjX = normal.getX();
+        this.adjY = normal.getY();
+        this.adjZ = normal.getZ();
+        // Paper end - Perf: Inline shift direction fields
     }
 
     public static Direction[] orderedByNearest(Entity entity) {
@@ -247,15 +258,15 @@ public enum Direction implements StringRepresentable {
     }
 
     public int getStepX() {
-        return this.normal.getX();
+        return this.adjX; // Paper - Perf: Inline shift direction fields
     }
 
     public int getStepY() {
-        return this.normal.getY();
+        return this.adjY; // Paper - Perf: Inline shift direction fields
     }
 
     public int getStepZ() {
-        return this.normal.getZ();
+        return this.adjZ; // Paper - Perf: Inline shift direction fields
     }
 
     public Vector3f step() {

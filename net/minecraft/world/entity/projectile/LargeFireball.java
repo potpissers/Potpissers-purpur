@@ -18,11 +18,13 @@ public class LargeFireball extends Fireball {
 
     public LargeFireball(EntityType<? extends LargeFireball> entityType, Level level) {
         super(entityType, level);
+        this.isIncendiary = (level instanceof ServerLevel serverLevel) && serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // CraftBukkit
     }
 
     public LargeFireball(Level level, LivingEntity owner, Vec3 movement, int explosionPower) {
         super(EntityType.FIREBALL, owner, movement, level);
         this.explosionPower = explosionPower;
+        this.isIncendiary = (level instanceof ServerLevel serverLevel) && serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // CraftBukkit
     }
 
     @Override
@@ -30,8 +32,16 @@ public class LargeFireball extends Fireball {
         super.onHit(result);
         if (this.level() instanceof ServerLevel serverLevel) {
             boolean _boolean = serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
-            this.level().explode(this, this.getX(), this.getY(), this.getZ(), this.explosionPower, _boolean, Level.ExplosionInteraction.MOB);
-            this.discard();
+            // CraftBukkit start - fire ExplosionPrimeEvent
+            org.bukkit.event.entity.ExplosionPrimeEvent event = new org.bukkit.event.entity.ExplosionPrimeEvent((org.bukkit.entity.Explosive) this.getBukkitEntity());
+            this.level().getCraftServer().getPluginManager().callEvent(event);
+
+            if (!event.isCancelled()) {
+                // give 'this' instead of (Entity) null so we know what causes the damage
+                this.level().explode(this, this.getX(), this.getY(), this.getZ(), event.getRadius(), event.getFire(), Level.ExplosionInteraction.MOB);
+            }
+            // CraftBukkit end
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause
         }
     }
 
@@ -57,7 +67,8 @@ public class LargeFireball extends Fireball {
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         if (compound.contains("ExplosionPower", 99)) {
-            this.explosionPower = compound.getByte("ExplosionPower");
+            // CraftBukkit - set bukkitYield when setting explosionpower
+            this.bukkitYield = this.explosionPower = compound.getByte("ExplosionPower");
         }
     }
 }

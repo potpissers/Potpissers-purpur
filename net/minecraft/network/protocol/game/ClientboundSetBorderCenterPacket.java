@@ -14,8 +14,10 @@ public class ClientboundSetBorderCenterPacket implements Packet<ClientGamePacket
     private final double newCenterZ;
 
     public ClientboundSetBorderCenterPacket(WorldBorder worldBorder) {
-        this.newCenterX = worldBorder.getCenterX();
-        this.newCenterZ = worldBorder.getCenterZ();
+        // CraftBukkit start - multiply out nether border
+        this.newCenterX = worldBorder.getCenterX() * (worldBorder.world != null ? worldBorder.world.dimensionType().coordinateScale() : 1.0);
+        this.newCenterZ = worldBorder.getCenterZ() * (worldBorder.world != null ? worldBorder.world.dimensionType().coordinateScale() : 1.0);
+        // CraftBukkit end
     }
 
     private ClientboundSetBorderCenterPacket(FriendlyByteBuf buffer) {

@@ -214,7 +214,14 @@ public class Pig extends Animal implements ItemSteerable, Saddleable {
                 }
 
                 mob.setPersistenceRequired();
-            });
+                // CraftBukkit start
+            }, null, null);
+            if (org.bukkit.craftbukkit.event.CraftEventFactory.callPigZapEvent(this, lightning, zombifiedPiglin).isCancelled()) {
+                return;
+            }
+            level.addFreshEntity(zombifiedPiglin, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.LIGHTNING);
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.TRANSFORMATION); // CraftBukkit - add Bukkit remove cause
+            // CraftBukkit end
             if (zombifiedPiglin == null) {
                 super.thunderHit(level, lightning);
             }

@@ -63,6 +63,14 @@ public class LeavesBlock extends Block implements SimpleWaterloggedBlock {
     @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (this.decaying(state)) {
+            // CraftBukkit start
+            org.bukkit.event.block.LeavesDecayEvent event = new org.bukkit.event.block.LeavesDecayEvent(level.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ()));
+            level.getCraftServer().getPluginManager().callEvent(event);
+
+            if (event.isCancelled() || level.getBlockState(pos).getBlock() != this) {
+                return;
+            }
+            // CraftBukkit end
             dropResources(state, level, pos);
             level.removeBlock(pos, false);
         }

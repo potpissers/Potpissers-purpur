@@ -85,14 +85,32 @@ public class ProtoChunk extends ChunkAccess {
         return new ChunkAccess.PackedTicks(this.blockTicks.pack(gametime), this.fluidTicks.pack(gametime));
     }
 
+    // Paper start - If loaded util
+    @Override
+    public final FluidState getFluidIfLoaded(BlockPos blockposition) {
+        return this.getFluidState(blockposition);
+    }
+
+    @Override
+    public final BlockState getBlockStateIfLoaded(BlockPos blockposition) {
+        return this.getBlockState(blockposition);
+    }
+    // Paper end
+
     @Override
     public BlockState getBlockState(BlockPos pos) {
-        int y = pos.getY();
+        // Paper start
+        return getBlockState(pos.getX(), pos.getY(), pos.getZ());
+    }
+    public BlockState getBlockState(final int x, final int y, final int z) {
+        // Paper end
         if (this.isOutsideBuildHeight(y)) {
             return Blocks.VOID_AIR.defaultBlockState();
         } else {
-            LevelChunkSection section = this.getSection(this.getSectionIndex(y));
-            return section.hasOnlyAir() ? Blocks.AIR.defaultBlockState() : section.getBlockState(pos.getX() & 15, y & 15, pos.getZ() & 15);
+            // Paper start
+            LevelChunkSection section = this.getSections()[this.getSectionIndex(y)];
+            return section.hasOnlyAir() ? Blocks.AIR.defaultBlockState() : section.getBlockState(x & 15, y & 15, z & 15);
+            // Paper end
         }
     }
 

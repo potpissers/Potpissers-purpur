@@ -38,7 +38,7 @@ public class CaveSpider extends Spider {
                 }
 
                 if (i > 0) {
-                    ((LivingEntity)source).addEffect(new MobEffectInstance(MobEffects.POISON, i * 20, 0), this);
+                    ((LivingEntity)source).addEffect(new MobEffectInstance(MobEffects.POISON, i * 20, 0), this, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.ATTACK); // CraftBukkit
                 }
             }
 

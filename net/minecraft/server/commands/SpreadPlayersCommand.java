@@ -255,6 +255,7 @@ public class SpreadPlayersCommand {
                 entity.getYRot(),
                 entity.getXRot(),
                 true
+                , org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND // CraftBukkit - handle teleport reason
             );
             double d1 = Double.MAX_VALUE;
 

@@ -18,6 +18,11 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
     private final int z;
     private final ClientboundLevelChunkPacketData chunkData;
     private final ClientboundLightUpdatePacketData lightData;
+    // Paper start - Anti-Xray
+    public void setReady(final boolean ready) {
+        // Empty hook, updated by feature patch
+    }
+    // Paper end - Anti-Xray
 
     public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightEngine, @Nullable BitSet skyLight, @Nullable BitSet blockLight) {
         ChunkPos pos = chunk.getPos();

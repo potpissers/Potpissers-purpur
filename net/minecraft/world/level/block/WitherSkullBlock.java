@@ -51,6 +51,7 @@ public class WitherSkullBlock extends SkullBlock {
     }
 
     public static void checkSpawn(Level level, BlockPos pos, SkullBlockEntity blockEntity) {
+        if (level.captureBlockStates) return; // CraftBukkit
         if (!level.isClientSide) {
             BlockState blockState = blockEntity.getBlockState();
             boolean flag = blockState.is(Blocks.WITHER_SKELETON_SKULL) || blockState.is(Blocks.WITHER_SKELETON_WALL_SKULL);
@@ -59,7 +60,7 @@ public class WitherSkullBlock extends SkullBlock {
                 if (blockPatternMatch != null) {
                     WitherBoss witherBoss = EntityType.WITHER.create(level, EntitySpawnReason.TRIGGERED);
                     if (witherBoss != null) {
-                        CarvedPumpkinBlock.clearPatternBlocks(level, blockPatternMatch);
+                        // CarvedPumpkinBlock.clearPatternBlocks(level, blockPatternMatch); // CraftBukkit - move down
                         BlockPos pos1 = blockPatternMatch.getBlock(1, 2, 0).getPos();
                         witherBoss.moveTo(
                             pos1.getX() + 0.5,
@@ -70,12 +71,18 @@ public class WitherSkullBlock extends SkullBlock {
                         );
                         witherBoss.yBodyRot = blockPatternMatch.getForwards().getAxis() == Direction.Axis.X ? 0.0F : 90.0F;
                         witherBoss.makeInvulnerable();
+                        // CraftBukkit start
+                        if (!level.addFreshEntity(witherBoss, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.BUILD_WITHER)) {
+                            return;
+                        }
+                        CarvedPumpkinBlock.clearPatternBlocks(level, blockPatternMatch); // CraftBukkit - from above
+                        // CraftBukkit end
 
                         for (ServerPlayer serverPlayer : level.getEntitiesOfClass(ServerPlayer.class, witherBoss.getBoundingBox().inflate(50.0))) {
                             CriteriaTriggers.SUMMONED_ENTITY.trigger(serverPlayer, witherBoss);
                         }
 
-                        level.addFreshEntity(witherBoss);
+                        // level.addFreshEntity(witherBoss); // CraftBukkit - moved up
                         CarvedPumpkinBlock.updatePatternBlocks(level, blockPatternMatch);
                     }
                 }

@@ -56,8 +56,18 @@ public abstract class DiodeBlock extends HorizontalDirectionalBlock {
             boolean poweredValue = state.getValue(POWERED);
             boolean shouldTurnOn = this.shouldTurnOn(level, pos, state);
             if (poweredValue && !shouldTurnOn) {
+                // CraftBukkit start
+                if (org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(level, pos, 15, 0).getNewCurrent() != 0) {
+                    return;
+                }
+                // CraftBukkit end
                 level.setBlock(pos, state.setValue(POWERED, Boolean.valueOf(false)), 2);
             } else if (!poweredValue) {
+                // CraftBukkit start
+                if (org.bukkit.craftbukkit.event.CraftEventFactory.callRedstoneChange(level, pos, 0, 15).getNewCurrent() != 15) {
+                    return;
+                }
+                // CraftBukkit end
                 level.setBlock(pos, state.setValue(POWERED, Boolean.valueOf(true)), 2);
                 if (!shouldTurnOn) {
                     level.scheduleTick(pos, this, this.getDelay(state), TickPriority.VERY_HIGH);

@@ -88,6 +88,13 @@ public class TransmuteRecipe implements CraftingRecipe {
         );
     }
 
+    // CraftBukkit start
+    @Override
+    public org.bukkit.inventory.Recipe toBukkitRecipe(org.bukkit.NamespacedKey id) {
+        return new org.bukkit.craftbukkit.inventory.CraftTransmuteRecipe(id, org.bukkit.craftbukkit.inventory.CraftItemType.minecraftToBukkit(this.result.value()), org.bukkit.craftbukkit.inventory.CraftRecipe.toBukkit(this.input), org.bukkit.craftbukkit.inventory.CraftRecipe.toBukkit(this.material));
+    }
+    // CraftBukkit end
+
     @Override
     public RecipeSerializer<TransmuteRecipe> getSerializer() {
         return RecipeSerializer.TRANSMUTE;

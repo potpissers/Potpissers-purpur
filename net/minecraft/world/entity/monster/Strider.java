@@ -309,7 +309,14 @@ public class Strider extends Animal implements ItemSteerable, Saddleable {
                 || blockStateOnLegacy.is(BlockTags.STRIDER_WARM_BLOCKS)
                 || this.getFluidHeight(FluidTags.LAVA) > 0.0;
             boolean flag1 = this.getVehicle() instanceof Strider strider && strider.isSuffocating();
-            this.setSuffocating(!flag || flag1);
+            // CraftBukkit start
+            boolean suffocating = !flag || flag1;
+            if (suffocating ^ this.isSuffocating()) {
+                if (org.bukkit.craftbukkit.event.CraftEventFactory.callStriderTemperatureChangeEvent(this, suffocating)) {
+                    this.setSuffocating(suffocating);
+                }
+            }
+            // CraftBukkit end
         }
 
         super.tick();

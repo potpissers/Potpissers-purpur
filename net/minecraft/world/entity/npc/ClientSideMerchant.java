@@ -56,6 +56,13 @@ public class ClientSideMerchant implements Merchant {
         return this.source == player;
     }
 
+    // Paper start
+    @Override
+    public org.bukkit.craftbukkit.inventory.CraftMerchant getCraftMerchant() {
+        throw new UnsupportedOperationException();
+    }
+    // Paper end
+
     @Override
     public int getVillagerXp() {
         return this.xp;

@@ -20,7 +20,7 @@ public record ClientIntentionPacket(int protocolVersion, String hostName, int po
     }
 
     private ClientIntentionPacket(FriendlyByteBuf buffer) {
-        this(buffer.readVarInt(), buffer.readUtf(255), buffer.readUnsignedShort(), ClientIntent.byId(buffer.readVarInt()));
+        this(buffer.readVarInt(), buffer.readUtf(Short.MAX_VALUE), buffer.readUnsignedShort(), ClientIntent.byId(buffer.readVarInt())); // Spigot - increase max hostName length
     }
 
     private void write(FriendlyByteBuf buffer) {

@@ -37,7 +37,7 @@ public class WorldLoader {
             CloseableResourceManager closeableResourceManager = pair.getSecond();
             LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess = RegistryLayer.createRegistryAccess();
             List<Registry.PendingTags<?>> list = TagLoader.loadTagsForExistingRegistries(
-                closeableResourceManager, layeredRegistryAccess.getLayer(RegistryLayer.STATIC)
+                closeableResourceManager, layeredRegistryAccess.getLayer(RegistryLayer.STATIC), io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent.Cause.INITIAL // Paper - tag lifecycle - add cause
             );
             RegistryAccess.Frozen accessForLoading = layeredRegistryAccess.getAccessForLoading(RegistryLayer.WORLDGEN);
             List<HolderLookup.RegistryLookup<?>> list1 = TagLoader.buildUpdatedLookups(accessForLoading, list);

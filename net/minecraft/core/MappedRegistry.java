@@ -33,17 +33,18 @@ import net.minecraft.util.RandomSource;
 public class MappedRegistry<T> implements WritableRegistry<T> {
     private final ResourceKey<? extends Registry<T>> key;
     private final ObjectList<Holder.Reference<T>> byId = new ObjectArrayList<>(256);
-    private final Reference2IntMap<T> toId = Util.make(new Reference2IntOpenHashMap<>(), map -> map.defaultReturnValue(-1));
-    private final Map<ResourceLocation, Holder.Reference<T>> byLocation = new HashMap<>();
-    private final Map<ResourceKey<T>, Holder.Reference<T>> byKey = new HashMap<>();
-    private final Map<T, Holder.Reference<T>> byValue = new IdentityHashMap<>();
-    private final Map<ResourceKey<T>, RegistrationInfo> registrationInfos = new IdentityHashMap<>();
+    private final Reference2IntMap<T> toId = Util.make(new Reference2IntOpenHashMap<>(2048), map -> map.defaultReturnValue(-1)); // Paper - Perf: Use bigger expected size to reduce collisions
+    private final Map<ResourceLocation, Holder.Reference<T>> byLocation = new HashMap<>(2048); // Paper - Perf: Use bigger expected size to reduce collisions
+    private final Map<ResourceKey<T>, Holder.Reference<T>> byKey = new HashMap<>(2048); // Paper - Perf: Use bigger expected size to reduce collisions
+    private final Map<T, Holder.Reference<T>> byValue = new IdentityHashMap<>(2048); // Paper - Perf: Use bigger expected size to reduce collisions
+    private final Map<ResourceKey<T>, RegistrationInfo> registrationInfos = new IdentityHashMap<>(2048); // Paper - Perf: Use bigger expected size to reduce collisions
     private Lifecycle registryLifecycle;
     private final Map<TagKey<T>, HolderSet.Named<T>> frozenTags = new IdentityHashMap<>();
     MappedRegistry.TagSet<T> allTags = MappedRegistry.TagSet.unbound();
     private boolean frozen;
     @Nullable
     private Map<T, Holder.Reference<T>> unregisteredIntrusiveHolders;
+    public final Map<ResourceLocation, T> temporaryUnfrozenMap = new HashMap<>(); // Paper - support pre-filling in registry mod API
 
     @Override
     public Stream<HolderSet.Named<T>> listTags() {
@@ -114,6 +115,7 @@ public class MappedRegistry<T> implements WritableRegistry<T> {
             this.toId.put(value, size);
             this.registrationInfos.put(key, registrationInfo);
             this.registryLifecycle = this.registryLifecycle.add(registrationInfo.lifecycle());
+            this.temporaryUnfrozenMap.put(key.location(), value); // Paper - support pre-filling in registry mod API
             return reference;
         }
     }
@@ -275,6 +277,7 @@ public class MappedRegistry<T> implements WritableRegistry<T> {
             return this;
         } else {
             this.frozen = true;
+            this.temporaryUnfrozenMap.clear(); // Paper - support pre-filling in registry mod API
             this.byValue.forEach((object, reference) -> reference.bindValue((T)object));
             List<ResourceLocation> list = this.byKey
                 .entrySet()
@@ -509,4 +512,13 @@ public class MappedRegistry<T> implements WritableRegistry<T> {
 
         Stream<HolderSet.Named<T>> getTags();
     }
+
+    // Paper start
+    // used to clear intrusive holders from GameEvent, Item, Block, EntityType, and Fluid from unused instances of those types
+    public void clearIntrusiveHolder(final T instance) {
+        if (this.unregisteredIntrusiveHolders != null) {
+            this.unregisteredIntrusiveHolders.remove(instance);
+        }
+    }
+    // Paper end
 }

@@ -123,6 +123,11 @@ public class SnowLayerBlock extends Block {
     @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (level.getBrightness(LightLayer.BLOCK, pos) > 11) {
+            // CraftBukkit start
+            if (org.bukkit.craftbukkit.event.CraftEventFactory.callBlockFadeEvent(level, pos, Blocks.AIR.defaultBlockState()).isCancelled()) {
+                return;
+            }
+            // CraftBukkit end
             dropResources(state, level, pos);
             level.removeBlock(pos, false);
         }

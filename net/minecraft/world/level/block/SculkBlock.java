@@ -37,8 +37,9 @@ public class SculkBlock extends DropExperienceBlock implements SculkBehaviour {
                 if (random.nextInt(growthSpawnCost) < charge) {
                     BlockPos blockPos = pos1.above();
                     BlockState randomGrowthState = this.getRandomGrowthState(level, blockPos, random, spreader.isWorldGeneration());
-                    level.setBlock(blockPos, randomGrowthState, 3);
+                    if (org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockSpreadEvent(level, pos, blockPos, randomGrowthState, 3)) { // CraftBukkit - Call BlockSpreadEvent
                     level.playSound(null, pos1, randomGrowthState.getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                    } // CraftBukkit - Call BlockSpreadEvent
                 }
 
                 return Math.max(0, charge - growthSpawnCost);

@@ -126,7 +126,7 @@ public class MinecartCommandBlock extends AbstractMinecart {
                 MinecartCommandBlock.this.position(),
                 MinecartCommandBlock.this.getRotationVector(),
                 this.getLevel(),
-                2,
+                this.getLevel().paperConfig().commandBlocks.permissionsLevel, // Paper - configurable command block perm level
                 this.getName().getString(),
                 MinecartCommandBlock.this.getDisplayName(),
                 this.getLevel().getServer(),
@@ -138,5 +138,12 @@ public class MinecartCommandBlock extends AbstractMinecart {
         public boolean isValid() {
             return !MinecartCommandBlock.this.isRemoved();
         }
+
+        // CraftBukkit start
+        @Override
+        public org.bukkit.command.CommandSender getBukkitSender(CommandSourceStack wrapper) {
+            return net.minecraft.world.entity.vehicle.MinecartCommandBlock.this.getBukkitEntity();
+        }
+        // CraftBukkit end
     }
 }

@@ -36,7 +36,7 @@ public record SelectorContents(SelectorPattern selector, Optional<Component> sep
         if (nbtPathPattern == null) {
             return Component.empty();
         } else {
-            Optional<? extends Component> optional = ComponentUtils.updateForEntity(nbtPathPattern, this.separator, entity, recursionDepth);
+            Optional<? extends Component> optional = ComponentUtils.updateSeparatorForEntity(nbtPathPattern, this.separator, entity, recursionDepth); // Paper - validate separator
             return ComponentUtils.formatList(this.selector.resolved().findEntities(nbtPathPattern), optional, Entity::getDisplayName);
         }
     }

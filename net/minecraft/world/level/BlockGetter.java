@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,6 +33,16 @@ public interface BlockGetter extends LevelHeightAccessor {
     }
 
     BlockState getBlockState(BlockPos pos);
+
+    // Paper start - if loaded util
+    @Nullable BlockState getBlockStateIfLoaded(BlockPos blockposition);
+
+    default @Nullable Block getBlockIfLoaded(BlockPos blockposition) {
+        BlockState type = this.getBlockStateIfLoaded(blockposition);
+        return type == null ? null : type.getBlock();
+    }
+    @Nullable FluidState getFluidIfLoaded(BlockPos blockposition);
+    // Paper end
 
     FluidState getFluidState(BlockPos pos);
 
@@ -66,10 +77,25 @@ public interface BlockGetter extends LevelHeightAccessor {
         );
     }
 
-    default BlockHitResult clip(ClipContext context) {
-        return traverseBlocks(context.getFrom(), context.getTo(), context, (traverseContext, traversePos) -> {
-            BlockState blockState = this.getBlockState(traversePos);
-            FluidState fluidState = this.getFluidState(traversePos);
+    // CraftBukkit start - moved block handling into separate method for use by Block#rayTrace
+    default BlockHitResult clip(ClipContext traverseContext, BlockPos traversePos) {
+        // Paper start - Add predicate for blocks when raytracing
+        return clip(traverseContext, traversePos, null);
+    }
+
+    default BlockHitResult clip(ClipContext traverseContext, BlockPos traversePos, java.util.function.Predicate<? super org.bukkit.block.Block> canCollide) {
+        // Paper end - Add predicate for blocks when raytracing
+        // Paper start - Prevent raytrace from loading chunks
+        BlockState blockState = this.getBlockStateIfLoaded(traversePos);
+        if (blockState == null) {
+            // copied the last function parameter (listed below)
+            Vec3 vec3d = traverseContext.getFrom().subtract(traverseContext.getTo());
+
+            return BlockHitResult.miss(traverseContext.getTo(), Direction.getApproximateNearest(vec3d.x, vec3d.y, vec3d.z), BlockPos.containing(traverseContext.getTo()));
+        }
+        // Paper end - Prevent raytrace from loading chunks
+        if (blockState.isAir() || (canCollide != null && this instanceof LevelAccessor levelAccessor && !canCollide.test(org.bukkit.craftbukkit.block.CraftBlock.at(levelAccessor, traversePos)))) return null; // Paper - Perf: optimise air cases & check canCollide predicate
+            FluidState fluidState = blockState.getFluidState(); // Paper - Perf: don't need to go to world state again
             Vec3 from = traverseContext.getFrom();
             Vec3 to = traverseContext.getTo();
             VoxelShape blockShape = traverseContext.getBlockShape(blockState, this, traversePos);
@@ -79,6 +105,18 @@ public interface BlockGetter extends LevelHeightAccessor {
             double d = blockHitResult == null ? Double.MAX_VALUE : traverseContext.getFrom().distanceToSqr(blockHitResult.getLocation());
             double d1 = blockHitResult1 == null ? Double.MAX_VALUE : traverseContext.getFrom().distanceToSqr(blockHitResult1.getLocation());
             return d <= d1 ? blockHitResult : blockHitResult1;
+    }
+    // CraftBukkit end
+
+    default BlockHitResult clip(ClipContext context) {
+        // Paper start - Add predicate for blocks when raytracing
+        return clip(context, (java.util.function.Predicate<org.bukkit.block.Block>) null);
+    }
+
+    default BlockHitResult clip(ClipContext context, java.util.function.Predicate<? super org.bukkit.block.Block> canCollide) {
+        // Paper end - Add predicate for blocks when raytracing
+        return (BlockHitResult) BlockGetter.traverseBlocks(context.getFrom(), context.getTo(), context, (raytrace1, blockposition) -> {
+            return this.clip(raytrace1, blockposition, canCollide); // CraftBukkit - moved into separate method // Paper - Add predicate for blocks when raytracing
         }, failContext -> {
             Vec3 vec3 = failContext.getFrom().subtract(failContext.getTo());
             return BlockHitResult.miss(failContext.getTo(), Direction.getApproximateNearest(vec3.x, vec3.y, vec3.z), BlockPos.containing(failContext.getTo()));

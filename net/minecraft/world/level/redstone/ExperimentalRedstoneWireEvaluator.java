@@ -36,7 +36,16 @@ public class ExperimentalRedstoneWireEvaluator extends RedstoneWireEvaluator {
             int intValue = entry.getIntValue();
             int i = unpackPower(intValue);
             BlockState blockState = level.getBlockState(blockPos);
-            if (blockState.is(this.wireBlock) && !blockState.getValue(RedStoneWireBlock.POWER).equals(i)) {
+            // CraftBukkit start
+            int oldPower = blockState.getValue(RedStoneWireBlock.POWER); // Paper - Call BlockRedstoneEvent properly; get the previous power from the right state
+            if (oldPower != i) {
+                org.bukkit.event.block.BlockRedstoneEvent event = new org.bukkit.event.block.BlockRedstoneEvent(org.bukkit.craftbukkit.block.CraftBlock.at(level, blockPos), oldPower, i);
+                level.getCraftServer().getPluginManager().callEvent(event);
+
+                i = event.getNewCurrent();
+            }
+            if (blockState.is(this.wireBlock) && oldPower != i) {
+                // CraftBukkit end
                 int i1 = 2;
                 if (!updateShape || !flag) {
                     i1 |= 128;
