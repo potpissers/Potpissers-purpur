@@ -71,6 +71,7 @@ public class WitherSkullBlock extends SkullBlock {
                         );
                         witherBoss.yBodyRot = blockPatternMatch.getForwards().getAxis() == Direction.Axis.X ? 0.0F : 90.0F;
                         witherBoss.makeInvulnerable();
+                        witherBoss.setSummoner(blockState.getBlock().placer == null ? null : blockState.getBlock().placer.getUUID()); // Purpur - Summoner API
                         // CraftBukkit start
                         if (!level.addFreshEntity(witherBoss, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.BUILD_WITHER)) {
                             return;

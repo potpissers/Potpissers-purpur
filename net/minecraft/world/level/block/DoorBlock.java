@@ -206,6 +206,7 @@ public class DoorBlock extends Block {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (!this.type.canOpenByHand()) {
             return InteractionResult.PASS;
+        } else if (requiresRedstone(level, state, pos)) { return InteractionResult.CONSUME; // Purpur - Option to make doors require redstone
         } else {
             state = state.cycle(OPEN);
             level.setBlock(pos, state, 10);
@@ -294,4 +295,18 @@ public class DoorBlock extends Block {
     public static boolean isWoodenDoor(BlockState state) {
         return state.getBlock() instanceof DoorBlock doorBlock && doorBlock.type().canOpenByHand();
     }
+
+    // Purpur start - Option to make doors require redstone
+    public static boolean requiresRedstone(Level level, BlockState state, BlockPos pos) {
+        if (level.purpurConfig.doorRequiresRedstone.contains(state.getBlock())) {
+            // force update client
+            BlockPos otherPos = pos.relative(state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER ? Direction.UP : Direction.DOWN);
+            BlockState otherState = level.getBlockState(otherPos);
+            level.sendBlockUpdated(pos, state, state, 3);
+            level.sendBlockUpdated(otherPos, otherState, otherState, 3);
+            return true;
+        }
+        return false;
+    }
+    // Purpur end - Option to make doors require redstone
 }

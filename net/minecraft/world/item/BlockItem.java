@@ -152,7 +152,16 @@ public class BlockItem extends Item {
     }
 
     protected boolean updateCustomBlockEntityTag(BlockPos pos, Level level, @Nullable Player player, ItemStack stack, BlockState state) {
-        return updateCustomBlockEntityTag(level, player, pos, stack);
+        // Purpur start - Persistent BlockEntity Lore and DisplayName
+        boolean handled = updateCustomBlockEntityTag(level, player, pos, stack);
+        if (level.purpurConfig.persistentTileEntityLore) {
+            BlockEntity blockEntity1 = level.getBlockEntity(pos);
+            if (blockEntity1 != null) {
+                blockEntity1.setPersistentLore(stack.getOrDefault(DataComponents.LORE, net.minecraft.world.item.component.ItemLore.EMPTY));
+            }
+        }
+        return handled;
+        // Purpur end - Persistent BlockEntity Lore and DisplayName
     }
 
     @Nullable
@@ -217,6 +226,7 @@ public class BlockItem extends Item {
                     }
 
                     if (!type.onlyOpCanSetNbt() || player != null && (player.canUseGameMasterBlocks() || (player.getAbilities().instabuild && player.getBukkitEntity().hasPermission("minecraft.nbt.place")))) { // Spigot - add permission
+                        if (!(level.purpurConfig.silkTouchEnabled && blockEntity instanceof net.minecraft.world.level.block.entity.SpawnerBlockEntity && player.getBukkitEntity().hasPermission("purpur.drop.spawners"))) // Purpur - Silk touch spawners
                         return customData.loadInto(blockEntity, level.registryAccess());
                     }
 
@@ -264,6 +274,7 @@ public class BlockItem extends Item {
     public void onDestroyed(ItemEntity itemEntity) {
         ItemContainerContents itemContainerContents = itemEntity.getItem().set(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
         if (itemContainerContents != null) {
+            if (itemEntity.level().purpurConfig.shulkerBoxItemDropContentsWhenDestroyed && this.getBlock() instanceof ShulkerBoxBlock) // Purpur - option to disable shulker box items from dropping contents when destroyed
             ItemUtils.onContainerDestroyed(itemEntity, itemContainerContents.nonEmptyItemsCopy());
         }
     }

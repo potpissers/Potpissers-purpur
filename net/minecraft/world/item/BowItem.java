@@ -28,6 +28,11 @@ public class BowItem extends ProjectileWeaponItem {
             return false;
         } else {
             ItemStack projectile = player.getProjectile(stack);
+            //  Purpur start - Infinity bow settings
+            if (level.purpurConfig.infinityWorksWithoutArrows && projectile.isEmpty() && net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.INFINITY, stack) > 0) {
+                projectile = new ItemStack(Items.ARROW);
+            }
+            // Purpur end - Infinity bow settings
             if (projectile.isEmpty()) {
                 return false;
             } else {
@@ -38,7 +43,7 @@ public class BowItem extends ProjectileWeaponItem {
                 } else {
                     List<ItemStack> list = draw(stack, projectile, player);
                     if (level instanceof ServerLevel serverLevel && !list.isEmpty()) {
-                        this.shoot(serverLevel, player, player.getUsedItemHand(), stack, list, powerForTime * 3.0F, 1.0F, powerForTime == 1.0F, null);
+                        this.shoot(serverLevel, player, player.getUsedItemHand(), stack, list, powerForTime * 3.0F, (float) serverLevel.purpurConfig.bowProjectileOffset, powerForTime == 1.0F, null); // Purpur - Projectile offset config
                     }
 
                     level.playSound(
@@ -89,7 +94,7 @@ public class BowItem extends ProjectileWeaponItem {
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack itemInHand = player.getItemInHand(hand);
         boolean flag = !player.getProjectile(itemInHand).isEmpty();
-        if (!player.hasInfiniteMaterials() && !flag) {
+        if (!player.hasInfiniteMaterials() && !flag && !(level.purpurConfig.infinityWorksWithoutArrows && net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.INFINITY, itemInHand) > 0)) { // Purpur - Infinity bow settings
             return InteractionResult.FAIL;
         } else {
             player.startUsingItem(hand);

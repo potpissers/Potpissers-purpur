@@ -69,6 +69,13 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
         super(entityType, level);
     }
 
+    // Purpur start - Allow leashing villagers
+    @Override
+    public boolean canBeLeashed() {
+        return level().purpurConfig.wanderingTraderCanBeLeashed;
+    }
+    // Purpur end - Allow leashing villagers
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
@@ -89,7 +96,7 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
                     this,
                     new ItemStack(Items.MILK_BUCKET),
                     SoundEvents.WANDERING_TRADER_REAPPEARED,
-                    wanderingTrader -> this.canDrinkMilk && this.level().isDay() && wanderingTrader.isInvisible() // Paper - Add more WanderingTrader API
+                    wanderingTrader -> level().purpurConfig.milkClearsBeneficialEffects && this.canDrinkMilk && this.level().isDay() && wanderingTrader.isInvisible() // Paper - Add more WanderingTrader API // // Purpur - Milk Keeps Beneficial Effects
                 )
             );
         this.goalSelector.addGoal(1, new TradeWithPlayerGoal(this));
@@ -133,8 +140,10 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
                     return InteractionResult.CONSUME;
                 }
 
+                if (this.level().purpurConfig.wanderingTraderAllowTrading) { // Purpur - Add config for villager trading
                 this.setTradingPlayer(player);
                 this.openTradingScreen(player, this.getDisplayName(), 1);
+                } // Purpur - Add config for villager trading
             }
 
             return InteractionResult.SUCCESS;

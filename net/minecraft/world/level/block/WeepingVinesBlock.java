@@ -34,4 +34,11 @@ public class WeepingVinesBlock extends GrowingPlantHeadBlock {
     protected boolean canGrowInto(BlockState state) {
         return NetherVines.isValidGrowthState(state);
     }
+
+    // Purpur start - weeping vines configurable max growth age
+    @Override
+    public int getMaxGrowthAge() {
+        return org.purpurmc.purpur.PurpurConfig.weepingVinesMaxGrowthAge;
+    }
+    // Purpur end - weeping vines configurable max growth age
 }

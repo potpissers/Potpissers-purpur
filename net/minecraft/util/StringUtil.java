@@ -87,6 +87,7 @@ public class StringUtil {
 
     // Paper start - Username validation
     public static boolean isReasonablePlayerName(final String name) {
+        if (true) return org.purpurmc.purpur.PurpurConfig.usernameValidCharactersPattern.matcher(name).matches(); // Purpur - Configurable valid characters for usernames
         if (name.isEmpty() || name.length() > 16) {
             return false;
         }

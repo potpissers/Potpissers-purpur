@@ -116,9 +116,9 @@ public class RangedBowAttackGoal<T extends Monster & RangedAttackMob> extends Go
                 }
 
                 this.mob.lookAt(target, 30.0F, 30.0F);
-            } else {
+            } //else { // Purpur - MC-121706 - Fix mobs not looking up and down when strafing
                 this.mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
-            }
+            //} // Purpur - MC-121706 - Fix mobs not looking up and down when strafing
 
             if (this.mob.isUsingItem()) {
                 if (!hasLineOfSight && this.seeTime < -60) {

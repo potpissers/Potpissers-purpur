@@ -483,6 +483,7 @@ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
             float groundFriction = this.getGroundFriction();
             if (groundFriction > 0.0F) {
                 this.landFriction = groundFriction;
+                if (level().purpurConfig.boatEjectPlayersOnLand) ejectPassengers(); // Purpur - Add option for boats to eject players on land
                 return AbstractBoat.Status.ON_LAND;
             } else {
                 return AbstractBoat.Status.IN_AIR;

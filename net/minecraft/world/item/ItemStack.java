@@ -461,6 +461,7 @@ public final class ItemStack implements DataComponentHolder {
                     serverLevel.isBlockPlaceCancelled = true; // Paper - prevent calling cleanup logic when undoing a block place upon a cancelled BlockPlaceEvent
                     for (org.bukkit.block.BlockState blockstate : blocks) {
                         blockstate.update(true, false);
+                        ((org.bukkit.craftbukkit.block.CraftBlock) blockstate.getBlock()).getNMS().getBlock().forgetPlacer(); // Purpur - Store placer on Block when placed
                     }
                     serverLevel.isBlockPlaceCancelled = false; // Paper - prevent calling cleanup logic when undoing a block place upon a cancelled BlockPlaceEvent
                     serverLevel.preventPoiUpdated = false;
@@ -486,6 +487,7 @@ public final class ItemStack implements DataComponentHolder {
                         if (!(block.getBlock() instanceof net.minecraft.world.level.block.BaseEntityBlock)) { // Containers get placed automatically
                             block.onPlace(serverLevel, newPos, oldBlock, true, context);
                         }
+                        block.getBlock().forgetPlacer(); // Purpur - Store placer on Block when placed
 
                         serverLevel.notifyAndUpdatePhysics(newPos, null, oldBlock, block, serverLevel.getBlockState(newPos), updateFlag, net.minecraft.world.level.block.Block.UPDATE_LIMIT); // send null chunk as chunk.k() returns false by this point
                     }
@@ -626,6 +628,26 @@ public final class ItemStack implements DataComponentHolder {
     public boolean isDamaged() {
         return this.isDamageableItem() && this.getDamageValue() > 0;
     }
+
+    // Purpur start - Add option to mend the most damaged equipment first
+    public float getDamagePercent() {
+        if (this.has(DataComponents.UNBREAKABLE)) {
+            return 0.0F;
+        }
+
+        final int maxDamage = this.getOrDefault(DataComponents.MAX_DAMAGE, 0);
+        if (maxDamage == 0) {
+            return 0.0F;
+        }
+
+        final int damage = this.getOrDefault(DataComponents.DAMAGE, 0);
+        if (damage == 0) {
+            return 0.0F;
+        }
+
+        return (float) damage / maxDamage;
+    }
+    // Purpur end - Add option to mend the most damaged equipment first
 
     public int getDamageValue() {
         return Mth.clamp(this.getOrDefault(DataComponents.DAMAGE, Integer.valueOf(0)), 0, this.getMaxDamage());
@@ -1251,6 +1273,12 @@ public final class ItemStack implements DataComponentHolder {
     public boolean isEnchanted() {
         return !this.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY).isEmpty();
     }
+
+    // Purpur start - Config to allow unsafe enchants
+    public boolean hasEnchantment(Holder<Enchantment> enchantment) {
+        return this.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY).getLevel(enchantment) > 0;
+    }
+    // Purpur end - Config to allow unsafe enchants
 
     public ItemEnchantments getEnchantments() {
         return this.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);

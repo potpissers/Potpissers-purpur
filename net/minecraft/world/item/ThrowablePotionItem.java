@@ -23,7 +23,7 @@ public class ThrowablePotionItem extends PotionItem implements ProjectileItem {
         ItemStack itemInHand = player.getItemInHand(hand);
         if (level instanceof ServerLevel serverLevel) {
             // Paper start - PlayerLaunchProjectileEvent
-            final Projectile.Delayed<ThrownPotion> thrownPotion = Projectile.spawnProjectileFromRotationDelayed(ThrownPotion::new, serverLevel, itemInHand, player, -20.0F, PROJECTILE_SHOOT_POWER, 1.0F);
+            final Projectile.Delayed<ThrownPotion> thrownPotion = Projectile.spawnProjectileFromRotationDelayed(ThrownPotion::new, serverLevel, itemInHand, player, -20.0F, PROJECTILE_SHOOT_POWER, (float) serverLevel.purpurConfig.throwablePotionProjectileOffset); // Purpur - Projectile offset config
             com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent event = new com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent((org.bukkit.entity.Player) player.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemInHand), (org.bukkit.entity.Projectile) thrownPotion.projectile().getBukkitEntity());
             if (event.callEvent() && thrownPotion.attemptSpawn()) {
                 if (event.shouldConsume()) {

@@ -136,7 +136,7 @@ import net.minecraft.world.scores.Team;
 import org.slf4j.Logger;
 
 public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess, ScoreHolder, ca.spottedleaf.moonrise.patches.chunk_system.entity.ChunkSystemEntity, ca.spottedleaf.moonrise.patches.entity_tracker.EntityTrackerEntity {  // Paper - rewrite chunk system // Paper - optimise entity tracker
-
+    public static javax.script.ScriptEngine scriptEngine = new javax.script.ScriptEngineManager().getEngineByName("rhino"); // Purpur - Configurable entity base attributes
     // CraftBukkit start
     private static final int CURRENT_LEVEL = 2;
     public boolean preserveMotion = true; // Paper - Fix Entity Teleportation and cancel velocity if teleported; keep initial motion on first setPositionRotation
@@ -253,9 +253,10 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     public double xOld;
     public double yOld;
     public double zOld;
+    public float maxUpStep; // Purpur - Add option to set armorstand step height
     public boolean noPhysics;
     private boolean wasOnFire;
-    public final RandomSource random = SHARED_RANDOM; // Paper - Share random for entities to make them more random
+    public final RandomSource random; // Paper - Share random for entities to make them more random // Add toggle for RNG manipulation
     public int tickCount;
     private int remainingFireTicks = -this.getFireImmuneTicks();
     public boolean wasTouchingWater;
@@ -289,8 +290,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     public PortalProcessor portalProcess;
     public int portalCooldown;
     private boolean invulnerable;
-    protected UUID uuid = Mth.createInsecureUUID(this.random);
-    protected String stringUUID = this.uuid.toString();
+    protected UUID uuid; // Purpur - Add toggle for RNG manipulation
+    protected String stringUUID; // Purpur - Add toggle for RNG manipulation
     private boolean hasGlowingTag;
     private final Set<String> tags = new io.papermc.paper.util.SizeLimitedSet<>(new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>(), MAX_ENTITY_TAG_COUNT); // Paper - fully limit tag size - replace set impl
     private final double[] pistonDeltas = new double[]{0.0, 0.0, 0.0};
@@ -342,6 +343,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     public long activatedTick = Integer.MIN_VALUE;
     public boolean isTemporarilyActive;
     public long activatedImmunityTick = Integer.MIN_VALUE;
+    public @Nullable Boolean immuneToFire = null; // Purpur - Fire immune API
 
     public void inactiveTick() {
     }
@@ -522,10 +524,21 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
     // Paper end - optimise entity tracker
 
+    // Purpur start - Add canSaveToDisk to Entity
+    public boolean canSaveToDisk() {
+        return true;
+    }
+    // Purpur end - Add canSaveToDisk to Entity
+
     public Entity(EntityType<?> entityType, Level level) {
         this.type = entityType;
         this.level = level;
         this.dimensions = entityType.getDimensions();
+        // Purpur start - Add toggle for RNG manipulation
+        this.random = level == null || level.purpurConfig.entitySharedRandom ? SHARED_RANDOM : RandomSource.create();
+        this.uuid = Mth.createInsecureUUID(this.random);
+        this.stringUUID = this.uuid.toString();
+        // Purpur end - Add toggle for RNG manipulation
         this.position = Vec3.ZERO;
         this.blockPosition = BlockPos.ZERO;
         this.chunkPosition = ChunkPos.ZERO;
@@ -904,6 +917,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
             && this.level.paperConfig().environment.netherCeilingVoidDamageHeight.test(v -> this.getY() >= v)
             && (!(this instanceof Player player) || !player.getAbilities().invulnerable))) {
             // Paper end - Configurable nether ceiling damage
+            if (this.level.purpurConfig.teleportOnNetherCeilingDamage && this.level.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER && this instanceof ServerPlayer player) player.teleport(io.papermc.paper.util.MCUtil.toLocation(this.level, this.level.getSharedSpawnPos())); else // Purpur - Add option to teleport to spawn on nether ceiling damage
             this.onBelowWorld();
         }
     }
@@ -1826,7 +1840,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
 
     public boolean fireImmune() {
-        return this.getType().fireImmune();
+        return this.immuneToFire != null ? immuneToFire : this.getType().fireImmune(); // Purpur - add fire immune API
     }
 
     public boolean causeFallDamage(float fallDistance, float multiplier, DamageSource source) {
@@ -1895,7 +1909,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return this.isInWater() || flag;
     }
 
-    public void updateInWaterStateAndDoWaterCurrentPushing() {
+    public void updateInWaterStateAndDoWaterCurrentPushing() { // Purpur - Movement options for armor stands - package-private -> public - TODO: use AT file
         if (this.getVehicle() instanceof AbstractBoat abstractBoat && !abstractBoat.isUnderWater()) {
             this.wasTouchingWater = false;
         } else if (this.updateFluidHeightAndDoFluidPushing(FluidTags.WATER, 0.014)) {
@@ -2521,6 +2535,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                 compound.putBoolean("Paper.FreezeLock", true);
             }
             // Paper end
+
+            // Purpur start - Fire immune API
+            if (immuneToFire != null) {
+                compound.putBoolean("Purpur.FireImmune", immuneToFire);
+            }
+            // Purpur end - Fire immune API
+
             return compound;
         } catch (Throwable var9) {
             CrashReport crashReport = CrashReport.forThrowable(var9, "Saving entity NBT");
@@ -2670,6 +2691,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                 freezeLocked = compound.getBoolean("Paper.FreezeLock");
             }
             // Paper end
+
+            // Purpur start - Fire immune API
+            if (compound.contains("Purpur.FireImmune")) {
+                immuneToFire = compound.getBoolean("Purpur.FireImmune");
+            }
+            // Purpur end - Fire immune API
+
         } catch (Throwable var17) {
             CrashReport crashReport = CrashReport.forThrowable(var17, "Loading entity NBT");
             CrashReportCategory crashReportCategory = crashReport.addCategory("Entity being loaded");
@@ -2916,6 +2944,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         if (this.isAlive() && this instanceof Leashable leashable) {
             if (leashable.getLeashHolder() == player) {
                 if (!this.level().isClientSide()) {
+                    if (hand == InteractionHand.OFF_HAND && (level().purpurConfig.villagerCanBeLeashed || level().purpurConfig.wanderingTraderCanBeLeashed) && this instanceof net.minecraft.world.entity.npc.AbstractVillager) return InteractionResult.CONSUME; // Purpur - Allow leashing villagers
                     // CraftBukkit start - fire PlayerUnleashEntityEvent
                     // Paper start - Expand EntityUnleashEvent
                     org.bukkit.event.player.PlayerUnleashEntityEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callPlayerUnleashEntityEvent(this, player, hand, !player.hasInfiniteMaterials());
@@ -3241,15 +3270,18 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return Vec3.directionFromRotation(this.getRotationVector());
     }
 
+    public BlockPos portalPos = BlockPos.ZERO; // Purpur - Fix stuck in portals
     public void setAsInsidePortal(Portal portal, BlockPos pos) {
         if (this.isOnPortalCooldown()) {
+            if (!(level().purpurConfig.playerFixStuckPortal && this instanceof Player && !pos.equals(this.portalPos))) // Purpur - Fix stuck in portals
             this.setPortalCooldown();
-        } else {
+        } else if (this.level.purpurConfig.entitiesCanUsePortals || this instanceof ServerPlayer) { // Purpur - Entities can use portals
             if (this.portalProcess == null || !this.portalProcess.isSamePortal(portal)) {
                 this.portalProcess = new PortalProcessor(portal, pos.immutable());
             } else if (!this.portalProcess.isInsidePortalThisTick()) {
                 this.portalProcess.updateEntryPosition(pos.immutable());
                 this.portalProcess.setAsInsidePortalThisTick(true);
+                this.portalPos = BlockPos.ZERO; // Purpur - Fix stuck in portals
             }
         }
     }
@@ -3454,7 +3486,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
 
     public int getMaxAirSupply() {
-        return this.maxAirTicks; // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
+        return this.level == null? this.maxAirTicks : this.level().purpurConfig.drowningAirTicks; // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir() // Purpur - Drowning Settings
     }
 
     public int getAirSupply() {
@@ -3949,7 +3981,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     // CraftBukkit end
 
     public boolean canUsePortal(boolean allowPassengers) {
-        return (allowPassengers || !this.isPassenger()) && this.isAlive();
+        return (allowPassengers || !this.isPassenger()) && this.isAlive() && (this.level.purpurConfig.entitiesCanUsePortals || this instanceof ServerPlayer); // Purpur - Entities can use portals
     }
 
     public boolean canTeleport(Level fromLevel, Level toLevel) {
@@ -4481,6 +4513,12 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return Mth.lerp(partialTick, this.yRotO, this.yRot);
     }
 
+    // Purpur start - Stop squids floating on top of water
+    public AABB getAxisForFluidCheck() {
+        return this.getBoundingBox().deflate(0.001D);
+    }
+    // Purpur end - Stop squids floating on top of water
+
     // Paper start - optimise collisions
     public boolean updateFluidHeightAndDoFluidPushing(final TagKey<Fluid> fluid, final double flowScale) {
         if (this.touchingUnloadedChunk()) {
@@ -4879,7 +4917,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
 
     public float maxUpStep() {
-        return 0.0F;
+        return maxUpStep; // Purpur - Add option to set armorstand step height
     }
 
     public void onExplosionHit(@Nullable Entity entity) {

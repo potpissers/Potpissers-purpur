@@ -442,4 +442,10 @@ public class AABB {
             center.x - xSize / 2.0, center.y - ySize / 2.0, center.z - zSize / 2.0, center.x + xSize / 2.0, center.y + ySize / 2.0, center.z + zSize / 2.0
         );
     }
+
+    // Purpur start - Stop squids floating on top of water - tuinity added method
+    public final AABB offsetY(double dy) {
+        return new AABB(this.minX, this.minY + dy, this.minZ, this.maxX, this.maxY + dy, this.maxZ);
+    }
+    // Purpur end - Stop squids floating on top of water
 }

@@ -177,7 +177,7 @@ public abstract class LavaFluid extends FlowingFluid {
 
     @Override
     public int getTickDelay(LevelReader level) {
-        return level.dimensionType().ultraWarm() ? 10 : 30;
+        return level.dimensionType().ultraWarm() ? level.getWorldBorder().world.purpurConfig.lavaSpeedNether : level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether; // Purpur - Make lava flow speed configurable
     }
 
     @Override
@@ -198,6 +198,13 @@ public abstract class LavaFluid extends FlowingFluid {
     private void fizz(LevelAccessor level, BlockPos pos) {
         level.levelEvent(1501, pos, 0);
     }
+
+    // Purpur start - Implement infinite liquids
+    @Override
+    protected int getRequiredSources(Level level) {
+        return level.purpurConfig.lavaInfiniteRequiredSources;
+    }
+    // Purpur end - Implement infinite liquids
 
     @Override
     protected boolean canConvertToSource(ServerLevel level) {

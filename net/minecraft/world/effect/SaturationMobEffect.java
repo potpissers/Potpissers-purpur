@@ -16,7 +16,8 @@ class SaturationMobEffect extends InstantenousMobEffect {
             int oldFoodLevel = player.getFoodData().foodLevel;
             org.bukkit.event.entity.FoodLevelChangeEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callFoodLevelChangeEvent(player, amplifier + 1 + oldFoodLevel);
             if (!event.isCancelled()) {
-                player.getFoodData().eat(event.getFoodLevel() - oldFoodLevel, 1.0F);
+                if (player.level().purpurConfig.playerBurpWhenFull && event.getFoodLevel() == 20 && oldFoodLevel < 20) player.burpDelay = player.level().purpurConfig.playerBurpDelay; // Purpur - Burp delay
+                player.getFoodData().eat(event.getFoodLevel() - oldFoodLevel, entity.level().purpurConfig.humanSaturationRegenAmount); // Purpur - Config MobEffect by world
             }
 
             ((org.bukkit.craftbukkit.entity.CraftPlayer) player.getBukkitEntity()).sendHealthUpdate();

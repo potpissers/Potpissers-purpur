@@ -974,6 +974,7 @@ public class EnderDragon extends Mob implements Enemy {
 
     @Override
     protected boolean canRide(Entity entity) {
+        if (this.level().purpurConfig.enderDragonCanRideVehicles) return this.boardingCooldown <= 0; // Purpur - Configs for if Wither/Ender Dragon can ride vehicles
         return false;
     }
 
@@ -1009,7 +1010,7 @@ public class EnderDragon extends Mob implements Enemy {
         boolean flag = worldserver.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT);
         int i = 500;
 
-        if (this.dragonFight != null && !this.dragonFight.hasPreviouslyKilledDragon()) {
+        if (this.dragonFight != null && (level().purpurConfig.enderDragonAlwaysDropsFullExp || !this.dragonFight.hasPreviouslyKilledDragon())) { // Purpur - Ender dragon always drop full exp
             i = 12000;
         }
 

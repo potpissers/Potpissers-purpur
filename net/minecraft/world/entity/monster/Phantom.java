@@ -158,7 +158,11 @@ public class Phantom extends FlyingMob implements Enemy {
         ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnReason, @Nullable SpawnGroupData spawnGroupData
     ) {
         this.anchorPoint = this.blockPosition().above(5);
-        this.setPhantomSize(0);
+        // Purpur start - Configurable phantom size
+        int min = level.getLevel().purpurConfig.phantomMinSize;
+        int max = level.getLevel().purpurConfig.phantomMaxSize;
+        this.setPhantomSize(min == max ? min : level.getRandom().nextInt(max + 1 - min) + min);
+        // Purpur end - Configurable phantom size
         return super.finalizeSpawn(level, difficulty, spawnReason, spawnGroupData);
     }
 

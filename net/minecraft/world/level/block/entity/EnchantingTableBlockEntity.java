@@ -28,6 +28,7 @@ public class EnchantingTableBlockEntity extends BlockEntity implements Nameable 
     private static final RandomSource RANDOM = RandomSource.create();
     @Nullable
     private Component name;
+    private int lapis = 0; // Purpur - Enchantment Table Persists Lapis
 
     public EnchantingTableBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntityType.ENCHANTING_TABLE, pos, state);
@@ -39,6 +40,7 @@ public class EnchantingTableBlockEntity extends BlockEntity implements Nameable 
         if (this.hasCustomName()) {
             tag.putString("CustomName", Component.Serializer.toJson(this.name, registries));
         }
+        tag.putInt("Purpur.Lapis", this.lapis); // Purpur - Enchantment Table Persists Lapis
     }
 
     @Override
@@ -47,6 +49,7 @@ public class EnchantingTableBlockEntity extends BlockEntity implements Nameable 
         if (tag.contains("CustomName", 8)) {
             this.name = parseCustomNameSafe(tag.getString("CustomName"), registries);
         }
+        this.lapis = tag.getInt("Purpur.Lapis"); // Purpur - Enchantment Table Persists Lapis
     }
 
     public static void bookAnimationTick(Level level, BlockPos pos, BlockState state, EnchantingTableBlockEntity enchantingTable) {
@@ -138,4 +141,14 @@ public class EnchantingTableBlockEntity extends BlockEntity implements Nameable 
     public void removeComponentsFromTag(CompoundTag tag) {
         tag.remove("CustomName");
     }
+
+    // Purpur start - Enchantment Table Persists Lapis
+    public int getLapis() {
+        return this.lapis;
+    }
+
+    public void setLapis(int lapis) {
+        this.lapis = lapis;
+    }
+    // Purpur end - Enchantment Table Persists Lapis
 }

@@ -119,6 +119,7 @@ public class CakeBlock extends Block {
             org.bukkit.event.entity.FoodLevelChangeEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callFoodLevelChangeEvent(player, 2 + oldFoodLevel);
 
             if (!event.isCancelled()) {
+                if (player.level().purpurConfig.playerBurpWhenFull && event.getFoodLevel() == 20 && oldFoodLevel < 20) player.burpDelay = player.level().purpurConfig.playerBurpDelay; // Purpur - Burp after eating food fills hunger bar completely
                 player.getFoodData().eat(event.getFoodLevel() - oldFoodLevel, 0.1F);
             }
 

@@ -32,7 +32,7 @@ public class ItemEnchantments implements TooltipProvider {
     private static final java.util.Comparator<Holder<Enchantment>> ENCHANTMENT_ORDER = java.util.Comparator.comparing(Holder::getRegisteredName);
     public static final ItemEnchantments EMPTY = new ItemEnchantments(new it.unimi.dsi.fastutil.objects.Object2IntAVLTreeMap<>(ENCHANTMENT_ORDER), true);
     // Paper end
-    private static final Codec<Integer> LEVEL_CODEC = Codec.intRange(1, 255);
+    private static final Codec<Integer> LEVEL_CODEC = Codec.intRange(1, (org.purpurmc.purpur.PurpurConfig.clampEnchantLevels ? 255 : 32767)); // Purpur - Add toggle for enchant level clamping
     // Paper start - sort enchantments
     private static final Codec<it.unimi.dsi.fastutil.objects.Object2IntAVLTreeMap<Holder<Enchantment>>> LEVELS_CODEC = Codec.unboundedMap(Enchantment.CODEC, LEVEL_CODEC)
         .xmap(m -> {
@@ -65,7 +65,7 @@ public class ItemEnchantments implements TooltipProvider {
 
         for (Entry<Holder<Enchantment>> entry : enchantments.object2IntEntrySet()) {
             int intValue = entry.getIntValue();
-            if (intValue < 0 || intValue > 255) {
+            if (intValue < 0 || intValue > (org.purpurmc.purpur.PurpurConfig.clampEnchantLevels ? 255 : 32767)) { // Purpur - Add toggle for enchant level clamping
                 throw new IllegalArgumentException("Enchantment " + entry.getKey() + " has invalid level " + intValue);
             }
         }
@@ -160,13 +160,13 @@ public class ItemEnchantments implements TooltipProvider {
             if (level <= 0) {
                 this.enchantments.removeInt(enchantment);
             } else {
-                this.enchantments.put(enchantment, Math.min(level, 255));
+                this.enchantments.put(enchantment, Math.min(level, (org.purpurmc.purpur.PurpurConfig.clampEnchantLevels ? 255 : 32767))); // Purpur - Add toggle for enchant level clamping
             }
         }
 
         public void upgrade(Holder<Enchantment> enchantment, int level) {
             if (level > 0) {
-                this.enchantments.merge(enchantment, Math.min(level, 255), Integer::max);
+                this.enchantments.merge(enchantment, Math.min(level, (org.purpurmc.purpur.PurpurConfig.clampEnchantLevels ? 255 : 32767)), Integer::max); // Purpur - Add toggle for enchant level clamping
             }
         }
 

@@ -51,7 +51,7 @@ public interface ChangeOverTimeBlock<T extends Enum<T>> {
         }
 
         float f = (float)(i1 + 1) / (i1 + i + 1);
-        float f1 = f * f * this.getChanceModifier();
+        float f1 = level.purpurConfig.disableOxidationProximityPenalty ? this.getChanceModifier() :f * f * this.getChanceModifier();// Purpur - option to disable the copper oxidation proximity penalty
         return random.nextFloat() < f1 ? this.getNext(state) : Optional.empty();
     }
 }

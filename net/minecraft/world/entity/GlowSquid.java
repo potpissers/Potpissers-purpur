@@ -25,6 +25,13 @@ public class GlowSquid extends Squid {
         super(entityType, level);
     }
 
+    // Purpur start - Flying squids! Oh my!
+    @Override
+    public boolean canFly() {
+        return this.level().purpurConfig.glowSquidsCanFly;
+    }
+    // Purpur end - Flying squids! Oh my!
+
     @Override
     protected ParticleOptions getInkParticle() {
         return ParticleTypes.GLOW_SQUID_INK;

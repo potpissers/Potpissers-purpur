@@ -231,7 +231,7 @@ public class Bat extends AmbientCreature {
         } else {
             int maxLocalRawBrightness = level.getMaxLocalRawBrightness(pos);
             int i = 4;
-            if (isHalloween()) {
+            if (Bat.isHalloweenSeason(level.getMinecraftWorld())) { // Purpur - Halloween options and optimizations
                 i = 7;
             } else if (randomSource.nextBoolean()) {
                 return false;
@@ -243,6 +243,11 @@ public class Bat extends AmbientCreature {
         }
     }
 
+    // Pufferfish start - only check for spooky season once an hour
+    //private static boolean isSpookySeason = false;
+    //private static final int ONE_HOUR = 20 * 60 * 60;
+    //private static int lastSpookyCheck = -ONE_HOUR;
+    public static boolean isHalloweenSeason(Level level) { return level.purpurConfig.forceHalloweenSeason || isHalloween(); } // Purpur - Halloween options and optimizations
     private static boolean isHalloween() {
         LocalDate localDate = LocalDate.now();
         int i = localDate.get(ChronoField.DAY_OF_MONTH);

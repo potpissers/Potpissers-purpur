@@ -36,6 +36,7 @@ public final class Ingredient implements StackedContents.IngredientInfo<io.paper
     // CraftBukkit start
     @javax.annotation.Nullable
     private java.util.Set<ItemStack> itemStacks; // Paper - Improve exact choice recipe ingredients
+    public Predicate<org.bukkit.inventory.ItemStack> predicate; // Purpur - Add predicate to recipe's ExactChoice ingredient
 
     public boolean isExact() {
         return this.itemStacks != null;
@@ -87,6 +88,11 @@ public final class Ingredient implements StackedContents.IngredientInfo<io.paper
         if (this.isExact()) {
             return this.itemStacks.contains(stack); // Paper - Improve exact choice recipe ingredients (hashing FTW!)
         }
+        // Purpur start - Add predicate to recipe's ExactChoice ingredient
+        if (predicate != null) {
+            return predicate.test(stack.asBukkitCopy());
+        }
+        // Purpur end - Add predicate to recipe's ExactChoice ingredient
         // CraftBukkit end
         return stack.is(this.values);
     }

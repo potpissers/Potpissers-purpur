@@ -65,6 +65,7 @@ public class CoralBlock extends Block {
     }
 
     protected boolean scanForWater(BlockGetter level, BlockPos pos) {
+        if (!((net.minecraft.world.level.LevelAccessor) level).getMinecraftWorld().purpurConfig.coralDieOutsideWater) return true; // Purpur - Config to not let coral die
         for (Direction direction : Direction.values()) {
             FluidState fluidState = level.getFluidState(pos.relative(direction));
             if (fluidState.is(FluidTags.WATER)) {

@@ -148,6 +148,7 @@ public class PlayerAdvancements {
             AdvancementHolder advancementHolder = advancementManager.get(path);
             if (advancementHolder == null) {
                 if (!path.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) return; // CraftBukkit
+                if (!org.purpurmc.purpur.PurpurConfig.loggerSuppressIgnoredAdvancementWarnings) // Purpur - Logger settings (suppressing pointless logs)
                 LOGGER.warn("Ignored advancement '{}' in progress file {} - it doesn't exist anymore?", path, this.playerSavePath);
             } else {
                 this.startProgress(advancementHolder, progress);
@@ -195,6 +196,7 @@ public class PlayerAdvancements {
                 advancement.value().display().ifPresent(displayInfo -> {
                     // Paper start - Add Adventure message to PlayerAdvancementDoneEvent
                     if (event.message() != null && this.player.serverLevel().getGameRules().getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)) {
+                        if (org.purpurmc.purpur.PurpurConfig.advancementOnlyBroadcastToAffectedPlayer) this.player.sendMessage(message); else // Purpur - Configurable broadcast settings
                         this.playerList.broadcastSystemMessage(io.papermc.paper.adventure.PaperAdventure.asVanilla(event.message()), false);
                         // Paper end
                     }

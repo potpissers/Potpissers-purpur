@@ -64,6 +64,10 @@ public class TargetingConditions {
             return false;
         } else if (this.selector != null && !this.selector.test(target, level)) {
             return false;
+        // Purpur start - AFK API
+        } else if (!level.purpurConfig.idleTimeoutTargetPlayer && target instanceof net.minecraft.server.level.ServerPlayer player && player.isAfk()) {
+            return false;
+        // Purpur end - AFK API
         } else {
             if (entity == null) {
                 if (this.isCombat && (!target.canBeSeenAsEnemy() || level.getDifficulty() == Difficulty.PEACEFUL)) {

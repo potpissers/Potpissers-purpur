@@ -72,7 +72,7 @@ public class NetherPortalBlock extends Block implements Portal {
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (level.spigotConfig.enableZombiePigmenPortalSpawns && level.dimensionType().natural() // Spigot
             && level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
-            && random.nextInt(2000) < level.getDifficulty().getId()) {
+            && random.nextInt(level.purpurConfig.piglinPortalSpawnModifier) < level.getDifficulty().getId()) { // Purpur - Piglin portal spawn modifier
             while (level.getBlockState(pos).is(this)) {
                 pos = pos.below();
             }
@@ -129,7 +129,7 @@ public class NetherPortalBlock extends Block implements Portal {
     @Override
     public int getPortalTransitionTime(ServerLevel level, Entity entity) {
         return entity instanceof Player player
-            ? Math.max(
+            ? player.canPortalInstant ? 1 : Math.max( // Purpur - Add portal permission bypass
                 0,
                 level.getGameRules()
                     .getInt(

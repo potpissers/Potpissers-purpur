@@ -34,7 +34,7 @@ public class PoweredRailBlock extends BaseRailBlock {
     }
 
     protected boolean findPoweredRailSignal(Level level, BlockPos pos, BlockState state, boolean searchForward, int recursionCount) {
-        if (recursionCount >= 8) {
+        if (recursionCount >= level.purpurConfig.railActivationRange) { // Purpur - Config for powered rail activation distance
             return false;
         } else {
             int x = pos.getX();

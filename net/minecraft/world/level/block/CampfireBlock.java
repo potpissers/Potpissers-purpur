@@ -141,7 +141,7 @@ public class CampfireBlock extends BaseEntityBlock implements SimpleWaterloggedB
         return this.defaultBlockState()
             .setValue(WATERLOGGED, Boolean.valueOf(flag))
             .setValue(SIGNAL_FIRE, Boolean.valueOf(this.isSmokeSource(level.getBlockState(clickedPos.below()))))
-            .setValue(LIT, Boolean.valueOf(!flag))
+            .setValue(LIT, Boolean.valueOf(level.getMinecraftWorld().purpurConfig.campFireLitWhenPlaced && !flag)) // Purpur - Campfire option for lit when placed
             .setValue(FACING, context.getHorizontalDirection());
     }
 

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Pair;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.server.level.ServerLevel;
@@ -666,13 +667,20 @@ public class PiglinAi {
 
     public static boolean isWearingSafeArmor(LivingEntity entity) {
         for (ItemStack itemStack : entity.getArmorAndBodyArmorSlots()) {
-            if (itemStack.is(ItemTags.PIGLIN_SAFE_ARMOR)) {
+            if (itemStack.is(ItemTags.PIGLIN_SAFE_ARMOR) || (entity.level().purpurConfig.piglinIgnoresArmorWithGoldTrim && isWearingGoldTrim(itemStack.getItem()))) { // Purpur - piglins ignore gold-trimmed armor
                 return true;
             }
         }
 
         return false;
     }
+
+    // Purpur start - piglins ignore gold-trimmed armor
+    private static boolean isWearingGoldTrim(Item itemstack) {
+        net.minecraft.world.item.equipment.trim.ArmorTrim armorTrim = itemstack.components().get(net.minecraft.core.component.DataComponents.TRIM);
+        return armorTrim != null && armorTrim.material().is(net.minecraft.world.item.equipment.trim.TrimMaterials.GOLD);
+    }
+    // Purpur end - piglins ignore gold-trimmed armor
 
     private static void stopWalking(Piglin piglin) {
         piglin.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);

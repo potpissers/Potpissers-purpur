@@ -240,7 +240,7 @@ public class WalkNodeEvaluator extends NodeEvaluator {
                 if ((node == null || node.costMalus < 0.0F)
                     && verticalDeltaLimit > 0
                     && (cachedPathType != PathType.FENCE || this.canWalkOverFences())
-                    && cachedPathType != PathType.UNPASSABLE_RAIL
+                    && (this.mob.level().purpurConfig.mobsIgnoreRails || cachedPathType != PathType.UNPASSABLE_RAIL) // Purpur - Config to allow mobs to pathfind over rails
                     && cachedPathType != PathType.TRAPDOOR
                     && cachedPathType != PathType.POWDER_SNOW) {
                     node = this.tryJumpOn(x, y, z, verticalDeltaLimit, nodeFloorLevel, direction, pathType, mutableBlockPos);
@@ -493,7 +493,7 @@ public class WalkNodeEvaluator extends NodeEvaluator {
             return PathType.TRAPDOOR;
         } else if (blockState.is(Blocks.POWDER_SNOW)) {
             return PathType.POWDER_SNOW;
-        } else if (blockState.is(Blocks.CACTUS) || blockState.is(Blocks.SWEET_BERRY_BUSH)) {
+        } else if (blockState.is(Blocks.CACTUS) || blockState.is(Blocks.SWEET_BERRY_BUSH) || blockState.is(Blocks.STONECUTTER)) { // Purpur - Stonecutter damage
             return PathType.DAMAGE_OTHER;
         } else if (blockState.is(Blocks.HONEY_BLOCK)) {
             return PathType.STICKY_HONEY;

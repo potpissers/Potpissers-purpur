@@ -42,9 +42,11 @@ public record FoodProperties(int nutrition, float saturation, boolean canAlwaysE
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), consumable.sound().value(), SoundSource.NEUTRAL, 1.0F, random.triangle(1.0F, 0.4F));
         if (entity instanceof Player player) {
             player.getFoodData().eat(this, stack, (net.minecraft.server.level.ServerPlayer) player); // CraftBukkit
-            level.playSound(
-                null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.5F, Mth.randomBetween(random, 0.9F, 1.0F)
-            );
+            // Purpur start - Burp delay - moved to Player#tick()
+            //level.playSound(
+            //    null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.5F, Mth.randomBetween(random, 0.9F, 1.0F)
+            //);
+            // Purpur end - Burp delay - moved to Player#tick()
         }
     }
 

@@ -49,6 +49,7 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
     public final boolean onlineMode = this.get("online-mode", true);
     public final boolean preventProxyConnections = this.get("prevent-proxy-connections", false);
     public final String serverIp = this.get("server-ip", "");
+    public final String serverName = this.get("server-name", "Unknown Server"); // Purpur - Bring back server name
     public final boolean pvp = this.get("pvp", true);
     public final boolean allowFlight = this.get("allow-flight", false);
     public final String motd = this.get("motd", "A Minecraft Server");

@@ -196,6 +196,7 @@ public class MapItem extends Item {
     public static void renderBiomePreviewMap(ServerLevel serverLevel, ItemStack stack) {
         MapItemSavedData savedData = getSavedData(stack, serverLevel);
         if (savedData != null) {
+            savedData.isExplorerMap = true; // Purpur - Explorer Map API
             if (serverLevel.dimension() == savedData.dimension) {
                 int i = 1 << savedData.scale;
                 int i1 = savedData.centerX;

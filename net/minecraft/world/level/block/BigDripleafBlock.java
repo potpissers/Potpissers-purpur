@@ -261,7 +261,7 @@ public class BigDripleafBlock extends HorizontalDirectionalBlock implements Bone
             playTiltSound(level, pos, sound);
         }
 
-        int _int = DELAY_UNTIL_NEXT_TILT_STATE.getInt(tilt);
+        int _int = level.purpurConfig.bigDripleafTiltDelay.getOrDefault(tilt, -1); // Purpur - Big dripleaf tilt delay
         if (_int != -1) {
             level.scheduleTick(pos, this, _int);
         }

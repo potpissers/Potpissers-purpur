@@ -20,6 +20,12 @@ public record ClearAllStatusEffectsConsumeEffect() implements ConsumeEffect {
     @Override
     // CraftBukkit start
     public boolean apply(Level level, ItemStack stack, LivingEntity entity, org.bukkit.event.entity.EntityPotionEffectEvent.Cause cause) {
+        // Purpur start - Option to toggle milk curing bad omen
+        net.minecraft.world.effect.MobEffectInstance badOmen = entity.getEffect(net.minecraft.world.effect.MobEffects.BAD_OMEN);
+        if (!level.purpurConfig.milkCuresBadOmen && stack.is(net.minecraft.world.item.Items.MILK_BUCKET) && badOmen != null) {
+            return entity.removeAllEffects(cause) && entity.addEffect(badOmen);
+        }
+        // Purpur end - Option to toggle milk curing bad omen
         return entity.removeAllEffects(cause);
         // CraftBukkit end
     }

@@ -84,6 +84,14 @@ public abstract class BlockEntity {
             this.persistentDataContainer.putAll((CompoundTag) persistentDataTag);
         }
         // Paper end - read persistent data container
+
+        // Purpur start - Persistent BlockEntity Lore and DisplayName
+        if (tag.contains("Purpur.persistentLore")) {
+            net.minecraft.world.item.component.ItemLore.CODEC.decode(net.minecraft.nbt.NbtOps.INSTANCE, tag.getCompound("Purpur.persistentLore")).result()
+                .ifPresent(tag1 -> this.persistentLore = tag1.getFirst());
+        }
+        // Purpur end - Persistent BlockEntity Lore and DisplayName
+
     }
 
     public final void loadWithComponents(CompoundTag tag, HolderLookup.Provider registries) {
@@ -97,6 +105,15 @@ public abstract class BlockEntity {
     public final void loadCustomOnly(CompoundTag tag, HolderLookup.Provider registries) {
         this.loadAdditional(tag, registries);
     }
+
+    // Purpur start - Persistent BlockEntity Lore and DisplayName
+    protected void saveAdditional(CompoundTag nbt) {
+        if (this.persistentLore != null) {
+            net.minecraft.world.item.component.ItemLore.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, this.persistentLore).result()
+                .ifPresent(tag -> nbt.put("Purpur.persistentLore", tag));
+        }
+    }
+    // Purpur end - Persistent BlockEntity Lore and DisplayName
 
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
     }
@@ -378,4 +395,16 @@ public abstract class BlockEntity {
 
         <T> T getOrDefault(DataComponentType<? extends T> component, T defaultValue);
     }
+    // Purpur start - Persistent BlockEntity Lore and DisplayName
+    @Nullable
+    private net.minecraft.world.item.component.ItemLore persistentLore = null;
+
+    public void setPersistentLore(net.minecraft.world.item.component.ItemLore lore) {
+        this.persistentLore = lore;
+    }
+
+    public @org.jetbrains.annotations.Nullable net.minecraft.world.item.component.ItemLore getPersistentLore() {
+        return this.persistentLore;
+    }
+    // Purpur end - Persistent BlockEntity Lore and DisplayName
 }

@@ -15,7 +15,7 @@ public class SleepStatus {
 
     public boolean areEnoughDeepSleeping(int requiredSleepPercentage, List<ServerPlayer> sleepingPlayers) {
         // CraftBukkit start
-        int i = (int) sleepingPlayers.stream().filter(player -> player.isSleepingLongEnough() || player.fauxSleeping).count();
+        int i = (int) sleepingPlayers.stream().filter(player -> player.isSleepingLongEnough() || player.fauxSleeping || (player.level().purpurConfig.idleTimeoutCountAsSleeping && player.isAfk())).count(); // Purpur - AFK API
         boolean anyDeepSleep = sleepingPlayers.stream().anyMatch(Player::isSleepingLongEnough);
         return anyDeepSleep && i >= this.sleepersNeeded(requiredSleepPercentage);
         // CraftBukkit end
@@ -43,7 +43,7 @@ public class SleepStatus {
         for (ServerPlayer serverPlayer : players) {
             if (!serverPlayer.isSpectator()) {
                 this.activePlayers++;
-                if (serverPlayer.isSleeping() || serverPlayer.fauxSleeping) { // CraftBukkit
+                if (serverPlayer.isSleeping() || serverPlayer.fauxSleeping || (serverPlayer.level().purpurConfig.idleTimeoutCountAsSleeping && serverPlayer.isAfk())) { // CraftBukkit // Purpur - AFK API
                     this.sleepingPlayers++;
                 }
                 // CraftBukkit start

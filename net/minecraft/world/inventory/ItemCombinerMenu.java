@@ -156,7 +156,9 @@ public abstract class ItemCombinerMenu extends AbstractContainerMenu {
                 return ItemStack.EMPTY;
             }
 
+            this.activeQuickItem = itemStack; // Purpur - Anvil API
             slot.onTake(player, item);
+            this.activeQuickItem = null; // Purpur - Anvil API
         }
 
         return itemStack;

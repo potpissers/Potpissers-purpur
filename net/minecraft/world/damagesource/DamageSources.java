@@ -45,11 +45,15 @@ public class DamageSources {
     // CraftBukkit start
     private final DamageSource melting;
     private final DamageSource poison;
+    private final DamageSource scissors; // Purpur - Dont run with scissors!
+    private final DamageSource stonecutter; // Purpur - Stonecutter damage
 
     public DamageSources(RegistryAccess registry) {
         this.damageTypes = registry.lookupOrThrow(Registries.DAMAGE_TYPE);
         this.melting = this.source(DamageTypes.ON_FIRE).melting();
         this.poison = this.source(DamageTypes.MAGIC).poison();
+        this.scissors = this.source(DamageTypes.MAGIC).scissors(); // Purpur - Dont run with scissors!
+        this.stonecutter = this.source(DamageTypes.MAGIC).stonecutter(); // Purpur - Stonecutter damage
         // CraftBukkit end
         this.inFire = this.source(DamageTypes.IN_FIRE);
         this.campfire = this.source(DamageTypes.CAMPFIRE);
@@ -100,6 +104,17 @@ public class DamageSources {
     }
     // CraftBukkit end
 
+    // Purpur start - Dont run with scissors!
+    public DamageSource scissors() {
+        return this.scissors;
+    }
+    // Purpur end - Dont run with scissors!
+
+    // Purpur start - Stonecutter damage
+    public DamageSource stonecutter() {
+        return this.stonecutter;
+    }
+    // Purpur end - Stonecutter damage
     public DamageSource inFire() {
         return this.inFire;
     }

@@ -77,6 +77,7 @@ public class WitherBoss extends Monster implements RangedAttackMob {
     private static final TargetingConditions.Selector LIVING_ENTITY_SELECTOR = (entity, level) -> !entity.getType().is(EntityTypeTags.WITHER_FRIENDS)
         && entity.attackable();
     private static final TargetingConditions TARGETING_CONDITIONS = TargetingConditions.forCombat().range(20.0).selector(LIVING_ENTITY_SELECTOR);
+    @Nullable private java.util.UUID summoner; // Purpur - Summoner API
 
     public WitherBoss(EntityType<? extends WitherBoss> entityType, Level level) {
         super(entityType, level);
@@ -84,6 +85,17 @@ public class WitherBoss extends Monster implements RangedAttackMob {
         this.setHealth(this.getMaxHealth());
         this.xpReward = 50;
     }
+
+    // Purpur start - Summoner API
+    @Nullable
+    public java.util.UUID getSummoner() {
+        return summoner;
+    }
+
+    public void setSummoner(@Nullable java.util.UUID summoner) {
+        this.summoner = summoner;
+    }
+    // Purpur end - Summoner API
 
     @Override
     protected PathNavigation createNavigation(Level level) {
@@ -117,6 +129,7 @@ public class WitherBoss extends Monster implements RangedAttackMob {
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("Invul", this.getInvulnerableTicks());
+        if (getSummoner() != null) compound.putUUID("Purpur.Summoner", getSummoner()); // Purpur - Summoner API
     }
 
     @Override
@@ -126,6 +139,7 @@ public class WitherBoss extends Monster implements RangedAttackMob {
         if (this.hasCustomName()) {
             this.bossEvent.setName(this.getDisplayName());
         }
+        if (compound.contains("Purpur.Summoner")) setSummoner(compound.getUUID("Purpur.Summoner")); // Purpur - Summoner API
     }
 
     @Override
@@ -269,7 +283,7 @@ public class WitherBoss extends Monster implements RangedAttackMob {
                     level.explode(this, this.getX(), this.getEyeY(), this.getZ(), event.getRadius(), event.getFire(), Level.ExplosionInteraction.MOB);
                 }
                 // CraftBukkit end
-                if (!this.isSilent()) {
+                if (!this.isSilent() && level.purpurConfig.witherPlaySpawnSound) { // Purpur - Toggle for Wither's spawn sound
                     // CraftBukkit start - Use relative location for far away sounds
                     // level.globalLevelEvent(1023, this.blockPosition(), 0);
                     int viewDistance = level.getCraftServer().getViewDistance() * 16;
@@ -376,8 +390,10 @@ public class WitherBoss extends Monster implements RangedAttackMob {
                 }
             }
 
-            if (this.tickCount % 20 == 0) {
-                this.heal(1.0F, org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.REGEN); // CraftBukkit
+            // Purpur start - Customizable wither health and healing - customizable heal rate and amount
+            if (this.tickCount % level().purpurConfig.witherHealthRegenDelay == 0) {
+                this.heal(level().purpurConfig.witherHealthRegenAmount, org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.REGEN); // CraftBukkit
+            // Purpur end - Customizable wither health and healing
             }
 
             this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
@@ -574,6 +590,7 @@ public class WitherBoss extends Monster implements RangedAttackMob {
 
     @Override
     protected boolean canRide(Entity entity) {
+        if (this.level().purpurConfig.witherCanRideVehicles) return this.boardingCooldown <= 0; // Purpur - Configs for if Wither/Ender Dragon can ride vehicles
         return false;
     }
 

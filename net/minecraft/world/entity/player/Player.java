@@ -200,11 +200,20 @@ public abstract class Player extends LivingEntity {
     private int currentImpulseContextResetGraceTime;
     public boolean affectsSpawning = true; // Paper - Affects Spawning API
     public net.kyori.adventure.util.TriState flyingFallDamage = net.kyori.adventure.util.TriState.NOT_SET; // Paper - flying fall damage
+    public int burpDelay = 0; // Purpur - Burp delay
+    public boolean canPortalInstant = false; // Purpur - Add portal permission bypass
 
     // CraftBukkit start
     public boolean fauxSleeping;
     public int oldLevel = -1;
 
+    // Purpur start - AFK API
+    public abstract void setAfk(boolean afk);
+
+    public boolean isAfk() {
+        return false;
+    }
+    // Purpur end - AFK API
     @Override
     public org.bukkit.craftbukkit.entity.CraftHumanEntity getBukkitEntity() {
         return (org.bukkit.craftbukkit.entity.CraftHumanEntity) super.getBukkitEntity();
@@ -262,6 +271,12 @@ public abstract class Player extends LivingEntity {
 
     @Override
     public void tick() {
+        // Purpur start - Burp delay
+        if (this.burpDelay > 0 && --this.burpDelay == 0) {
+            this.level().playSound(null, getX(), getY(), getZ(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 1.0F, this.level().random.nextFloat() * 0.1F + 0.9F);
+        }
+        // Purpur end - Burp delay
+
         this.noPhysics = this.isSpectator();
         if (this.isSpectator() || this.isPassenger()) {
             this.setOnGround(false);
@@ -339,6 +354,17 @@ public abstract class Player extends LivingEntity {
         if (!this.isEyeInFluid(FluidTags.WATER) && this.isEquipped(Items.TURTLE_HELMET)) {
             this.turtleHelmetTick();
         }
+
+        // Purpur start - Full netherite armor grants fire resistance
+        if (this.level().purpurConfig.playerNetheriteFireResistanceDuration > 0 && this.level().getGameTime() % 20 == 0) {
+            if (this.getItemBySlot(EquipmentSlot.HEAD).is(Items.NETHERITE_HELMET)
+                && this.getItemBySlot(EquipmentSlot.CHEST).is(Items.NETHERITE_CHESTPLATE)
+                && this.getItemBySlot(EquipmentSlot.LEGS).is(Items.NETHERITE_LEGGINGS)
+                && this.getItemBySlot(EquipmentSlot.FEET).is(Items.NETHERITE_BOOTS)) {
+                this.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, this.level().purpurConfig.playerNetheriteFireResistanceDuration, this.level().purpurConfig.playerNetheriteFireResistanceAmplifier, this.level().purpurConfig.playerNetheriteFireResistanceAmbient, this.level().purpurConfig.playerNetheriteFireResistanceShowParticles, this.level().purpurConfig.playerNetheriteFireResistanceShowIcon), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.NETHERITE_ARMOR);
+            }
+        }
+        // Purpur end - Full netherite armor grants fire resistance
 
         this.cooldowns.tick();
         this.updatePlayerPose();
@@ -610,7 +636,7 @@ public abstract class Player extends LivingEntity {
             List<Entity> list = Lists.newArrayList();
 
             for (Entity entity : entities) {
-                if (entity.getType() == EntityType.EXPERIENCE_ORB) {
+                if (entity.getType() == EntityType.EXPERIENCE_ORB && entity.level().purpurConfig.playerExpPickupDelay >= 0) { // Purpur - Configurable player pickup exp delay
                     list.add(entity);
                 } else if (!entity.isRemoved()) {
                     this.touch(entity);
@@ -1269,7 +1295,7 @@ public abstract class Player extends LivingEntity {
                         flag2 = flag2 && !this.level().paperConfig().entities.behavior.disablePlayerCrits; // Paper - Toggleable player crits
                         if (flag2) {
                             damageSource = damageSource.critical(true); // Paper start - critical damage API
-                            f *= 1.5F;
+                            f *= this.level().purpurConfig.playerCriticalDamageMultiplier; // Purpur - Add config change multiplier critical damage value
                         }
 
                         float f2 = f + f1;
@@ -1882,7 +1908,23 @@ public abstract class Player extends LivingEntity {
 
     @Override
     protected int getBaseExperienceReward(ServerLevel level) {
-        return !level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !this.isSpectator() ? Math.min(this.experienceLevel * 7, 100) : 0;
+        // Purpur start - Add player death exp control options
+        if (!level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !this.isSpectator()) {
+            int toDrop;
+            try {
+                toDrop = Math.round(((Number) scriptEngine.eval("let expLevel = " + experienceLevel + "; " +
+                    "let expTotal = " + totalExperience + "; " +
+                    "let exp = " + experienceProgress + "; " +
+                    level().purpurConfig.playerDeathExpDropEquation)).floatValue());
+            } catch (javax.script.ScriptException e) {
+                e.printStackTrace();
+                toDrop = experienceLevel * 7;
+            }
+            return Math.min(toDrop, level().purpurConfig.playerDeathExpDropMax);
+        } else {
+            return 0;
+        }
+        // Purpur end - Add player death exp control options
     }
 
     @Override
@@ -1965,6 +2007,13 @@ public abstract class Player extends LivingEntity {
     public boolean canUseSlot(EquipmentSlot slot) {
         return slot != EquipmentSlot.BODY;
     }
+
+    // Purpur start - Player ridable in water option
+    @Override
+    public boolean dismountsUnderwater() {
+        return !level().purpurConfig.playerRidableInWater;
+    }
+    // Purpur end - Player ridable in water option
 
     public boolean setEntityOnShoulder(CompoundTag entityCompound) {
         if (this.isPassenger() || !this.onGround() || this.isInWater() || this.isInPowderSnow) {

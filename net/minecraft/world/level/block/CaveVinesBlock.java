@@ -92,4 +92,11 @@ public class CaveVinesBlock extends GrowingPlantHeadBlock implements CaveVines {
     public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
         level.setBlock(pos, state.setValue(BERRIES, Boolean.valueOf(true)), 2);
     }
+
+    // Purpur start - cave vines configurable max growth age
+    @Override
+    public int getMaxGrowthAge() {
+        return org.purpurmc.purpur.PurpurConfig.caveVinesMaxGrowthAge;
+    }
+    // Purpur end - cave vines configurable max growth age
 }

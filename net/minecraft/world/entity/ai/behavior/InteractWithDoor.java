@@ -55,7 +55,7 @@ public class InteractWithDoor {
                             Node nextNode = path.getNextNode();
                             BlockPos blockPos = previousNode.asBlockPos();
                             BlockState blockState = level.getBlockState(blockPos);
-                            if (blockState.is(BlockTags.MOB_INTERACTABLE_DOORS, state -> state.getBlock() instanceof DoorBlock)) {
+                            if (blockState.is(BlockTags.MOB_INTERACTABLE_DOORS, state -> state.getBlock() instanceof DoorBlock)&& !DoorBlock.requiresRedstone(entity.level(), blockState, blockPos)) { // Purpur - Option to make doors require redstone
                                 DoorBlock doorBlock = (DoorBlock)blockState.getBlock();
                                 if (!doorBlock.isOpen(blockState)) {
                                     // CraftBukkit start - entities opening doors
@@ -72,7 +72,7 @@ public class InteractWithDoor {
 
                             BlockPos blockPos1 = nextNode.asBlockPos();
                             BlockState blockState1 = level.getBlockState(blockPos1);
-                            if (blockState1.is(BlockTags.MOB_INTERACTABLE_DOORS, state -> state.getBlock() instanceof DoorBlock)) {
+                            if (blockState1.is(BlockTags.MOB_INTERACTABLE_DOORS, state -> state.getBlock() instanceof DoorBlock) && !DoorBlock.requiresRedstone(entity.level(), blockState1, blockPos1)) { // Purpur - Option to make doors require redstone
                                 DoorBlock doorBlock1 = (DoorBlock)blockState1.getBlock();
                                 if (!doorBlock1.isOpen(blockState1)) {
                                     // CraftBukkit start - entities opening doors
@@ -118,7 +118,7 @@ public class InteractWithDoor {
                     iterator.remove();
                 } else {
                     BlockState blockState = level.getBlockState(blockPos);
-                    if (!blockState.is(BlockTags.MOB_INTERACTABLE_DOORS, state -> state.getBlock() instanceof DoorBlock)) {
+                    if (!blockState.is(BlockTags.MOB_INTERACTABLE_DOORS, state -> state.getBlock() instanceof DoorBlock) || DoorBlock.requiresRedstone(entity.level(), blockState, blockPos)) { // Purpur - Option to make doors require redstone
                         iterator.remove();
                     } else {
                         DoorBlock doorBlock = (DoorBlock)blockState.getBlock();

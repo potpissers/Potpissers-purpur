@@ -39,6 +39,7 @@ public abstract class BaseCoralPlantTypeBlock extends Block implements SimpleWat
     }
 
     protected static boolean scanForWater(BlockState state, BlockGetter level, BlockPos pos) {
+        if (!((net.minecraft.world.level.LevelAccessor) level).getMinecraftWorld().purpurConfig.coralDieOutsideWater) return true; // Purpur - Config to not let coral die
         if (state.getValue(WATERLOGGED)) {
             return true;
         } else {

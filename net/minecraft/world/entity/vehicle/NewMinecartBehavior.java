@@ -391,7 +391,7 @@ public class NewMinecartBehavior extends MinecartBehavior {
     private Vec3 calculateBoostTrackSpeed(Vec3 speed, BlockPos pos, BlockState state) {
         if (state.is(Blocks.POWERED_RAIL) && state.getValue(PoweredRailBlock.POWERED)) {
             if (speed.length() > 0.01) {
-                return speed.normalize().scale(speed.length() + 0.06);
+                return speed.normalize().scale(speed.length() + this.level().purpurConfig.poweredRailBoostModifier); // Purpur - Configurable powered rail boost modifier
             } else {
                 Vec3 redstoneDirection = this.minecart.getRedstoneDirection(pos);
                 return redstoneDirection.lengthSqr() <= 0.0 ? speed : redstoneDirection.scale(speed.length() + 0.2);

@@ -70,7 +70,7 @@ public class EnchantCommand {
 
     private static int enchant(CommandSourceStack source, Collection<? extends Entity> targets, Holder<Enchantment> enchantment, int level) throws CommandSyntaxException {
         Enchantment enchantment1 = enchantment.value();
-        if (level > enchantment1.getMaxLevel()) {
+        if (!org.purpurmc.purpur.PurpurConfig.allowUnsafeEnchantCommand && level > enchantment1.getMaxLevel()) { // Purpur - Config to allow unsafe enchants
             throw ERROR_LEVEL_TOO_HIGH.create(level, enchantment1.getMaxLevel());
         } else {
             int i = 0;
@@ -81,7 +81,7 @@ public class EnchantCommand {
                     ItemStack mainHandItem = livingEntity.getMainHandItem();
                     if (!mainHandItem.isEmpty()) {
                         if (enchantment1.canEnchant(mainHandItem)
-                            && EnchantmentHelper.isEnchantmentCompatible(EnchantmentHelper.getEnchantmentsForCrafting(mainHandItem).keySet(), enchantment)) {
+                            && EnchantmentHelper.isEnchantmentCompatible(EnchantmentHelper.getEnchantmentsForCrafting(mainHandItem).keySet(), enchantment) || (org.purpurmc.purpur.PurpurConfig.allowUnsafeEnchantCommand && !mainHandItem.hasEnchantment(enchantment))) { // Purpur - Config to allow unsafe enchants
                             mainHandItem.enchant(enchantment, level);
                             i++;
                         } else if (targets.size() == 1) {

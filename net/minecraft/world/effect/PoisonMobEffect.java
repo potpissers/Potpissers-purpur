@@ -12,8 +12,8 @@ public class PoisonMobEffect extends MobEffect {
 
     @Override
     public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
-        if (entity.getHealth() > 1.0F) {
-            entity.hurtServer(level, entity.damageSources().poison(), 1.0F); // CraftBukkit - DamageSource.MAGIC -> CraftEventFactory.POISON
+        if (entity.getHealth() > entity.level().purpurConfig.entityMinimalHealthPoison) { // Purpur
+            entity.hurtServer(level, entity.damageSources().poison(), entity.level().purpurConfig.entityPoisonDegenerationAmount); // CraftBukkit - DamageSource.MAGIC -> CraftEventFactory.POISON // Purpur - Config MobEffect by world
         }
 
         return true;

@@ -12,7 +12,7 @@ public class WitherMobEffect extends MobEffect {
 
     @Override
     public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
-        entity.hurtServer(level, entity.damageSources().wither(), 1.0F);
+        entity.hurtServer(level, entity.damageSources().wither(), entity.level().purpurConfig.entityWitherDegenerationAmount); // Purpur - Config MobEffect by world
         return true;
     }
 

@@ -46,6 +46,7 @@ public class DragonEggBlock extends FallingBlock {
     }
 
     private void teleport(BlockState state, Level level, BlockPos pos) {
+        if (!level.purpurConfig.dragonEggTeleport) return; // Purpur - Option to disable dragon egg teleporting
         WorldBorder worldBorder = level.getWorldBorder();
 
         for (int i = 0; i < 1000; i++) {

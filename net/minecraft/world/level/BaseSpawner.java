@@ -52,6 +52,7 @@ public abstract class BaseSpawner {
     }
 
     public boolean isNearPlayer(Level level, BlockPos pos) {
+        if (level.purpurConfig.spawnerDeactivateByRedstone && level.hasNeighborSignal(pos)) return false; // Purpur - Redstone deactivates spawners
         return level.hasNearbyAlivePlayerThatAffectsSpawning(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.requiredPlayerRange); // Paper - Affects Spawning API
     }
 

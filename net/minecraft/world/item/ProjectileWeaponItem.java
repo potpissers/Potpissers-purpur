@@ -108,6 +108,8 @@ public abstract class ProjectileWeaponItem extends Item {
             abstractArrow.setCritArrow(true);
         }
 
+        abstractArrow.setActualEnchantments(weapon.getEnchantments()); // Purpur - Add an option to fix MC-3304 projectile looting
+
         return abstractArrow;
     }
 

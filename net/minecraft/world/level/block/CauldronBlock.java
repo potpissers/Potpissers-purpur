@@ -32,8 +32,8 @@ public class CauldronBlock extends AbstractCauldronBlock {
 
     protected static boolean shouldHandlePrecipitation(Level level, Biome.Precipitation precipitation) {
         return precipitation == Biome.Precipitation.RAIN
-            ? level.getRandom().nextFloat() < 0.05F
-            : precipitation == Biome.Precipitation.SNOW && level.getRandom().nextFloat() < 0.1F;
+            ? level.getRandom().nextFloat() < level.purpurConfig.cauldronRainChance // Purpur - Cauldron fill chances
+            : precipitation == Biome.Precipitation.SNOW && level.getRandom().nextFloat() < level.purpurConfig.cauldronPowderSnowChance; // Purpur - Cauldron fill chances
     }
 
     @Override

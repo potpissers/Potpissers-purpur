@@ -6486,6 +6486,7 @@ public class Blocks {
         BlockBehaviour.Properties.of()
             .mapColor(MapColor.PLANT)
             .forceSolidOff()
+            .randomTicks() // Purpur - Chance for azalea blocks to grow into trees naturally
             .instabreak()
             .sound(SoundType.AZALEA)
             .noOcclusion()
@@ -6497,6 +6498,7 @@ public class Blocks {
         BlockBehaviour.Properties.of()
             .mapColor(MapColor.PLANT)
             .forceSolidOff()
+            .randomTicks() // Purpur - Chance for azalea blocks to grow into trees naturally
             .instabreak()
             .sound(SoundType.FLOWERING_AZALEA)
             .noOcclusion()

@@ -74,6 +74,7 @@ public abstract class AbstractArrow extends Projectile {
     public ItemStack pickupItemStack = this.getDefaultPickupItem(); // Paper - private -> public
     @Nullable
     public ItemStack firedFromWeapon = null; // Paper - private -> public
+    public net.minecraft.world.item.enchantment.ItemEnchantments actualEnchantments = net.minecraft.world.item.enchantment.ItemEnchantments.EMPTY; // Purpur - Add an option to fix MC-3304 projectile looting
 
     protected AbstractArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
@@ -347,7 +348,7 @@ public abstract class AbstractArrow extends Projectile {
         this.setInGround(false);
         Vec3 deltaMovement = this.getDeltaMovement();
         this.setDeltaMovement(deltaMovement.multiply(this.random.nextFloat() * 0.2F, this.random.nextFloat() * 0.2F, this.random.nextFloat() * 0.2F));
-        this.life = 0;
+        if (this.level().purpurConfig.arrowMovementResetsDespawnCounter) this.life = 0; // Purpur - Arrows should not reset despawn counter
     }
 
     public boolean isInGround() { // Paper - protected -> public
@@ -559,6 +560,12 @@ public abstract class AbstractArrow extends Projectile {
     public ItemStack getWeaponItem() {
         return this.firedFromWeapon;
     }
+
+    // Purpur start - Add an option to fix MC-3304 projectile looting
+    public void setActualEnchantments(net.minecraft.world.item.enchantment.ItemEnchantments actualEnchantments) {
+        this.actualEnchantments = actualEnchantments;
+    }
+    // Purpur end - Add an option to fix MC-3304 projectile looting
 
     protected SoundEvent getDefaultHitGroundSoundEvent() {
         return SoundEvents.ARROW_HIT;

@@ -28,6 +28,8 @@ public class DamageSource {
     private boolean sweep = false;
     private boolean melting = false;
     private boolean poison = false;
+    private boolean scissors = false; // Purpur - Dont run with scissors!
+    private boolean stonecutter = false; // Purpur - Stonecutter damage
     @Nullable
     private Entity customEventDamager = null; // This field is a helper for when causing entity damage is not set by vanilla // Paper - fix DamageSource API
 
@@ -57,6 +59,27 @@ public class DamageSource {
     public boolean isPoison() {
         return this.poison;
     }
+
+    // Purpur start - Dont run with scissors!
+    public DamageSource scissors() {
+        this.scissors = true;
+        return this;
+    }
+
+    public boolean isScissors() {
+        return this.scissors;
+    }
+    // Purpur end - Dont run with scissors!
+    // Purpur start -  - Stonecutter damage
+    public DamageSource stonecutter() {
+        this.stonecutter = true;
+        return this;
+    }
+
+    public boolean isStonecutter() {
+        return this.stonecutter;
+    }
+    // Purpur end - Stonecutter damage
 
     // Paper start - fix DamageSource API
     @Nullable
@@ -118,6 +141,8 @@ public class DamageSource {
         damageSource.sweep = this.isSweep();
         damageSource.poison = this.isPoison();
         damageSource.melting = this.isMelting();
+        damageSource.scissors = this.isScissors(); // Purpur - Dont run with scissors!
+        damageSource.stonecutter = this.isStonecutter(); // Purpur - Stonecutter damage
         return damageSource;
     }
     // CraftBukkit end
@@ -184,11 +209,20 @@ public class DamageSource {
         } else {
             Component component = this.causingEntity == null ? this.directEntity.getDisplayName() : this.causingEntity.getDisplayName();
             ItemStack itemStack = this.causingEntity instanceof LivingEntity livingEntity1 ? livingEntity1.getMainHandItem() : ItemStack.EMPTY;
-            return !itemStack.isEmpty() && itemStack.has(DataComponents.CUSTOM_NAME)
+            return !itemStack.isEmpty() && (org.purpurmc.purpur.PurpurConfig.playerDeathsAlwaysShowItem || itemStack.has(DataComponents.CUSTOM_NAME)) // Purpur - always show item in player death messages
                 ? Component.translatable(string + ".item", livingEntity.getDisplayName(), component, itemStack.getDisplayName())
                 : Component.translatable(string, livingEntity.getDisplayName(), component);
         }
     }
+
+    // Purpur start - Component related conveniences
+    public Component getLocalizedDeathMessage(String str, LivingEntity entity) {
+        net.kyori.adventure.text.Component name = io.papermc.paper.adventure.PaperAdventure.asAdventure(entity.getDisplayName());
+        net.kyori.adventure.text.minimessage.tag.resolver.TagResolver template = net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component("player", name);
+        net.kyori.adventure.text.Component component = net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(str, template);
+        return io.papermc.paper.adventure.PaperAdventure.asVanilla(component);
+    }
+    // Purpur end - Component related conveniences
 
     public String getMsgId() {
         return this.type().msgId();

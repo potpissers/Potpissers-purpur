@@ -74,6 +74,12 @@ public abstract class WaterFluid extends FlowingFluid {
     protected boolean canConvertToSource(ServerLevel level) {
         return level.getGameRules().getBoolean(GameRules.RULE_WATER_SOURCE_CONVERSION);
     }
+    // Purpur start - Implement infinite liquids
+    @Override
+    protected int getRequiredSources(Level level) {
+        return level.purpurConfig.waterInfiniteRequiredSources;
+    }
+    // Purpur end - Implement infinite liquids
     // Paper start - Add BlockBreakBlockEvent
      @Override
     protected void beforeDestroyingBlock(LevelAccessor level, BlockPos pos, BlockState state, BlockPos source) {

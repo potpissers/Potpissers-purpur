@@ -96,6 +96,7 @@ public class SnowLayerBlock extends Block {
     @Override
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockState blockState = level.getBlockState(pos.below());
+        if (blockState.is(Blocks.BLUE_ICE) && !level.getWorldBorder().world.purpurConfig.snowOnBlueIce) return false; // Purpur - Add config for snow on blue ice
         return !blockState.is(BlockTags.SNOW_LAYER_CANNOT_SURVIVE_ON)
             && (
                 blockState.is(BlockTags.SNOW_LAYER_CAN_SURVIVE_ON)

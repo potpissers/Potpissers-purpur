@@ -332,6 +332,14 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
         return this.isTame() && otherAnimal instanceof Cat cat && cat.isTame() && super.canMate(otherAnimal);
     }
 
+    // Purpur start - Configurable default collar color
+    @Override
+    public void tame(Player player) {
+        setCollarColor(level().purpurConfig.catDefaultCollarColor);
+        super.tame(player);
+    }
+    // Purpur end - Configurable default collar color
+
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(
@@ -438,7 +446,7 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
     }
 
     private void tryToTame(Player player) {
-        if (this.random.nextInt(3) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit
+        if (this.level().purpurConfig.alwaysTameInCreative && player.hasInfiniteMaterials() || this.random.nextInt(3) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit // Purpur - Config to always tame in Creative
             this.tame(player);
             this.setOrderedToSit(true);
             this.level().broadcastEntityEvent(this, (byte)7);

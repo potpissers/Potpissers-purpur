@@ -31,7 +31,7 @@ public class EquipmentDispenseItemBehavior extends DefaultDispenseItemBehavior {
             return false;
         } else {
             LivingEntity livingEntity = entitiesOfClass.getFirst();
-            EquipmentSlot equipmentSlotForItem = livingEntity.getEquipmentSlotForItem(item);
+            EquipmentSlot equipmentSlotForItem = blockSource.level().purpurConfig.dispenserApplyCursedArmor ? livingEntity.getEquipmentSlotForItem(item) : livingEntity.getEquipmentSlotForDispenserItem(item); if (equipmentSlotForItem == null) return false; // Purpur - Dispenser curse of binding protection
             ItemStack itemStack = item.copyWithCount(1); // Paper - shrink below and single item in event
             // CraftBukkit start
             net.minecraft.world.level.Level world = blockSource.level();

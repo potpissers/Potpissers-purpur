@@ -24,7 +24,7 @@ public class EndCrystalItem extends Item {
         Level level = context.getLevel();
         BlockPos clickedPos = context.getClickedPos();
         BlockState blockState = level.getBlockState(clickedPos);
-        if (!blockState.is(Blocks.OBSIDIAN) && !blockState.is(Blocks.BEDROCK)) {
+        if (!level.purpurConfig.endCrystalPlaceAnywhere && !blockState.is(Blocks.OBSIDIAN) && !blockState.is(Blocks.BEDROCK)) { // Purpur - place end crystal on any block
             return InteractionResult.FAIL;
         } else {
             BlockPos blockPos = clickedPos.above(); final BlockPos aboveBlockPosition = blockPos; // Paper - OBFHELPER

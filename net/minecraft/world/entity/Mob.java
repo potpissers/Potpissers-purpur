@@ -145,6 +145,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
     private BlockPos restrictCenter = BlockPos.ZERO;
     private float restrictRadius = -1.0F;
     public boolean aware = true; // CraftBukkit
+    public int ticksSinceLastInteraction; // Purpur - Entity lifespan
 
     protected Mob(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);
@@ -294,6 +295,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
                 target = null;
             }
         }
+        if (target instanceof net.minecraft.server.level.ServerPlayer) this.ticksSinceLastInteraction = 0; // Purpur - Entity lifespan
         this.target = target;
         return true;
         // CraftBukkit end
@@ -337,7 +339,27 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
         }
 
         profilerFiller.pop();
+        incrementTicksSinceLastInteraction(); // Purpur - Entity lifespan
     }
+
+    // Purpur start - Entity lifespan
+    private void incrementTicksSinceLastInteraction() {
+        ++this.ticksSinceLastInteraction;
+        if (getRider() != null) {
+            this.ticksSinceLastInteraction = 0;
+            return;
+        }
+        if (this.level().purpurConfig.entityLifeSpan <= 0) {
+            return; // feature disabled
+        }
+        if (!this.removeWhenFarAway(0) || isPersistenceRequired() || requiresCustomPersistence() || hasCustomName()) {
+            return; // mob persistent
+        }
+        if (this.ticksSinceLastInteraction > this.level().purpurConfig.entityLifeSpan) {
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DISCARD);
+        }
+    }
+    // Purpur end - Entity lifespan
 
     @Override
     protected void playHurtSound(DamageSource source) {
@@ -486,6 +508,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
             compound.putBoolean("NoAI", this.isNoAi());
         }
         compound.putBoolean("Bukkit.Aware", this.aware); // CraftBukkit
+        compound.putInt("Purpur.ticksSinceLastInteraction", this.ticksSinceLastInteraction); // Purpur - Entity lifespan
     }
 
     @Override
@@ -568,6 +591,11 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
             this.aware = compound.getBoolean("Bukkit.Aware");
         }
         // CraftBukkit end
+        // Purpur start - Entity lifespan
+        if (compound.contains("Purpur.ticksSinceLastInteraction")) {
+            this.ticksSinceLastInteraction = compound.getInt("Purpur.ticksSinceLastInteraction");
+        }
+        // Purpur end - Entity lifespan
     }
 
     @Override
@@ -1280,7 +1308,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
             );
         }
 
-        this.setLeftHanded(random.nextFloat() < 0.05F);
+        this.setLeftHanded(random.nextFloat() < level.getLevel().purpurConfig.entityLeftHandedChance); // Purpur - Changeable Mob Left Handed Chance
         return spawnGroupData;
     }
 
@@ -1619,6 +1647,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
             this.playAttackSound();
         }
 
+        if (target instanceof net.minecraft.server.level.ServerPlayer) this.ticksSinceLastInteraction = 0; // Purpur - Entity lifespan
         return flag;
     }
 

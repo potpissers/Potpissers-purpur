@@ -232,7 +232,7 @@ public class Ocelot extends Animal {
     public boolean checkSpawnObstruction(LevelReader level) {
         if (level.isUnobstructed(this) && !level.containsAnyLiquid(this.getBoundingBox())) {
             BlockPos blockPos = this.blockPosition();
-            if (blockPos.getY() < level.getSeaLevel()) {
+            if (!level().purpurConfig.ocelotSpawnUnderSeaLevel && blockPos.getY() < level.getSeaLevel()) { // Purpur - Option Ocelot Spawn Under Sea Level
                 return false;
             }
 

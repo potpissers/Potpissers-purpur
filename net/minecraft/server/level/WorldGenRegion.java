@@ -312,6 +312,7 @@ public class WorldGenRegion implements WorldGenLevel {
             return true;
         } else {
             // Paper start - Buffer OOB setBlock calls
+            if (!org.purpurmc.purpur.PurpurConfig.loggerSuppressSetBlockFarChunk) // Purpur - Logger settings (suppressing pointless logs)
             if (!hasSetFarWarned) {
             Util.logAndPauseIfInIde(
                 "Detected setBlock in a far chunk ["

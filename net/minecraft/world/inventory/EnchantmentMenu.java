@@ -63,6 +63,22 @@ public class EnchantmentMenu extends AbstractContainerMenu {
                 return access.getLocation();
             }
             // CraftBukkit end
+
+            // Purpur start - Enchantment Table Persists Lapis
+            @Override
+            public void onClose(org.bukkit.craftbukkit.entity.CraftHumanEntity who) {
+                super.onClose(who);
+
+                if (who.getHandle().level().purpurConfig.enchantmentTableLapisPersists) {
+                    access.execute((level, pos) -> {
+                        net.minecraft.world.level.block.entity.BlockEntity blockEntity = level.getBlockEntity(pos);
+                        if (blockEntity instanceof net.minecraft.world.level.block.entity.EnchantingTableBlockEntity enchantmentTable) {
+                            enchantmentTable.setLapis(this.getItem(1).getCount());
+                        }
+                    });
+                }
+            }
+            // Purpur end - Enchantment Table Persists Lapis
         };
         // Paper end - Add missing InventoryHolders
         this.access = access;
@@ -83,6 +99,16 @@ public class EnchantmentMenu extends AbstractContainerMenu {
                 return EnchantmentMenu.EMPTY_SLOT_LAPIS_LAZULI;
             }
         });
+        // Purpur start - Enchantment Table Persists Lapis
+        access.execute((level, pos) -> {
+            if (level.purpurConfig.enchantmentTableLapisPersists) {
+                net.minecraft.world.level.block.entity.BlockEntity blockEntity = level.getBlockEntity(pos);
+                if (blockEntity instanceof net.minecraft.world.level.block.entity.EnchantingTableBlockEntity enchantmentTable) {
+                    this.getSlot(1).set(new ItemStack(Items.LAPIS_LAZULI, enchantmentTable.getLapis()));
+                }
+            }
+        });
+        // Purpur end - Enchantment Table Persists Lapis
         this.addStandardInventorySlots(playerInventory, 8, 84);
         this.addDataSlot(DataSlot.shared(this.costs, 0));
         this.addDataSlot(DataSlot.shared(this.costs, 1));
@@ -294,7 +320,7 @@ public class EnchantmentMenu extends AbstractContainerMenu {
     @Override
     public void removed(Player player) {
         super.removed(player);
-        this.access.execute((level, blockPos) -> this.clearContainer(player, this.enchantSlots));
+        this.access.execute((level, blockPos) -> {if (level.purpurConfig.enchantmentTableLapisPersists) this.getSlot(1).set(ItemStack.EMPTY);this.clearContainer(player, this.enchantSlots);}); // Purpur - Enchantment Table Persists Lapis
     }
 
     @Override

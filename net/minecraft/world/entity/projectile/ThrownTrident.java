@@ -64,7 +64,7 @@ public class ThrownTrident extends AbstractArrow {
 
         Entity owner = this.getOwner();
         int i = this.entityData.get(ID_LOYALTY);
-        if (i > 0 && (this.dealtDamage || this.isNoPhysics()) && owner != null) {
+        if (i > 0 && (this.dealtDamage || this.isNoPhysics() || (level().purpurConfig.tridentLoyaltyVoidReturnHeight < 0.0D && getY() < level().purpurConfig.tridentLoyaltyVoidReturnHeight)) && owner != null) { // Purpur - Add option to allow loyalty on tridents to work in the void
             if (!this.isAcceptibleReturnOwner()) {
                 if (this.level() instanceof ServerLevel serverLevel && this.pickup == AbstractArrow.Pickup.ALLOWED) {
                     this.spawnAtLocation(serverLevel, this.getPickupItem(), 0.1F);

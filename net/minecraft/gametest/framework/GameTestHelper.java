@@ -279,6 +279,8 @@ public class GameTestHelper {
                 return gameType.isCreative();
             }
 
+            public void setAfk(final boolean afk) {} // Purpur - AFK API
+
             @Override
             public boolean isLocalPlayer() {
                 return true;

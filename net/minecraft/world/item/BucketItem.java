@@ -147,7 +147,7 @@ public class BucketItem extends Item implements DispensibleContainerItem {
             // CraftBukkit end
             if (!flag) {
                 return result != null && this.emptyContents(player, level, result.getBlockPos().relative(result.getDirection()), null, enumdirection, clicked, itemstack, enumhand); // CraftBukkit
-            } else if (level.dimensionType().ultraWarm() && this.content.is(FluidTags.WATER)) {
+            } else if ((level.dimensionType().ultraWarm() || (level.isTheEnd() && !org.purpurmc.purpur.PurpurConfig.allowWaterPlacementInTheEnd)) && this.content.is(FluidTags.WATER)) { // Purpur - Add allow water in end world option
                 int x = pos.getX();
                 int y = pos.getY();
                 int z = pos.getZ();
@@ -156,7 +156,7 @@ public class BucketItem extends Item implements DispensibleContainerItem {
                 );
 
                 for (int i = 0; i < 8; i++) {
-                    level.addParticle(ParticleTypes.LARGE_SMOKE, x + Math.random(), y + Math.random(), z + Math.random(), 0.0, 0.0, 0.0);
+                    ((net.minecraft.server.level.ServerLevel) level).sendParticlesSource(null, ParticleTypes.LARGE_SMOKE, true, false, x + Math.random(), y + Math.random(), z + Math.random(), 1, 0.0D, 0.0D, 0.0D, 0.0D); // Purpur - Add allow water in end world option
                 }
 
                 return true;

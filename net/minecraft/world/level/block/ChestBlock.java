@@ -357,6 +357,7 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
     }
 
     public static boolean isBlockedChestByBlock(BlockGetter level, BlockPos pos) {
+        if (level instanceof Level level1 && level1.purpurConfig.chestOpenWithBlockOnTop) return false; // Purpur - Option for chests to open even with a solid block on top
         BlockPos blockPos = pos.above();
         return level.getBlockState(blockPos).isRedstoneConductor(level, blockPos);
     }

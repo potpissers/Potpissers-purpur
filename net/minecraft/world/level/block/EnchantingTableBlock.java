@@ -119,4 +119,18 @@ public class EnchantingTableBlock extends BaseEntityBlock {
     protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
+
+    // Purpur start - Enchantment Table Persists Lapis
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+
+        if (level.purpurConfig.enchantmentTableLapisPersists && blockEntity instanceof EnchantingTableBlockEntity enchantmentTable) {
+            net.minecraft.world.Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LAPIS_LAZULI, enchantmentTable.getLapis()));
+            level.updateNeighbourForOutputSignal(pos, this);
+        }
+
+        super.onRemove(state, level, pos, newState, moved);
+    }
+    // Purpur end - Enchantment Table Persists Lapis
 }

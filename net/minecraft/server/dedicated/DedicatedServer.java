@@ -106,6 +106,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
                 // CraftBukkit start
                 if (!org.bukkit.craftbukkit.Main.useConsole) return;
                 // Paper start - Use TerminalConsoleAppender
+                if (DedicatedServer.this.gui == null || System.console() != null) // Purpur - GUI Improvements - has no GUI or has console (did not double-click)
                 new com.destroystokyo.paper.console.PaperConsole(DedicatedServer.this).start();
                 /*
                 jline.console.ConsoleReader bufferedreader = DedicatedServer.this.reader;
@@ -224,6 +225,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
         io.papermc.paper.command.PaperCommands.registerCommands(this); // Paper - setup /paper command
         this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
         com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
+        /*// Purpur start - Purpur config files // Purpur - Configurable void damage height and damage
+        try {
+            org.purpurmc.purpur.PurpurConfig.init((java.io.File) options.valueOf("purpur-settings"));
+        } catch (Exception e) {
+            DedicatedServer.LOGGER.error("Unable to load server configuration", e);
+            return false;
+        }
+        org.purpurmc.purpur.PurpurConfig.registerCommands();
+        */// Purpur end - Purpur config files // Purpur - Configurable void damage height and damage
         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
 
         this.setPvpAllowed(properties.pvp);
@@ -271,6 +281,30 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
             if (true) throw new IllegalStateException("Failed to bind to port", var10); // Paper - Propagate failed to bind to port error
             return false;
         }
+        // Purpur start - UPnP Port Forwarding
+        if (org.purpurmc.purpur.PurpurConfig.useUPnP) {
+            LOGGER.info("[UPnP] Attempting to start UPnP port forwarding service...");
+            if (dev.omega24.upnp4j.UPnP4J.isUPnPAvailable()) {
+                if (dev.omega24.upnp4j.UPnP4J.isOpen(this.getPort(), dev.omega24.upnp4j.util.Protocol.TCP)) {
+                    this.upnp = false;
+                    LOGGER.info("[UPnP] Port {} is already open", this.getPort());
+                } else if (dev.omega24.upnp4j.UPnP4J.open(this.getPort(), dev.omega24.upnp4j.util.Protocol.TCP)) {
+                    this.upnp = true;
+                    LOGGER.info("[UPnP] Successfully opened port {}", this.getPort());
+                } else {
+                    this.upnp = false;
+                    LOGGER.info("[UPnP] Failed to open port {}", this.getPort());
+                }
+
+                if (upnp) {
+                    LOGGER.info("[UPnP] {}:{}", dev.omega24.upnp4j.UPnP4J.getExternalIP(), this.getPort());
+                }
+            } else {
+                this.upnp = false;
+                LOGGER.error("[UPnP] Service is unavailable");
+            }
+        }
+        // Purpur end - UPnP Port Forwarding
 
         // CraftBukkit start
         // this.setPlayerList(new DedicatedPlayerList(this, this.registries(), this.playerDataStorage)); // Spigot - moved up
@@ -350,6 +384,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
                 LOGGER.info("JMX monitoring enabled");
             }
 
+            org.purpurmc.purpur.task.BossBarTask.startAll(); // Purpur - Implement TPSBar
+            if (org.purpurmc.purpur.PurpurConfig.beeCountPayload) org.purpurmc.purpur.task.BeehiveTask.instance().register(); // Purpur - Give bee counts in beehives to Purpur clients
             return true;
         }
     }

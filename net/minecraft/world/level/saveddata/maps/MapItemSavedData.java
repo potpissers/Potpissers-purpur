@@ -68,6 +68,7 @@ public class MapItemSavedData extends SavedData {
     public final Map<String, MapDecoration> decorations = Maps.newLinkedHashMap();
     private final Map<String, MapFrame> frameMarkers = Maps.newHashMap();
     private int trackedDecorationCount;
+    public boolean isExplorerMap; // Purpur - Explorer Map API
 
     // CraftBukkit start
     public final org.bukkit.craftbukkit.map.CraftMapView mapView;

@@ -159,7 +159,7 @@ public class RespawnAnchorBlock extends Block {
         };
         Vec3 center = pos2.getCenter();
         level.explode(
-            null, level.damageSources().badRespawnPointExplosion(center, blockState), explosionDamageCalculator, center, 5.0F, true, Level.ExplosionInteraction.BLOCK // CraftBukkit - add state
+            null, level.damageSources().badRespawnPointExplosion(center, blockState), explosionDamageCalculator, center, (float) level.purpurConfig.respawnAnchorExplosionPower, level.purpurConfig.respawnAnchorExplosionFire, level.purpurConfig.respawnAnchorExplosionEffect // CraftBukkit - add state // Purpur - Implement respawn anchor explosion options
         );
     }
 

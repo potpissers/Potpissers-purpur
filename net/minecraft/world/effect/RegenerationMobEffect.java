@@ -11,7 +11,7 @@ class RegenerationMobEffect extends MobEffect {
     @Override
     public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
         if (entity.getHealth() < entity.getMaxHealth()) {
-            entity.heal(1.0F, org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.MAGIC_REGEN); // CraftBukkit
+            entity.heal(entity.level().purpurConfig.entityHealthRegenAmount, org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.MAGIC_REGEN); // CraftBukkit // Purpur - Config MobEffect by world
         }
 
         return true;

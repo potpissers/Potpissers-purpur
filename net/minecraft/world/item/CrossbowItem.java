@@ -70,7 +70,7 @@ public class CrossbowItem extends ProjectileWeaponItem {
         ItemStack itemInHand = player.getItemInHand(hand);
         ChargedProjectiles chargedProjectiles = itemInHand.get(DataComponents.CHARGED_PROJECTILES);
         if (chargedProjectiles != null && !chargedProjectiles.isEmpty()) {
-            this.performShooting(level, player, hand, itemInHand, getShootingPower(chargedProjectiles), 1.0F, null);
+            this.performShooting(level, player, hand, itemInHand, getShootingPower(chargedProjectiles), (float) level.purpurConfig.crossbowProjectileOffset, null); // Purpur - Projectile offset config
             return InteractionResult.CONSUME;
         } else if (!player.getProjectile(itemInHand).isEmpty()) {
             this.startSoundPlayed = false;

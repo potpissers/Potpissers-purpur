@@ -26,7 +26,7 @@ public class EggItem extends Item implements ProjectileItem {
         if (level instanceof ServerLevel serverLevel) {
             // CraftBukkit start
             // Paper start - PlayerLaunchProjectileEvent
-            final Projectile.Delayed<ThrownEgg> thrownEgg = Projectile.spawnProjectileFromRotationDelayed(ThrownEgg::new, serverLevel, itemInHand, player, 0.0F, EggItem.PROJECTILE_SHOOT_POWER, 1.0F);
+            final Projectile.Delayed<ThrownEgg> thrownEgg = Projectile.spawnProjectileFromRotationDelayed(ThrownEgg::new, serverLevel, itemInHand, player, 0.0F, EggItem.PROJECTILE_SHOOT_POWER, (float) serverLevel.purpurConfig.eggProjectileOffset); // Purpur - Projectile offset config
             com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent event = new com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent((org.bukkit.entity.Player) player.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemInHand), (org.bukkit.entity.Projectile) thrownEgg.projectile().getBukkitEntity());
             if (event.callEvent() && thrownEgg.attemptSpawn()) {
                 if (event.shouldConsume()) {

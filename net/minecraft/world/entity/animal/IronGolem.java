@@ -56,13 +56,26 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     private int remainingPersistentAngerTime;
     @Nullable
     private UUID persistentAngerTarget;
+    @Nullable private UUID summoner; // Purpur - Summoner API
 
     public IronGolem(EntityType<? extends IronGolem> entityType, Level level) {
         super(entityType, level);
     }
 
+    // Purpur start - Summoner API
+    @Nullable
+    public UUID getSummoner() {
+        return summoner;
+    }
+
+    public void setSummoner(@Nullable UUID summoner) {
+        this.summoner = summoner;
+    }
+    // Purpur end - Summoner API
+
     @Override
     protected void registerGoals() {
+        if (this.level().purpurConfig.ironGolemPoppyCalm) this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.ReceiveFlower(this)); // Purpur - Iron golem calm anger options
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0, true));
         this.goalSelector.addGoal(2, new MoveTowardsTargetGoal(this, 0.9, 32.0F));
         this.goalSelector.addGoal(2, new MoveBackToVillageGoal(this, 0.6, false));
@@ -140,6 +153,7 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("PlayerCreated", this.isPlayerCreated());
+        if (getSummoner() != null) compound.putUUID("Purpur.Summoner", getSummoner()); // Purpur - Summoner API
         this.addPersistentAngerSaveData(compound);
     }
 
@@ -147,6 +161,7 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         this.setPlayerCreated(compound.getBoolean("PlayerCreated"));
+        if (compound.contains("Purpur.Summoner")) setSummoner(compound.getUUID("Purpur.Summoner")); // Purpur - Summoner API
         this.readPersistentAngerSaveData(this.level(), compound);
     }
 
@@ -266,6 +281,7 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
                 float f = 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F;
                 this.playSound(SoundEvents.IRON_GOLEM_REPAIR, 1.0F, f);
                 itemInHand.consume(1, player);
+                if (this.level().purpurConfig.ironGolemHealCalm && isAngry() && getHealth() == getMaxHealth()) stopBeingAngry(); // Purpur - Iron golem calm anger options
                 return InteractionResult.SUCCESS;
             }
         }

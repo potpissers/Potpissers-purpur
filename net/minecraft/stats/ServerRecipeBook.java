@@ -138,6 +138,7 @@ public class ServerRecipeBook extends RecipeBook {
             try {
                 ResourceKey<Recipe<?>> resourceKey = ResourceKey.create(Registries.RECIPE, ResourceLocation.parse(string));
                 if (!isRecognized.test(resourceKey)) {
+                    if (!org.purpurmc.purpur.PurpurConfig.loggerSuppressUnrecognizedRecipeErrors) // Purpur - Logger settings (suppressing pointless logs)
                     LOGGER.error("Tried to load unrecognized recipe: {} removed now.", resourceKey);
                 } else {
                     output.accept(resourceKey);

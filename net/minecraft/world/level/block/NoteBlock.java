@@ -107,7 +107,7 @@ public class NoteBlock extends Block {
     }
 
     private void playNote(@Nullable Entity entity, BlockState state, Level level, BlockPos pos) {
-        if (state.getValue(INSTRUMENT).worksAboveNoteBlock() || level.getBlockState(pos.above()).isAir()) {
+        if (level.purpurConfig.noteBlockIgnoreAbove || state.getValue(INSTRUMENT).worksAboveNoteBlock() || level.getBlockState(pos.above()).isAir()) { // Purpur - Config to allow Note Block sounds when blocked
             level.blockEvent(pos, this, 0, 0);
             level.gameEvent(entity, GameEvent.NOTE_BLOCK_PLAY, pos);
         }

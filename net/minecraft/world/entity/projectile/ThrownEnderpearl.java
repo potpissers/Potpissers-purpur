@@ -133,9 +133,10 @@ public class ThrownEnderpearl extends ThrowableItemProjectile {
                             return;
                         }
                         // CraftBukkit end
-                        if (this.random.nextFloat() < 0.05F && serverLevel.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) {
+                        if (this.random.nextFloat() < serverLevel.purpurConfig.enderPearlEndermiteChance && serverLevel.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) { // Purpur - Configurable Ender Pearl RNG
                             Endermite endermite = EntityType.ENDERMITE.create(serverLevel, EntitySpawnReason.TRIGGERED);
                             if (endermite != null) {
+                                endermite.setPlayerSpawned(true); // Purpur - Add back player spawned endermite API
                                 endermite.moveTo(owner.getX(), owner.getY(), owner.getZ(), owner.getYRot(), owner.getXRot());
                                 serverLevel.addFreshEntity(endermite, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.ENDER_PEARL);
                             }
@@ -155,7 +156,7 @@ public class ThrownEnderpearl extends ThrowableItemProjectile {
                         if (serverPlayer1 != null) {
                             serverPlayer1.resetFallDistance();
                             serverPlayer1.resetCurrentImpulseContext();
-                            serverPlayer1.hurtServer(serverPlayer.serverLevel(), this.damageSources().enderPearl().customEventDamager(this), 5.0F); // CraftBukkit // Paper - fix DamageSource API
+                            serverPlayer1.hurtServer(serverPlayer.serverLevel(), this.damageSources().enderPearl().customEventDamager(this), this.level().purpurConfig.enderPearlDamage); // CraftBukkit // Paper - fix DamageSource API // Purpur - Configurable Ender Pearl damage
                         }
 
                         this.playSound(serverLevel, vec3);

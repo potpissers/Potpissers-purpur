@@ -393,6 +393,10 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
     public com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent playerNaturallySpawnedEvent; // Paper - PlayerNaturallySpawnCreaturesEvent
     public @Nullable String clientBrandName = null; // Paper - Brand support
     public org.bukkit.event.player.PlayerQuitEvent.QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
+    public boolean purpurClient = false; // Purpur - Purpur client support
+    private boolean tpsBar = false; // Purpur - Implement TPSBar
+    private boolean compassBar = false; // Purpur - Add compass command
+    private boolean ramBar = false; // Purpur - Implement rambar commands
 
     // Paper start - rewrite chunk system
     private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
@@ -561,6 +565,10 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
         if (tag != null) {
             BlockPos.CODEC.parse(NbtOps.INSTANCE, tag).resultOrPartial(LOGGER::error).ifPresent(pos -> this.raidOmenPosition = pos);
         }
+
+        if (compound.contains("Purpur.TPSBar")) { this.tpsBar = compound.getBoolean("Purpur.TPSBar"); } // Purpur - Implement TPSBar
+        if (compound.contains("Purpur.CompassBar")) { this.compassBar = compound.getBoolean("Purpur.CompassBar"); } // Purpur - Add compass command
+        if (compound.contains("Purpur.RamBar")) { this.ramBar = compound.getBoolean("Purpur.RamBar"); } // Purpur - Implement rambar command
     }
 
     @Override
@@ -605,6 +613,9 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
         }
 
         this.saveEnderPearls(compound);
+        compound.putBoolean("Purpur.TPSBar", this.tpsBar); // Purpur - Implement TPSBar
+        compound.putBoolean("Purpur.CompassBar", this.compassBar); // Purpur - Add compass command
+        compound.putBoolean("Purpur.RamBar", this.ramBar); // Purpur - Add rambar command
     }
 
     private void saveParentVehicle(CompoundTag tag) {
@@ -1124,6 +1135,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
                     )
                 );
             Team team = this.getTeam();
+            if (org.purpurmc.purpur.PurpurConfig.deathMessageOnlyBroadcastToAffectedPlayer) this.sendSystemMessage(deathMessage); else // Purpur - Configurable broadcast settings
             if (team == null || team.getDeathMessageVisibility() == Team.Visibility.ALWAYS) {
                 this.server.getPlayerList().broadcastSystemMessage(deathMessage, false);
             } else if (team.getDeathMessageVisibility() == Team.Visibility.HIDE_FOR_OTHER_TEAMS) {
@@ -1217,6 +1229,13 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
         if (this.isInvulnerableTo(level, damageSource)) {
             return false;
         } else {
+            // Purpur start - Add boat fall damage config
+            if (damageSource.is(net.minecraft.tags.DamageTypeTags.IS_FALL)) {
+                if (getRootVehicle() instanceof net.minecraft.world.entity.vehicle.Boat && !level().purpurConfig.boatsDoFallDamage) {
+                    return false;
+                }
+            }
+            // Purpur end - Add boat fall damage config
             Entity entity = damageSource.getEntity();
             if (!( // Paper - split the if statement. If below statement is false, hurtServer would not have been evaluated. Return false.
              !(entity instanceof Player player && !this.canHarmPlayer(player))
@@ -1446,6 +1465,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
                 serverLevel.removePlayerImmediately(this, Entity.RemovalReason.CHANGED_DIMENSION);
                 this.unsetRemoved();
                 // CraftBukkit end
+                this.portalPos = io.papermc.paper.util.MCUtil.toBlockPosition(exit); // Purpur - Fix stuck in portals
                 this.setServerLevel(level);
                 this.connection.internalTeleport(PositionMoveRotation.of(teleportTransition), teleportTransition.relatives()); // CraftBukkit - use internal teleport without event
                 this.connection.resetPosition();
@@ -1564,7 +1584,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
                             new AABB(vec3.x() - 8.0, vec3.y() - 5.0, vec3.z() - 8.0, vec3.x() + 8.0, vec3.y() + 5.0, vec3.z() + 8.0),
                             monster -> monster.isPreventingPlayerRest(this.serverLevel(), this)
                         );
-                    if (!entitiesOfClass.isEmpty()) {
+                    if (!this.level().purpurConfig.playerSleepNearMonsters && !entitiesOfClass.isEmpty()) { // Purpur - Config to ignore nearby mobs when sleeping
                         return Either.left(Player.BedSleepingProblem.NOT_SAFE);
                     }
                 }
@@ -1601,7 +1621,19 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
                     CriteriaTriggers.SLEPT_IN_BED.trigger(this);
                 });
                 if (!this.serverLevel().canSleepThroughNights()) {
-                    this.displayClientMessage(Component.translatable("sleep.not_possible"), true);
+                    // Purpur start - Customizable sleeping actionbar messages
+                    Component clientMessage;
+                    if (org.purpurmc.purpur.PurpurConfig.sleepNotPossible.isBlank()) {
+                        clientMessage = null;
+                    } else if (!org.purpurmc.purpur.PurpurConfig.sleepNotPossible.equalsIgnoreCase("default")) {
+                        clientMessage = io.papermc.paper.adventure.PaperAdventure.asVanilla(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(org.purpurmc.purpur.PurpurConfig.sleepNotPossible));
+                    } else {
+                        clientMessage = Component.translatable("sleep.not_possible");
+                    }
+                    if (clientMessage != null) {
+                        this.displayClientMessage(clientMessage, true);
+                    }
+                    // Purpur end - Customizable sleeping actionbar messages
                 }
 
                 ((ServerLevel)this.level()).updateSleepingPlayerList();
@@ -1709,6 +1741,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
 
     @Override
     public void openTextEdit(SignBlockEntity signEntity, boolean isFrontText) {
+        if (level().purpurConfig.signAllowColors) this.connection.send(signEntity.getTranslatedUpdatePacket(textFilteringEnabled, isFrontText)); // Purpur - Signs allow color codes
         this.connection.send(new ClientboundBlockUpdatePacket(this.level(), signEntity.getBlockPos()));
         this.connection.send(new ClientboundOpenSignEditorPacket(signEntity.getBlockPos(), isFrontText));
     }
@@ -2014,6 +2047,26 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
         this.lastSentExp = -1; // CraftBukkit - Added to reset
     }
 
+    // Purpur start - Component related conveniences
+    public void sendActionBarMessage(@Nullable String message) {
+        if (message != null && !message.isEmpty()) {
+            sendActionBarMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(message));
+        }
+    }
+
+    public void sendActionBarMessage(@Nullable net.kyori.adventure.text.Component message) {
+        if (message != null) {
+            sendActionBarMessage(io.papermc.paper.adventure.PaperAdventure.asVanilla(message));
+        }
+    }
+
+    public void sendActionBarMessage(@Nullable Component message) {
+        if (message != null) {
+            displayClientMessage(message, true);
+        }
+    }
+    // Purpur end - Component related conveniences
+
     @Override
     public void displayClientMessage(Component chatComponent, boolean actionBar) {
         this.sendSystemMessage(chatComponent, actionBar);
@@ -2235,6 +2288,20 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
         );
     }
 
+    // Purpur start - Component related conveniences
+    public void sendMiniMessage(@Nullable String message) {
+        if (message != null && !message.isEmpty()) {
+            this.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(message));
+        }
+    }
+
+    public void sendMessage(@Nullable net.kyori.adventure.text.Component message) {
+        if (message != null) {
+            this.sendSystemMessage(io.papermc.paper.adventure.PaperAdventure.asVanilla(message));
+        }
+    }
+    // Purpur end - Component related conveniences
+
     public void sendSystemMessage(Component mesage) {
         this.sendSystemMessage(mesage, false);
     }
@@ -2373,7 +2440,67 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
 
     public void resetLastActionTime() {
         this.lastActionTime = Util.getMillis();
+        this.setAfk(false); // Purpur - AFK API
     }
+
+    // Purpur start - AFK API
+    private boolean isAfk = false;
+
+    @Override
+    public void setAfk(boolean afk) {
+        if (this.isAfk == afk) {
+            return;
+        }
+
+        String msg = afk ? org.purpurmc.purpur.PurpurConfig.afkBroadcastAway : org.purpurmc.purpur.PurpurConfig.afkBroadcastBack;
+
+        org.purpurmc.purpur.event.PlayerAFKEvent event = new org.purpurmc.purpur.event.PlayerAFKEvent(this.getBukkitEntity(), afk, this.level().purpurConfig.idleTimeoutKick, msg, !org.bukkit.Bukkit.isPrimaryThread());
+        if (!event.callEvent() || event.shouldKick()) {
+            return;
+        }
+
+        this.isAfk = afk;
+
+        if (!afk) {
+            resetLastActionTime();
+        }
+
+        msg = event.getBroadcastMsg();
+        if (msg != null && !msg.isEmpty()) {
+            String playerName = this.getGameProfile().getName();
+            if (org.purpurmc.purpur.PurpurConfig.afkBroadcastUseDisplayName) {
+                net.kyori.adventure.text.Component playerDisplayNameComponent = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(this.getBukkitEntity().getDisplayName());
+                playerName = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(playerDisplayNameComponent);
+            }
+            server.getPlayerList().broadcastMiniMessage(String.format(msg, playerName), false);
+        }
+
+        if (this.level().purpurConfig.idleTimeoutUpdateTabList) {
+            String scoreboardName = getScoreboardName();
+            String playerListName = net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().serialize(getBukkitEntity().playerListName());
+            String[] split = playerListName.split(scoreboardName);
+            String prefix = (split.length > 0 ? split[0] : "").replace(org.purpurmc.purpur.PurpurConfig.afkTabListPrefix, "");
+            String suffix = (split.length > 1 ? split[1] : "").replace(org.purpurmc.purpur.PurpurConfig.afkTabListSuffix, "");
+            if (afk) {
+                getBukkitEntity().setPlayerListName(org.purpurmc.purpur.PurpurConfig.afkTabListPrefix + prefix + scoreboardName + suffix + org.purpurmc.purpur.PurpurConfig.afkTabListSuffix, true);
+            } else {
+                getBukkitEntity().setPlayerListName(prefix + scoreboardName + suffix, true);
+            }
+        }
+
+        ((ServerLevel) this.level()).updateSleepingPlayerList();
+    }
+
+    @Override
+    public boolean isAfk() {
+        return this.isAfk;
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return !this.isAfk() && super.canBeCollidedWith();
+    }
+    // Purpur end - AFK API
 
     public ServerStatsCounter getStats() {
         return this.stats;
@@ -3078,4 +3205,56 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
         return (org.bukkit.craftbukkit.entity.CraftPlayer) super.getBukkitEntity();
     }
     // CraftBukkit end
+
+    // Purpur start - Add option to teleport to spawn if outside world border
+    public void teleport(org.bukkit.Location to) {
+        this.ejectPassengers();
+        this.stopRiding(true);
+
+        if (this.isSleeping()) {
+            this.stopSleepInBed(true, false);
+        }
+
+        if (this.containerMenu != this.inventoryMenu) {
+            this.closeContainer(org.bukkit.event.inventory.InventoryCloseEvent.Reason.TELEPORT);
+        }
+
+        ServerLevel toLevel = ((org.bukkit.craftbukkit.CraftWorld) to.getWorld()).getHandle();
+        if (this.level() == toLevel) {
+            this.connection.teleport(to);
+        } else {
+            this.server.getPlayerList().respawn(this, true, RemovalReason.KILLED, org.bukkit.event.player.PlayerRespawnEvent.RespawnReason.DEATH, to);
+        }
+    }
+    // Purpur end - Add option to teleport to spawn if outside world border
+
+    // Purpur start - Implement TPSBar
+    public boolean tpsBar() {
+        return this.tpsBar;
+    }
+
+    public void tpsBar(boolean tpsBar) {
+        this.tpsBar = tpsBar;
+    }
+    // Purpur end - Implement TPSBar
+
+    // Purpur start - Add compass command
+    public boolean compassBar() {
+        return this.compassBar;
+    }
+
+    public void compassBar(boolean compassBar) {
+        this.compassBar = compassBar;
+    }
+    // Purpur end - Add compass command
+
+    // Purpur start - Add rambar command
+    public boolean ramBar() {
+        return this.ramBar;
+    }
+
+    public void ramBar(boolean ramBar) {
+        this.ramBar = ramBar;
+    }
+    // Purpur end - Add rambar command
 }

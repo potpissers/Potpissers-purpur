@@ -27,7 +27,7 @@ public class CatSpawner implements CustomSpawner {
             if (this.nextTick > 0) {
                 return 0;
             } else {
-                this.nextTick = 1200;
+                this.nextTick = level.purpurConfig.catSpawnDelay; // Purpur - Cat spawning options
                 Player randomPlayer = level.getRandomPlayer();
                 if (randomPlayer == null) {
                     return 0;
@@ -61,8 +61,12 @@ public class CatSpawner implements CustomSpawner {
 
     private int spawnInVillage(ServerLevel serverLevel, BlockPos pos) {
         int i = 48;
-        if (serverLevel.getPoiManager().getCountInRange(holder -> holder.is(PoiTypes.HOME), pos, 48, PoiManager.Occupancy.IS_OCCUPIED) > 4L) {
-            List<Cat> entitiesOfClass = serverLevel.getEntitiesOfClass(Cat.class, new AABB(pos).inflate(48.0, 8.0, 48.0));
+        // Purpur start - Cat spawning options
+        int range = serverLevel.purpurConfig.catSpawnVillageScanRange;
+        if (range <= 0) return 0;
+        if (serverLevel.getPoiManager().getCountInRange(holder -> holder.is(PoiTypes.HOME), pos, range, PoiManager.Occupancy.IS_OCCUPIED) > 4L) {
+            List<Cat> entitiesOfClass = serverLevel.getEntitiesOfClass(Cat.class, new AABB(pos).inflate(range, 8.0, range));
+        // Purpur end - Cat spawning options
             if (entitiesOfClass.size() < 5) {
                 return this.spawnCat(pos, serverLevel);
             }
@@ -73,7 +77,11 @@ public class CatSpawner implements CustomSpawner {
 
     private int spawnInHut(ServerLevel serverLevel, BlockPos pos) {
         int i = 16;
-        List<Cat> entitiesOfClass = serverLevel.getEntitiesOfClass(Cat.class, new AABB(pos).inflate(16.0, 8.0, 16.0));
+        // Purpur start - Cat spawning options
+        int range = serverLevel.purpurConfig.catSpawnSwampHutScanRange;
+        if (range <= 0) return 0;
+        List<Cat> entitiesOfClass = serverLevel.getEntitiesOfClass(Cat.class, new AABB(pos).inflate(range, 8.0, range));
+        // Purpur end - Cat spawning options
         return entitiesOfClass.size() < 1 ? this.spawnCat(pos, serverLevel) : 0;
     }
 

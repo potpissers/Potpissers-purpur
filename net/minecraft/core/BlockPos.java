@@ -63,6 +63,12 @@ public class BlockPos extends Vec3i {
     public static final int MAX_HORIZONTAL_COORDINATE = 33554431;
     // Paper end - Optimize Bit Operations by inlining
 
+    // Purpur start - Ridables
+    public BlockPos(net.minecraft.world.entity.Entity entity) {
+        super(entity.getBlockX(), entity.getBlockY(), entity.getBlockZ());
+    }
+    // Purpur end - Ridables
+
     public BlockPos(int x, int y, int z) {
         super(x, y, z);
     }

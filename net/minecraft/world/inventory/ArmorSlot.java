@@ -42,7 +42,7 @@ class ArmorSlot extends Slot {
     @Override
     public boolean mayPickup(Player player) {
         ItemStack item = this.getItem();
-        return (item.isEmpty() || player.isCreative() || !EnchantmentHelper.has(item, EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE))
+        return (item.isEmpty() || player.isCreative() || (!EnchantmentHelper.has(item, EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE) || player.level().purpurConfig.playerRemoveBindingWithWeakness && player.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS))) // Purpur - Config to remove curse of binding with weakness
             && super.mayPickup(player);
     }
 

@@ -36,6 +36,7 @@ public class FoodData {
         int oldFoodLevel = this.foodLevel;
         org.bukkit.event.entity.FoodLevelChangeEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callFoodLevelChangeEvent(serverPlayer, foodProperties.nutrition() + oldFoodLevel, stack);
         if (!event.isCancelled()) {
+            if (serverPlayer.level().purpurConfig.playerBurpWhenFull && event.getFoodLevel() == 20 && oldFoodLevel < 20) serverPlayer.burpDelay = serverPlayer.level().purpurConfig.playerBurpDelay; // Purpur - Burp after eating food fills hunger bar completely
             this.add(event.getFoodLevel() - oldFoodLevel, foodProperties.saturation());
         }
         serverPlayer.getBukkitEntity().sendHealthUpdate();
@@ -84,7 +85,7 @@ public class FoodData {
             this.tickTimer++;
             if (this.tickTimer >= this.starvationRate) { // CraftBukkit - add regen rate manipulation
                 if (player.getHealth() > 10.0F || difficulty == Difficulty.HARD || player.getHealth() > 1.0F && difficulty == Difficulty.NORMAL) {
-                    player.hurtServer(serverLevel, player.damageSources().starve(), 1.0F);
+                    player.hurtServer(serverLevel, player.damageSources().starve(), player.level().purpurConfig.hungerStarvationDamage); // Purpur - Configurable hunger starvation damage
                 }
 
                 this.tickTimer = 0;

@@ -124,10 +124,10 @@ public class BubbleColumnBlock extends Block implements BucketPickup {
         if (blockState.is(Blocks.BUBBLE_COLUMN)) {
             return blockState;
         } else if (blockState.is(Blocks.SOUL_SAND)) {
-            return Blocks.BUBBLE_COLUMN.defaultBlockState().setValue(DRAG_DOWN, Boolean.valueOf(false));
+            return Blocks.BUBBLE_COLUMN.defaultBlockState().setValue(DRAG_DOWN, Boolean.valueOf(org.purpurmc.purpur.PurpurConfig.soulSandBlockReverseBubbleColumnFlow)); // Purpur - Config to reverse bubble column flow
         } else {
             return blockState.is(Blocks.MAGMA_BLOCK)
-                ? Blocks.BUBBLE_COLUMN.defaultBlockState().setValue(DRAG_DOWN, Boolean.valueOf(true))
+                ? Blocks.BUBBLE_COLUMN.defaultBlockState().setValue(DRAG_DOWN, Boolean.valueOf(!org.purpurmc.purpur.PurpurConfig.magmaBlockReverseBubbleColumnFlow)) // Purpur - Config to reverse bubble column flow
                 : Blocks.WATER.defaultBlockState();
         }
     }

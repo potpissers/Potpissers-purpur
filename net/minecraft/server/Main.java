@@ -108,6 +108,12 @@ public class Main {
                 JvmProfiler.INSTANCE.start(Environment.SERVER);
             }
 
+            // Purpur start - Add toggle for enchant level clamping - load config files early
+            org.bukkit.configuration.file.YamlConfiguration purpurConfiguration = io.papermc.paper.configuration.PaperConfigurations.loadLegacyConfigFile((File) optionSet.valueOf("purpur-settings"));
+            org.purpurmc.purpur.PurpurConfig.clampEnchantLevels = purpurConfiguration.getBoolean("settings.enchantment.clamp-levels", true);
+            org.purpurmc.purpur.PurpurConfig.registerMinecraftDebugCommands = purpurConfiguration.getBoolean("settings.register-minecraft-debug-commands"); // Purpur - register minecraft debug commands
+            // Purpur end - Add toggle for enchant level clamping - load config files early
+
             io.papermc.paper.plugin.PluginInitializerManager.load(optionSet); // Paper
             Bootstrap.bootStrap();
             Bootstrap.validate();

@@ -28,11 +28,22 @@ import net.minecraft.world.level.block.state.BlockState;
 public class Endermite extends Monster {
     private static final int MAX_LIFE = 2400;
     public int life;
+    private boolean isPlayerSpawned; // Purpur - Add back player spawned endermite API
 
     public Endermite(EntityType<? extends Endermite> entityType, Level level) {
         super(entityType, level);
         this.xpReward = 3;
     }
+
+    // Purpur start - Add back player spawned endermite API
+    public boolean isPlayerSpawned() {
+        return this.isPlayerSpawned;
+    }
+
+    public void setPlayerSpawned(boolean playerSpawned) {
+        this.isPlayerSpawned = playerSpawned;
+    }
+    // Purpur end - Add back player spawned endermite API
 
     @Override
     protected void registerGoals() {
@@ -79,12 +90,14 @@ public class Endermite extends Monster {
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         this.life = compound.getInt("Lifetime");
+        this.isPlayerSpawned = compound.getBoolean("PlayerSpawned"); // Purpur - Add back player spawned endermite API
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("Lifetime", this.life);
+        compound.putBoolean("PlayerSpawned", this.isPlayerSpawned); // Purpur - Add back player spawned endermite API
     }
 
     @Override
