@@ -973,6 +973,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
             MinecraftServer.LOGGER.error("Failed to unlock level {}", this.storageSource.getLevelId(), ioexception1);
         }
         // Spigot start
+        io.papermc.paper.util.MCUtil.asyncExecutor.shutdown(); // Paper
+        try { io.papermc.paper.util.MCUtil.asyncExecutor.awaitTermination(30, java.util.concurrent.TimeUnit.SECONDS); // Paper
+        } catch (java.lang.InterruptedException ignored) {} // Paper
         if (org.spigotmc.SpigotConfig.saveUserCacheOnStopOnly) {
             MinecraftServer.LOGGER.info("Saving usercache.json");
             this.getProfileCache().save();
@@ -1337,7 +1340,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
             MinecraftServer.LOGGER.debug("Autosave finished");
             SpigotTimings.worldSaveTimer.stopTiming(); // Spigot
         }
-
         this.profiler.push("tallying");
         long j = Util.getNanos() - i;
         int k = this.tickCount % 100;
