@@ -53,7 +53,7 @@ public abstract class RandomizableContainerBlockEntity extends BaseContainerBloc
 
     @Override
     public ItemStack getItem(int index) {
-        this.unpackLootTable(null);
+        if (index == 0) this.unpackLootTable(null); // Paper - Perf: Optimize Hoppers
         return super.getItem(index);
     }
 

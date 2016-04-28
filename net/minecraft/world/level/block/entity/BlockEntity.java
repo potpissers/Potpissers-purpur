@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.slf4j.Logger;
 
 public abstract class BlockEntity {
+    static boolean ignoreBlockEntityUpdates; // Paper - Perf: Optimize Hoppers
     // CraftBukkit start - data containers
     private static final org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry();
     public org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer persistentDataContainer;
@@ -196,6 +197,7 @@ public abstract class BlockEntity {
 
     public void setChanged() {
         if (this.level != null) {
+            if (ignoreBlockEntityUpdates) return; // Paper - Perf: Optimize Hoppers
             setChanged(this.level, this.worldPosition, this.blockState);
         }
     }

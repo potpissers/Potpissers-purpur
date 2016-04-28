@@ -827,10 +827,16 @@ public final class ItemStack implements DataComponentHolder {
     }
 
     public ItemStack copy() {
-        if (this.isEmpty()) {
+        // Paper start - Perf: Optimize Hoppers
+        return this.copy(false);
+    }
+
+    public ItemStack copy(final boolean originalItem) {
+        if (!originalItem && this.isEmpty()) {
+            // Paper end - Perf: Optimize Hoppers
             return EMPTY;
         } else {
-            ItemStack itemStack = new ItemStack(this.getItem(), this.count, this.components.copy());
+            ItemStack itemStack = new ItemStack(originalItem ? this.item : this.getItem(), this.count, this.components.copy()); // Paper - Perf: Optimize Hoppers
             itemStack.setPopTime(this.getPopTime());
             return itemStack;
         }
