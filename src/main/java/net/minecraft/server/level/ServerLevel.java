@@ -2496,6 +2496,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
                             {
                                 if ( iter.next().player == entity )
                                 {
+                                    map.decorations.remove(entity.getName().getString()); // Paper
                                     iter.remove();
                                 }
                             }
