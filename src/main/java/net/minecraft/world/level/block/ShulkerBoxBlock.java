@@ -148,7 +148,7 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
                 itemEntity.setDefaultPickUpDelay();
                 world.addFreshEntity(itemEntity);
             } else {
-                shulkerBoxBlockEntity.unpackLootTable(player);
+                shulkerBoxBlockEntity.unpackLootTable(player, true); // Paper - force clear loot table so replenish data isn't persisted in the stack
             }
         }
 
@@ -158,7 +158,15 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
     @Override
     protected List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+        Runnable reAdd = null; // Paper
         if (blockEntity instanceof ShulkerBoxBlockEntity shulkerBoxBlockEntity) {
+            // Paper start - clear loot table if it was already used
+            if (shulkerBoxBlockEntity.lootableData().getLastFill() != -1 || !builder.getLevel().paperConfig().lootables.retainUnlootedShulkerBoxLootTableOnNonPlayerBreak) {
+                net.minecraft.resources.ResourceKey<net.minecraft.world.level.storage.loot.LootTable> lootTableResourceKey = shulkerBoxBlockEntity.getLootTable();
+                reAdd = () -> shulkerBoxBlockEntity.setLootTable(lootTableResourceKey);
+                shulkerBoxBlockEntity.setLootTable(null);
+            }
+            // Paper end
             builder = builder.withDynamicDrop(CONTENTS, lootConsumer -> {
                 for (int i = 0; i < shulkerBoxBlockEntity.getContainerSize(); i++) {
                     lootConsumer.accept(shulkerBoxBlockEntity.getItem(i));
@@ -166,7 +174,13 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
             });
         }
 
+        // Paper start - re-set loot table if it was cleared
+        try {
         return super.getDrops(state, builder);
+        } finally {
+            if (reAdd != null) reAdd.run();
+        }
+        // Paper end - re-set loot table if it was cleared
     }
 
     @Override
