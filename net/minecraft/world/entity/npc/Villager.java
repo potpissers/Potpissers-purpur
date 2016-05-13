@@ -265,11 +265,35 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
         return this.assignProfessionWhenSpawned;
     }
 
+    // Paper start - EAR 2
+    @Override
+    public void inactiveTick() {
+        // SPIGOT-3874, SPIGOT-3894, SPIGOT-3846, SPIGOT-5286 :(
+        if (this.getUnhappyCounter() > 0) {
+            this.setUnhappyCounter(this.getUnhappyCounter() - 1);
+        }
+        if (this.isEffectiveAi()) {
+            if (this.level().spigotConfig.tickInactiveVillagers) {
+                this.customServerAiStep(this.level().getMinecraftWorld());
+            } else {
+                this.customServerAiStep(this.level().getMinecraftWorld(), true);
+            }
+        }
+        maybeDecayGossip();
+        super.inactiveTick();
+    }
+    // Paper end - EAR 2
+
     @Override
     protected void customServerAiStep(ServerLevel level) {
+        // Paper start - EAR 2
+        this.customServerAiStep(level, false);
+    }
+    protected void customServerAiStep(ServerLevel level, final boolean inactive) {
+        // Paper end - EAR 2
         ProfilerFiller profilerFiller = Profiler.get();
         profilerFiller.push("villagerBrain");
-        this.getBrain().tick(level, this);
+        if (!inactive) this.getBrain().tick(level, this); // Paper - EAR 2
         profilerFiller.pop();
         if (this.assignProfessionWhenSpawned) {
             this.assignProfessionWhenSpawned = false;
@@ -293,7 +317,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
             this.lastTradedPlayer = null;
         }
 
-        if (!this.isNoAi() && this.random.nextInt(100) == 0) {
+        if (!inactive && !this.isNoAi() && this.random.nextInt(100) == 0) { // Paper - EAR 2
             Raid raidAt = level.getRaidAt(this.blockPosition());
             if (raidAt != null && raidAt.isActive() && !raidAt.isOver()) {
                 level.broadcastEntityEvent(this, (byte)42);
@@ -303,6 +327,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
         if (this.getVillagerData().getProfession() == VillagerProfession.NONE && this.isTrading()) {
             this.stopTrading();
         }
+        if (inactive) return; // Paper - EAR 2
 
         super.customServerAiStep(level);
     }

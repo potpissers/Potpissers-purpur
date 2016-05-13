@@ -124,6 +124,29 @@ public class ItemEntity extends Entity implements TraceableEntity {
         return 0.04;
     }
 
+    // Paper start - EAR 2
+    @Override
+    public void inactiveTick() {
+        super.inactiveTick();
+        if (this.pickupDelay > 0 && this.pickupDelay != 32767) {
+            this.pickupDelay--;
+        }
+        if (this.age != -32768) {
+            this.age++;
+        }
+
+        if (!this.level().isClientSide && this.age >= this.despawnRate) {// Paper - Alternative item-despawn-rate
+            // CraftBukkit start - fire ItemDespawnEvent
+            if (org.bukkit.craftbukkit.event.CraftEventFactory.callItemDespawnEvent(this).isCancelled()) {
+                this.age = 0;
+                return;
+            }
+            // CraftBukkit end
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
+        }
+    }
+    // Paper end - EAR 2
+
     @Override
     public void tick() {
         if (this.getItem().isEmpty()) {

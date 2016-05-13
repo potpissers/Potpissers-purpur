@@ -3096,6 +3096,14 @@ public abstract class LivingEntity extends Entity implements Attackable {
         return false;
     }
 
+    // Paper start - EAR 2
+    @Override
+    public void inactiveTick() {
+        super.inactiveTick();
+        ++this.noActionTime; // Above all the floats
+    }
+    // Paper end - EAR 2
+
     @Override
     public void tick() {
         super.tick();

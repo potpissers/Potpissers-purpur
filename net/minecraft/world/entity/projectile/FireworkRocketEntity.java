@@ -102,6 +102,21 @@ public class FireworkRocketEntity extends Projectile implements ItemSupplier {
         return super.shouldRender(x, y, z) && !this.isAttachedToEntity();
     }
 
+    // Paper start - EAR 2
+    @Override
+    public void inactiveTick() {
+        this.life++;
+        if (this.life > this.lifetime && this.level() instanceof ServerLevel serverLevel) {
+            // CraftBukkit start
+            if (!org.bukkit.craftbukkit.event.CraftEventFactory.callFireworkExplodeEvent(this).isCancelled()) {
+                this.explode(serverLevel);
+            }
+            // CraftBukkit end
+        }
+        super.inactiveTick();
+    }
+    // Paper end - EAR 2
+
     @Override
     public void tick() {
         super.tick();

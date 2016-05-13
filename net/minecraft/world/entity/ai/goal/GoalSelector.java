@@ -25,6 +25,7 @@ public class GoalSelector {
     private final Map<Goal.Flag, WrappedGoal> lockedFlags = new EnumMap<>(Goal.Flag.class);
     private final Set<WrappedGoal> availableGoals = new ObjectLinkedOpenHashSet<>();
     private final EnumSet<Goal.Flag> disabledFlags = EnumSet.noneOf(Goal.Flag.class);
+    private int curRate; // Paper - EAR 2
 
     public void addGoal(int priority, Goal goal) {
         this.availableGoals.add(new WrappedGoal(priority, goal));
@@ -34,6 +35,22 @@ public class GoalSelector {
     public void removeAllGoals(Predicate<Goal> filter) {
         this.availableGoals.removeIf(wrappedGoal -> filter.test(wrappedGoal.getGoal()));
     }
+
+    // Paper start - EAR 2
+    public boolean inactiveTick() {
+        this.curRate++;
+        return this.curRate % 3 == 0; // TODO newGoalRate was already unused in 1.20.4, check if this is correct
+    }
+
+    public boolean hasTasks() {
+        for (WrappedGoal task : this.availableGoals) {
+            if (task.isRunning()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // Paper end - EAR 2
 
     public void removeGoal(Goal goal) {
         for (WrappedGoal wrappedGoal : this.availableGoals) {

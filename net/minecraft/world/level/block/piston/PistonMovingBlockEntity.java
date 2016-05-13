@@ -149,6 +149,10 @@ public class PistonMovingBlockEntity extends BlockEntity {
                                 }
 
                                 entity.setDeltaMovement(d1, d2, d3);
+                                // Paper - EAR items stuck in slime pushed by a piston
+                                entity.activatedTick = Math.max(entity.activatedTick, net.minecraft.server.MinecraftServer.currentTick + 10);
+                                entity.activatedImmunityTick = Math.max(entity.activatedImmunityTick, net.minecraft.server.MinecraftServer.currentTick + 10);
+                                // Paper end
                                 break;
                             }
                         }

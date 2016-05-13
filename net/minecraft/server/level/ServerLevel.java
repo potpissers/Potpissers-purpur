@@ -551,6 +551,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
                 profilerFiller.pop();
             }
 
+            io.papermc.paper.entity.activation.ActivationRange.activateEntities(this); // Paper - EAR
             this.entityTickList
                 .forEach(
                     entity -> {
@@ -979,12 +980,15 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
         entity.tickCount++;
         profilerFiller.push(() -> BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
         profilerFiller.incrementCounter("tickNonPassenger");
+        final boolean isActive = io.papermc.paper.entity.activation.ActivationRange.checkIfActive(entity); // Paper - EAR 2
+        if (isActive) { // Paper - EAR 2
         entity.tick();
         entity.postTick(); // CraftBukkit
+        } else {entity.inactiveTick();} // Paper - EAR 2
         profilerFiller.pop();
 
         for (Entity entity1 : entity.getPassengers()) {
-            this.tickPassenger(entity, entity1);
+            this.tickPassenger(entity, entity1, isActive); // Paper - EAR 2
         }
         // Paper start - log detailed entity tick information
         } finally {
@@ -995,7 +999,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
         // Paper end - log detailed entity tick information
     }
 
-    private void tickPassenger(Entity ridingEntity, Entity passengerEntity) {
+    private void tickPassenger(Entity ridingEntity, Entity passengerEntity, final boolean isActive) { // Paper - EAR 2
         if (passengerEntity.isRemoved() || passengerEntity.getVehicle() != ridingEntity) {
             passengerEntity.stopRiding();
         } else if (passengerEntity instanceof Player || this.entityTickList.contains(passengerEntity)) {
@@ -1004,12 +1008,21 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
             ProfilerFiller profilerFiller = Profiler.get();
             profilerFiller.push(() -> BuiltInRegistries.ENTITY_TYPE.getKey(passengerEntity.getType()).toString());
             profilerFiller.incrementCounter("tickPassenger");
+            // Paper start - EAR 2
+            if (isActive) {
             passengerEntity.rideTick();
             passengerEntity.postTick(); // CraftBukkit
+            } else {
+                passengerEntity.setDeltaMovement(Vec3.ZERO);
+                passengerEntity.inactiveTick();
+                // copied from inside of if (isPassenger()) of passengerTick, but that ifPassenger is unnecessary
+                ridingEntity.positionRider(passengerEntity);
+            }
+            // Paper end - EAR 2
             profilerFiller.pop();
 
             for (Entity entity : passengerEntity.getPassengers()) {
-                this.tickPassenger(passengerEntity, entity);
+                this.tickPassenger(passengerEntity, entity, isActive); // Paper - EAR 2
             }
         }
     }

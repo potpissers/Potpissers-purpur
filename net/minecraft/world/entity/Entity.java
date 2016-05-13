@@ -380,6 +380,15 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     public boolean fixedPose = false; // Paper - Expand Pose API
     private final int despawnTime; // Paper - entity despawn time limit
     public final io.papermc.paper.entity.activation.ActivationType activationType = io.papermc.paper.entity.activation.ActivationType.activationTypeFor(this); // Paper - EAR 2/tracking ranges
+    // Paper start - EAR 2
+    public final boolean defaultActivationState;
+    public long activatedTick = Integer.MIN_VALUE;
+    public boolean isTemporarilyActive;
+    public long activatedImmunityTick = Integer.MIN_VALUE;
+
+    public void inactiveTick() {
+    }
+    // Paper end - EAR 2
 
     public void setOrigin(@javax.annotation.Nonnull org.bukkit.Location location) {
         this.origin = location.toVector();
@@ -413,6 +422,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         this.position = Vec3.ZERO;
         this.blockPosition = BlockPos.ZERO;
         this.chunkPosition = ChunkPos.ZERO;
+        // Paper start - EAR 2
+        if (level != null) {
+            this.defaultActivationState = io.papermc.paper.entity.activation.ActivationRange.initializeEntityActivationState(this, level.spigotConfig);
+        } else {
+            this.defaultActivationState = false;
+        }
+        // Paper end - EAR 2
         SynchedEntityData.Builder builder = new SynchedEntityData.Builder(this);
         builder.define(DATA_SHARED_FLAGS_ID, (byte)0);
         builder.define(DATA_AIR_SUPPLY_ID, this.getMaxAirSupply());
@@ -977,6 +993,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         } else {
             this.wasOnFire = this.isOnFire();
             if (type == MoverType.PISTON) {
+                this.activatedTick = Math.max(this.activatedTick, MinecraftServer.currentTick + 20); // Paper - EAR 2
+                this.activatedImmunityTick = Math.max(this.activatedImmunityTick, MinecraftServer.currentTick + 20);   // Paper - EAR 2
                 movement = this.limitPistonMovement(movement);
                 if (movement.equals(Vec3.ZERO)) {
                     return;
@@ -990,6 +1008,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                 this.stuckSpeedMultiplier = Vec3.ZERO;
                 this.setDeltaMovement(Vec3.ZERO);
             }
+            // Paper start - ignore movement changes while inactive.
+            if (isTemporarilyActive && !(this instanceof ItemEntity) && movement == getDeltaMovement() && type == MoverType.SELF) {
+                setDeltaMovement(Vec3.ZERO);
+                profilerFiller.pop();
+                return;
+            }
+            // Paper end
 
             movement = this.maybeBackOffFromEdge(movement, type);
             Vec3 vec3 = this.collide(movement);

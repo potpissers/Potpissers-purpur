@@ -126,6 +126,23 @@ public abstract class AgeableMob extends PathfinderMob {
         super.onSyncedDataUpdated(key);
     }
 
+    // Paper start - EAR 2
+    @Override
+    public void inactiveTick() {
+        super.inactiveTick();
+        if (this.level().isClientSide || this.ageLocked) { // CraftBukkit
+            this.refreshDimensions();
+        } else {
+            int age = this.getAge();
+            if (age < 0) {
+                this.setAge(++age);
+            } else if (age > 0) {
+                this.setAge(--age);
+            }
+        }
+    }
+    // Paper end - EAR 2
+
     @Override
     public void aiStep() {
         super.aiStep();

@@ -128,6 +128,16 @@ public class AreaEffectCloud extends Entity implements TraceableEntity {
         this.duration = duration;
     }
 
+    // Paper start - EAR 2
+    @Override
+    public void inactiveTick() {
+        super.inactiveTick();
+        if (this.tickCount >= this.waitTime + this.duration) {
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
+        }
+    }
+    // Paper end - EAR 2
+
     @Override
     public void tick() {
         super.tick();

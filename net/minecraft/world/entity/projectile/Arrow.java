@@ -66,6 +66,16 @@ public class Arrow extends AbstractArrow {
         builder.define(ID_EFFECT_COLOR, -1);
     }
 
+    // Paper start - EAR 2
+    @Override
+    public void inactiveTick() {
+        if (this.isInGround()) {
+            this.life++;
+        }
+        super.inactiveTick();
+    }
+    // Paper end
+
     @Override
     public void tick() {
         super.tick();

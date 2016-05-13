@@ -17,6 +17,8 @@ public abstract class PathfinderMob extends Mob {
         super(entityType, level);
     }
 
+    public BlockPos movingTarget; public BlockPos getMovingTarget() { return movingTarget; } // Paper
+
     public float getWalkTargetValue(BlockPos pos) {
         return this.getWalkTargetValue(pos, this.level());
     }
