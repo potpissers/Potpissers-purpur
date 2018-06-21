@@ -74,6 +74,7 @@ public class Explosion {
     public boolean wasCanceled = false;
     public float yield;
     // CraftBukkit end
+    public boolean excludeSourceFromDamage = true; // Paper - Allow explosions to damage source
 
     public static DamageSource getDefaultDamageSource(Level world, @Nullable Entity source) {
         return world.damageSources().explosion(source, Explosion.getIndirectSourceEntityInternal(source));
@@ -227,7 +228,7 @@ public class Explosion {
         int i1 = Mth.floor(this.y + (double) f2 + 1.0D);
         int j1 = Mth.floor(this.z - (double) f2 - 1.0D);
         int k1 = Mth.floor(this.z + (double) f2 + 1.0D);
-        List<Entity> list = this.level.getEntities(this.source, new AABB((double) i, (double) l, (double) j1, (double) j, (double) i1, (double) k1), (com.google.common.base.Predicate<Entity>) entity -> entity.isAlive() && !entity.isSpectator()); // Paper - Fix lag from explosions processing dead entities
+        List<Entity> list = this.level.getEntities(excludeSourceFromDamage ? this.source : null, new AABB((double) i, (double) l, (double) j1, (double) j, (double) i1, (double) k1), (com.google.common.base.Predicate<Entity>) entity -> entity.isAlive() && !entity.isSpectator()); // Paper - Fix lag from explosions processing dead entities, Allow explosions to damage source
         Vec3 vec3d = new Vec3(this.x, this.y, this.z);
         Iterator iterator = list.iterator();
 

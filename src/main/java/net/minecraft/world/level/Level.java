@@ -782,7 +782,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
     }
 
     public Explosion explode(@Nullable Entity entity, double x, double y, double z, float power, boolean createFire, Level.ExplosionInteraction explosionSourceType) {
-        return this.explode(entity, Explosion.getDefaultDamageSource(this, entity), (ExplosionDamageCalculator) null, x, y, z, power, createFire, explosionSourceType, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
+    // Paper start - Allow explosions to damage source
+        return this.explode(entity, x, y, z, power, createFire, explosionSourceType, null);
+    }
+    public Explosion explode(@Nullable Entity entity, double x, double y, double z, float power, boolean createFire, Level.ExplosionInteraction explosionSourceType, @Nullable Consumer<Explosion> configurator) {
+        return this.explode(entity, Explosion.getDefaultDamageSource(this, entity), (ExplosionDamageCalculator) null, x, y, z, power, createFire, explosionSourceType, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE, configurator);
+    // Paper end - Allow explosions to damage source
     }
 
     public Explosion explode(@Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior, Vec3 pos, float power, boolean createFire, Level.ExplosionInteraction explosionSourceType) {
@@ -794,10 +799,21 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
     }
 
     public Explosion explode(@Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior, double x, double y, double z, float power, boolean createFire, Level.ExplosionInteraction explosionSourceType, ParticleOptions particle, ParticleOptions emitterParticle, Holder<SoundEvent> soundEvent) {
-        return this.explode(entity, damageSource, behavior, x, y, z, power, createFire, explosionSourceType, true, particle, emitterParticle, soundEvent);
+    // Paper start - Allow explosions to damage source
+        return this.explode(entity, damageSource, behavior, x, y, z, power, createFire, explosionSourceType, particle, emitterParticle, soundEvent, null);
+    }
+
+    public Explosion explode(@Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior, double x, double y, double z, float power, boolean createFire, Level.ExplosionInteraction explosionSourceType, ParticleOptions particle, ParticleOptions emitterParticle, Holder<SoundEvent> soundEvent, @Nullable Consumer<Explosion> configurator) {
+        return this.explode(entity, damageSource, behavior, x, y, z, power, createFire, explosionSourceType, true, particle, emitterParticle, soundEvent, configurator);
+    // Paper end - Allow explosions to damage source
     }
 
     public Explosion explode(@Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior, double x, double y, double z, float power, boolean createFire, Level.ExplosionInteraction explosionSourceType, boolean particles, ParticleOptions particle, ParticleOptions emitterParticle, Holder<SoundEvent> soundEvent) {
+    // Paper start - Allow explosions to damage source
+        return this.explode(entity, damageSource, behavior, x, y, z, power, createFire, explosionSourceType, particle, emitterParticle, soundEvent, null);
+    }
+    public Explosion explode(@Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior, double x, double y, double z, float power, boolean createFire, Level.ExplosionInteraction explosionSourceType, boolean particles, ParticleOptions particle, ParticleOptions emitterParticle, Holder<SoundEvent> soundEvent, @Nullable Consumer<Explosion> configurator) {
+    // Paper end - Allow explosions to damage source
         Explosion.BlockInteraction explosion_effect;
 
         switch (explosionSourceType.ordinal()) {
@@ -827,6 +843,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
 
         Explosion.BlockInteraction explosion_effect1 = explosion_effect;
         Explosion explosion = new Explosion(this, entity, damageSource, behavior, x, y, z, power, createFire, explosion_effect1, particle, emitterParticle, soundEvent);
+        if (configurator != null) configurator.accept(explosion); // Paper - Allow explosions to damage source
 
         explosion.explode();
         explosion.finalizeExplosion(particles);
