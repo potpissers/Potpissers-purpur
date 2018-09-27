@@ -44,7 +44,7 @@ public class DefaultRedstoneWireEvaluator extends RedstoneWireEvaluator {
         }
     }
 
-    private int calculateTargetStrength(Level level, BlockPos pos) {
+    public int calculateTargetStrength(Level level, BlockPos pos) { // Paper - Optimize redstone
         int blockSignal = this.getBlockSignal(level, pos);
         return blockSignal == 15 ? blockSignal : Math.max(blockSignal, this.getIncomingWireSignal(level, pos));
     }

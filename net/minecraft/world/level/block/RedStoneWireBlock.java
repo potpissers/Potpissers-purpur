@@ -290,6 +290,60 @@ public class RedStoneWireBlock extends Block {
         return state.isFaceSturdy(level, pos, Direction.UP) || state.is(Blocks.HOPPER);
     }
 
+    // Paper start - Optimize redstone
+    // The bulk of the new functionality is found in RedstoneWireTurbo.java
+    io.papermc.paper.redstone.RedstoneWireTurbo turbo = new io.papermc.paper.redstone.RedstoneWireTurbo(this);
+
+    /*
+     * Modified version of pre-existing updateSurroundingRedstone, which is called from
+     * this.neighborChanged and a few other methods in this class.
+     * Note: Added 'source' argument so as to help determine direction of information flow
+     */
+    private void updateSurroundingRedstone(Level worldIn, BlockPos pos, BlockState state, @Nullable Orientation orientation, boolean blockAdded) {
+        if (worldIn.paperConfig().misc.redstoneImplementation == io.papermc.paper.configuration.WorldConfiguration.Misc.RedstoneImplementation.EIGENCRAFT) {
+            // since 24w33a the source pos is no longer given, but instead an Orientation parameter
+            // when this is not null, it can be used to find the source pos, which the turbo uses
+            // to find the direction of information flow
+            BlockPos source = null;
+            if (orientation != null) {
+                source = pos.relative(orientation.getFront().getOpposite());
+            }
+            turbo.updateSurroundingRedstone(worldIn, pos, state, source);
+            return;
+        }
+        updatePowerStrength(worldIn, pos, state, orientation, blockAdded);
+    }
+
+    /*
+     * This method computes a wire's target strength and updates the given block state.
+     * It uses the DefaultRedstoneWireEvaluator for this, which is identical to code
+     * that was present in this class prior to the introduction of the experimental redstone
+     * changes in 24w33a.
+     * The previous implementation of this method in this patch had optimizations that have
+     * not been relevant since 1.13, thus it has been greatly simplified.
+     */
+    public BlockState calculateCurrentChanges(Level level, BlockPos pos, BlockState state) {
+        int oldPower = state.getValue(POWER);
+        int newPower = ((DefaultRedstoneWireEvaluator) evaluator).calculateTargetStrength(level, pos);
+        if (oldPower != newPower) {
+            org.bukkit.event.block.BlockRedstoneEvent event = new org.bukkit.event.block.BlockRedstoneEvent(org.bukkit.craftbukkit.block.CraftBlock.at(level, pos), oldPower, newPower);
+            level.getCraftServer().getPluginManager().callEvent(event);
+
+            newPower = event.getNewCurrent();
+
+            if (level.getBlockState(pos) == state) {
+                state = state.setValue(POWER, newPower);
+                // [Space Walker] suppress shape updates and emit those manually to
+                // bypass the new neighbor update stack.
+                if (level.setBlock(pos, state, Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_CLIENTS)) {
+                    turbo.updateNeighborShapes(level, pos, state);
+                }
+            }
+        }
+        return state;
+    }
+    // Paper end
+
     private void updatePowerStrength(Level level, BlockPos pos, BlockState state, @Nullable Orientation orientation, boolean updateShape) {
         if (useExperimentalEvaluator(level)) {
             new ExperimentalRedstoneWireEvaluator(this).updatePowerStrength(level, pos, state, orientation, updateShape);
@@ -318,7 +372,7 @@ public class RedStoneWireBlock extends Block {
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         if (!oldState.is(state.getBlock()) && !level.isClientSide) {
-            this.updatePowerStrength(level, pos, state, null, true);
+            this.updateSurroundingRedstone(level, pos, state, null, true); // Paper - Optimize redstone
 
             for (Direction direction : Direction.Plane.VERTICAL) {
                 level.updateNeighborsAt(pos.relative(direction), this);
@@ -337,7 +391,7 @@ public class RedStoneWireBlock extends Block {
                     level.updateNeighborsAt(pos.relative(direction), this);
                 }
 
-                this.updatePowerStrength(level, pos, state, null, false);
+                this.updateSurroundingRedstone(level, pos, state, null, false); // Paper - Optimize redstone
                 this.updateNeighborsOfNeighboringWires(level, pos);
             }
         }
@@ -363,7 +417,7 @@ public class RedStoneWireBlock extends Block {
         if (!level.isClientSide) {
             if (neighborBlock != this || !useExperimentalEvaluator(level)) {
                 if (state.canSurvive(level, pos)) {
-                    this.updatePowerStrength(level, pos, state, orientation, false);
+                    this.updateSurroundingRedstone(level, pos, state, orientation, false); // Paper - Optimize redstone
                 } else {
                     dropResources(state, level, pos);
                     level.removeBlock(pos, false);
