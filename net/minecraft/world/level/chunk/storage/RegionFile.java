@@ -53,6 +53,7 @@ public class RegionFile implements AutoCloseable {
         this.info = info;
         this.path = path;
         this.version = version;
+        this.initOversizedState(); // Paper
         if (!Files.isDirectory(externalFileDir)) {
             throw new IllegalArgumentException("Expected directory, got " + externalFileDir.toAbsolutePath());
         } else {
@@ -423,4 +424,75 @@ public class RegionFile implements AutoCloseable {
     interface CommitOp {
         void run() throws IOException;
     }
+
+    // Paper start
+    private final byte[] oversized = new byte[1024];
+    private int oversizedCount;
+
+    private synchronized void initOversizedState() throws IOException {
+        Path metaFile = getOversizedMetaFile();
+        if (Files.exists(metaFile)) {
+            final byte[] read = java.nio.file.Files.readAllBytes(metaFile);
+            System.arraycopy(read, 0, oversized, 0, oversized.length);
+            for (byte temp : oversized) {
+                oversizedCount += temp;
+            }
+        }
+    }
+
+    private static int getChunkIndex(int x, int z) {
+        return (x & 31) + (z & 31) * 32;
+    }
+
+    synchronized boolean isOversized(int x, int z) {
+        return this.oversized[getChunkIndex(x, z)] == 1;
+    }
+
+    synchronized void setOversized(int x, int z, boolean oversized) throws IOException {
+        final int offset = getChunkIndex(x, z);
+        boolean previous = this.oversized[offset] == 1;
+        this.oversized[offset] = (byte) (oversized ? 1 : 0);
+        if (!previous && oversized) {
+            oversizedCount++;
+        } else if (!oversized && previous) {
+            oversizedCount--;
+        }
+        if (previous && !oversized) {
+            Path oversizedFile = getOversizedFile(x, z);
+            if (Files.exists(oversizedFile)) {
+                Files.delete(oversizedFile);
+            }
+        }
+        if (oversizedCount > 0) {
+            if (previous != oversized) {
+                writeOversizedMeta();
+            }
+        } else if (previous) {
+            Path oversizedMetaFile = getOversizedMetaFile();
+            if (Files.exists(oversizedMetaFile)) {
+                Files.delete(oversizedMetaFile);
+            }
+        }
+    }
+
+    private void writeOversizedMeta() throws IOException {
+        java.nio.file.Files.write(getOversizedMetaFile(), oversized);
+    }
+
+    private Path getOversizedMetaFile() {
+        return this.path.getParent().resolve(this.path.getFileName().toString().replaceAll("\\.mca$", "") + ".oversized.nbt");
+    }
+
+    private Path getOversizedFile(int x, int z) {
+        return this.path.getParent().resolve(this.path.getFileName().toString().replaceAll("\\.mca$", "") + "_oversized_" + x + "_" + z + ".nbt");
+    }
+
+    synchronized net.minecraft.nbt.CompoundTag getOversizedData(int x, int z) throws IOException {
+        Path file = getOversizedFile(x, z);
+        try (DataInputStream out = new DataInputStream(new java.io.BufferedInputStream(new java.util.zip.InflaterInputStream(Files.newInputStream(file))))) {
+            return net.minecraft.nbt.NbtIo.read((java.io.DataInput) out);
+        }
+
+    }
+    // Paper end
 }

@@ -47,6 +47,43 @@ public final class RegionFileStorage implements AutoCloseable {
         }
     }
 
+    // Paper start
+    private static void printOversizedLog(String msg, Path file, int x, int z) {
+        org.apache.logging.log4j.LogManager.getLogger().fatal(msg + " (" + file.toString().replaceAll(".+[\\\\/]", "") + " - " + x + "," + z + ") Go clean it up to remove this message. /minecraft:tp " + (x<<4)+" 128 "+(z<<4) + " - DO NOT REPORT THIS TO PAPER - You may ask for help on Discord, but do not file an issue. These error messages can not be removed.");
+    }
+
+    private static CompoundTag readOversizedChunk(RegionFile regionfile, ChunkPos chunkCoordinate) throws IOException {
+        synchronized (regionfile) {
+            try (DataInputStream datainputstream = regionfile.getChunkDataInputStream(chunkCoordinate)) {
+                CompoundTag oversizedData = regionfile.getOversizedData(chunkCoordinate.x, chunkCoordinate.z);
+                CompoundTag chunk = NbtIo.read(datainputstream);
+                if (oversizedData == null) {
+                    return chunk;
+                }
+                CompoundTag oversizedLevel = oversizedData.getCompound("Level");
+
+                mergeChunkList(chunk.getCompound("Level"), oversizedLevel, "Entities", "Entities");
+                mergeChunkList(chunk.getCompound("Level"), oversizedLevel, "TileEntities", "TileEntities");
+
+                return chunk;
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+                throw throwable;
+            }
+        }
+    }
+
+    private static void mergeChunkList(CompoundTag level, CompoundTag oversizedLevel, String key, String oversizedKey) {
+        net.minecraft.nbt.ListTag levelList = level.getList(key, net.minecraft.nbt.Tag.TAG_COMPOUND);
+        net.minecraft.nbt.ListTag oversizedList = oversizedLevel.getList(oversizedKey, net.minecraft.nbt.Tag.TAG_COMPOUND);
+
+        if (!oversizedList.isEmpty()) {
+            levelList.addAll(oversizedList);
+            level.put(key, levelList);
+        }
+    }
+    // Paper end
+
     @Nullable
     public CompoundTag read(ChunkPos chunkPos) throws IOException {
         // CraftBukkit start - SPIGOT-5680: There's no good reason to preemptively create files on read, save that for writing
@@ -55,6 +92,12 @@ public final class RegionFileStorage implements AutoCloseable {
             return null;
         }
         // CraftBukkit end
+        // Paper start
+        if (regionFile.isOversized(chunkPos.x, chunkPos.z)) {
+            printOversizedLog("Loading Oversized Chunk!", regionFile.getPath(), chunkPos.x, chunkPos.z);
+            return readOversizedChunk(regionFile, chunkPos);
+        }
+        // Paper end
 
         CompoundTag var4;
         try (DataInputStream chunkDataInputStream = regionFile.getChunkDataInputStream(chunkPos)) {
@@ -90,6 +133,7 @@ public final class RegionFileStorage implements AutoCloseable {
         } else {
             try (DataOutputStream chunkDataOutputStream = regionFile.getChunkDataOutputStream(chunkPos)) {
                 NbtIo.write(chunkData, chunkDataOutputStream);
+                regionFile.setOversized(chunkPos.x, chunkPos.z, false); // Paper - We don't do this anymore, mojang stores differently, but clear old meta flag if it exists to get rid of our own meta file once last oversized is gone
             }
         }
     }
