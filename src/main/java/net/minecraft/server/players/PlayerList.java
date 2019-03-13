@@ -1128,6 +1128,7 @@ public abstract class PlayerList {
     }
 
     public void setUsingWhiteList(boolean whitelistEnabled) {
+        new com.destroystokyo.paper.event.server.WhitelistToggleEvent(whitelistEnabled).callEvent(); // Paper - WhitelistToggleEvent
         this.doWhiteList = whitelistEnabled;
     }
 
