@@ -483,7 +483,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
 
     @Override
     public com.destroystokyo.paper.util.VersionFetcher getVersionFetcher() {
-        return new gg.pufferfish.pufferfish.PufferfishVersionFetcher(); // Pufferfish
+        return new com.destroystokyo.paper.PaperVersionFetcher(); // Pufferfish // Purpur
     }
 
     @Override

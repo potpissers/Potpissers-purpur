@@ -11,7 +11,7 @@ public final class Versioning {
     public static String getBukkitVersion() {
         String result = "Unknown-Version";
 
-        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/gg.pufferfish.pufferfish/pufferfish-api/pom.properties"); // Pufferfish
+        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/org.purpurmc.purpur/purpur-api/pom.properties"); // Pufferfish // Purpur
         Properties properties = new Properties();
 
         if (stream != null) {

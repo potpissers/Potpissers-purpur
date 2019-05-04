@@ -35,7 +35,10 @@ public class PaperVersionFetcher implements VersionFetcher {
     private static final Logger LOGGER = LogUtils.getClassLogger();
     private static final int DISTANCE_ERROR = -1;
     private static final int DISTANCE_UNKNOWN = -2;
-    private static final String DOWNLOAD_PAGE = "https://papermc.io/downloads/paper";
+    // Purpur start
+    private static final String DOWNLOAD_PAGE = "https://purpurmc.org/downloads";
+    private static int distance = DISTANCE_UNKNOWN; public int distance() { return distance; }
+    // Purpur end
 
     @Override
     public long getCacheTime() {
@@ -49,7 +52,7 @@ public class PaperVersionFetcher implements VersionFetcher {
         if (build.buildNumber().isEmpty() && build.gitCommit().isEmpty()) {
             updateMessage = text("You are running a development version without access to version information", color(0xFF5300));
         } else {
-            updateMessage = getUpdateStatusMessage("PaperMC/Paper", build);
+            updateMessage = getUpdateStatusMessage("PurpurMC/Purpur", build); // Purpur
         }
         final @Nullable Component history = this.getHistory();
 
@@ -57,7 +60,7 @@ public class PaperVersionFetcher implements VersionFetcher {
     }
 
     private static Component getUpdateStatusMessage(final String repo, final ServerBuildInfo build) {
-        int distance = DISTANCE_ERROR;
+        //int distance = DISTANCE_ERROR; // Purpur - use field
 
         final OptionalInt buildNumber = build.buildNumber();
         if (buildNumber.isPresent()) {
@@ -71,10 +74,10 @@ public class PaperVersionFetcher implements VersionFetcher {
         }
 
         return switch (distance) {
-            case DISTANCE_ERROR -> text("Error obtaining version information", NamedTextColor.YELLOW);
-            case 0 -> text("You are running the latest version", NamedTextColor.GREEN);
-            case DISTANCE_UNKNOWN -> text("Unknown version", NamedTextColor.YELLOW);
-            default -> text("You are " + distance + " version(s) behind", NamedTextColor.YELLOW)
+            case DISTANCE_ERROR -> text("* Error obtaining version information", NamedTextColor.RED); // Purpur
+            case 0 -> text("* You are running the latest version", NamedTextColor.GREEN); // Purpur
+            case DISTANCE_UNKNOWN -> text("* Unknown version", NamedTextColor.YELLOW); // Purpur
+            default -> text("* You are " + distance + " version(s) behind", NamedTextColor.YELLOW) // Purpur
                 .append(Component.newline())
                 .append(text("Download the new version at: ")
                     .append(text(DOWNLOAD_PAGE, NamedTextColor.GOLD)
@@ -86,18 +89,15 @@ public class PaperVersionFetcher implements VersionFetcher {
     private static int fetchDistanceFromSiteApi(final ServerBuildInfo build, final int jenkinsBuild) {
         try {
             try (final BufferedReader reader = Resources.asCharSource(
-                URI.create("https://api.papermc.io/v2/projects/paper/versions/" + build.minecraftVersionId()).toURL(),
+                URI.create("https://api.purpurmc.org/v2/purpur/" + build.minecraftVersionId()).toURL(), // Purpur
                 Charsets.UTF_8
             ).openBufferedStream()) {
                 final JsonObject json = new Gson().fromJson(reader, JsonObject.class);
-                final JsonArray builds = json.getAsJsonArray("builds");
-                final int latest = StreamSupport.stream(builds.spliterator(), false)
-                    .mapToInt(JsonElement::getAsInt)
-                    .max()
-                    .orElseThrow();
+                //final JsonArray builds = json.getAsJsonArray("builds"); // Purpur
+                final int latest = json.getAsJsonObject("builds").getAsJsonPrimitive("latest").getAsInt(); // Purpur
                 return latest - jenkinsBuild;
             } catch (final JsonSyntaxException ex) {
-                LOGGER.error("Error parsing json from Paper's downloads API", ex);
+                LOGGER.error("Error parsing json from Purpur's downloads API", ex); // Purpur
                 return DISTANCE_ERROR;
             }
         } catch (final IOException e) {
@@ -141,6 +141,6 @@ public class PaperVersionFetcher implements VersionFetcher {
             return null;
         }
 
-        return text("Previous version: " + oldVersion, NamedTextColor.GRAY, TextDecoration.ITALIC);
+        return text("Previous: " + oldVersion, NamedTextColor.GRAY); // Purpur
     }
 }

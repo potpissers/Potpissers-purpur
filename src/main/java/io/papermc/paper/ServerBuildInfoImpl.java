@@ -32,6 +32,7 @@ public record ServerBuildInfoImpl(
 
     private static final String BRAND_PAPER_NAME = "Paper";
     private static final String BRAND_PUFFERFISH_NAME = "Pufferfish"; // Purpur
+    private static final String BRAND_PURPUR_NAME = "Purpur"; // Purpur
 
     private static final String BUILD_DEV = "DEV";
 
@@ -43,9 +44,9 @@ public record ServerBuildInfoImpl(
         this(
             getManifestAttribute(manifest, ATTRIBUTE_BRAND_ID)
                 .map(Key::key)
-                .orElse(BRAND_PUFFERFISH_ID), // Purpur
+                .orElse(BRAND_PURPUR_ID), // Purpur
             getManifestAttribute(manifest, ATTRIBUTE_BRAND_NAME)
-                .orElse(BRAND_PUFFERFISH_NAME), // Purpur
+                .orElse(BRAND_PURPUR_NAME), // Purpur
             SharedConstants.getCurrentVersion().getId(),
             SharedConstants.getCurrentVersion().getName(),
             getManifestAttribute(manifest, ATTRIBUTE_BUILD_NUMBER)
@@ -62,7 +63,7 @@ public record ServerBuildInfoImpl(
 
     @Override
     public boolean isBrandCompatible(final @NotNull Key brandId) {
-        return brandId.equals(this.brandId) || brandId.equals(BRAND_PAPER_ID); // Purpur
+        return brandId.equals(this.brandId) || brandId.equals(BRAND_PAPER_ID) || brandId.equals(BRAND_PUFFERFISH_ID); // Purpur
     }
 
     @Override

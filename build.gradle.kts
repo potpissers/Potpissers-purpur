@@ -13,7 +13,7 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
 val alsoShade: Configuration by configurations.creating
 
 dependencies {
-    implementation(project(":pufferfish-api")) // Pufferfish // Paper
+    implementation(project(":purpur-api")) // Pufferfish // Paper // Purpur
     // Paper start
     implementation("org.jline:jline-terminal-jansi:3.21.0")
     implementation("net.minecrell:terminalconsoleappender:1.3.0")
@@ -53,6 +53,10 @@ dependencies {
         exclude(group="org.yaml", module="snakeyaml")
     }
     // Pufferfish end
+
+    implementation("org.mozilla:rhino-runtime:1.7.14") // Purpur
+    implementation("org.mozilla:rhino-engine:1.7.14") // Purpur
+    implementation("dev.omega24:upnp4j:1.0") // Purpur
 
     testImplementation("io.github.classgraph:classgraph:4.8.47") // Paper - mob goal test
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
@@ -99,14 +103,14 @@ tasks.jar {
         val gitBranch = git("rev-parse", "--abbrev-ref", "HEAD").getText().trim() // Paper
         attributes(
             "Main-Class" to "org.bukkit.craftbukkit.Main",
-            "Implementation-Title" to "Pufferfish", // Pufferfish
+            "Implementation-Title" to "Purpur", // Pufferfish // Purpur
             "Implementation-Version" to implementationVersion,
             "Implementation-Vendor" to date, // Paper
-            "Specification-Title" to "Pufferfish", // Pufferfish
+            "Specification-Title" to "Purpur", // Pufferfish // Purpur
             "Specification-Version" to project.version,
-            "Specification-Vendor" to "Pufferfish Studios LLC", // Pufferfish
-            "Brand-Id" to "pufferfish:pufferfish", // Pufferfish
-            "Brand-Name" to "Pufferfish", // Pufferfish
+            "Specification-Vendor" to "Purpur Team", // Pufferfish // Purpur
+            "Brand-Id" to "purpurmc:purpur", // Pufferfish // Purpur
+            "Brand-Name" to "Purpur", // Pufferfish // Purpur
             "Build-Number" to (build ?: ""),
             "Build-Time" to Instant.now().toString(),
             "Git-Branch" to gitBranch, // Paper
@@ -163,7 +167,7 @@ fun TaskContainer.registerRunTask(
     name: String,
     block: JavaExec.() -> Unit
 ): TaskProvider<JavaExec> = register<JavaExec>(name) {
-    group = "paper"
+    group = "paperweight" // Purpur
     mainClass.set("org.bukkit.craftbukkit.Main")
     standardInput = System.`in`
     workingDir = rootProject.layout.projectDirectory

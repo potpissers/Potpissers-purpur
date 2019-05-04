@@ -32,6 +32,7 @@ public class CrashReport {
     private boolean trackingStackTrace = true;
     private StackTraceElement[] uncategorizedStackTrace = new StackTraceElement[0];
     private final SystemReport systemReport = new SystemReport();
+    private List<String> extraInfo = List.of("", "DO NOT REPORT THIS TO PAPER! REPORT TO PURPUR INSTEAD!", ""); // Purpur - Rebrand
 
     public CrashReport(String message, Throwable cause) {
         io.papermc.paper.util.StacktraceDeobfuscator.INSTANCE.deobfuscateThrowable(cause); // Paper
@@ -144,7 +145,7 @@ public class CrashReport {
     }
 
     public String getFriendlyReport(ReportType type) {
-        return this.getFriendlyReport(type, List.of());
+        return this.getFriendlyReport(type, extraInfo); // Purpur - Rebrand
     }
 
     @Nullable
@@ -191,7 +192,7 @@ public class CrashReport {
     }
 
     public boolean saveToFile(Path path, ReportType type) {
-        return this.saveToFile(path, type, List.of());
+        return this.saveToFile(path, type, extraInfo); // Purpur - Rebrand
     }
 
     public SystemReport getSystemReport() {
