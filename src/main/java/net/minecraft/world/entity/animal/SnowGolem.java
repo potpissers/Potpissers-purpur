@@ -190,6 +190,14 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
             }
 
             return InteractionResult.sidedSuccess(this.level().isClientSide);
+        // Purpur start
+        } else if (level().purpurConfig.snowGolemPutPumpkinBack && !hasPumpkin() && itemstack.getItem() == Blocks.CARVED_PUMPKIN.asItem()) {
+            setPumpkin(true);
+            if (!player.getAbilities().instabuild) {
+                itemstack.shrink(1);
+            }
+            return InteractionResult.SUCCESS;
+        // Purpur end
         } else {
             return tryRide(player, hand); // Purpur
         }
