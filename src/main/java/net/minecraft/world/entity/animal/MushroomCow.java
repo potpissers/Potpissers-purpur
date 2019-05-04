@@ -218,7 +218,13 @@ public class MushroomCow extends Cow implements Shearable, VariantHolder<Mushroo
                 // this.discard(); // CraftBukkit - moved down
                 entitycow.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
                 entitycow.setHealth(this.getHealth());
+                // Purpur start
+                entitycow.copyPosition(this);
                 entitycow.yBodyRot = this.yBodyRot;
+                entitycow.setYHeadRot(this.getYHeadRot());
+                entitycow.yRotO = this.yRotO;
+                entitycow.xRotO = this.xRotO;
+                // Purpur end
                 if (this.hasCustomName()) {
                     entitycow.setCustomName(this.getCustomName());
                     entitycow.setCustomNameVisible(this.isCustomNameVisible());
