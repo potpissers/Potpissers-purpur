@@ -47,6 +47,7 @@ public class Phantom extends FlyingMob implements Enemy {
     Vec3 moveTargetPoint = Vec3.ZERO;
     public BlockPos anchorPoint = BlockPos.ZERO;
     Phantom.AttackPhase attackPhase = Phantom.AttackPhase.CIRCLE;
+    Vec3 crystalPosition; // Purpur - Phantoms attracted to crystals and crystals shoot phantoms
     // Paper start
     @Nullable
     public java.util.UUID spawningEntity;
@@ -118,6 +119,25 @@ public class Phantom extends FlyingMob implements Enemy {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Phantoms attracted to crystals and crystals shoot phantoms
+    @Override
+    protected void dropFromLootTable(ServerLevel world, DamageSource damageSource, boolean causedByPlayer) {
+        boolean dropped = false;
+        if (lastHurtByPlayer == null && damageSource.getEntity() instanceof net.minecraft.world.entity.boss.enderdragon.EndCrystal) {
+            if (random.nextInt(5) < 1) {
+                dropped = spawnAtLocation(world, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.PHANTOM_MEMBRANE)) != null;
+            }
+        }
+        if (!dropped) {
+            super.dropFromLootTable(world, damageSource, causedByPlayer);
+        }
+    }
+
+    public boolean isCirclingCrystal() {
+        return crystalPosition != null;
+    }
+    // Purpur end - Phantoms attracted to crystals and crystals shoot phantoms
+
     @Override
     public boolean isFlapping() {
         return (this.getUniqueFlapTickOffset() + this.tickCount) % TICKS_PER_FLAP == 0;
@@ -131,9 +151,15 @@ public class Phantom extends FlyingMob implements Enemy {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
-        this.goalSelector.addGoal(1, new Phantom.PhantomAttackStrategyGoal());
-        this.goalSelector.addGoal(2, new Phantom.PhantomSweepAttackGoal());
-        this.goalSelector.addGoal(3, new Phantom.PhantomCircleAroundAnchorGoal());
+        // Purpur start - Phantoms attracted to crystals and crystals shoot phantoms
+        if (level().purpurConfig.phantomOrbitCrystalRadius > 0) {
+            this.goalSelector.addGoal(1, new PhantomFindCrystalGoal(this));
+            this.goalSelector.addGoal(2, new PhantomOrbitCrystalGoal(this));
+        }
+        this.goalSelector.addGoal(3, new Phantom.PhantomAttackStrategyGoal());
+        this.goalSelector.addGoal(4, new Phantom.PhantomSweepAttackGoal());
+        this.goalSelector.addGoal(5, new Phantom.PhantomCircleAroundAnchorGoal());
+        // Purpur end - Phantoms attracted to crystals and crystals shoot phantoms
         this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.targetSelector.addGoal(1, new Phantom.PhantomAttackPlayerTargetGoal());
     }
@@ -508,6 +534,124 @@ public class Phantom extends FlyingMob implements Enemy {
         public void vanillaTick() { // Purpur - Ridables
         }
     }
+
+    // Purpur start - Phantoms attracted to crystals and crystals shoot phantoms
+    class PhantomFindCrystalGoal extends Goal {
+        private final Phantom phantom;
+        private net.minecraft.world.entity.boss.enderdragon.EndCrystal crystal;
+        private Comparator<net.minecraft.world.entity.boss.enderdragon.EndCrystal> comparator;
+
+        PhantomFindCrystalGoal(Phantom phantom) {
+            this.phantom = phantom;
+            this.comparator = Comparator.comparingDouble(phantom::distanceToSqr);
+            this.setFlags(EnumSet.of(Flag.LOOK));
+        }
+
+        @Override
+        public boolean canUse() {
+            double range = maxTargetRange();
+            List<net.minecraft.world.entity.boss.enderdragon.EndCrystal> crystals = level().getEntitiesOfClass(net.minecraft.world.entity.boss.enderdragon.EndCrystal.class, phantom.getBoundingBox().inflate(range));
+            if (crystals.isEmpty()) {
+                return false;
+            }
+            crystals.sort(comparator);
+            crystal = crystals.get(0);
+            if (phantom.distanceToSqr(crystal) > range * range) {
+                crystal = null;
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            if (crystal == null || !crystal.isAlive()) {
+                return false;
+            }
+            double range = maxTargetRange();
+            return phantom.distanceToSqr(crystal) <= (range * range) * 2;
+        }
+
+        @Override
+        public void start() {
+            phantom.crystalPosition = new Vec3(crystal.getX(), crystal.getY() + (phantom.random.nextInt(10) + 10), crystal.getZ());
+        }
+
+        @Override
+        public void stop() {
+            crystal = null;
+            phantom.crystalPosition = null;
+            super.stop();
+        }
+
+        private double maxTargetRange() {
+            return phantom.level().purpurConfig.phantomOrbitCrystalRadius;
+        }
+    }
+
+    class PhantomOrbitCrystalGoal extends Goal {
+        private final Phantom phantom;
+        private float offset;
+        private float radius;
+        private float verticalChange;
+        private float direction;
+
+        PhantomOrbitCrystalGoal(Phantom phantom) {
+            this.phantom = phantom;
+            this.setFlags(EnumSet.of(Flag.MOVE));
+        }
+
+        @Override
+        public boolean canUse() {
+            return phantom.isCirclingCrystal();
+        }
+
+        @Override
+        public void start() {
+            this.radius = 5.0F + phantom.random.nextFloat() * 10.0F;
+            this.verticalChange = -4.0F + phantom.random.nextFloat() * 9.0F;
+            this.direction = phantom.random.nextBoolean() ? 1.0F : -1.0F;
+            updateOffset();
+        }
+
+        @Override
+        public void tick() {
+            if (phantom.random.nextInt(350) == 0) {
+                this.verticalChange = -4.0F + phantom.random.nextFloat() * 9.0F;
+            }
+            if (phantom.random.nextInt(250) == 0) {
+                ++this.radius;
+                if (this.radius > 15.0F) {
+                    this.radius = 5.0F;
+                    this.direction = -this.direction;
+                }
+            }
+            if (phantom.random.nextInt(450) == 0) {
+                this.offset = phantom.random.nextFloat() * 2.0F * 3.1415927F;
+                updateOffset();
+            }
+            if (phantom.moveTargetPoint.distanceToSqr(phantom.getX(), phantom.getY(), phantom.getZ()) < 4.0D) {
+                updateOffset();
+            }
+            if (phantom.moveTargetPoint.y < phantom.getY() && !phantom.level().isEmptyBlock(new BlockPos(phantom).below(1))) {
+                this.verticalChange = Math.max(1.0F, this.verticalChange);
+                updateOffset();
+            }
+            if (phantom.moveTargetPoint.y > phantom.getY() && !phantom.level().isEmptyBlock(new BlockPos(phantom).above(1))) {
+                this.verticalChange = Math.min(-1.0F, this.verticalChange);
+                updateOffset();
+            }
+        }
+
+        private void updateOffset() {
+            this.offset += this.direction * 15.0F * 0.017453292F;
+            phantom.moveTargetPoint = phantom.crystalPosition.add(
+                    this.radius * Mth.cos(this.offset),
+                    -4.0F + this.verticalChange,
+                    this.radius * Mth.sin(this.offset));
+        }
+    }
+    // Purpur end - Phantoms attracted to crystals and crystals shoot phantoms
 
     class PhantomMoveControl extends org.purpurmc.purpur.controller.FlyingMoveControllerWASD { // Purpur - Ridables
         private float speed = 0.1F;
