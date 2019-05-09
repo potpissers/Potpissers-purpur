@@ -31,6 +31,12 @@ public class EndCrystal extends Entity {
     private static final EntityDataAccessor<Boolean> DATA_SHOW_BOTTOM = SynchedEntityData.defineId(EndCrystal.class, EntityDataSerializers.BOOLEAN);
     public int time;
     public boolean generatedByDragonFight = false; // Paper - Fix invulnerable end crystals
+    // Purpur start
+    private net.minecraft.world.entity.monster.Phantom targetPhantom;
+    private int phantomBeamTicks = 0;
+    private int phantomDamageCooldown = 0;
+    private int idleCooldown = 0;
+    // Purpur end
 
     public EndCrystal(EntityType<? extends EndCrystal> type, Level world) {
         super(type, world);
@@ -82,6 +88,49 @@ public class EndCrystal extends Entity {
             // Paper end - Fix invulnerable end crystals
         }
 
+    // Purpur start
+        if (level().purpurConfig.phantomAttackedByCrystalRadius <= 0 || --idleCooldown > 0) {
+            return; // on cooldown
+        }
+
+        if (targetPhantom == null) {
+            for (net.minecraft.world.entity.monster.Phantom phantom : level().getEntitiesOfClass(net.minecraft.world.entity.monster.Phantom.class, getBoundingBox().inflate(level().purpurConfig.phantomAttackedByCrystalRadius))) {
+                if (phantom.hasLineOfSight(this)) {
+                    attackPhantom(phantom);
+                    break;
+                }
+            }
+        } else {
+            setBeamTarget(new BlockPos(targetPhantom).offset(0, -2, 0));
+            if (--phantomBeamTicks > 0 && targetPhantom.isAlive()) {
+                phantomDamageCooldown--;
+                if (targetPhantom.hasLineOfSight(this)) {
+                    if (phantomDamageCooldown <= 0) {
+                        phantomDamageCooldown = 20;
+                        targetPhantom.hurt(targetPhantom.damageSources().indirectMagic(this, this), level().purpurConfig.phantomAttackedByCrystalDamage);
+                    }
+                } else {
+                    forgetPhantom(); // no longer in sight
+                }
+            } else {
+                forgetPhantom(); // attacked long enough
+            }
+        }
+    }
+
+    private void attackPhantom(net.minecraft.world.entity.monster.Phantom phantom) {
+        phantomDamageCooldown = 0;
+        phantomBeamTicks = 60;
+        targetPhantom = phantom;
+    }
+
+    private void forgetPhantom() {
+        targetPhantom = null;
+        setBeamTarget(null);
+        phantomBeamTicks = 0;
+        phantomDamageCooldown = 0;
+        idleCooldown = 60;
+    // Purpur end
     }
 
     @Override
