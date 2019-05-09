@@ -1070,6 +1070,7 @@ public final class CraftServer implements Server {
 
         org.spigotmc.SpigotConfig.init((File) this.console.options.valueOf("spigot-settings")); // Spigot
         this.console.paperConfigurations.reloadConfigs(this.console);
+        org.purpurmc.purpur.PurpurConfig.init((File) console.options.valueOf("purpur-settings")); // Purpur
         for (ServerLevel world : this.console.getAllLevels()) {
             // world.serverLevelData.setDifficulty(config.difficulty); // Paper - per level difficulty
             world.setSpawnSettings(world.serverLevelData.getDifficulty() != Difficulty.PEACEFUL && config.spawnMonsters, config.spawnAnimals); // Paper - per level difficulty (from MinecraftServer#setDifficulty(ServerLevel, Difficulty, boolean))
@@ -1085,6 +1086,7 @@ public final class CraftServer implements Server {
                 }
             }
             world.spigotConfig.init(); // Spigot
+            world.purpurConfig.init(); // Purpur
         }
 
         Plugin[] pluginClone = pluginManager.getPlugins().clone(); // Paper
@@ -1102,6 +1104,7 @@ public final class CraftServer implements Server {
         org.spigotmc.SpigotConfig.registerCommands(); // Spigot
         io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
         this.spark.registerCommandBeforePlugins(this); // Paper - spark
+        org.purpurmc.purpur.PurpurConfig.registerCommands(); // Purpur
         this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
         this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
 
@@ -2987,6 +2990,18 @@ public final class CraftServer implements Server {
         {
             return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
         }
+
+        // Purpur start
+        @Override
+        public YamlConfiguration getPurpurConfig() {
+            return org.purpurmc.purpur.PurpurConfig.config;
+        }
+
+        @Override
+        public java.util.Properties getServerProperties() {
+            return getProperties().properties;
+        }
+        // Purpur end
 
         @Override
         public void restart() {

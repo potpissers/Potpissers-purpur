@@ -310,6 +310,30 @@ public class CommandSourceStack implements ExecutionCommandSource<CommandSourceS
         }
     }
 
+    // Purpur start
+    public void sendSuccess(@Nullable String message) {
+        sendSuccess(message, false);
+    }
+
+    public void sendSuccess(@Nullable String message, boolean broadcastToOps) {
+        if (message == null) {
+            return;
+        }
+        sendSuccess(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(message), broadcastToOps);
+    }
+
+    public void sendSuccess(@Nullable net.kyori.adventure.text.Component message) {
+        sendSuccess(message, false);
+    }
+
+    public void sendSuccess(@Nullable net.kyori.adventure.text.Component message, boolean broadcastToOps) {
+        if (message == null) {
+            return;
+        }
+        sendSuccess(() -> io.papermc.paper.adventure.PaperAdventure.asVanilla(message), broadcastToOps);
+    }
+    // Purpur end
+
     public void sendSuccess(Supplier<Component> feedbackSupplier, boolean broadcastToOps) {
         boolean flag1 = this.source.acceptsSuccess() && !this.silent;
         boolean flag2 = broadcastToOps && this.source.shouldInformAdmins() && !this.silent;

@@ -238,6 +238,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
         io.papermc.paper.command.PaperCommands.registerCommands(this); // Paper - setup /paper command
         this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
         com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
+        // Purpur start
+        try {
+            org.purpurmc.purpur.PurpurConfig.init((java.io.File) options.valueOf("purpur-settings"));
+        } catch (Exception e) {
+            DedicatedServer.LOGGER.error("Unable to load server configuration", e);
+            return false;
+        }
+        org.purpurmc.purpur.PurpurConfig.registerCommands();
+        // Purpur end
         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
         gg.pufferfish.pufferfish.PufferfishConfig.load(); // Pufferfish
         gg.pufferfish.pufferfish.PufferfishCommand.init(); // Pufferfish
