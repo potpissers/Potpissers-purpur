@@ -337,7 +337,7 @@ public class Items {
     public static final Item PURPUR_BLOCK = registerBlock(Blocks.PURPUR_BLOCK);
     public static final Item PURPUR_PILLAR = registerBlock(Blocks.PURPUR_PILLAR);
     public static final Item PURPUR_STAIRS = registerBlock(Blocks.PURPUR_STAIRS);
-    public static final Item SPAWNER = registerBlock(Blocks.SPAWNER);
+    public static final Item SPAWNER = registerBlock(new org.purpurmc.purpur.item.SpawnerItem(Blocks.SPAWNER, new Item.Properties().rarity(Rarity.EPIC))); // Purpur
     public static final Item CHEST = registerBlock(Blocks.CHEST, settings -> settings.component(DataComponents.CONTAINER, ItemContainerContents.EMPTY));
     public static final Item CRAFTING_TABLE = registerBlock(Blocks.CRAFTING_TABLE);
     public static final Item FARMLAND = registerBlock(Blocks.FARMLAND);

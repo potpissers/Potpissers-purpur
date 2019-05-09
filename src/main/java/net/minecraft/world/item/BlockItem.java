@@ -219,6 +219,7 @@ public class BlockItem extends Item {
 
                 if (tileentity != null) {
                     if (!world.isClientSide && tileentity.onlyOpCanSetNbt() && (player == null || !(player.canUseGameMasterBlocks() || (player.getAbilities().instabuild && player.getBukkitEntity().hasPermission("minecraft.nbt.place"))))) { // Spigot - add permission
+                        if (!(!world.isClientSide && world.purpurConfig.silkTouchEnabled && tileentity instanceof net.minecraft.world.level.block.entity.SpawnerBlockEntity && player.getBukkitEntity().hasPermission("purpur.drop.spawners")))
                         return false;
                     }
 
