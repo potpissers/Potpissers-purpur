@@ -30,8 +30,23 @@ public class Giant extends Monster {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this));
-        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this));
+        if (level().purpurConfig.giantHaveAI) {
+            this.goalSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.FloatGoal(this));
+            this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this));
+            this.goalSelector.addGoal(7, new net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal(this, 1.0D));
+            this.goalSelector.addGoal(8, new net.minecraft.world.entity.ai.goal.LookAtPlayerGoal(this, net.minecraft.world.entity.player.Player.class, 16.0F));
+            this.goalSelector.addGoal(8, new net.minecraft.world.entity.ai.goal.RandomLookAroundGoal(this));
+            this.goalSelector.addGoal(5, new net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal(this, 1.0D));
+            if (level().purpurConfig.giantHaveHostileAI) {
+                this.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.MeleeAttackGoal(this, 1.0D, false));
+                this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this));
+                this.targetSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal(this).setAlertOthers(ZombifiedPiglin.class));
+                this.targetSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, net.minecraft.world.entity.player.Player.class, true));
+                this.targetSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, net.minecraft.world.entity.npc.Villager.class, false));
+                this.targetSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, net.minecraft.world.entity.animal.IronGolem.class, true));
+                this.targetSelector.addGoal(5, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, net.minecraft.world.entity.animal.Turtle.class, true));
+            }
+        }
     }
 
     @Override
@@ -49,7 +64,33 @@ public class Giant extends Monster {
     }
 
     @Override
+    public net.minecraft.world.entity.SpawnGroupData finalizeSpawn(net.minecraft.world.level.ServerLevelAccessor world, net.minecraft.world.DifficultyInstance difficulty, net.minecraft.world.entity.MobSpawnType spawnReason, @javax.annotation.Nullable net.minecraft.world.entity.SpawnGroupData entityData) {
+        net.minecraft.world.entity.SpawnGroupData groupData = super.finalizeSpawn(world, difficulty, spawnReason, entityData);
+        if (groupData == null) {
+            populateDefaultEquipmentSlots(this.random, difficulty);
+            populateDefaultEquipmentEnchantments(world, this.random, difficulty);
+        }
+        return groupData;
+    }
+
+    @Override
+    protected void populateDefaultEquipmentSlots(net.minecraft.util.RandomSource random, net.minecraft.world.DifficultyInstance difficulty) {
+        super.populateDefaultEquipmentSlots(this.random, difficulty);
+        // TODO make configurable
+        if (random.nextFloat() < (level().getDifficulty() == net.minecraft.world.Difficulty.HARD ? 0.1F : 0.05F)) {
+            this.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+        }
+    }
+
+    @Override
+    public float getJumpPower() {
+        // make giants jump as high as everything else relative to their size
+        // 1.0 makes bottom of feet about as high as their waist when they jump
+        return level().purpurConfig.giantJumpHeight;
+    }
+
+    @Override
     public float getWalkTargetValue(BlockPos pos, LevelReader world) {
-        return world.getPathfindingCostFromLightLevels(pos);
+        return super.getWalkTargetValue(pos, world); // Purpur - fix light requirements for natural spawns
     }
 }
