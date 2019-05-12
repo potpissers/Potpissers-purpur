@@ -179,6 +179,17 @@ public class Pig extends Animal implements ItemSteerable, Saddleable {
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         boolean flag = this.isFood(player.getItemInHand(hand));
 
+        if (level().purpurConfig.pigGiveSaddleBack && player.isSecondaryUseActive() && !flag && isSaddled() && !isVehicle()) {
+            this.steering.setSaddle(false);
+            if (!player.getAbilities().instabuild) {
+                ItemStack saddle = new ItemStack(Items.SADDLE);
+                if (!player.getInventory().add(saddle)) {
+                    player.drop(saddle, false);
+                }
+            }
+            return InteractionResult.SUCCESS;
+        }
+
         if (!flag && this.isSaddled() && !this.isVehicle() && !player.isSecondaryUseActive()) {
             if (!this.level().isClientSide) {
                 player.startRiding(this);
