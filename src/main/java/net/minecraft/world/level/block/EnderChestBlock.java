@@ -92,7 +92,7 @@ public class EnderChestBlock extends AbstractChestBlock<EnderChestBlockEntity> i
                 playerEnderChestContainer.setActiveChest(enderChestBlockEntity);
                 // Paper start - Fix InventoryOpenEvent cancellation
                 if (player.openMenu(
-                    new SimpleMenuProvider((i, inventory, playerx) -> ChestMenu.threeRows(i, inventory, playerEnderChestContainer), CONTAINER_TITLE)
+                    new SimpleMenuProvider((i, inventory, playerx) -> org.purpurmc.purpur.PurpurConfig.enderChestSixRows ? getEnderChestSixRows(i, inventory, player, playerEnderChestContainer) : ChestMenu.threeRows(i, inventory, playerEnderChestContainer), CONTAINER_TITLE) // Purpur
                 ).isPresent()) {
                     player.awardStat(Stats.OPEN_ENDERCHEST);
                     PiglinAi.angerNearbyPiglins(player, true);
@@ -104,6 +104,35 @@ public class EnderChestBlock extends AbstractChestBlock<EnderChestBlockEntity> i
             return InteractionResult.sidedSuccess(world.isClientSide);
         }
     }
+
+    // Purpur start
+    private ChestMenu getEnderChestSixRows(int syncId, net.minecraft.world.entity.player.Inventory inventory, Player player, PlayerEnderChestContainer playerEnderChestContainer) {
+        if (org.purpurmc.purpur.PurpurConfig.enderChestPermissionRows) {
+            org.bukkit.craftbukkit.entity.CraftHumanEntity bukkitPlayer = player.getBukkitEntity();
+            if (bukkitPlayer.hasPermission("purpur.enderchest.rows.six")) {
+                player.sixRowEnderchestSlotCount = 54;
+                return ChestMenu.sixRows(syncId, inventory, playerEnderChestContainer);
+            } else if (bukkitPlayer.hasPermission("purpur.enderchest.rows.five")) {
+                player.sixRowEnderchestSlotCount = 45;
+                return ChestMenu.fiveRows(syncId, inventory, playerEnderChestContainer);
+            } else if (bukkitPlayer.hasPermission("purpur.enderchest.rows.four")) {
+                player.sixRowEnderchestSlotCount = 36;
+                return ChestMenu.fourRows(syncId, inventory, playerEnderChestContainer);
+            } else if (bukkitPlayer.hasPermission("purpur.enderchest.rows.three")) {
+                player.sixRowEnderchestSlotCount = 27;
+                return ChestMenu.threeRows(syncId, inventory, playerEnderChestContainer);
+            } else if (bukkitPlayer.hasPermission("purpur.enderchest.rows.two")) {
+                player.sixRowEnderchestSlotCount = 18;
+                return ChestMenu.twoRows(syncId, inventory, playerEnderChestContainer);
+            } else if (bukkitPlayer.hasPermission("purpur.enderchest.rows.one")) {
+                player.sixRowEnderchestSlotCount = 9;
+                return ChestMenu.oneRow(syncId, inventory, playerEnderChestContainer);
+            }
+        }
+        player.sixRowEnderchestSlotCount = -1;
+        return ChestMenu.sixRows(syncId, inventory, playerEnderChestContainer);
+    }
+    // Purpur end
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

@@ -67,9 +67,29 @@ public class ChestMenu extends AbstractContainerMenu {
         return new ChestMenu(MenuType.GENERIC_9x6, syncId, playerInventory, 6);
     }
 
+    // Purpur start
+    public static ChestMenu oneRow(int syncId, Inventory playerInventory, Container inventory) {
+        return new ChestMenu(MenuType.GENERIC_9x1, syncId, playerInventory, inventory, 1);
+    }
+
+    public static ChestMenu twoRows(int syncId, Inventory playerInventory, Container inventory) {
+        return new ChestMenu(MenuType.GENERIC_9x2, syncId, playerInventory, inventory, 2);
+    }
+    // Purpur end
+
     public static ChestMenu threeRows(int syncId, Inventory playerInventory, Container inventory) {
         return new ChestMenu(MenuType.GENERIC_9x3, syncId, playerInventory, inventory, 3);
     }
+
+    // Purpur start
+    public static ChestMenu fourRows(int syncId, Inventory playerInventory, Container inventory) {
+        return new ChestMenu(MenuType.GENERIC_9x4, syncId, playerInventory, inventory, 4);
+    }
+
+    public static ChestMenu fiveRows(int syncId, Inventory playerInventory, Container inventory) {
+        return new ChestMenu(MenuType.GENERIC_9x5, syncId, playerInventory, inventory, 5);
+    }
+    // Purpur end
 
     public static ChestMenu sixRows(int syncId, Inventory playerInventory, Container inventory) {
         return new ChestMenu(MenuType.GENERIC_9x6, syncId, playerInventory, inventory, 6);

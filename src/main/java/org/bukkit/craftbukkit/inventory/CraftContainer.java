@@ -145,8 +145,19 @@ public class CraftContainer extends AbstractContainerMenu {
             case PLAYER:
             case CHEST:
             case ENDER_CHEST:
+                // Purpur start
+                this.delegate = new ChestMenu(org.purpurmc.purpur.PurpurConfig.enderChestSixRows ? net.minecraft.world.inventory.MenuType.GENERIC_9x6 : net.minecraft.world.inventory.MenuType.GENERIC_9x3, windowId, bottom, top, top.getContainerSize() / 9);
+                break;
             case BARREL:
-                this.delegate = new ChestMenu(net.minecraft.world.inventory.MenuType.GENERIC_9x3, windowId, bottom, top, top.getContainerSize() / 9);
+                this.delegate = new ChestMenu(switch (org.purpurmc.purpur.PurpurConfig.barrelRows) {
+                    case 6 -> net.minecraft.world.inventory.MenuType.GENERIC_9x6;
+                    case 5 -> net.minecraft.world.inventory.MenuType.GENERIC_9x5;
+                    case 4 -> net.minecraft.world.inventory.MenuType.GENERIC_9x4;
+                    case 2 -> net.minecraft.world.inventory.MenuType.GENERIC_9x2;
+                    case 1 -> net.minecraft.world.inventory.MenuType.GENERIC_9x1;
+                    default -> net.minecraft.world.inventory.MenuType.GENERIC_9x3;
+                }, windowId, bottom, top, top.getContainerSize() / 9);
+                // Purpur end
                 break;
             case DISPENSER:
             case DROPPER:

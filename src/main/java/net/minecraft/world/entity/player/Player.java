@@ -197,6 +197,7 @@ public abstract class Player extends LivingEntity {
     private int currentImpulseContextResetGraceTime;
     public boolean affectsSpawning = true; // Paper - Affects Spawning API
     public net.kyori.adventure.util.TriState flyingFallDamage = net.kyori.adventure.util.TriState.NOT_SET; // Paper - flying fall damage
+    public int sixRowEnderchestSlotCount = -1; // Purpur
 
     // CraftBukkit start
     public boolean fauxSleeping;

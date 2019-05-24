@@ -68,7 +68,16 @@ public class BarrelBlockEntity extends RandomizableContainerBlockEntity {
 
     public BarrelBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntityType.BARREL, pos, state);
-        this.items = NonNullList.withSize(27, ItemStack.EMPTY);
+        // Purpur start
+        this.items = NonNullList.withSize(switch (org.purpurmc.purpur.PurpurConfig.barrelRows) {
+            case 6 -> 54;
+            case 5 -> 45;
+            case 4 -> 36;
+            case 2 -> 18;
+            case 1 -> 9;
+            default -> 27;
+        }, ItemStack.EMPTY);
+        // Purpur end
         this.openersCounter = new ContainerOpenersCounter() {
             @Override
             protected void onOpen(Level world, BlockPos pos, BlockState state) {
@@ -119,7 +128,16 @@ public class BarrelBlockEntity extends RandomizableContainerBlockEntity {
 
     @Override
     public int getContainerSize() {
-        return 27;
+        // Purpur start
+        return switch (org.purpurmc.purpur.PurpurConfig.barrelRows) {
+            case 6 -> 54;
+            case 5 -> 45;
+            case 4 -> 36;
+            case 2 -> 18;
+            case 1 -> 9;
+            default -> 27;
+        };
+        // Purpur end
     }
 
     @Override
@@ -139,7 +157,16 @@ public class BarrelBlockEntity extends RandomizableContainerBlockEntity {
 
     @Override
     protected AbstractContainerMenu createMenu(int syncId, Inventory playerInventory) {
-        return ChestMenu.threeRows(syncId, playerInventory, this);
+        // Purpur start
+        return switch (org.purpurmc.purpur.PurpurConfig.barrelRows) {
+            case 6 -> ChestMenu.sixRows(syncId, playerInventory, this);
+            case 5 -> ChestMenu.fiveRows(syncId, playerInventory, this);
+            case 4 -> ChestMenu.fourRows(syncId, playerInventory, this);
+            case 2 -> ChestMenu.twoRows(syncId, playerInventory, this);
+            case 1 -> ChestMenu.oneRow(syncId, playerInventory, this);
+            default -> ChestMenu.threeRows(syncId, playerInventory, this);
+        };
+        // Purpur end
     }
 
     @Override

@@ -31,10 +31,17 @@ public class PlayerEnderChestContainer extends SimpleContainer {
     }
 
     public PlayerEnderChestContainer(Player owner) {
-        super(27);
+        super(org.purpurmc.purpur.PurpurConfig.enderChestSixRows ? 54 : 27); // Purpur
         this.owner = owner;
         // CraftBukkit end
     }
+
+    // Purpur start
+    @Override
+    public int getContainerSize() {
+        return owner.sixRowEnderchestSlotCount < 0 ? super.getContainerSize() : owner.sixRowEnderchestSlotCount;
+    }
+    // Purpur end
 
     public void setActiveChest(EnderChestBlockEntity blockEntity) {
         this.activeChest = blockEntity;

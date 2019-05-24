@@ -1151,6 +1151,27 @@ public abstract class PlayerList {
         player.getBukkitEntity().recalculatePermissions(); // CraftBukkit
         this.server.getCommands().sendCommands(player);
         } // Paper - Add sendOpLevel API
+
+        // Purpur start
+        if (org.purpurmc.purpur.PurpurConfig.enderChestSixRows && org.purpurmc.purpur.PurpurConfig.enderChestPermissionRows) {
+            org.bukkit.craftbukkit.entity.CraftHumanEntity bukkit = player.getBukkitEntity();
+            if (bukkit.hasPermission("purpur.enderchest.rows.six")) {
+                player.sixRowEnderchestSlotCount = 54;
+            } else if (bukkit.hasPermission("purpur.enderchest.rows.five")) {
+                player.sixRowEnderchestSlotCount = 45;
+            } else if (bukkit.hasPermission("purpur.enderchest.rows.four")) {
+                player.sixRowEnderchestSlotCount = 36;
+            } else if (bukkit.hasPermission("purpur.enderchest.rows.three")) {
+                player.sixRowEnderchestSlotCount = 27;
+            } else if (bukkit.hasPermission("purpur.enderchest.rows.two")) {
+                player.sixRowEnderchestSlotCount = 18;
+            } else if (bukkit.hasPermission("purpur.enderchest.rows.one")) {
+                player.sixRowEnderchestSlotCount = 9;
+            }
+        } else {
+            player.sixRowEnderchestSlotCount = -1;
+        }
+        //Purpur end
     }
 
     public boolean isWhiteListed(GameProfile profile) {
