@@ -56,6 +56,7 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
     public final boolean onlineMode = this.get("online-mode", true);
     public final boolean preventProxyConnections = this.get("prevent-proxy-connections", false);
     public final String serverIp = this.get("server-ip", "");
+    public final String serverName = this.get("server-name", "Unknown Server"); // Purpur
     public final boolean spawnAnimals = this.get("spawn-animals", true);
     public final boolean spawnNpcs = this.get("spawn-npcs", true);
     public final boolean pvp = this.get("pvp", true);

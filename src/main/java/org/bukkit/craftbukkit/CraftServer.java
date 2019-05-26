@@ -3230,4 +3230,11 @@ public final class CraftServer implements Server {
         return this.potionBrewer;
     }
     // Paper end
+
+    // Purpur start
+    @Override
+    public String getServerName() {
+        return this.getProperties().serverName;
+    }
+    // Purpur end
 }
