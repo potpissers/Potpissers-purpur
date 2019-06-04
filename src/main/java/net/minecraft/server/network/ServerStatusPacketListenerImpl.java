@@ -154,6 +154,7 @@ public class ServerStatusPacketListenerImpl implements ServerStatusPacketListene
             this.connection.send(new ClientboundStatusResponsePacket(ping));
             // CraftBukkit end
             */
+            if (MinecraftServer.getServer().getStatus().version().isEmpty()) return; // Purpur - do not respond to pings before we know the protocol version
             com.destroystokyo.paper.network.StandardPaperServerListPingEventImpl.processRequest(MinecraftServer.getServer(), this.connection);
             // Paper end
         }
