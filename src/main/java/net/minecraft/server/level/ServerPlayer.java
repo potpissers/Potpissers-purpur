@@ -1707,6 +1707,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
 
     @Override
     public void openTextEdit(SignBlockEntity sign, boolean front) {
+        if (level().purpurConfig.signAllowColors) this.connection.send(sign.getTranslatedUpdatePacket(textFilteringEnabled, front)); // Purpur
         this.connection.send(new ClientboundBlockUpdatePacket(this.level(), sign.getBlockPos()));
         this.connection.send(new ClientboundOpenSignEditorPacket(sign.getBlockPos(), front));
     }
