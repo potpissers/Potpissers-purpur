@@ -203,6 +203,25 @@ public class TurtleEggBlock extends Block {
     }
 
     private boolean canDestroyEgg(Level world, Entity entity) {
-        return !(entity instanceof Turtle) && !(entity instanceof Bat) ? (!(entity instanceof LivingEntity) ? false : entity instanceof Player || world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) : false;
+        // Purpur start
+        if (entity instanceof Turtle || entity instanceof Bat) {
+            return false;
+        }
+        if (world.purpurConfig.turtleEggsBreakFromExpOrbs && entity instanceof net.minecraft.world.entity.ExperienceOrb) {
+            return true;
+        }
+        if (world.purpurConfig.turtleEggsBreakFromItems && entity instanceof net.minecraft.world.entity.item.ItemEntity) {
+            return true;
+        }
+        if (world.purpurConfig.turtleEggsBreakFromMinecarts && entity instanceof net.minecraft.world.entity.vehicle.AbstractMinecart) {
+            return true;
+        }
+        if (!(entity instanceof LivingEntity)) {
+            return false;
+        }
+        if (entity instanceof Player) return true;
+
+        return world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+        // Purpur end
     }
 }
