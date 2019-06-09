@@ -482,6 +482,7 @@ public abstract class PlayerList {
 
     protected void save(ServerPlayer player) {
         if (!player.getBukkitEntity().isPersistent()) return; // CraftBukkit
+        player.lastSave = MinecraftServer.currentTick; // Paper - Incremental chunk and player saving
         this.playerIo.save(player);
         ServerStatsCounter serverStatsCounter = player.getStats(); // CraftBukkit
         if (serverStatsCounter != null) {
@@ -1064,9 +1065,23 @@ public abstract class PlayerList {
     }
 
     public void saveAll() {
+        // Paper start - Incremental chunk and player saving
+        this.saveAll(-1);
+    }
+
+    public void saveAll(final int interval) {
         io.papermc.paper.util.MCUtil.ensureMain("Save Players" , () -> { // Paper - Ensure main
+        int numSaved = 0;
+        final long now = MinecraftServer.currentTick;
         for (int i = 0; i < this.players.size(); i++) {
-            this.save(this.players.get(i));
+            final ServerPlayer player = this.players.get(i);
+            if (interval == -1 || now - player.lastSave >= interval) {
+                this.save(player);
+                if (interval != -1 && ++numSaved >= io.papermc.paper.configuration.GlobalConfiguration.get().playerAutoSave.maxPerTick()) {
+                    break;
+                }
+            }
+            // Paper end - Incremental chunk and player saving
         }
         return null; }); // Paper - ensure main
     }

@@ -960,7 +960,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
         boolean var4;
         try {
             this.isSaving = true;
-            this.getPlayerList().saveAll();
+            this.getPlayerList().saveAll(); // Paper - Incremental chunk and player saving; diff on change
             var4 = this.saveAllChunks(suppressLog, flush, forced);
         } finally {
             this.isSaving = false;
@@ -1533,9 +1533,29 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
         }
 
         this.ticksUntilAutosave--;
-        if (this.autosavePeriod > 0 && this.ticksUntilAutosave <= 0) { // CraftBukkit
-            this.autoSave();
+        // Paper start - Incremental chunk and player saving
+        final ProfilerFiller profiler = Profiler.get();
+        int playerSaveInterval = io.papermc.paper.configuration.GlobalConfiguration.get().playerAutoSave.rate;
+        if (playerSaveInterval < 0) {
+            playerSaveInterval = autosavePeriod;
         }
+        profiler.push("save");
+        final boolean fullSave = autosavePeriod > 0 && this.tickCount % autosavePeriod == 0;
+        try {
+            this.isSaving = true;
+            if (playerSaveInterval > 0) {
+                this.playerList.saveAll(playerSaveInterval);
+            }
+            for (final ServerLevel level : this.getAllLevels()) {
+                if (level.paperConfig().chunks.autoSaveInterval.value() > 0) {
+                    level.saveIncrementally(fullSave);
+                }
+            }
+        } finally {
+            this.isSaving = false;
+        }
+        profiler.pop();
+        // Paper end - Incremental chunk and player saving
 
         ProfilerFiller profilerFiller = Profiler.get();
         this.runAllTasks(); // Paper - move runAllTasks() into full server tick (previously for timings)
