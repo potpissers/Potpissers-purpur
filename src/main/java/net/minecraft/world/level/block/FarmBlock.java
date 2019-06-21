@@ -172,7 +172,7 @@ public class FarmBlock extends Block {
             }
         }
 
-        return false;
+        return ((ServerLevel) world).purpurConfig.farmlandGetsMoistFromBelow && world.getFluidState(pos.relative(Direction.DOWN)).is(FluidTags.WATER); // Purpur;
         // Paper end - Perf: remove abstract block iteration
     }
 
