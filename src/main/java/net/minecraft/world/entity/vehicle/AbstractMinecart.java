@@ -102,12 +102,14 @@ public abstract class AbstractMinecart extends VehicleEntity {
     private double flyingY = 0.95;
     private double flyingZ = 0.95;
     public double maxSpeed = 0.4D;
+    public double storedMaxSpeed; // Purpur
     // CraftBukkit end
 
     protected AbstractMinecart(EntityType<?> type, Level world) {
         super(type, world);
         this.targetDeltaMovement = Vec3.ZERO;
         this.blocksBuilding = true;
+        if (world != null) maxSpeed = storedMaxSpeed = world.purpurConfig.minecartMaxSpeed; // Purpur
     }
 
     protected AbstractMinecart(EntityType<?> type, Level world, double x, double y, double z) {
@@ -296,6 +298,12 @@ public abstract class AbstractMinecart extends VehicleEntity {
 
     @Override
     public void tick() {
+        // Purpur start
+        if (storedMaxSpeed != level().purpurConfig.minecartMaxSpeed) {
+            maxSpeed = storedMaxSpeed = level().purpurConfig.minecartMaxSpeed;
+        }
+        // Purpur end
+
         // CraftBukkit start
         double prevX = this.getX();
         double prevY = this.getY();
@@ -448,16 +456,62 @@ public abstract class AbstractMinecart extends VehicleEntity {
 
     public void activateMinecart(int x, int y, int z, boolean powered) {}
 
+    // Purpur start
+    private Double lastSpeed;
+
+    public double getControllableSpeed() {
+        BlockState blockState = level().getBlockState(this.blockPosition());
+        if (!blockState.isSolid()) {
+            blockState = level().getBlockState(this.blockPosition().relative(Direction.DOWN));
+        }
+        Double speed = level().purpurConfig.minecartControllableBlockSpeeds.get(blockState.getBlock());
+        if (!blockState.isSolid()) {
+            speed = lastSpeed;
+        }
+        if (speed == null) {
+            speed = level().purpurConfig.minecartControllableBaseSpeed;
+        }
+        return lastSpeed = speed;
+    }
+    // Purpur end
+
     protected void comeOffTrack() {
         double d0 = this.getMaxSpeed();
         Vec3 vec3d = this.getDeltaMovement();
 
         this.setDeltaMovement(Mth.clamp(vec3d.x, -d0, d0), vec3d.y, Mth.clamp(vec3d.z, -d0, d0));
+
+        // Purpur start
+        if (level().purpurConfig.minecartControllable && !isInWater() && !isInLava() && !passengers.isEmpty()) {
+            Entity passenger = passengers.get(0);
+            if (passenger instanceof Player) {
+                Player player = (Player) passenger;
+                if (player.jumping && this.onGround) {
+                    setDeltaMovement(new Vec3(getDeltaMovement().x, level().purpurConfig.minecartControllableHopBoost, getDeltaMovement().z));
+                }
+                if (player.zza != 0.0F) {
+                    Vector velocity = player.getBukkitEntity().getEyeLocation().getDirection().normalize().multiply(getControllableSpeed());
+                    if (player.zza < 0.0) {
+                        velocity.multiply(-0.5);
+                    }
+                    setDeltaMovement(new Vec3(velocity.getX(), getDeltaMovement().y, velocity.getZ()));
+                }
+                this.setYRot(passenger.getYRot() - 90);
+                maxUpStep = level().purpurConfig.minecartControllableStepHeight;
+            } else {
+                maxUpStep = 0.0F;
+            }
+        } else {
+            maxUpStep = 0.0F;
+        }
+        // Purpur end
+        
         if (this.onGround()) {
             // CraftBukkit start - replace magic numbers with our variables
             this.setDeltaMovement(new Vec3(this.getDeltaMovement().x * this.derailedX, this.getDeltaMovement().y * this.derailedY, this.getDeltaMovement().z * this.derailedZ));
             // CraftBukkit end
         }
+        else if (level().purpurConfig.minecartControllable) setDeltaMovement(new Vec3(getDeltaMovement().x * derailedX, getDeltaMovement().y, getDeltaMovement().z * derailedZ)); // Purpur
 
         this.move(MoverType.SELF, this.getDeltaMovement());
         if (!this.onGround()) {

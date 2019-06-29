@@ -94,7 +94,7 @@ public abstract class BlockBehaviour implements FeatureElement {
     protected final float jumpFactor;
     protected final boolean dynamicShape;
     protected final FeatureFlagSet requiredFeatures;
-    protected final BlockBehaviour.Properties properties;
+    public final BlockBehaviour.Properties properties; // Purpur - protected -> public
     @Nullable
     protected ResourceKey<LootTable> drops;
 
