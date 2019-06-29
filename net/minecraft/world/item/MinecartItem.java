@@ -30,8 +30,9 @@ public class MinecartItem extends Item {
         BlockPos clickedPos = context.getClickedPos();
         BlockState blockState = level.getBlockState(clickedPos);
         if (!blockState.is(BlockTags.RAILS)) {
-            return InteractionResult.FAIL;
-        } else {
+            if (!level.purpurConfig.minecartPlaceAnywhere) return InteractionResult.FAIL; // Purpur - Minecart settings and WASD controls
+            if (blockState.isSolid()) clickedPos = clickedPos.relative(context.getClickedFace());
+        } // else { // Purpur - Minecart settings and WASD controls
             ItemStack itemInHand = context.getItemInHand();
             RailShape railShape = blockState.getBlock() instanceof BaseRailBlock
                 ? blockState.getValue(((BaseRailBlock)blockState.getBlock()).getShapeProperty())
@@ -72,6 +73,6 @@ public class MinecartItem extends Item {
                 itemInHand.shrink(1);
                 return InteractionResult.SUCCESS;
             }
-        }
+        // } // Purpur - Minecart settings and WASD controls
     }
 }

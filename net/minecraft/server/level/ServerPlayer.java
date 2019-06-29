@@ -1240,6 +1240,11 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
         } else {
             // Purpur start - Add boat fall damage config
             if (damageSource.is(net.minecraft.tags.DamageTypeTags.IS_FALL)) {
+                // Purpur start - Minecart settings and WASD controls
+                if (getRootVehicle() instanceof net.minecraft.world.entity.vehicle.AbstractMinecart && level().purpurConfig.minecartControllable && !level().purpurConfig.minecartControllableFallDamage) {
+                    return false;
+                }
+                // Purpur end - Minecart settings and WASD controls
                 if (getRootVehicle() instanceof net.minecraft.world.entity.vehicle.Boat && !level().purpurConfig.boatsDoFallDamage) {
                     return false;
                 }
