@@ -1880,7 +1880,8 @@ public abstract class LivingEntity extends Entity implements Attackable {
         boolean flag = this.lastHurtByPlayerTime > 0;
 
         this.dropEquipment(); // CraftBukkit - from below
-        if (this.shouldDropLoot() && world.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT)) {
+        if (this.shouldDropLoot() && this.level().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT)) {
+            if (!(damageSource.is(net.minecraft.world.damagesource.DamageTypes.CRAMMING) && level().purpurConfig.disableDropsOnCrammingDeath)) { // Purpur
             this.dropFromLootTable(damageSource, flag);
             // Paper start
             final boolean prev = this.clearEquipmentSlots;
@@ -1889,6 +1890,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
             // Paper end
             this.dropCustomDeathLoot(world, damageSource, flag);
             this.clearEquipmentSlots = prev; // Paper
+            } // Purpur
         }
         // CraftBukkit start - Call death event // Paper start - call advancement triggers with correct entity equipment
         org.bukkit.event.entity.EntityDeathEvent deathEvent = CraftEventFactory.callEntityDeathEvent(this, damageSource, this.drops, () -> {
