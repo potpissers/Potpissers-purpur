@@ -332,6 +332,16 @@ public class EntityType<T extends Entity> implements FeatureElement, EntityTypeT
         return (EntityType) Registry.register(BuiltInRegistries.ENTITY_TYPE, id, (EntityType<T>) type.build(id)); // CraftBukkit - decompile error
     }
 
+    // Purpur start
+    public static EntityType<?> getFromBukkitType(org.bukkit.entity.EntityType bukkitType) {
+        return getFromKey(ResourceLocation.parse(bukkitType.getKey().toString()));
+    }
+
+    public static EntityType<?> getFromKey(ResourceLocation location) {
+        return BuiltInRegistries.ENTITY_TYPE.get(location);
+    }
+    // Purpur end
+
     public static ResourceLocation getKey(EntityType<?> type) {
         return BuiltInRegistries.ENTITY_TYPE.getKey(type);
     }
@@ -538,6 +548,16 @@ public class EntityType<T extends Entity> implements FeatureElement, EntityTypeT
     public MobCategory getCategory() {
         return this.category;
     }
+
+    // Purpur start
+    public String getName() {
+        return BuiltInRegistries.ENTITY_TYPE.getKey(this).getPath();
+    }
+
+    public String getTranslatedName() {
+        return getDescription().getString();
+    }
+    // Purpur end
 
     public String getDescriptionId() {
         if (this.descriptionId == null) {

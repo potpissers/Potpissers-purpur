@@ -74,6 +74,24 @@ public class SpawnEggItem extends Item {
                 Spawner spawner = (Spawner) tileentity;
 
                 entitytypes = this.getType(itemstack);
+
+                // Purpur start
+                if (spawner instanceof net.minecraft.world.level.block.entity.SpawnerBlockEntity) {
+                    org.bukkit.block.Block bukkitBlock = world.getWorld().getBlockAt(blockposition.getX(), blockposition.getY(), blockposition.getZ());
+                    org.purpurmc.purpur.event.PlayerSetSpawnerTypeWithEggEvent event = new org.purpurmc.purpur.event.PlayerSetSpawnerTypeWithEggEvent((org.bukkit.entity.Player) context.getPlayer().getBukkitEntity(), bukkitBlock, (org.bukkit.block.CreatureSpawner) bukkitBlock.getState(), org.bukkit.entity.EntityType.fromName(entitytypes.getName()));
+                    if (!event.callEvent()) {
+                        return InteractionResult.FAIL;
+                    }
+                    entitytypes = EntityType.getFromBukkitType(event.getEntityType());
+                } else if (spawner instanceof net.minecraft.world.level.block.entity.TrialSpawnerBlockEntity) {
+                    org.bukkit.block.Block bukkitBlock = world.getWorld().getBlockAt(blockposition.getX(), blockposition.getY(), blockposition.getZ());
+                    org.purpurmc.purpur.event.PlayerSetTrialSpawnerTypeWithEggEvent event = new org.purpurmc.purpur.event.PlayerSetTrialSpawnerTypeWithEggEvent((org.bukkit.entity.Player) context.getPlayer().getBukkitEntity(), bukkitBlock, (org.bukkit.block.TrialSpawner) bukkitBlock.getState(), org.bukkit.entity.EntityType.fromName(entitytypes.getName()));
+                    if (!event.callEvent()) {
+                        return InteractionResult.FAIL;
+                    }
+                    entitytypes = EntityType.getFromBukkitType(event.getEntityType());
+                }
+                // Purpur end
                 spawner.setEntityId(entitytypes, world.getRandom());
                 world.sendBlockUpdated(blockposition, iblockdata, iblockdata, 3);
                 world.gameEvent((Entity) context.getPlayer(), (Holder) GameEvent.BLOCK_CHANGE, blockposition);
