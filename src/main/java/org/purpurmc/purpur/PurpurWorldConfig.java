@@ -1644,6 +1644,7 @@ public class PurpurWorldConfig {
     public double zombieHorseJumpStrengthMax = 1.0D;
     public double zombieHorseMovementSpeedMin = 0.2D;
     public double zombieHorseMovementSpeedMax = 0.2D;
+    public double zombieHorseSpawnChance = 0.0D;
     private void zombieHorseSettings() {
         zombieHorseRidable = getBoolean("mobs.zombie_horse.ridable", zombieHorseRidable);
         zombieHorseRidableInWater = getBoolean("mobs.zombie_horse.ridable-in-water", zombieHorseRidableInWater);
@@ -1660,6 +1661,7 @@ public class PurpurWorldConfig {
         zombieHorseJumpStrengthMax = getDouble("mobs.zombie_horse.attributes.jump_strength.max", zombieHorseJumpStrengthMax);
         zombieHorseMovementSpeedMin = getDouble("mobs.zombie_horse.attributes.movement_speed.min", zombieHorseMovementSpeedMin);
         zombieHorseMovementSpeedMax = getDouble("mobs.zombie_horse.attributes.movement_speed.max", zombieHorseMovementSpeedMax);
+        zombieHorseSpawnChance = getDouble("mobs.zombie_horse.spawn-chance", zombieHorseSpawnChance);
     }
 
     public boolean zombieVillagerRidable = false;
