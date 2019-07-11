@@ -25,7 +25,9 @@ public class MilkBucketItem extends Item {
         }
 
         if (!world.isClientSide) {
+            net.minecraft.world.effect.MobEffectInstance badOmen = user.getEffect(net.minecraft.world.effect.MobEffects.BAD_OMEN); // Purpur
             user.removeAllEffects(org.bukkit.event.entity.EntityPotionEffectEvent.Cause.MILK); // CraftBukkit
+            if (!world.purpurConfig.milkCuresBadOmen && badOmen != null) user.addEffect(badOmen); // Purpur
         }
 
         if (user instanceof Player entityhuman) {
