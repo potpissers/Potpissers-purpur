@@ -390,6 +390,11 @@ public class Fox extends Animal implements VariantHolder<Fox.Type> {
     }
 
     private void setTargetGoals() {
+        // Purpur start - do not add duplicate goals
+        this.targetSelector.removeGoal(this.landTargetGoal);
+        this.targetSelector.removeGoal(this.turtleEggTargetGoal);
+        this.targetSelector.removeGoal(this.fishTargetGoal);
+        // Purpur end
         if (this.getVariant() == Fox.Type.RED) {
             this.targetSelector.addGoal(4, this.landTargetGoal);
             this.targetSelector.addGoal(4, this.turtleEggTargetGoal);
@@ -423,6 +428,7 @@ public class Fox extends Animal implements VariantHolder<Fox.Type> {
 
     public void setVariant(Fox.Type variant) {
         this.entityData.set(Fox.DATA_TYPE_ID, variant.getId());
+        this.setTargetGoals(); // Purpur - fix API bug not updating pathfinders on type change
     }
 
     List<UUID> getTrustedUUIDs() {
@@ -762,6 +768,29 @@ public class Fox extends Animal implements VariantHolder<Fox.Type> {
         return slot == EquipmentSlot.MAINHAND;
     }
     // Paper end
+
+    // Purpur start
+    @Override
+    public net.minecraft.world.InteractionResult mobInteract(Player player, InteractionHand hand) {
+        if (level().purpurConfig.foxTypeChangesWithTulips) {
+            ItemStack itemstack = player.getItemInHand(hand);
+            if (getVariant() == Type.RED && itemstack.getItem() == Items.WHITE_TULIP) {
+                setVariant(Type.SNOW);
+                if (!player.getAbilities().instabuild) {
+                    itemstack.shrink(1);
+                }
+                return net.minecraft.world.InteractionResult.SUCCESS;
+            } else if (getVariant() == Type.SNOW && itemstack.getItem() == Items.ORANGE_TULIP) {
+                setVariant(Type.RED);
+                if (!player.getAbilities().instabuild) {
+                    itemstack.shrink(1);
+                }
+                return net.minecraft.world.InteractionResult.SUCCESS;
+            }
+        }
+        return super.mobInteract(player, hand);
+    }
+    // Purpur end
 
     @Override
     // Paper start - Cancellable death event
