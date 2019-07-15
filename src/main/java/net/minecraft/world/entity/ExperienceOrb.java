@@ -347,7 +347,7 @@ public class ExperienceOrb extends Entity {
     }
 
     private int repairPlayerItems(ServerPlayer player, int amount) {
-        Optional<EnchantedItemInUse> optional = EnchantmentHelper.getRandomItemWith(EnchantmentEffectComponents.REPAIR_WITH_XP, player, ItemStack::isDamaged);
+        Optional<EnchantedItemInUse> optional = level().purpurConfig.useBetterMending ? EnchantmentHelper.getMostDamagedItemWith(EnchantmentEffectComponents.REPAIR_WITH_XP, player) : EnchantmentHelper.getRandomItemWith(EnchantmentEffectComponents.REPAIR_WITH_XP, player, ItemStack::isDamaged); // Purpur - Add option to mend the most damaged equipment first
 
         if (optional.isPresent()) {
             ItemStack itemstack = ((EnchantedItemInUse) optional.get()).itemStack();

@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -569,4 +570,48 @@ public class EnchantmentHelper {
         return getItemEnchantmentLevel(getEnchantmentHolder(enchantment), stack);
     }
     // Purpur end - Enchantment convenience methods
+
+    // Purpur start - Add option to mend the most damaged equipment first
+    public static Optional<EnchantedItemInUse> getMostDamagedItemWith(DataComponentType<?> componentType, LivingEntity entity) {
+        ItemStack maxStack = null;
+        EquipmentSlot maxSlot = null;
+        float maxPercent = 0.0F;
+
+        equipmentSlotLoop:
+        for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
+            ItemStack stack = entity.getItemBySlot(equipmentSlot);
+
+            // do not even check enchantments for item with lower or equal damage percent
+            float percent = stack.getDamagePercent();
+            if (percent <= maxPercent) {
+                continue;
+            }
+
+            ItemEnchantments itemEnchantments = stack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+
+            for (Entry<Holder<Enchantment>> entry : itemEnchantments.entrySet()) {
+                Enchantment enchantment = entry.getKey().value();
+
+                net.minecraft.core.component.DataComponentMap effects = enchantment.effects();
+                if (!effects.has(componentType)) {
+                    // try with another enchantment
+                    continue;
+                }
+
+                if (enchantment.matchingSlot(equipmentSlot)) {
+                    maxStack = stack;
+                    maxSlot = equipmentSlot;
+                    maxPercent = percent;
+
+                    // check another slot now
+                    continue equipmentSlotLoop;
+                }
+            }
+        }
+
+        return maxStack != null
+            ? Optional.of(new EnchantedItemInUse(maxStack, maxSlot, entity))
+            : Optional.empty();
+    }
+    // Purpur end - Add option to mend the most damaged equipment first
 }
