@@ -318,6 +318,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
     // Spigot end
     public final io.papermc.paper.configuration.PaperConfigurations paperConfigurations; // Paper - add paper configuration files
     public boolean isIteratingOverLevels = false; // Paper - Throw exception on world create while being ticked
+    public boolean lagging = false; // Purpur
 
     public volatile Thread shutdownThread; // Paper
     public volatile boolean abnormalExit = false; // Paper
@@ -1283,6 +1284,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                     this.recentTps[0] = tps1.getAverage();
                     this.recentTps[1] = tps5.getAverage();
                     this.recentTps[2] = tps15.getAverage();
+                    lagging = recentTps[0] < org.purpurmc.purpur.PurpurConfig.laggingThreshold; // Purpur
                     tickSection = currentTime;
                 }
                 // Paper end - further improve server tick loop
