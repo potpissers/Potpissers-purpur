@@ -733,6 +733,14 @@ public final class ItemStack implements DataComponentHolder {
                 org.bukkit.craftbukkit.event.CraftEventFactory.callPlayerItemBreakEvent(serverPlayer, this); // Paper - Add EntityDamageItemEvent
             }
             // CraftBukkit end
+
+            // Purpur start - Implement elytra settings
+            if (this.has(DataComponents.GLIDER)) {
+                setDamageValue(this.getMaxDamage() - 1);
+                return;
+            }
+            // Purpur end - Implement elytra settings
+
             this.shrink(1);
             onBreak.accept(item);
         }

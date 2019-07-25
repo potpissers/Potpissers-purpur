@@ -66,6 +66,19 @@ public class FireworkRocketItem extends Item implements ProjectileItem {
                 com.destroystokyo.paper.event.player.PlayerElytraBoostEvent event = new com.destroystokyo.paper.event.player.PlayerElytraBoostEvent((org.bukkit.entity.Player) player.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemInHand), (org.bukkit.entity.Firework) delayed.projectile().getBukkitEntity(), org.bukkit.craftbukkit.CraftEquipmentSlot.getHand(hand));
                 if (event.callEvent() && delayed.attemptSpawn()) {
                     player.awardStat(Stats.ITEM_USED.get(this)); // Moved up from below
+
+                    // Purpur start - Implement elytra settings
+                    if (level.purpurConfig.elytraDamagePerFireworkBoost > 0) {
+                        List<net.minecraft.world.entity.EquipmentSlot> list = net.minecraft.world.entity.EquipmentSlot.VALUES.stream().filter((enumitemslot) -> net.minecraft.world.entity.LivingEntity.canGlideUsing(player.getItemBySlot(enumitemslot), enumitemslot)).toList();
+                        net.minecraft.world.entity.EquipmentSlot enumitemslot = net.minecraft.Util.getRandom(list, player.random);
+
+                        ItemStack glideItem = player.getItemBySlot(enumitemslot);
+                        if (player.canGlide()) {
+                            glideItem.hurtAndBreak(level.purpurConfig.elytraDamagePerFireworkBoost, player, enumitemslot);
+                        }
+                    }
+                    // Purpur end - Implement elytra settings
+
                     if (event.shouldConsume() && !player.hasInfiniteMaterials()) {
                         itemInHand.shrink(1); // Moved up from below
                     } else {

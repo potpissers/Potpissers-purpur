@@ -3595,7 +3595,18 @@ public abstract class LivingEntity extends Entity implements Attackable {
                 if (i1 % 2 == 0) {
                     List<EquipmentSlot> list = EquipmentSlot.VALUES.stream().filter(slot -> canGlideUsing(this.getItemBySlot(slot), slot)).toList();
                     EquipmentSlot equipmentSlot = Util.getRandom(list, this.random);
-                    this.getItemBySlot(equipmentSlot).hurtAndBreak(1, this, equipmentSlot);
+
+                    // Purpur start - Implement elytra settings
+                    int damage = level().purpurConfig.elytraDamagePerSecond;
+                    if (level().purpurConfig.elytraDamageMultiplyBySpeed > 0) {
+                        double speed = getDeltaMovement().lengthSqr();
+                        if (speed > level().purpurConfig.elytraDamageMultiplyBySpeed) {
+                            damage *= (int) speed;
+                        }
+                    }
+
+                    this.getItemBySlot(equipmentSlot).hurtAndBreak(damage, this, equipmentSlot);
+                    // Purpur end - Implement elytra settings
                 }
 
                 this.gameEvent(GameEvent.ELYTRA_GLIDE);

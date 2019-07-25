@@ -133,6 +133,18 @@ public class TridentItem extends Item implements ProjectileItem {
                         f1 *= tridentSpinAttackStrength / squareRoot;
                         f2 *= tridentSpinAttackStrength / squareRoot;
                         org.bukkit.craftbukkit.event.CraftEventFactory.callPlayerRiptideEvent(player, stack, f, f1, f2); // CraftBukkit
+
+                        // Purpur start - Implement elytra settings
+                        List<EquipmentSlot> list = EquipmentSlot.VALUES.stream().filter((enumitemslot) -> LivingEntity.canGlideUsing(entity.getItemBySlot(enumitemslot), enumitemslot)).toList();
+                        if (!list.isEmpty()) {
+                            EquipmentSlot enumitemslot = net.minecraft.Util.getRandom(list, entity.random);
+                            ItemStack glideItem = entity.getItemBySlot(enumitemslot);
+                            if (glideItem.has(net.minecraft.core.component.DataComponents.GLIDER) && level.purpurConfig.elytraDamagePerTridentBoost > 0) {
+                                glideItem.hurtAndBreak(level.purpurConfig.elytraDamagePerTridentBoost, entity, enumitemslot);
+                            }
+                        }
+                        // Purpur end - Implement elytra settings
+
                         player.push(f, f1, f2);
                         player.startAutoSpinAttack(20, 8.0F, stack);
                         if (player.onGround()) {
