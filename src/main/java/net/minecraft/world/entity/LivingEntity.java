@@ -3639,7 +3639,16 @@ public abstract class LivingEntity extends Entity implements Attackable {
                     int j = i / 10;
 
                     if (j % 2 == 0) {
-                        itemstack.hurtAndBreak(1, this, EquipmentSlot.CHEST);
+                        // Purpur start
+                        int damage = level().purpurConfig.elytraDamagePerSecond;
+                        if (level().purpurConfig.elytraDamageMultiplyBySpeed > 0) {
+                            double speed = getDeltaMovement().lengthSqr();
+                            if (speed > level().purpurConfig.elytraDamageMultiplyBySpeed) {
+                                damage *= (int) speed;
+                            }
+                        }
+                        itemstack.hurtAndBreak(damage, this, EquipmentSlot.CHEST);
+                        // Purpur end
                     }
 
                     this.gameEvent(GameEvent.ELYTRA_GLIDE);

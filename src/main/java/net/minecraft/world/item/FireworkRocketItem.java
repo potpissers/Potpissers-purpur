@@ -65,6 +65,14 @@ public class FireworkRocketItem extends Item implements ProjectileItem {
                 com.destroystokyo.paper.event.player.PlayerElytraBoostEvent event = new com.destroystokyo.paper.event.player.PlayerElytraBoostEvent((org.bukkit.entity.Player) user.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemStack), (org.bukkit.entity.Firework) fireworkRocketEntity.getBukkitEntity(), org.bukkit.craftbukkit.CraftEquipmentSlot.getHand(hand));
                 if (event.callEvent() && world.addFreshEntity(fireworkRocketEntity)) {
                     user.awardStat(Stats.ITEM_USED.get(this));
+                    // Purpur start
+                    if (world.purpurConfig.elytraDamagePerFireworkBoost > 0) {
+                        ItemStack chestItem = user.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST);
+                        if (chestItem.getItem() == Items.ELYTRA) {
+                            chestItem.hurtAndBreak(world.purpurConfig.elytraDamagePerFireworkBoost, user, net.minecraft.world.entity.EquipmentSlot.CHEST);
+                        }
+                    }
+                    // Purpur end
                     if (event.shouldConsume() && !user.hasInfiniteMaterials()) {
                         itemStack.shrink(1);
                     } else ((net.minecraft.server.level.ServerPlayer) user).getBukkitEntity().updateInventory();

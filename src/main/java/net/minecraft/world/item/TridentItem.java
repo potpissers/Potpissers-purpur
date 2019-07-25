@@ -127,6 +127,14 @@ public class TridentItem extends Item implements ProjectileItem {
                             f4 *= f / f6;
                             f5 *= f / f6;
                             org.bukkit.craftbukkit.event.CraftEventFactory.callPlayerRiptideEvent(entityhuman, stack, f3, f4, f5); // CraftBukkit
+
+                            // Purpur start
+                            ItemStack chestItem = entityhuman.getItemBySlot(EquipmentSlot.CHEST);
+                            if (chestItem.getItem() == Items.ELYTRA && world.purpurConfig.elytraDamagePerTridentBoost > 0) {
+                                chestItem.hurtAndBreak(world.purpurConfig.elytraDamagePerTridentBoost, entityhuman, EquipmentSlot.CHEST);
+                            }
+                            // Purpur end
+
                             entityhuman.push((double) f3, (double) f4, (double) f5);
                             entityhuman.startAutoSpinAttack(20, 8.0F, stack);
                             if (entityhuman.onGround()) {
