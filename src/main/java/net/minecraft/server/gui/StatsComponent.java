@@ -45,7 +45,7 @@ public class StatsComponent extends JComponent {
         this.msgs[1] = "Avg tick: "
             + DECIMAL_FORMAT.format((double)this.server.getAverageTickTimeNanos() / (double)TimeUtil.NANOSECONDS_PER_MILLISECOND)
             + " ms";
-        this.msgs[2] = "TPS from last 1m, 5m, 15m: " + String.join(", ", tpsAvg);
+        this.msgs[2] = "TPS from last 5s, 1m, 5m, 15m: " + String.join(", ", tpsAvg); // Purpur
         // Paper end - Improve ServerGUI
         this.values[this.vp++ & 0xFF] = (int)(l * 100L / Runtime.getRuntime().maxMemory());
         this.repaint();
