@@ -332,6 +332,20 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
     private boolean justTeleported = false;
     // CraftBukkit end
 
+        // Purpur start
+    private final com.google.common.cache.LoadingCache<CraftPlayer, Boolean> kickPermissionCache = com.google.common.cache.CacheBuilder.newBuilder()
+        .maximumSize(1000)
+        .expireAfterWrite(1, java.util.concurrent.TimeUnit.MINUTES)
+        .build(
+            new com.google.common.cache.CacheLoader<>() {
+                @Override
+                public Boolean load(CraftPlayer player) {
+                    return player.hasPermission("purpur.bypassIdleKick");
+                }
+            }
+        );
+    // Purpur end
+
     @Override
     public void tick() {
         if (this.ackBlockChangesUpTo > -1) {
@@ -399,6 +413,12 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
         }
 
         if (this.player.getLastActionTime() > 0L && this.server.getPlayerIdleTimeout() > 0 && Util.getMillis() - this.player.getLastActionTime() > (long) this.server.getPlayerIdleTimeout() * 1000L * 60L && !this.player.wonGame) { // Paper - Prevent AFK kick while watching end credits
+            // Purpur start
+            this.player.setAfk(true);
+            if (!this.player.level().purpurConfig.idleTimeoutKick || (!Boolean.parseBoolean(System.getenv("PURPUR_FORCE_IDLE_KICK")) && kickPermissionCache.getUnchecked(this.player.getBukkitEntity()))) {
+                return;
+            }
+            // Purpur end
             this.player.resetLastActionTime(); // CraftBukkit - SPIGOT-854
             this.disconnect((Component) Component.translatable("multiplayer.disconnect.idling"), org.bukkit.event.player.PlayerKickEvent.Cause.IDLING); // Paper - kick event cause
         }
@@ -657,6 +677,8 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
                     this.lastPosZ = to.getZ();
                     this.lastYaw = to.getYaw();
                     this.lastPitch = to.getPitch();
+
+                    if (!to.getWorld().getUID().equals(from.getWorld().getUID()) || to.getBlockX() != from.getBlockX() || to.getBlockY() != from.getBlockY() || to.getBlockZ() != from.getBlockZ() || to.getYaw() != from.getYaw() || to.getPitch() != from.getPitch()) this.player.resetLastActionTime(); // Purpur
 
                     Location oldTo = to.clone();
                     PlayerMoveEvent event = new PlayerMoveEvent(player, from, to);
@@ -1489,7 +1511,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
                                     movedWrongly = true;
                                     if (event.getLogWarning())
                                 // Paper end
-                                ServerGamePacketListenerImpl.LOGGER.warn("{} moved wrongly!", this.player.getName().getString());
+                                ServerGamePacketListenerImpl.LOGGER.warn("{} moved wrongly!, ({})", this.player.getName().getString(), d11); // Purpur
                                 } // Paper
                             }
 
@@ -1556,6 +1578,8 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
                                     this.lastPosZ = to.getZ();
                                     this.lastYaw = to.getYaw();
                                     this.lastPitch = to.getPitch();
+
+                                    if (!to.getWorld().getUID().equals(from.getWorld().getUID()) || to.getBlockX() != from.getBlockX() || to.getBlockY() != from.getBlockY() || to.getBlockZ() != from.getBlockZ() || to.getYaw() != from.getYaw() || to.getPitch() != from.getPitch()) this.player.resetLastActionTime(); // Purpur
 
                                     Location oldTo = to.clone();
                                     PlayerMoveEvent event = new PlayerMoveEvent(player, from, to);

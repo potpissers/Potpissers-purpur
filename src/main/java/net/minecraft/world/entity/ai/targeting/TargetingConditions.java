@@ -64,6 +64,10 @@ public class TargetingConditions {
             return false;
         } else if (this.selector != null && !this.selector.test(targetEntity)) {
             return false;
+        // Purpur start
+        } else if (!targetEntity.level().purpurConfig.idleTimeoutTargetPlayer && targetEntity instanceof net.minecraft.server.level.ServerPlayer player && player.isAfk()) {
+            return false;
+        // Purpur end
         } else {
             if (baseEntity == null) {
                 if (this.isCombat && (!targetEntity.canBeSeenAsEnemy() || targetEntity.level().getDifficulty() == Difficulty.PEACEFUL)) {

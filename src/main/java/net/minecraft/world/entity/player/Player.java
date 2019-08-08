@@ -203,6 +203,13 @@ public abstract class Player extends LivingEntity {
     public boolean fauxSleeping;
     public int oldLevel = -1;
 
+    public void setAfk(boolean afk) {
+    }
+
+    public boolean isAfk() {
+        return false;
+    }
+
     @Override
     public CraftHumanEntity getBukkitEntity() {
         return (CraftHumanEntity) super.getBukkitEntity();

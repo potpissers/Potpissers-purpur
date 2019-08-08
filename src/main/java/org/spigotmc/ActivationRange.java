@@ -205,6 +205,8 @@ public class ActivationRange
                 continue;
             }
 
+            if (!player.level().purpurConfig.idleTimeoutTickNearbyEntities && player.isAfk()) continue; // Purpur
+
             // Paper start
             int worldHeight = world.getHeight();
             ActivationRange.maxBB = player.getBoundingBox().inflate( maxRange, worldHeight, maxRange );

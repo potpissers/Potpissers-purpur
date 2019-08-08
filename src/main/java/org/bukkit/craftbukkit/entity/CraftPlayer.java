@@ -578,10 +578,15 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void setPlayerListName(String name) {
+        // Purpur start
+        setPlayerListName(name, false);
+    }
+    public void setPlayerListName(String name, boolean useMM) {
+        // Purpur end
         if (name == null) {
             name = this.getName();
         }
-        this.getHandle().listName = name.equals(this.getName()) ? null : CraftChatMessage.fromStringOrNull(name);
+        this.getHandle().listName = name.equals(this.getName()) ? null : useMM ? io.papermc.paper.adventure.PaperAdventure.asVanilla(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(name)) : CraftChatMessage.fromStringOrNull(name); // Purpur
         if (this.getHandle().connection == null) return; // Paper - Updates are possible before the player has fully joined
         for (ServerPlayer player : (List<ServerPlayer>) this.server.getHandle().players) {
             if (player.getBukkitEntity().canSee(this)) {
@@ -3573,6 +3578,21 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     @Override
     public boolean usesPurpurClient() {
         return getHandle().purpurClient;
+    }
+
+    @Override
+    public boolean isAfk() {
+        return getHandle().isAfk();
+    }
+
+    @Override
+    public void setAfk(boolean setAfk) {
+        getHandle().setAfk(setAfk);
+    }
+
+    @Override
+    public void resetIdleTimer() {
+        getHandle().resetLastActionTime();
     }
     // Purpur end
 }

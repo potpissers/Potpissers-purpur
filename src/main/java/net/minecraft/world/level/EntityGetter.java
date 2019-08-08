@@ -187,7 +187,7 @@ public interface EntityGetter extends ca.spottedleaf.moonrise.patches.chunk_syst
 
     default boolean hasNearbyAlivePlayer(double x, double y, double z, double range) {
         for (Player player : this.players()) {
-            if (EntitySelector.NO_SPECTATORS.test(player) && EntitySelector.LIVING_ENTITY_STILL_ALIVE.test(player)) {
+            if (EntitySelector.NO_SPECTATORS.test(player) && EntitySelector.LIVING_ENTITY_STILL_ALIVE.test(player) && EntitySelector.notAfk.test(player)) { // Purpur
                 double d = player.distanceToSqr(x, y, z);
                 if (range < 0.0 || d < range * range) {
                     return true;

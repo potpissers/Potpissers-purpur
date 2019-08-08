@@ -2371,7 +2371,67 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
 
     public void resetLastActionTime() {
         this.lastActionTime = Util.getMillis();
+        this.setAfk(false); // Purpur
     }
+
+    // Purpur Start
+    private boolean isAfk = false;
+
+    @Override
+    public void setAfk(boolean afk) {
+        if (this.isAfk == afk) {
+            return;
+        }
+
+        String msg = afk ? org.purpurmc.purpur.PurpurConfig.afkBroadcastAway : org.purpurmc.purpur.PurpurConfig.afkBroadcastBack;
+
+        org.purpurmc.purpur.event.PlayerAFKEvent event = new org.purpurmc.purpur.event.PlayerAFKEvent(this.getBukkitEntity(), afk, this.level().purpurConfig.idleTimeoutKick, msg, !Bukkit.isPrimaryThread());
+        if (!event.callEvent() || event.shouldKick()) {
+            return;
+        }
+
+        this.isAfk = afk;
+
+        if (!afk) {
+            resetLastActionTime();
+        }
+
+        msg = event.getBroadcastMsg();
+        if (msg != null && !msg.isEmpty()) {
+            String playerName = this.getGameProfile().getName();
+            if (org.purpurmc.purpur.PurpurConfig.afkBroadcastUseDisplayName) {
+                net.kyori.adventure.text.Component playerDisplayNameComponent = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(this.getBukkitEntity().getDisplayName());
+                playerName = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(playerDisplayNameComponent);
+            }
+            server.getPlayerList().broadcastMiniMessage(String.format(msg, playerName), false);
+        }
+
+        if (this.level().purpurConfig.idleTimeoutUpdateTabList) {
+            String scoreboardName = getScoreboardName();
+            String playerListName = net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().serialize(getBukkitEntity().playerListName());
+            String[] split = playerListName.split(scoreboardName);
+            String prefix = (split.length > 0 ? split[0] : "").replace(org.purpurmc.purpur.PurpurConfig.afkTabListPrefix, "");
+            String suffix = (split.length > 1 ? split[1] : "").replace(org.purpurmc.purpur.PurpurConfig.afkTabListSuffix, "");
+            if (afk) {
+                getBukkitEntity().setPlayerListName(org.purpurmc.purpur.PurpurConfig.afkTabListPrefix + prefix + scoreboardName + suffix + org.purpurmc.purpur.PurpurConfig.afkTabListSuffix, true);
+            } else {
+                getBukkitEntity().setPlayerListName(prefix + scoreboardName + suffix, true);
+            }
+        }
+
+        ((ServerLevel) this.level()).updateSleepingPlayerList();
+    }
+
+    @Override
+    public boolean isAfk() {
+        return this.isAfk;
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return !this.isAfk() && super.canBeCollidedWith();
+    }
+    // Purpur End
 
     public ServerStatsCounter getStats() {
         return this.stats;

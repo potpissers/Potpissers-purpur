@@ -19,7 +19,7 @@ public class SleepStatus {
 
     public boolean areEnoughDeepSleeping(int percentage, List<ServerPlayer> players) {
         // CraftBukkit start
-        int j = (int) players.stream().filter((eh) -> { return eh.isSleepingLongEnough() || eh.fauxSleeping; }).count();
+        int j = (int) players.stream().filter((eh) -> { return eh.isSleepingLongEnough() || eh.fauxSleeping || (eh.level().purpurConfig.idleTimeoutCountAsSleeping && eh.isAfk()); }).count(); // Purpur
         boolean anyDeepSleep = players.stream().anyMatch(Player::isSleepingLongEnough);
 
         return anyDeepSleep && j >= this.sleepersNeeded(percentage);
@@ -52,7 +52,7 @@ public class SleepStatus {
 
             if (!entityplayer.isSpectator()) {
                 ++this.activePlayers;
-                if (entityplayer.isSleeping() || entityplayer.fauxSleeping) { // CraftBukkit
+                if ((entityplayer.isSleeping() || entityplayer.fauxSleeping) || (entityplayer.level().purpurConfig.idleTimeoutCountAsSleeping && entityplayer.isAfk())) { // CraftBukkit // Purpur
                     ++this.sleepingPlayers;
                 }
                 // CraftBukkit start

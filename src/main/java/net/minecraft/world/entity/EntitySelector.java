@@ -40,6 +40,7 @@ public final class EntitySelector {
         return net.minecraft.util.Mth.clamp(serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM.get(net.minecraft.stats.Stats.TIME_SINCE_REST)), 1, Integer.MAX_VALUE) >= playerInsomniaTicks;
     };
     // Paper end - Ability to control player's insomnia and phantoms
+    public static Predicate<Player> notAfk = (player) -> !player.isAfk(); // Purpur
 
     private EntitySelector() {}
     // Paper start - Affects Spawning API
