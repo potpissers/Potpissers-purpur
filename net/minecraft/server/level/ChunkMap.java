@@ -236,11 +236,29 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
         // Paper - rewrite chunk system
     }
 
-    // Paper start
-    public int getMobCountNear(final ServerPlayer player, final net.minecraft.world.entity.MobCategory mobCategory) {
-        return -1;
+    // Paper start - Optional per player mob spawns
+    public void updatePlayerMobTypeMap(final Entity entity) {
+        if (!this.level.paperConfig().entities.spawning.perPlayerMobSpawns) {
+            return;
+        }
+
+        final int index = entity.getType().getCategory().ordinal();
+        final ca.spottedleaf.moonrise.common.list.ReferenceList<ServerPlayer> inRange =
+            this.level.moonrise$getNearbyPlayers().getPlayers(entity.chunkPosition(), ca.spottedleaf.moonrise.common.misc.NearbyPlayers.NearbyMapType.TICK_VIEW_DISTANCE);
+        if (inRange == null) {
+            return;
+        }
+
+        final ServerPlayer[] backingSet = inRange.getRawDataUnchecked();
+        for (int i = 0, len = inRange.size(); i < len; i++) {
+            ++(backingSet[i].mobCounts[index]);
+        }
     }
-    // Paper end
+
+    public int getMobCountNear(final ServerPlayer player, final net.minecraft.world.entity.MobCategory mobCategory) {
+        return player.mobCounts[mobCategory.ordinal()];
+     }
+    // Paper end - Optional per player mob spawns
 
     protected ChunkGenerator generator() {
         return this.worldGenContext.generator();

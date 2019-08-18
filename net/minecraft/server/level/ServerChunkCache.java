@@ -517,7 +517,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
                     profilerFiller.popPush("shuffleChunks");
                     // Paper start - chunk tick iteration optimisation
                     this.shuffleRandom.setSeed(this.level.random.nextLong());
-                    Util.shuffle(list, this.shuffleRandom);
+                    if (!this.level.paperConfig().entities.spawning.perPlayerMobSpawns) Util.shuffle(list, this.shuffleRandom); // Paper - Optional per player mob spawns; do not need this when per-player is enabled
                     // Paper end - chunk tick iteration optimisation
                     this.tickChunks(profilerFiller, l, list);
                     profilerFiller.pop();
@@ -571,9 +571,18 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
     private void tickChunks(ProfilerFiller profiler, long timeInhabited, List<LevelChunk> chunks) {
         profiler.popPush("naturalSpawnCount");
         int naturalSpawnChunkCount = this.distanceManager.getNaturalSpawnChunkCount();
-        NaturalSpawner.SpawnState spawnState = NaturalSpawner.createState(
-            naturalSpawnChunkCount, this.level.getAllEntities(), this::getFullChunk, new LocalMobCapCalculator(this.chunkMap)
-        );
+        // Paper start - Optional per player mob spawns
+        NaturalSpawner.SpawnState spawnState;
+        if ((this.spawnFriendlies || this.spawnEnemies) && this.level.paperConfig().entities.spawning.perPlayerMobSpawns) { // don't count mobs when animals and monsters are disabled
+            // re-set mob counts
+            for (ServerPlayer player : this.level.players) {
+                Arrays.fill(player.mobCounts, 0);
+            }
+            spawnState = NaturalSpawner.createState(naturalSpawnChunkCount, this.level.getAllEntities(), this::getFullChunk, null, true);
+        } else {
+            spawnState = NaturalSpawner.createState(naturalSpawnChunkCount, this.level.getAllEntities(), this::getFullChunk, !this.level.paperConfig().entities.spawning.perPlayerMobSpawns ? new LocalMobCapCalculator(this.chunkMap) : null, false);
+        }
+        // Paper end - Optional per player mob spawns
         this.lastSpawnState = spawnState;
         profiler.popPush("spawnAndTick");
         boolean _boolean = this.level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING) && !this.level.players().isEmpty(); // CraftBukkit
