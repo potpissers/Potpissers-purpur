@@ -763,7 +763,7 @@ public class EnderDragon extends Mob implements Enemy {
         boolean flag = this.level().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT);
         short short0 = 500;
 
-        if (this.dragonFight != null && !this.dragonFight.hasPreviouslyKilledDragon()) {
+        if (this.dragonFight != null && (level().purpurConfig.enderDragonAlwaysDropsFullExp || !this.dragonFight.hasPreviouslyKilledDragon())) {
             short0 = 12000;
         }
 
