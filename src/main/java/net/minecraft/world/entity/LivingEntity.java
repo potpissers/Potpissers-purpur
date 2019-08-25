@@ -4599,6 +4599,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
         return EquipmentSlot.MAINHAND;
     }
 
+    // Purpur start - Dispenser curse of binding protection
+    public @Nullable EquipmentSlot getEquipmentSlotForDispenserItem(ItemStack itemstack) {
+        return EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.BINDING_CURSE, itemstack) > 0 ? null : this.getEquipmentSlotForItem(itemstack);
+    }
+    // Purpur end - Dispenser curse of binding protection
+
     private static SlotAccess createEquipmentSlotAccess(LivingEntity entity, EquipmentSlot slot) {
         return slot != EquipmentSlot.HEAD && slot != EquipmentSlot.MAINHAND && slot != EquipmentSlot.OFFHAND ? SlotAccess.forEquipmentSlot(entity, slot, (itemstack) -> {
             return itemstack.isEmpty() || entity.getEquipmentSlotForItem(itemstack) == slot;

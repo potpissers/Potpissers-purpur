@@ -60,7 +60,7 @@ public class ArmorItem extends Item implements Equipable {
             return false;
         } else {
             LivingEntity entityliving = (LivingEntity) list.get(0);
-            EquipmentSlot enumitemslot = entityliving.getEquipmentSlotForItem(armor);
+            EquipmentSlot enumitemslot = pointer.level().purpurConfig.dispenserApplyCursedArmor ? entityliving.getEquipmentSlotForItem(armor) : entityliving.getEquipmentSlotForDispenserItem(armor); if (enumitemslot == null) return false; // Purpur - Dispenser curse of binding protection
             ItemStack itemstack1 = armor.copyWithCount(1); // Paper - shrink below and single item in event
             // CraftBukkit start
             Level world = pointer.level();
