@@ -1092,6 +1092,8 @@ public class PurpurWorldConfig {
     public boolean rabbitControllable = true;
     public double rabbitMaxHealth = 3.0D;
     public double rabbitScale = 1.0D;
+    public double rabbitNaturalToast = 0.0D;
+    public double rabbitNaturalKiller = 0.0D;
     private void rabbitSettings() {
         rabbitRidable = getBoolean("mobs.rabbit.ridable", rabbitRidable);
         rabbitRidableInWater = getBoolean("mobs.rabbit.ridable-in-water", rabbitRidableInWater);
@@ -1103,6 +1105,8 @@ public class PurpurWorldConfig {
         }
         rabbitMaxHealth = getDouble("mobs.rabbit.attributes.max_health", rabbitMaxHealth);
         rabbitScale = Mth.clamp(getDouble("mobs.rabbit.attributes.scale", rabbitScale), 0.0625D, 16.0D);
+        rabbitNaturalToast = getDouble("mobs.rabbit.spawn-toast-chance", rabbitNaturalToast);
+        rabbitNaturalKiller = getDouble("mobs.rabbit.spawn-killer-rabbit-chance", rabbitNaturalKiller);
     }
 
     public boolean ravagerRidable = false;

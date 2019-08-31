@@ -471,10 +471,23 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
         }
 
         this.setVariant(entityrabbit_variant);
+
+        // Purpur start
+        if (entityrabbit_variant != Variant.EVIL && world.getLevel().purpurConfig.rabbitNaturalToast > 0D && random.nextDouble() <= world.getLevel().purpurConfig.rabbitNaturalToast) {
+            setCustomName(Component.translatable("Toast"));
+        }
+        // Purpur end
+
         return super.finalizeSpawn(world, difficulty, spawnReason, (SpawnGroupData) entityData);
     }
 
     private static Rabbit.Variant getRandomRabbitVariant(LevelAccessor world, BlockPos pos) {
+        // Purpur start
+        Level level = world.getMinecraftWorld();
+        if (level.purpurConfig.rabbitNaturalKiller > 0D && world.getRandom().nextDouble() <= level.purpurConfig.rabbitNaturalKiller) {
+            return Rabbit.Variant.EVIL;
+        }
+        // Purpur end
         Holder<Biome> holder = world.getBiome(pos);
         int i = world.getRandom().nextInt(100);
 
