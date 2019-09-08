@@ -543,6 +543,7 @@ public class Boat extends VehicleEntity implements Leashable, VariantHolder<Boat
 
             if (f > 0.0F) {
                 this.landFriction = f;
+                if (level().purpurConfig.boatEjectPlayersOnLand) ejectPassengers(); // Purpur
                 return Boat.Status.ON_LAND;
             } else {
                 return Boat.Status.IN_AIR;
