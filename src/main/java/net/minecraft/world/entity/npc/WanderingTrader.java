@@ -86,6 +86,11 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
     public boolean isControllable() {
         return level().purpurConfig.wanderingTraderControllable;
     }
+
+    @Override
+    public boolean canBeLeashed() {
+        return level().purpurConfig.wanderingTraderCanBeLeashed;
+    }
     // Purpur end
 
     @Override

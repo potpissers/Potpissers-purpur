@@ -1576,6 +1576,7 @@ public class PurpurWorldConfig {
     public double villagerMaxHealth = 20.0D;
     public double villagerScale = 1.0D;
     public boolean villagerFollowEmeraldBlock = false;
+    public boolean villagerCanBeLeashed = false;
     private void villagerSettings() {
         villagerRidable = getBoolean("mobs.villager.ridable", villagerRidable);
         villagerRidableInWater = getBoolean("mobs.villager.ridable-in-water", villagerRidableInWater);
@@ -1588,6 +1589,7 @@ public class PurpurWorldConfig {
         villagerMaxHealth = getDouble("mobs.villager.attributes.max_health", villagerMaxHealth);
         villagerScale = Mth.clamp(getDouble("mobs.villager.attributes.scale", villagerScale), 0.0625D, 16.0D);
         villagerFollowEmeraldBlock = getBoolean("mobs.villager.follow-emerald-blocks", villagerFollowEmeraldBlock);
+        villagerCanBeLeashed = getBoolean("mobs.villager.can-be-leashed", villagerCanBeLeashed);
     }
 
     public boolean vindicatorRidable = false;
@@ -1614,6 +1616,7 @@ public class PurpurWorldConfig {
     public double wanderingTraderMaxHealth = 20.0D;
     public double wanderingTraderScale = 1.0D;
     public boolean wanderingTraderFollowEmeraldBlock = false;
+    public boolean wanderingTraderCanBeLeashed = false;
     private void wanderingTraderSettings() {
         wanderingTraderRidable = getBoolean("mobs.wandering_trader.ridable", wanderingTraderRidable);
         wanderingTraderRidableInWater = getBoolean("mobs.wandering_trader.ridable-in-water", wanderingTraderRidableInWater);
@@ -1626,6 +1629,7 @@ public class PurpurWorldConfig {
         wanderingTraderMaxHealth = getDouble("mobs.wandering_trader.attributes.max_health", wanderingTraderMaxHealth);
         wanderingTraderScale = Mth.clamp(getDouble("mobs.wandering_trader.attributes.scale", wanderingTraderScale), 0.0625D, 16.0D);
         wanderingTraderFollowEmeraldBlock = getBoolean("mobs.wandering_trader.follow-emerald-blocks", wanderingTraderFollowEmeraldBlock);
+        wanderingTraderCanBeLeashed = getBoolean("mobs.wandering_trader.can-be-leashed", wanderingTraderCanBeLeashed);
     }
 
     public boolean wardenRidable = false;

@@ -179,6 +179,11 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this));
     }
+
+    @Override
+    public boolean canBeLeashed() {
+        return level().purpurConfig.villagerCanBeLeashed;
+    }
     // Purpur end
 
     @Override

@@ -2933,6 +2933,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         if (this.isAlive() && this instanceof Leashable leashable) {
             if (leashable.getLeashHolder() == player) {
                 if (!this.level().isClientSide()) {
+                    if (hand == InteractionHand.OFF_HAND && (level().purpurConfig.villagerCanBeLeashed || level().purpurConfig.wanderingTraderCanBeLeashed) && this instanceof net.minecraft.world.entity.npc.AbstractVillager) return InteractionResult.CONSUME; // Purpur
                     // CraftBukkit start - fire PlayerUnleashEntityEvent
                     // Paper start - Expand EntityUnleashEvent
                     org.bukkit.event.player.PlayerUnleashEntityEvent event = CraftEventFactory.callPlayerUnleashEntityEvent(this, player, hand, !player.hasInfiniteMaterials());
