@@ -683,6 +683,7 @@ public class ArmorStand extends LivingEntity {
 
     @Override
     public void tick() {
+        maxUpStep = level().purpurConfig.armorstandStepHeight;
         // Paper start - Allow ArmorStands not to tick
         if (!this.canTick) {
             if (this.noTickPoseDirty) {

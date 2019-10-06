@@ -343,6 +343,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     public double xOld;
     public double yOld;
     public double zOld;
+    public float maxUpStep; // Purpur
     public boolean noPhysics;
     public final RandomSource random;
     public int tickCount;
@@ -4890,7 +4891,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
 
     public float maxUpStep() {
-        return 0.0F;
+        return maxUpStep;
     }
 
     public void onExplosionHit(@Nullable Entity entity) {}
