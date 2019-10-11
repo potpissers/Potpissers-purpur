@@ -79,6 +79,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
     private long keepAliveChallenge;
     private long closedListenerTime;
     private boolean closed = false;
+    private it.unimi.dsi.fastutil.longs.LongList keepAlives = new it.unimi.dsi.fastutil.longs.LongArrayList(); // Purpur
     private int latency;
     private volatile boolean suspendFlushingOnServerThread = false;
     public final java.util.Map<java.util.UUID, net.kyori.adventure.resource.ResourcePackCallback> packCallbacks = new java.util.concurrent.ConcurrentHashMap<>(); // Paper - adventure resource pack callbacks
@@ -130,6 +131,16 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
 
     @Override
     public void handleKeepAlive(ServerboundKeepAlivePacket packet) {
+        // Purpur start
+        if (org.purpurmc.purpur.PurpurConfig.useAlternateKeepAlive) {
+            if (this.keepAlivePending && !keepAlives.isEmpty() && keepAlives.contains(packet.getId())) {
+                int ping = (int) (Util.getMillis() - packet.getId());
+                this.latency = (this.latency * 3 + ping) / 4;
+                this.keepAlivePending = false;
+                keepAlives.clear(); // we got a valid response, lets roll with it and forget the rest
+            }
+        } else
+        // Purpur end
         //PacketUtils.ensureRunningOnSameThread(packet, this, this.player.serverLevel()); // CraftBukkit // Paper - handle ServerboundKeepAlivePacket async
         if (this.keepAlivePending && packet.getId() == this.keepAliveChallenge) {
             int i = (int) (Util.getMillis() - this.keepAliveTime);
@@ -261,6 +272,21 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
         // This should effectively place the keepalive handling back to "as it was" before 1.12.2
         long currentTime = Util.getMillis();
         long elapsedTime = currentTime - this.keepAliveTime;
+
+        // Purpur start
+        if (org.purpurmc.purpur.PurpurConfig.useAlternateKeepAlive) {
+            if (elapsedTime >= 1000L) { // 1 second
+                if (this.keepAlivePending && !this.processedDisconnect && keepAlives.size() * 1000L >= KEEPALIVE_LIMIT) {
+                    this.disconnect(ServerCommonPacketListenerImpl.TIMEOUT_DISCONNECTION_MESSAGE, org.bukkit.event.player.PlayerKickEvent.Cause.TIMEOUT);
+                } else if (this.checkIfClosed(currentTime)) {
+                    this.keepAlivePending = true;
+                    this.keepAliveTime = currentTime; // hijack this field for 1 second intervals
+                    this.keepAlives.add(currentTime); // currentTime is ID
+                    this.send(new ClientboundKeepAlivePacket(currentTime));
+                }
+            }
+        } else
+        // Purpur end
 
         if (!this.isSingleplayerOwner() && elapsedTime >= 15000L) { // Paper - use vanilla's 15000L between keep alive packets
             if (this.keepAlivePending && !this.processedDisconnect && elapsedTime >= KEEPALIVE_LIMIT) { // Paper - check keepalive limit, don't fire if already disconnected
