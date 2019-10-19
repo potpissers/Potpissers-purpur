@@ -75,6 +75,7 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
     private Llama caravanHead;
     @Nullable
     public Llama caravanTail; // Paper
+    public boolean shouldJoinCaravan = true; // Purpur
 
     public Llama(EntityType<? extends Llama> type, Level world) {
         super(type, world);
@@ -168,6 +169,7 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
         super.addAdditionalSaveData(nbt);
         nbt.putInt("Variant", this.getVariant().id);
         nbt.putInt("Strength", this.getStrength());
+        nbt.putBoolean("Purpur.ShouldJoinCaravan", shouldJoinCaravan); // Purpur
     }
 
     @Override
@@ -175,6 +177,7 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
         this.setStrength(nbt.getInt("Strength"));
         super.readAdditionalSaveData(nbt);
         this.setVariant(Llama.Variant.byId(nbt.getInt("Variant")));
+        if (nbt.contains("Purpur.ShouldJoinCaravan")) this.shouldJoinCaravan = nbt.getBoolean("Purpur.ShouldJoinCaravan"); // Purpur
     }
 
     @Override
@@ -456,6 +459,7 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
 
     public void leaveCaravan() {
         if (this.caravanHead != null) {
+            new org.purpurmc.purpur.event.entity.LlamaLeaveCaravanEvent((org.bukkit.entity.Llama) getBukkitEntity()).callEvent(); // Purpur
             this.caravanHead.caravanTail = null;
         }
 
@@ -463,6 +467,7 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
     }
 
     public void joinCaravan(Llama llama) {
+        if (!shouldJoinCaravan || !new org.purpurmc.purpur.event.entity.LlamaJoinCaravanEvent((org.bukkit.entity.Llama) getBukkitEntity(), (org.bukkit.entity.Llama) llama.getBukkitEntity()).callEvent()) return; // Purpur
         this.caravanHead = llama;
         this.caravanHead.caravanTail = this;
     }

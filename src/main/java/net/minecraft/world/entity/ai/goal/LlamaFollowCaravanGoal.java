@@ -22,6 +22,7 @@ public class LlamaFollowCaravanGoal extends Goal {
 
     @Override
     public boolean canUse() {
+        if (!this.llama.shouldJoinCaravan) return false; // Purpur
         if (!this.llama.isLeashed() && !this.llama.inCaravan()) {
             List<Entity> list = this.llama.level().getEntities(this.llama, this.llama.getBoundingBox().inflate(9.0, 4.0, 9.0), entity -> {
                 EntityType<?> entityType = entity.getType();
@@ -71,6 +72,7 @@ public class LlamaFollowCaravanGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
+        if (!this.llama.shouldJoinCaravan) return false; // Purpur
         if (this.llama.inCaravan() && this.llama.getCaravanHead().isAlive() && this.firstIsLeashed(this.llama, 0)) {
             double d = this.llama.distanceToSqr(this.llama.getCaravanHead());
             if (d > 676.0) {
