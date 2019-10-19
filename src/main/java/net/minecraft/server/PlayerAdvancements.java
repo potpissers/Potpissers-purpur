@@ -199,6 +199,7 @@ public class PlayerAdvancements {
 
             if (advancementholder == null) {
                 if (!minecraftkey.getNamespace().equals("minecraft")) return; // CraftBukkit
+                if (!org.purpurmc.purpur.PurpurConfig.loggerSuppressIgnoredAdvancementWarnings) // Purpur
                 PlayerAdvancements.LOGGER.warn("Ignored advancement '{}' in progress file {} - it doesn't exist anymore?", minecraftkey, this.playerSavePath);
             } else {
                 this.startProgress(advancementholder, advancementprogress);

@@ -125,6 +125,7 @@ public class ServerRecipeBook extends RecipeBook {
                 Optional<RecipeHolder<?>> optional = recipeManager.byKey(minecraftkey);
 
                 if (optional.isEmpty()) {
+                    if (!org.purpurmc.purpur.PurpurConfig.loggerSuppressUnrecognizedRecipeErrors) // Purpur
                     ServerRecipeBook.LOGGER.error("Tried to load unrecognized recipe: {} removed now.", minecraftkey);
                 } else {
                     handler.accept((RecipeHolder) optional.get());
