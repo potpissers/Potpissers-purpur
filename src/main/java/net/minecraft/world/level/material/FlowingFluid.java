@@ -227,7 +227,7 @@ public abstract class FlowingFluid extends Fluid {
             }
         }
 
-        if (this.canConvertToSource(world) && j >= 2) {
+        if (this.canConvertToSource(world) && j >= getRequiredSources(world)) {
             BlockState iblockdata2 = world.getBlockState(pos.below());
             FluidState fluid1 = iblockdata2.getFluidState();
 
@@ -324,6 +324,12 @@ public abstract class FlowingFluid extends Fluid {
     }
 
     protected abstract boolean canConvertToSource(Level world);
+
+    // Purpur start
+    protected int getRequiredSources(Level level) {
+        return 2;
+    }
+    // Purpur end
 
     protected void spreadTo(LevelAccessor world, BlockPos pos, BlockState state, Direction direction, FluidState fluidState) {
         if (state.getBlock() instanceof LiquidBlockContainer) {

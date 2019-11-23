@@ -222,6 +222,11 @@ public class PurpurWorldConfig {
         farmlandGetsMoistFromBelow = getBoolean("blocks.farmland.gets-moist-from-below", farmlandGetsMoistFromBelow);
     }
 
+    public int lavaInfiniteRequiredSources = 2;
+    private void lavaSettings() {
+        lavaInfiniteRequiredSources = getInt("blocks.lava.infinite-required-sources", lavaInfiniteRequiredSources);
+    }
+
     public boolean turtleEggsBreakFromExpOrbs = false;
     public boolean turtleEggsBreakFromItems = false;
     public boolean turtleEggsBreakFromMinecarts = false;
@@ -229,6 +234,11 @@ public class PurpurWorldConfig {
         turtleEggsBreakFromExpOrbs = getBoolean("blocks.turtle_egg.break-from-exp-orbs", turtleEggsBreakFromExpOrbs);
         turtleEggsBreakFromItems = getBoolean("blocks.turtle_egg.break-from-items", turtleEggsBreakFromItems);
         turtleEggsBreakFromMinecarts = getBoolean("blocks.turtle_egg.break-from-minecarts", turtleEggsBreakFromMinecarts);
+    }
+
+    public int waterInfiniteRequiredSources = 2;
+    private void waterSources() {
+        waterInfiniteRequiredSources = getInt("blocks.water.infinite-required-sources", waterInfiniteRequiredSources);
     }
 
     public boolean babiesAreRidable = true;

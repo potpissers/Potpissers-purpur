@@ -198,6 +198,13 @@ public abstract class LavaFluid extends FlowingFluid {
         world.levelEvent(1501, pos, 0);
     }
 
+    // Purpur start
+    @Override
+    protected int getRequiredSources(Level level) {
+        return level.purpurConfig.lavaInfiniteRequiredSources;
+    }
+    // Purpur end
+
     @Override
     protected boolean canConvertToSource(Level world) {
         return world.getGameRules().getBoolean(GameRules.RULE_LAVA_SOURCE_CONVERSION);
