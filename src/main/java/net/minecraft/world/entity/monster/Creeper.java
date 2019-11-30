@@ -258,6 +258,14 @@ public class Creeper extends Monster implements PowerableMob {
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.creeperScale);
     }
 
+    public net.minecraft.world.entity.SpawnGroupData finalizeSpawn(net.minecraft.world.level.ServerLevelAccessor world, net.minecraft.world.DifficultyInstance difficulty, net.minecraft.world.entity.MobSpawnType spawnReason, @Nullable net.minecraft.world.entity.SpawnGroupData entityData) {
+        double chance = world.getLevel().purpurConfig.creeperChargedChance;
+        if (chance > 0D && random.nextDouble() <= chance) {
+            setPowered(true);
+        }
+        return super.finalizeSpawn(world, difficulty, spawnReason, entityData);
+    }
+
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.CREEPER_HURT;

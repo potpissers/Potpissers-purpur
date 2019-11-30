@@ -395,6 +395,7 @@ public class PurpurWorldConfig {
     public boolean creeperControllable = true;
     public double creeperMaxHealth = 20.0D;
     public double creeperScale = 1.0D;
+    public double creeperChargedChance = 0.0D;
     private void creeperSettings() {
         creeperRidable = getBoolean("mobs.creeper.ridable", creeperRidable);
         creeperRidableInWater = getBoolean("mobs.creeper.ridable-in-water", creeperRidableInWater);
@@ -406,6 +407,7 @@ public class PurpurWorldConfig {
         }
         creeperMaxHealth = getDouble("mobs.creeper.attributes.max_health", creeperMaxHealth);
         creeperScale = Mth.clamp(getDouble("mobs.creeper.attributes.scale", creeperScale), 0.0625D, 16.0D);
+        creeperChargedChance = getDouble("mobs.creeper.naturally-charged-chance", creeperChargedChance);
     }
 
     public boolean dolphinRidable = false;
