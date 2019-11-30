@@ -265,6 +265,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this));
+        if (level().purpurConfig.villagerFollowEmeraldBlock) this.goalSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.TemptGoal(this, 1.0D, TEMPT_ITEMS, false)); // Purpur - Villagers follow emerald blocks
     }
     // Purpur end - Ridables
 
@@ -273,6 +274,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     public void initAttributes() {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.villagerMaxHealth);
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.villagerScale);
+        this.getAttribute(Attributes.TEMPT_RANGE).setBaseValue(this.level().purpurConfig.villagerTemptRange); // Purpur - Villagers follow emerald blocks
     }
     // Purpur end - Configurable entity base attributes
 
@@ -341,7 +343,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.5);
+        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.5).add(Attributes.TEMPT_RANGE, 10.0D); // Purpur - Villagers follow emerald blocks
     }
 
     public boolean assignProfessionWhenSpawned() {

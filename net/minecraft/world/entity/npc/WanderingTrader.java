@@ -97,8 +97,15 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
     @Override
     public void initAttributes() {
         this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.wanderingTraderMaxHealth);
+        this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.TEMPT_RANGE).setBaseValue(this.level().purpurConfig.wanderingTraderTemptRange); // Purpur - Villagers follow emerald blocks
     }
     // Purpur end - Configurable entity base attributes
+
+    // Purpur start - Villagers follow emerald blocks
+    public static net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder createAttributes() {
+        return Mob.createMobAttributes().add(net.minecraft.world.entity.ai.attributes.Attributes.TEMPT_RANGE, 10.0D);
+    }
+    // Purpur end - Villagers follow emerald blocks
 
     @Override
     protected void registerGoals() {
@@ -134,6 +141,7 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
         this.goalSelector.addGoal(1, new PanicGoal(this, 0.5));
         this.goalSelector.addGoal(1, new LookAtTradingPlayerGoal(this));
         this.goalSelector.addGoal(2, new WanderingTrader.WanderToPositionGoal(this, 2.0, 0.35));
+        if (level().purpurConfig.wanderingTraderFollowEmeraldBlock) this.goalSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.TemptGoal(this, 1.0D, TEMPT_ITEMS, false)); // Purpur - Villagers follow emerald blocks
         this.goalSelector.addGoal(4, new MoveTowardsRestrictionGoal(this, 0.35));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 0.35));
         this.goalSelector.addGoal(9, new InteractGoal(this, Player.class, 3.0F, 1.0F));

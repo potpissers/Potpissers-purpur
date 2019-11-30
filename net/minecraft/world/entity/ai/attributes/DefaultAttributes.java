@@ -162,7 +162,7 @@ public class DefaultAttributes {
         .put(EntityType.VILLAGER, Villager.createAttributes().build())
         .put(EntityType.VINDICATOR, Vindicator.createAttributes().build())
         .put(EntityType.WARDEN, Warden.createAttributes().build())
-        .put(EntityType.WANDERING_TRADER, Mob.createMobAttributes().build())
+        .put(EntityType.WANDERING_TRADER, net.minecraft.world.entity.npc.WanderingTrader.createAttributes().build()) // Purpur - Villagers follow emerald blocks
         .put(EntityType.WITCH, Witch.createAttributes().build())
         .put(EntityType.WITHER, WitherBoss.createAttributes().build())
         .put(EntityType.WITHER_SKELETON, AbstractSkeleton.createAttributes().build())
