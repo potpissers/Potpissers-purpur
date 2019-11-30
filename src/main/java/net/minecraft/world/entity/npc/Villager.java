@@ -156,6 +156,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
         this.getNavigation().setCanFloat(true);
         this.setCanPickUpLoot(true);
         this.setVillagerData(this.getVillagerData().setType(type).setProfession(VillagerProfession.NONE));
+        if (level().purpurConfig.villagerFollowEmeraldBlock) this.goalSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.TemptGoal(this, 1.0D, TEMPT_ITEMS, false));
     }
 
     // Purpur start

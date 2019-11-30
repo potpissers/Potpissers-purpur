@@ -64,7 +64,7 @@ public class TemptGoal extends Goal {
     }
 
     private boolean shouldFollow(LivingEntity entity) {
-        return this.items.test(entity.getMainHandItem()) || this.items.test(entity.getOffhandItem());
+        return (this.items.test(entity.getMainHandItem()) || this.items.test(entity.getOffhandItem())) && (!(this.mob instanceof net.minecraft.world.entity.npc.Villager villager) || !villager.isSleeping()); // Purpur Fix #512
     }
 
     @Override

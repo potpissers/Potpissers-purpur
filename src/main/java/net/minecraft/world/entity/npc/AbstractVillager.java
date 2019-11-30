@@ -48,6 +48,7 @@ import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 // CraftBukkit end
 
 public abstract class AbstractVillager extends AgeableMob implements InventoryCarrier, Npc, Merchant {
+    static final net.minecraft.world.item.crafting.Ingredient TEMPT_ITEMS = net.minecraft.world.item.crafting.Ingredient.of(net.minecraft.world.level.block.Blocks.EMERALD_BLOCK.asItem()); // Purpur
 
     // CraftBukkit start
     @Override
