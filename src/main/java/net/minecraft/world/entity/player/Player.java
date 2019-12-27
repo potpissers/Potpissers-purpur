@@ -1976,9 +1976,19 @@ public abstract class Player extends LivingEntity {
     @Override
     protected int getBaseExperienceReward() {
         if (!this.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !this.isSpectator()) {
-            int i = this.experienceLevel * 7;
-
-            return i > 100 ? 100 : i;
+            // Purpur start
+            int toDrop;
+            try {
+                toDrop = Math.round(((Number) scriptEngine.eval("let expLevel = " + experienceLevel + "; " +
+                        "let expTotal = " + totalExperience + "; " +
+                        "let exp = " + experienceProgress + "; " +
+                        level().purpurConfig.playerDeathExpDropEquation)).floatValue());
+            } catch (javax.script.ScriptException e) {
+                e.printStackTrace();
+                toDrop = experienceLevel * 7;
+            }
+            return Math.min(toDrop, level().purpurConfig.playerDeathExpDropMax);
+            // Purpur end
         } else {
             return 0;
         }
