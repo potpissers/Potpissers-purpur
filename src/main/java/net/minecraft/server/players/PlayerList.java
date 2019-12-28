@@ -1143,6 +1143,7 @@ public abstract class PlayerList {
             } else {
                 b0 = (byte) (24 + permissionLevel);
             }
+            if (b0 < 28 && player.getBukkitEntity().hasPermission("purpur.debug.f3n")) b0 = 28; // Purpur
 
             player.connection.send(new ClientboundEntityEventPacket(player, b0));
         }
