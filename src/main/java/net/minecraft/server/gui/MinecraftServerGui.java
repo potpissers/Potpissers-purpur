@@ -43,6 +43,11 @@ public class MinecraftServerGui extends JComponent {
     private Thread logAppenderThread;
     private final Collection<Runnable> finalizers = Lists.newArrayList();
     final AtomicBoolean isClosing = new AtomicBoolean();
+    // Purpur start
+    private final CommandHistory history = new CommandHistory();
+    private String currentCommand = "";
+    private int historyIndex = 0;
+    // Purpur end
 
     public static MinecraftServerGui showFrameFor(final DedicatedServer server) {
         try {
@@ -51,7 +56,7 @@ public class MinecraftServerGui extends JComponent {
             ;
         }
 
-        final JFrame jframe = new JFrame("Minecraft server");
+        final JFrame jframe = new JFrame("Purpur Minecraft server"); // Purpur
         final MinecraftServerGui servergui = new MinecraftServerGui(server);
 
         jframe.setDefaultCloseOperation(2);
@@ -59,7 +64,7 @@ public class MinecraftServerGui extends JComponent {
         jframe.pack();
         jframe.setLocationRelativeTo((Component) null);
         jframe.setVisible(true);
-        jframe.setName("Minecraft server"); // Paper - Improve ServerGUI
+        jframe.setName("Purpur Minecraft server"); // Paper - Improve ServerGUI // Purpur
 
         // Paper start - Improve ServerGUI
         try {
@@ -71,7 +76,7 @@ public class MinecraftServerGui extends JComponent {
         jframe.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowevent) {
                 if (!servergui.isClosing.getAndSet(true)) {
-                    jframe.setTitle("Minecraft server - shutting down!");
+                    jframe.setTitle("Purpur Minecraft server - shutting down!"); // Purpur
                     server.halt(true);
                     servergui.runFinalizers();
                 }
@@ -159,7 +164,7 @@ public class MinecraftServerGui extends JComponent {
 
     private JComponent buildChatPanel() {
         JPanel jpanel = new JPanel(new BorderLayout());
-        JTextArea jtextarea = new JTextArea();
+        org.purpurmc.purpur.gui.JColorTextPane jtextarea = new org.purpurmc.purpur.gui.JColorTextPane(); // Purpur
         JScrollPane jscrollpane = new JScrollPane(jtextarea, 22, 30);
 
         jtextarea.setEditable(false);
@@ -171,10 +176,43 @@ public class MinecraftServerGui extends JComponent {
 
             if (!s.isEmpty()) {
                 this.server.handleConsoleInput(s, this.server.createCommandSourceStack());
+                // Purpur start
+                history.add(s);
+                historyIndex = -1;
+                // Purpur end
             }
 
             jtextfield.setText("");
         });
+        // Purpur start
+        jtextfield.getInputMap().put(javax.swing.KeyStroke.getKeyStroke("UP"), "up");
+        jtextfield.getInputMap().put(javax.swing.KeyStroke.getKeyStroke("DOWN"), "down");
+        jtextfield.getActionMap().put("up", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+                if (historyIndex < 0) {
+                    currentCommand = jtextfield.getText();
+                }
+                if (historyIndex < history.size() - 1) {
+                    jtextfield.setText(history.get(++historyIndex));
+                }
+            }
+        });
+        jtextfield.getActionMap().put("down", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+                if (historyIndex >= 0) {
+                    if (historyIndex == 0) {
+                        --historyIndex;
+                        jtextfield.setText(currentCommand);
+                    } else {
+                        --historyIndex;
+                        jtextfield.setText(history.get(historyIndex));
+                    }
+                }
+            }
+        });
+        // Purpur end
         jtextarea.addFocusListener(new FocusAdapter() { // CraftBukkit - decompile error
             public void focusGained(FocusEvent focusevent) {}
         });
@@ -210,7 +248,7 @@ public class MinecraftServerGui extends JComponent {
     }
 
     private static final java.util.regex.Pattern ANSI = java.util.regex.Pattern.compile("\\e\\[[\\d;]*[^\\d;]"); // CraftBukkit // Paper
-    public void print(JTextArea textArea, JScrollPane scrollPane, String message) {
+    public void print(org.purpurmc.purpur.gui.JColorTextPane textArea, JScrollPane scrollPane, String message) { // Purpur
         if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(() -> {
                 this.print(textArea, scrollPane, message);
@@ -224,11 +262,14 @@ public class MinecraftServerGui extends JComponent {
                 flag = (double) jscrollbar.getValue() + jscrollbar.getSize().getHeight() + (double) (MinecraftServerGui.MONOSPACED.getSize() * 4) > (double) jscrollbar.getMaximum();
             }
 
+            /* // Purpur
             try {
                 document.insertString(document.getLength(), MinecraftServerGui.ANSI.matcher(message).replaceAll(""), (AttributeSet) null); // CraftBukkit
             } catch (BadLocationException badlocationexception) {
                 ;
             }
+            */ // Purpur
+            textArea.append(message); // Purpur
 
             if (flag) {
                 jscrollbar.setValue(Integer.MAX_VALUE);
@@ -236,4 +277,16 @@ public class MinecraftServerGui extends JComponent {
 
         }
     }
+
+    // Purpur start
+    public static class CommandHistory extends java.util.LinkedList<String> {
+        @Override
+        public boolean add(String command) {
+            if (size() > 1000) {
+                remove();
+            }
+            return super.offerFirst(command);
+        }
+    }
+    // Purpur end
 }

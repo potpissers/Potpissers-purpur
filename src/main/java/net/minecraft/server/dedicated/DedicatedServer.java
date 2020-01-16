@@ -114,6 +114,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
                     return;
                 }
                 // Paper start - Use TerminalConsoleAppender
+                if (DedicatedServer.this.gui == null || System.console() != null) // Purpur - has no GUI or has console (did not double-click)
                 new com.destroystokyo.paper.console.PaperConsole(DedicatedServer.this).start();
                 /*
                 jline.console.ConsoleReader bufferedreader = DedicatedServer.this.reader;
