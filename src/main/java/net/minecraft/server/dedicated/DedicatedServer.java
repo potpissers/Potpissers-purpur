@@ -297,6 +297,30 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
             if (true) throw new IllegalStateException("Failed to bind to port", ioexception); // Paper - Propagate failed to bind to port error
             return false;
         }
+        // Purpur start
+        if (org.purpurmc.purpur.PurpurConfig.useUPnP) {
+            LOGGER.info("[UPnP] Attempting to start UPnP port forwarding service...");
+            if (dev.omega24.upnp4j.UPnP4J.isUPnPAvailable()) {
+                if (dev.omega24.upnp4j.UPnP4J.isOpen(this.getPort(), dev.omega24.upnp4j.util.Protocol.TCP)) {
+                    this.upnp = false;
+                    LOGGER.info("[UPnP] Port {} is already open", this.getPort());
+                } else if (dev.omega24.upnp4j.UPnP4J.open(this.getPort(), dev.omega24.upnp4j.util.Protocol.TCP)) {
+                    this.upnp = true;
+                    LOGGER.info("[UPnP] Successfully opened port {}", this.getPort());
+                } else {
+                    this.upnp = false;
+                    LOGGER.info("[UPnP] Failed to open port {}", this.getPort());
+                }
+
+                if (upnp) {
+                    LOGGER.info("[UPnP] {}:{}", dev.omega24.upnp4j.UPnP4J.getExternalIP(), this.getPort());
+                }
+            } else {
+                this.upnp = false;
+                LOGGER.error("[UPnP] Service is unavailable");
+            }
+        }
+        // Purpur end
 
         // CraftBukkit start
         // this.setPlayerList(new DedicatedPlayerList(this, this.registries(), this.playerDataStorage)); // Spigot - moved up

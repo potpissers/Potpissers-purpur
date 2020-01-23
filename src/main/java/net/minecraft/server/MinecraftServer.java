@@ -320,6 +320,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
     public final io.papermc.paper.configuration.PaperConfigurations paperConfigurations; // Paper - add paper configuration files
     public boolean isIteratingOverLevels = false; // Paper - Throw exception on world create while being ticked
     public boolean lagging = false; // Purpur
+    protected boolean upnp = false; // Purpur
 
     public volatile Thread shutdownThread; // Paper
     public volatile boolean abnormalExit = false; // Paper
@@ -1043,6 +1044,15 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
         Commands.COMMAND_SENDING_POOL.shutdownNow(); // Paper - Perf: Async command map building; Shutdown and don't bother finishing
         MinecraftTimings.stopServer(); // Paper
         this.server.spark.disable(); // Paper - spark
+        // Purpur start
+        if (upnp) {
+            if (dev.omega24.upnp4j.UPnP4J.close(this.getPort(), dev.omega24.upnp4j.util.Protocol.TCP)) {
+                LOGGER.info("[UPnP] Port {} closed", this.getPort());
+            } else {
+                LOGGER.error("[UPnP] Failed to close port {}", this.getPort());
+            }
+        }
+        // Purpur end
         // CraftBukkit start
         if (this.server != null) {
             this.server.disablePlugins();
