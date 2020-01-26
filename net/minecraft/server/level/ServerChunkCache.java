@@ -218,6 +218,12 @@ public class ServerChunkCache extends ChunkSource {
         if (Thread.currentThread() != this.mainThread) {
             return CompletableFuture.<ChunkAccess>supplyAsync(() -> this.getChunk(x, z, chunkStatus, requireChunk), this.mainThreadProcessor).join();
         } else {
+            // Paper start - Perf: Optimise getChunkAt calls for loaded chunks
+            LevelChunk ifLoaded = this.getChunkAtIfCachedImmediately(x, z);
+            if (ifLoaded != null) {
+                return ifLoaded;
+            }
+            // Paper end - Perf: Optimise getChunkAt calls for loaded chunks
             ProfilerFiller profilerFiller = Profiler.get();
             profilerFiller.incrementCounter("getChunk");
             long packedChunkPos = ChunkPos.asLong(x, z);
@@ -252,30 +258,7 @@ public class ServerChunkCache extends ChunkSource {
         if (Thread.currentThread() != this.mainThread) {
             return null;
         } else {
-            Profiler.get().incrementCounter("getChunkNow");
-            long packedChunkPos = ChunkPos.asLong(chunkX, chunkZ);
-
-            for (int i = 0; i < 4; i++) {
-                if (packedChunkPos == this.lastChunkPos[i] && this.lastChunkStatus[i] == ChunkStatus.FULL) {
-                    ChunkAccess chunkAccess = this.lastChunk[i];
-                    return chunkAccess instanceof LevelChunk ? (LevelChunk)chunkAccess : null;
-                }
-            }
-
-            ChunkHolder visibleChunkIfPresent = this.getVisibleChunkIfPresent(packedChunkPos);
-            if (visibleChunkIfPresent == null) {
-                return null;
-            } else {
-                ChunkAccess chunkAccess = visibleChunkIfPresent.getChunkIfPresent(ChunkStatus.FULL);
-                if (chunkAccess != null) {
-                    this.storeInCache(packedChunkPos, chunkAccess, ChunkStatus.FULL);
-                    if (chunkAccess instanceof LevelChunk) {
-                        return (LevelChunk)chunkAccess;
-                    }
-                }
-
-                return null;
-            }
+            return this.getChunkAtIfCachedImmediately(chunkX, chunkZ); // Paper - Perf: Optimise getChunkAt calls for loaded chunks
         }
     }
 
