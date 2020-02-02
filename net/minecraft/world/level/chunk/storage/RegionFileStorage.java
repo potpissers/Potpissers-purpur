@@ -23,6 +23,36 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
     private final Path folder;
     private final boolean sync;
 
+    // Paper start - recalculate region file headers
+    private final boolean isChunkData;
+
+    public static boolean isChunkDataFolder(Path path) {
+        return path.toFile().getName().equalsIgnoreCase("region");
+    }
+
+    @Nullable
+    public static ChunkPos getRegionFileCoordinates(Path file) {
+        String fileName = file.getFileName().toString();
+        if (!fileName.startsWith("r.") || !fileName.endsWith(".mca")) {
+            return null;
+        }
+
+        String[] split = fileName.split("\\.");
+
+        if (split.length != 4) {
+            return null;
+        }
+
+        try {
+            int x = Integer.parseInt(split[1]);
+            int z = Integer.parseInt(split[2]);
+
+            return new ChunkPos(x << 5, z << 5);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+    // Paper end
     // Paper start - rewrite chunk system
     private static final int REGION_SHIFT = 5;
     private static final int MAX_NON_EXISTING_CACHE = 1024 * 4;
@@ -216,6 +246,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
         this.folder = folder;
         this.sync = sync;
         this.info = info;
+        this.isChunkData = isChunkDataFolder(this.folder); // Paper - recalculate region file headers
     }
 
     @org.jetbrains.annotations.Contract("_, false -> !null") @Nullable private RegionFile getRegionFile(ChunkPos chunkPos, boolean existingOnly) throws IOException { // CraftBukkit
@@ -309,6 +340,19 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
             }
 
             var4 = NbtIo.read(chunkDataInputStream);
+            // Paper start - recover from corrupt regionfile header
+            if (this.isChunkData) {
+                ChunkPos headerChunkPos = SerializableChunkData.getChunkCoordinate(var4);
+                if (!headerChunkPos.equals(chunkPos)) {
+                    net.minecraft.server.MinecraftServer.LOGGER.error("Attempting to read chunk data at " + chunkPos + " but got chunk data for " + headerChunkPos + " instead! Attempting regionfile recalculation for regionfile " + regionFile.getPath().toAbsolutePath());
+                    if (regionFile.recalculateHeader()) {
+                        return this.read(chunkPos);
+                    }
+                    net.minecraft.server.MinecraftServer.LOGGER.error("Can't recalculate regionfile header, regenerating chunk " + chunkPos + " for " + regionFile.getPath().toAbsolutePath());
+                    return null;
+                }
+            }
+            // Paper end - recover from corrupt regionfile header
         }
 
         return var4;

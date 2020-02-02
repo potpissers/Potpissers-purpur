@@ -120,6 +120,18 @@ public record SerializableChunkData(
         }
     }
     // Paper end - guard against serializing mismatching coordinates
+    // Paper start - Attempt to recalculate regionfile header if it is corrupt
+    // TODO: Check on update
+    public static long getLastWorldSaveTime(final CompoundTag chunkData) {
+        final int dataVersion = ChunkStorage.getVersion(chunkData);
+        if (dataVersion < 2842) { // Level tag is removed after this version
+            final CompoundTag levelData = chunkData.getCompound("Level");
+            return levelData.getLong("LastUpdate");
+        } else {
+            return chunkData.getLong("LastUpdate");
+        }
+    }
+    // Paper end - Attempt to recalculate regionfile header if it is corrupt
 
     // Paper start - Do not let the server load chunks from newer versions
     private static final int CURRENT_DATA_VERSION = net.minecraft.SharedConstants.getCurrentVersion().getDataVersion().getVersion();
@@ -604,7 +616,7 @@ public record SerializableChunkData(
         compoundTag.putInt("xPos", this.chunkPos.x);
         compoundTag.putInt("yPos", this.minSectionY);
         compoundTag.putInt("zPos", this.chunkPos.z);
-        compoundTag.putLong("LastUpdate", this.lastUpdateTime);
+        compoundTag.putLong("LastUpdate", this.lastUpdateTime); // Paper - Diff on change
         compoundTag.putLong("InhabitedTime", this.inhabitedTime);
         compoundTag.putString("Status", BuiltInRegistries.CHUNK_STATUS.getKey(this.chunkStatus).toString());
         if (this.blendingData != null) {
