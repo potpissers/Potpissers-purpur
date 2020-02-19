@@ -105,6 +105,7 @@ public class EntityStorage implements EntityPersistentStorage<Entity> {
                 }
                 // Paper end - Entity load/save limit per chunk
                 CompoundTag compoundTagx = new CompoundTag();
+                if (!entity.canSaveToDisk()) return; // Purpur
                 if (entity.save(compoundTagx)) {
                     listTag.add(compoundTagx);
                 }

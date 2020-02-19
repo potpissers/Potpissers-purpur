@@ -121,6 +121,11 @@ public class WitherSkull extends AbstractHurtingProjectile {
         // do not hit rider
         return target != this.getRider() && super.canHitEntity(target);
     }
+
+    @Override
+    public boolean canSaveToDisk() {
+        return false;
+    }
     // Purpur end
 
     @Override

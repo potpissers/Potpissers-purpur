@@ -553,6 +553,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         }
     }
     // Paper end - optimise entity tracker
+    // Purpur start
+    public boolean canSaveToDisk() {
+        return true;
+    }
+    // Purpur end
 
     public Entity(EntityType<?> type, Level world) {
         this.id = Entity.ENTITY_COUNTER.incrementAndGet();

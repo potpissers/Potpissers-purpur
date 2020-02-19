@@ -36,6 +36,13 @@ public class DolphinSpit extends LlamaSpit {
                 dolphin.getZ() + (double) (dolphin.getBbWidth() + 1.0F) * 0.5D * (double) Mth.cos(dolphin.yBodyRot * 0.017453292F));
     }
 
+    // Purpur start
+    @Override
+    public boolean canSaveToDisk() {
+        return false;
+    }
+    // Purpur end
+
     public void tick() {
         super_tick();
 
