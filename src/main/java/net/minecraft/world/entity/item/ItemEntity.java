@@ -64,6 +64,12 @@ public class ItemEntity extends Entity implements TraceableEntity {
     public boolean canMobPickup = true; // Paper - Item#canEntityPickup
     private int despawnRate = -1; // Paper - Alternative item-despawn-rate
     public net.kyori.adventure.util.TriState frictionState = net.kyori.adventure.util.TriState.NOT_SET; // Paper - Friction API
+    // Purpur start
+    public boolean immuneToCactus = false;
+    public boolean immuneToExplosion = false;
+    public boolean immuneToFire = false;
+    public boolean immuneToLightning = false;
+    // Purpur end
 
     public ItemEntity(EntityType<? extends ItemEntity> type, Level world) {
         super(type, world);
@@ -371,7 +377,16 @@ public class ItemEntity extends Entity implements TraceableEntity {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (this.isInvulnerableTo(source)) {
+        // Purpur start
+        if (
+            (immuneToCactus && source.is(net.minecraft.world.damagesource.DamageTypes.CACTUS)) ||
+            (immuneToFire && (source.is(DamageTypeTags.IS_FIRE) || source.is(net.minecraft.world.damagesource.DamageTypes.ON_FIRE) || source.is(net.minecraft.world.damagesource.DamageTypes.IN_FIRE))) ||
+            (immuneToLightning && source.is(net.minecraft.world.damagesource.DamageTypes.LIGHTNING_BOLT)) ||
+            (immuneToExplosion && source.is(DamageTypeTags.IS_EXPLOSION))
+        ) {
+            return false;
+        } else if (this.isInvulnerableTo(source)) {
+        // Purpur end
             return false;
         } else if (!this.getItem().isEmpty() && this.getItem().is(Items.NETHER_STAR) && source.is(DamageTypeTags.IS_EXPLOSION)) {
             return false;
@@ -579,6 +594,12 @@ public class ItemEntity extends Entity implements TraceableEntity {
     public void setItem(ItemStack stack) {
         this.getEntityData().set(ItemEntity.DATA_ITEM, stack);
         this.despawnRate = this.level().paperConfig().entities.spawning.altItemDespawnRate.enabled ? this.level().paperConfig().entities.spawning.altItemDespawnRate.items.getOrDefault(stack.getItem(), this.level().spigotConfig.itemDespawnRate) : this.level().spigotConfig.itemDespawnRate; // Paper - Alternative item-despawn-rate
+        // Purpur start
+        if (level().purpurConfig.itemImmuneToCactus.contains(stack.getItem())) immuneToCactus = true;
+        if (level().purpurConfig.itemImmuneToExplosion.contains(stack.getItem())) immuneToExplosion = true;
+        if (level().purpurConfig.itemImmuneToFire.contains(stack.getItem())) immuneToFire = true;
+        if (level().purpurConfig.itemImmuneToLightning.contains(stack.getItem())) immuneToLightning = true;
+        // level end
     }
 
     @Override
