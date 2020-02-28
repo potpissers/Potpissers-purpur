@@ -1222,6 +1222,16 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
             }
             // Purpur end - config for startup commands
 
+            // Purpur start - Configurable void damage height and damage
+            if (org.purpurmc.purpur.configuration.transformation.VoidDamageHeightMigration.HAS_BEEN_REGISTERED) {
+                try {
+                    org.purpurmc.purpur.PurpurConfig.config.save((java.io.File) this.options.valueOf("purpur-settings"));
+                } catch (IOException ex) {
+                    org.bukkit.Bukkit.getLogger().log(java.util.logging.Level.SEVERE, "Could not save " + this.options.valueOf("purpur-settings"), ex);
+                }
+            }
+            // Purpur end - Configurable void damage height and damage
+
             while (this.running) {
                 long l;
                 if (!this.isPaused() && this.tickRateManager.isSprinting() && this.tickRateManager.checkShouldSprintThisTick()) {

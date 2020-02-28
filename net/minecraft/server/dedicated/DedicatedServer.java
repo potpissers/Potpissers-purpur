@@ -209,6 +209,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
         org.spigotmc.SpigotConfig.registerCommands();
         // Spigot end
         io.papermc.paper.util.ObfHelper.INSTANCE.getClass(); // Paper - load mappings for stacktrace deobf and etc.
+        // Purpur start - Configurable void damage height and damage
+        try {
+            org.purpurmc.purpur.PurpurConfig.init((java.io.File) options.valueOf("purpur-settings"));
+        } catch (Exception e) {
+            DedicatedServer.LOGGER.error("Unable to load server configuration", e);
+            return false;
+        }
+        org.purpurmc.purpur.PurpurConfig.registerCommands();
+        // Purpur end - Configurable void damage height and damage
         // Paper start - initialize global and world-defaults configuration
         this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
         this.paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
