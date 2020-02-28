@@ -260,6 +260,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
         for (final NodePath path : RemovedConfigurations.REMOVED_WORLD_PATHS) {
             builder.addAction(path, TransformAction.remove());
         }
+        org.purpurmc.purpur.configuration.transformation.VoidDamageHeightMigration.apply(builder, contextMap); // Purpur
         builder.build().apply(node);
 
         final ConfigurationTransformation.VersionedBuilder versionedBuilder = Transformations.versionedBuilder();

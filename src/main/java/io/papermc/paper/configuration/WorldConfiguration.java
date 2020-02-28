@@ -401,6 +401,7 @@ public class WorldConfiguration extends ConfigurationPart {
         public boolean useVanillaWorldScoreboardNameColoring = false;
     }
 
+    @Setting(org.purpurmc.purpur.configuration.transformation.VoidDamageHeightMigration.ENVIRONMENT_KEY) // Purpur
     public Environment environment;
 
     public class Environment extends ConfigurationPart {
@@ -410,7 +411,9 @@ public class WorldConfiguration extends ConfigurationPart {
         public boolean disableExplosionKnockback = false;
         public boolean generateFlatBedrock = false;
         public FrostedIce frostedIce;
+        @Setting(org.purpurmc.purpur.configuration.transformation.VoidDamageHeightMigration.VOID_DAMAGE_KEY) // Purpur
         public DoubleOr.Disabled voidDamageAmount = new DoubleOr.Disabled(OptionalDouble.of(4));
+        @Setting(org.purpurmc.purpur.configuration.transformation.VoidDamageHeightMigration.VOID_DAMAGE_MIN_HEIGHT_OFFSET_KEY) // Purpur
         public double voidDamageMinBuildHeightOffset = -64.0;
 
         public class FrostedIce extends ConfigurationPart {

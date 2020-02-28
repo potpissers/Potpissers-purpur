@@ -1249,7 +1249,15 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                 LOGGER.info("*************************************************************************************");
             }
             // Paper end - Add onboarding message for initial server start
-
+            // Purpur start
+            if (org.purpurmc.purpur.configuration.transformation.VoidDamageHeightMigration.HAS_BEEN_REGISTERED) {
+                try {
+                    org.purpurmc.purpur.PurpurConfig.config.save((File) this.options.valueOf("purpur-settings"));
+                } catch (IOException ex) {
+                    Bukkit.getLogger().log(java.util.logging.Level.SEVERE, "Could not save " + this.options.valueOf("purpur-settings"), ex);
+                }
+            }
+            // Purpur end
             while (this.running) {
                 long i;
 
