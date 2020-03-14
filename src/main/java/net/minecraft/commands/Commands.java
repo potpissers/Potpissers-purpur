@@ -250,6 +250,7 @@ public class Commands {
             StopCommand.register(this.dispatcher);
             TransferCommand.register(this.dispatcher);
             WhitelistCommand.register(this.dispatcher);
+            org.purpurmc.purpur.command.PingCommand.register(this.dispatcher); // Purpur
         }
 
         if (environment.includeIntegrated) {
