@@ -69,7 +69,7 @@ public class ThrownTrident extends AbstractArrow {
         Entity entity = this.getOwner();
         byte b0 = (Byte) this.entityData.get(ThrownTrident.ID_LOYALTY);
 
-        if (b0 > 0 && (this.dealtDamage || this.isNoPhysics()) && entity != null) {
+        if (b0 > 0 && (this.dealtDamage || this.isNoPhysics() || (level().purpurConfig.tridentLoyaltyVoidReturnHeight < 0.0D && getY() < level().purpurConfig.tridentLoyaltyVoidReturnHeight)) && entity != null) { // Purpur
             if (!this.isAcceptibleReturnOwner()) {
                 if (!this.level().isClientSide && this.pickup == AbstractArrow.Pickup.ALLOWED) {
                     this.spawnAtLocation(this.getPickupItem(), 0.1F);
