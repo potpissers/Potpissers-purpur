@@ -1948,7 +1948,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
 
     @DontObfuscate
     public String getServerModName() {
-        return io.papermc.paper.ServerBuildInfo.buildInfo().brandName(); // Paper
+        return org.purpurmc.purpur.PurpurConfig.serverModName; // Paper // Purpur
     }
 
     public SystemReport fillSystemReport(SystemReport details) {
