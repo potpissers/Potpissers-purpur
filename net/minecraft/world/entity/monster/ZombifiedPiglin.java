@@ -88,6 +88,23 @@ public class ZombifiedPiglin extends Zombie implements NeutralMob {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Configurable jockey options
+    @Override
+    public boolean jockeyOnlyBaby() {
+        return level().purpurConfig.zombifiedPiglinJockeyOnlyBaby;
+    }
+
+    @Override
+    public double jockeyChance() {
+        return level().purpurConfig.zombifiedPiglinJockeyChance;
+    }
+
+    @Override
+    public boolean jockeyTryExistingChickens() {
+        return level().purpurConfig.zombifiedPiglinJockeyTryExistingChickens;
+    }
+    // Purpur end - Configurable jockey options
+
     @Override
     public void setPersistentAngerTarget(@Nullable UUID target) {
         this.persistentAngerTarget = target;

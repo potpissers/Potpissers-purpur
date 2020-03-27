@@ -107,6 +107,23 @@ public class ZombieVillager extends Zombie implements VillagerDataHolder {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Configurable jockey options
+    @Override
+    public boolean jockeyOnlyBaby() {
+        return level().purpurConfig.zombieVillagerJockeyOnlyBaby;
+    }
+
+    @Override
+    public double jockeyChance() {
+        return level().purpurConfig.zombieVillagerJockeyChance;
+    }
+
+    @Override
+    public boolean jockeyTryExistingChickens() {
+        return level().purpurConfig.zombieVillagerJockeyTryExistingChickens;
+    }
+    // Purpur end - Configurable jockey options
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);

@@ -125,6 +125,20 @@ public class Zombie extends Monster {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start -  Configurable jockey options
+    public boolean jockeyOnlyBaby() {
+        return level().purpurConfig.zombieJockeyOnlyBaby;
+    }
+
+    public double jockeyChance() {
+        return level().purpurConfig.zombieJockeyChance;
+    }
+
+    public boolean jockeyTryExistingChickens() {
+        return level().purpurConfig.zombieJockeyTryExistingChickens;
+    }
+    // Purpur end -  Configurable jockey options
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
@@ -556,19 +570,18 @@ public class Zombie extends Monster {
         }
 
         if (spawnGroupData instanceof Zombie.ZombieGroupData zombieGroupData) {
-            if (zombieGroupData.isBaby) {
-                this.setBaby(true);
+            if (!jockeyOnlyBaby() || zombieGroupData.isBaby) { // Purpur - Configurable jockey options
+                this.setBaby(zombieGroupData.isBaby); // Purpur - Configurable jockey options
                 if (zombieGroupData.canSpawnJockey) {
-                    if (random.nextFloat() < 0.05) {
-                        List<Chicken> entitiesOfClass = level.getEntitiesOfClass(
+                    if (random.nextFloat() < jockeyChance()) { // Purpur - Configurable jockey options
+                        List<Chicken> entitiesOfClass = jockeyTryExistingChickens() ? level.getEntitiesOfClass( // Purpur - Configurable jockey options
                             Chicken.class, this.getBoundingBox().inflate(5.0, 3.0, 5.0), EntitySelector.ENTITY_NOT_BEING_RIDDEN
-                        );
+                        ) : java.util.Collections.emptyList(); // Purpur - Configurable jockey options
                         if (!entitiesOfClass.isEmpty()) {
                             Chicken chicken = entitiesOfClass.get(0);
                             chicken.setChickenJockey(true);
                             this.startRiding(chicken);
-                        }
-                    } else if (random.nextFloat() < 0.05) {
+                    } else { // Purpur - Configurable jockey options
                         Chicken chicken1 = EntityType.CHICKEN.create(this.level(), EntitySpawnReason.JOCKEY);
                         if (chicken1 != null) {
                             chicken1.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), 0.0F);
@@ -577,6 +590,7 @@ public class Zombie extends Monster {
                             this.startRiding(chicken1);
                             level.addFreshEntity(chicken1, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.MOUNT); // CraftBukkit
                         }
+                        } // Purpur - Configurable jockey options
                     }
                 }
             }

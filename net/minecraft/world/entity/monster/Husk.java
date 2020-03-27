@@ -50,6 +50,23 @@ public class Husk extends Zombie {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Configurable jockey options
+    @Override
+    public boolean jockeyOnlyBaby() {
+        return level().purpurConfig.huskJockeyOnlyBaby;
+    }
+
+    @Override
+    public double jockeyChance() {
+        return level().purpurConfig.huskJockeyChance;
+    }
+
+    @Override
+    public boolean jockeyTryExistingChickens() {
+        return level().purpurConfig.huskJockeyTryExistingChickens;
+    }
+    // Purpur end - Configurable jockey options
+
     public static boolean checkHuskSpawnRules(
         EntityType<Husk> entityType, ServerLevelAccessor level, EntitySpawnReason spawnReason, BlockPos pos, RandomSource random
     ) {

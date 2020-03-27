@@ -105,6 +105,23 @@ public class Drowned extends Zombie implements RangedAttackMob {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Configurable jockey options
+    @Override
+    public boolean jockeyOnlyBaby() {
+        return level().purpurConfig.drownedJockeyOnlyBaby;
+    }
+
+    @Override
+    public double jockeyChance() {
+        return level().purpurConfig.drownedJockeyChance;
+    }
+
+    @Override
+    public boolean jockeyTryExistingChickens() {
+        return level().purpurConfig.drownedJockeyTryExistingChickens;
+    }
+    // Purpur end - Configurable jockey options
+
     @Override
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new Drowned.DrownedGoToWaterGoal(this, 1.0));
