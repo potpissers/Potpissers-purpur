@@ -87,6 +87,21 @@ public class ZombifiedPiglin extends Zombie implements NeutralMob {
     }
 
     @Override
+    public boolean jockeyOnlyBaby() {
+        return level().purpurConfig.zombifiedPiglinJockeyOnlyBaby;
+    }
+
+    @Override
+    public double jockeyChance() {
+        return level().purpurConfig.zombifiedPiglinJockeyChance;
+    }
+
+    @Override
+    public boolean jockeyTryExistingChickens() {
+        return level().purpurConfig.zombifiedPiglinJockeyTryExistingChickens;
+    }
+
+    @Override
     public void setPersistentAngerTarget(@Nullable UUID angryAt) {
         this.persistentAngerTarget = angryAt;
     }

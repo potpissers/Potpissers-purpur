@@ -100,6 +100,21 @@ public class Drowned extends Zombie implements RangedAttackMob {
     }
 
     @Override
+    public boolean jockeyOnlyBaby() {
+        return level().purpurConfig.drownedJockeyOnlyBaby;
+    }
+
+    @Override
+    public double jockeyChance() {
+        return level().purpurConfig.drownedJockeyChance;
+    }
+
+    @Override
+    public boolean jockeyTryExistingChickens() {
+        return level().purpurConfig.drownedJockeyTryExistingChickens;
+    }
+
+    @Override
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new Drowned.DrownedGoToWaterGoal(this, 1.0D));
         this.goalSelector.addGoal(2, new Drowned.DrownedTridentAttackGoal(this, 1.0D, 40, 10.0F));

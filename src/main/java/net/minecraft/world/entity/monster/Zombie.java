@@ -131,6 +131,18 @@ public class Zombie extends Monster {
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.zombieScale);
     }
 
+    public boolean jockeyOnlyBaby() {
+        return level().purpurConfig.zombieJockeyOnlyBaby;
+    }
+
+    public double jockeyChance() {
+        return level().purpurConfig.zombieJockeyChance;
+    }
+
+    public boolean jockeyTryExistingChickens() {
+        return level().purpurConfig.zombieJockeyTryExistingChickens;
+    }
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
@@ -542,19 +554,20 @@ public class Zombie extends Monster {
         }
 
         if (object instanceof Zombie.ZombieGroupData entityzombie_groupdatazombie) {
-            if (entityzombie_groupdatazombie.isBaby) {
-                this.setBaby(true);
+            // Purpur start
+            if (!jockeyOnlyBaby() || entityzombie_groupdatazombie.isBaby) {
+                this.setBaby(entityzombie_groupdatazombie.isBaby);
                 if (entityzombie_groupdatazombie.canSpawnJockey) {
-                    if ((double) randomsource.nextFloat() < 0.05D) {
-                        List<Chicken> list = world.getEntitiesOfClass(Chicken.class, this.getBoundingBox().inflate(5.0D, 3.0D, 5.0D), EntitySelector.ENTITY_NOT_BEING_RIDDEN);
+                    if ((double) randomsource.nextFloat() < jockeyChance()) {
+                        List<Chicken> list = jockeyTryExistingChickens() ? world.getEntitiesOfClass(Chicken.class, this.getBoundingBox().inflate(5.0D, 3.0D, 5.0D), EntitySelector.ENTITY_NOT_BEING_RIDDEN) : java.util.Collections.emptyList();
+                        // Purpur end
 
                         if (!list.isEmpty()) {
                             Chicken entitychicken = (Chicken) list.get(0);
 
                             entitychicken.setChickenJockey(true);
                             this.startRiding(entitychicken);
-                        }
-                    } else if ((double) randomsource.nextFloat() < 0.05D) {
+                        } else { // Purpur
                         Chicken entitychicken1 = (Chicken) EntityType.CHICKEN.create(this.level());
 
                         if (entitychicken1 != null) {
@@ -564,6 +577,7 @@ public class Zombie extends Monster {
                             this.startRiding(entitychicken1);
                             world.addFreshEntity(entitychicken1, CreatureSpawnEvent.SpawnReason.MOUNT); // CraftBukkit
                         }
+                        } // Purpur
                     }
                 }
             }
