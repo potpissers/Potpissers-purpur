@@ -1316,7 +1316,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                 this.mayHaveDelayedTasks = true;
                 this.delayedTasksMaxNextTickTimeNanos = Math.max(Util.getNanos() + i, this.nextTickTimeNanos);
                 // Pufferfish start - tps catchup
-                if (!gg.pufferfish.pufferfish.PufferfishConfig.tpsCatchup) {
+                if (!org.purpurmc.purpur.PurpurConfig.tpsCatchup || !gg.pufferfish.pufferfish.PufferfishConfig.tpsCatchup) { // Purpur
                     this.nextTickTimeNanos = currentTime + i;
                     this.delayedTasksMaxNextTickTimeNanos = nextTickTimeNanos;
                 }
