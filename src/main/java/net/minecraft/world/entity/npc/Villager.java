@@ -782,7 +782,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
 
     @Override
     public boolean canBreed() {
-        return this.foodLevel + this.countFoodPointsInInventory() >= 12 && !this.isSleeping() && this.getAge() == 0;
+        return this.level().purpurConfig.villagerCanBreed && this.foodLevel + this.countFoodPointsInInventory() >= 12 && !this.isSleeping() && this.getAge() == 0; // Purpur
     }
 
     private boolean hungry() {

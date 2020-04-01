@@ -1745,6 +1745,7 @@ public class PurpurWorldConfig {
     public double villagerScale = 1.0D;
     public boolean villagerFollowEmeraldBlock = false;
     public boolean villagerCanBeLeashed = false;
+    public boolean villagerCanBreed = true;
     private void villagerSettings() {
         villagerRidable = getBoolean("mobs.villager.ridable", villagerRidable);
         villagerRidableInWater = getBoolean("mobs.villager.ridable-in-water", villagerRidableInWater);
@@ -1758,6 +1759,7 @@ public class PurpurWorldConfig {
         villagerScale = Mth.clamp(getDouble("mobs.villager.attributes.scale", villagerScale), 0.0625D, 16.0D);
         villagerFollowEmeraldBlock = getBoolean("mobs.villager.follow-emerald-blocks", villagerFollowEmeraldBlock);
         villagerCanBeLeashed = getBoolean("mobs.villager.can-be-leashed", villagerCanBeLeashed);
+        villagerCanBreed = getBoolean("mobs.villager.can-breed", villagerCanBreed);
     }
 
     public boolean vindicatorRidable = false;
