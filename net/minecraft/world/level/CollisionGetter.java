@@ -50,11 +50,13 @@ public interface CollisionGetter extends BlockGetter {
     }
 
     default boolean noCollision(@Nullable Entity entity, AABB collisionBox, boolean checkLiquid) {
+        try { if (entity != null) entity.collisionLoadChunks = true; // Paper
         for (VoxelShape voxelShape : checkLiquid ? this.getBlockAndLiquidCollisions(entity, collisionBox) : this.getBlockCollisions(entity, collisionBox)) {
             if (!voxelShape.isEmpty()) {
                 return false;
             }
         }
+        } finally { if (entity != null) entity.collisionLoadChunks = false; } // Paper
 
         if (!this.getEntityCollisions(entity, collisionBox).isEmpty()) {
             return false;

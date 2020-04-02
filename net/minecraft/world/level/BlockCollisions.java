@@ -80,16 +80,37 @@ public class BlockCollisions<T> extends AbstractIterator<T> {
     @Override
     protected T computeNext() {
         while (this.cursor.advance()) {
-            int i = this.cursor.nextX();
-            int i1 = this.cursor.nextY();
-            int i2 = this.cursor.nextZ();
+            int i = this.cursor.nextX(); final int x = i; // Paper - OBFHELPER
+            int i1 = this.cursor.nextY(); final int y = i1; // Paper - OBFHELPER
+            int i2 = this.cursor.nextZ(); final int z = i2; // Paper - OBFHELPER
             int nextType = this.cursor.getNextType();
             if (nextType != 3) {
-                BlockGetter chunk = this.getChunk(i, i2);
-                if (chunk != null) {
-                    this.pos.set(i, i1, i2);
-                    BlockState blockState = chunk.getBlockState(this.pos);
-                    if ((!this.onlySuffocatingBlocks || blockState.isSuffocating(chunk, this.pos))
+                // Paper start - ensure we don't load chunks
+                // BlockGetter blockGetter = this.getChunk(i, k);
+                if (true) {
+                    @Nullable final Entity source = this.context instanceof net.minecraft.world.phys.shapes.EntityCollisionContext entityContext ? entityContext.getEntity() : null;
+                    final boolean far = source != null && io.papermc.paper.util.MCUtil.distanceSq(source.getX(), y, source.getZ(), x, y, z) > 14;
+                    this.pos.set(x, y, z);
+                    BlockState blockState;
+                    if (this.collisionGetter instanceof net.minecraft.server.level.WorldGenRegion) {
+                        BlockGetter blockGetter = this.getChunk(x, z);
+                        if (blockGetter == null) {
+                            continue;
+                        }
+                        blockState = blockGetter.getBlockState(this.pos);
+                    } else if ((!far && source instanceof net.minecraft.server.level.ServerPlayer) || (source != null && source.collisionLoadChunks)) {
+                        blockState = this.collisionGetter.getBlockState(this.pos);
+                    } else {
+                        blockState = this.collisionGetter.getBlockStateIfLoaded(this.pos);
+                    }
+                    if (blockState == null) {
+                        if (!(source instanceof net.minecraft.server.level.ServerPlayer) || source.level().paperConfig().chunks.preventMovingIntoUnloadedChunks) {
+                            return this.resultProvider.apply(new BlockPos.MutableBlockPos(x, y, z), Shapes.create(far ? source.getBoundingBox() : new AABB(new BlockPos(x, y, z))));
+                        }
+                        continue;
+                    }
+                    if (true // onlySuffocatingBlocks is only true on the client, so we don't care about it here
+                    // Paper end - ensure we don't load chunks
                         && (nextType != 1 || blockState.hasLargeCollisionShape())
                         && (nextType != 2 || blockState.is(Blocks.MOVING_PISTON))) {
                         VoxelShape collisionShape = this.context.getCollisionShape(blockState, this.collisionGetter, this.pos);
