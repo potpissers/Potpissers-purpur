@@ -7,7 +7,15 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 
 public abstract class Goal {
-    private final EnumSet<Goal.Flag> flags = EnumSet.noneOf(Goal.Flag.class);
+    private final ca.spottedleaf.moonrise.common.set.OptimizedSmallEnumSet<net.minecraft.world.entity.ai.goal.Goal.Flag> goalTypes = new ca.spottedleaf.moonrise.common.set.OptimizedSmallEnumSet<>(Goal.Flag.class); // Paper - remove streams from GoalSelector
+
+    // Paper start - remove streams from GoalSelector; make sure types are not empty
+    protected Goal() {
+        if (this.goalTypes.size() == 0) {
+            this.goalTypes.addUnchecked(Flag.UNKNOWN_BEHAVIOR);
+        }
+    }
+    // Paper end - remove streams from GoalSelector
 
     public abstract boolean canUse();
 
@@ -33,8 +41,13 @@ public abstract class Goal {
     }
 
     public void setFlags(EnumSet<Goal.Flag> flagSet) {
-        this.flags.clear();
-        this.flags.addAll(flagSet);
+        // Paper start - remove streams from GoalSelector
+        this.goalTypes.clear();
+        this.goalTypes.addAllUnchecked(flagSet);
+        if (this.goalTypes.size() == 0) {
+            this.goalTypes.addUnchecked(Flag.UNKNOWN_BEHAVIOR);
+        }
+        // Paper end - remove streams from GoalSelector
     }
 
     @Override
@@ -42,18 +55,20 @@ public abstract class Goal {
         return this.getClass().getSimpleName();
     }
 
-    public EnumSet<Goal.Flag> getFlags() {
-        return this.flags;
+    // Paper start - remove streams from GoalSelector
+    public ca.spottedleaf.moonrise.common.set.OptimizedSmallEnumSet<Goal.Flag> getFlags() {
+        return this.goalTypes;
+        // Paper end - remove streams from GoalSelector
     }
 
 
     // Paper start - Mob Goal API
     public boolean hasFlag(final Goal.Flag flag) {
-        return this.flags.contains(flag);
+        return this.goalTypes.hasElement(flag);
     }
 
     public void addFlag(final Goal.Flag flag) {
-        this.flags.add(flag);
+        this.goalTypes.addUnchecked(flag);
     }
     // Paper end - Mob Goal API
 
