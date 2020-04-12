@@ -74,6 +74,9 @@ public class Chicken extends Animal {
     public void initAttributes() {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.chickenMaxHealth);
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.chickenScale);
+        if (level().purpurConfig.chickenRetaliate) {
+            this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(2.0D);
+        }
     }
     // Purpur end
 
@@ -81,7 +84,7 @@ public class Chicken extends Animal {
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
-        this.goalSelector.addGoal(1, new PanicGoal(this, 1.4D));
+        // this.goalSelector.addGoal(1, new PanicGoal(this, 1.4D)); // Purpur - moved down
         this.goalSelector.addGoal(2, new BreedGoal(this, 1.0D));
         this.goalSelector.addGoal(3, new TemptGoal(this, 1.0D, (itemstack) -> {
             return itemstack.is(ItemTags.CHICKEN_FOOD);
@@ -90,6 +93,14 @@ public class Chicken extends Animal {
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+        // Purpur start
+        if (level().purpurConfig.chickenRetaliate) {
+            this.goalSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.MeleeAttackGoal(this, 1.0D, false));
+            this.targetSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal(this));
+        } else {
+            this.goalSelector.addGoal(1, new PanicGoal(this, 1.4D));
+        }
+        // Purpur end
     }
 
     @Override
@@ -98,7 +109,7 @@ public class Chicken extends Animal {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 4.0D).add(Attributes.MOVEMENT_SPEED, 0.25D);
+        return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 4.0D).add(Attributes.MOVEMENT_SPEED, 0.25D).add(Attributes.ATTACK_DAMAGE, 0.0D); // Purpur
     }
 
     @Override
