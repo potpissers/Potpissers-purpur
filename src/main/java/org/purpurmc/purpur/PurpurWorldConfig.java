@@ -347,6 +347,11 @@ public class PurpurWorldConfig {
         }
     }
 
+    public boolean spawnerDeactivateByRedstone = false;
+    private void spawnerSettings() {
+        spawnerDeactivateByRedstone = getBoolean("blocks.spawner.deactivate-by-redstone", spawnerDeactivateByRedstone);
+    }
+
     public boolean turtleEggsBreakFromExpOrbs = false;
     public boolean turtleEggsBreakFromItems = false;
     public boolean turtleEggsBreakFromMinecarts = false;
