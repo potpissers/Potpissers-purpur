@@ -76,6 +76,7 @@ public abstract class AbstractContainerMenu {
     @Nullable
     private ContainerSynchronizer synchronizer;
     private boolean suppressRemoteUpdates;
+    @Nullable protected ItemStack activeQuickItem = null; // Purpur - Anvil API
 
     // CraftBukkit start
     public boolean checkReachable = true;

@@ -25,6 +25,12 @@ import org.slf4j.Logger;
 import org.bukkit.craftbukkit.inventory.view.CraftAnvilView;
 // CraftBukkit end
 
+// Purpur start - Anvil API
+import net.minecraft.network.protocol.game.ClientboundContainerSetDataPacket;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.server.level.ServerPlayer;
+// Purpur end - Anvil API
+
 public class AnvilMenu extends ItemCombinerMenu {
 
     public static final int INPUT_SLOT = 0;
@@ -54,6 +60,10 @@ public class AnvilMenu extends ItemCombinerMenu {
     private CraftAnvilView bukkitEntity;
     // CraftBukkit end
     public boolean bypassEnchantmentLevelRestriction = false; // Paper - bypass anvil level restrictions
+    // Purpur start - Anvil API
+    public boolean bypassCost = false;
+    public boolean canDoUnsafeEnchants = false;
+    // Purpur end - Anvil API
 
     public AnvilMenu(int syncId, Inventory inventory) {
         this(syncId, inventory, ContainerLevelAccess.NULL);
@@ -81,12 +91,17 @@ public class AnvilMenu extends ItemCombinerMenu {
 
     @Override
     protected boolean mayPickup(Player player, boolean present) {
-        return (player.hasInfiniteMaterials() || player.experienceLevel >= this.cost.get()) && this.cost.get() > AnvilMenu.DEFAULT_DENIED_COST && present; // CraftBukkit - allow cost 0 like a free item
+        return (player.hasInfiniteMaterials() || player.experienceLevel >= this.cost.get()) && (this.bypassCost || this.cost.get() > AnvilMenu.DEFAULT_DENIED_COST) && present; // CraftBukkit - allow cost 0 like a free item // Purpur - Anvil API
     }
 
     @Override
     protected void onTake(Player player, ItemStack stack) {
+        // Purpur start - Anvil API
+        ItemStack itemstack = this.activeQuickItem != null ? this.activeQuickItem : stack;
+        if (org.purpurmc.purpur.event.inventory.AnvilTakeResultEvent.getHandlerList().getRegisteredListeners().length > 0) new org.purpurmc.purpur.event.inventory.AnvilTakeResultEvent(player.getBukkitEntity(), getBukkitView(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemstack)).callEvent();
+        // Purpur end - Anvil API
         if (!player.getAbilities().instabuild) {
+            if (this.bypassCost) ((ServerPlayer) player).lastSentExp = -1; else // Purpur - Anvil API
             player.giveExperienceLevels(-this.cost.get());
         }
 
@@ -137,6 +152,12 @@ public class AnvilMenu extends ItemCombinerMenu {
 
     @Override
     public void createResult() {
+        // Purpur start - Anvil API
+        this.bypassCost = false;
+        this.canDoUnsafeEnchants = false;
+        if (org.purpurmc.purpur.event.inventory.AnvilUpdateResultEvent.getHandlerList().getRegisteredListeners().length > 0) new org.purpurmc.purpur.event.inventory.AnvilUpdateResultEvent(getBukkitView()).callEvent();
+        // Purpur end - Anvil API
+
         ItemStack itemstack = this.inputSlots.getItem(0);
 
         this.cost.set(1);
@@ -144,7 +165,7 @@ public class AnvilMenu extends ItemCombinerMenu {
         long j = 0L;
         byte b0 = 0;
 
-        if (!itemstack.isEmpty() && EnchantmentHelper.canStoreEnchantments(itemstack)) {
+        if (!itemstack.isEmpty() && this.canDoUnsafeEnchants || EnchantmentHelper.canStoreEnchantments(itemstack)) { // Purpur - Anvil API
             ItemStack itemstack1 = itemstack.copy();
             ItemStack itemstack2 = this.inputSlots.getItem(1);
             ItemEnchantments.Mutable itemenchantments_a = new ItemEnchantments.Mutable(EnchantmentHelper.getEnchantmentsForCrafting(itemstack1));
@@ -223,7 +244,7 @@ public class AnvilMenu extends ItemCombinerMenu {
                             Holder<Enchantment> holder1 = (Holder) iterator1.next();
 
                             if (!holder1.equals(holder) && !Enchantment.areCompatible(holder, holder1)) {
-                                flag3 = false;
+                                flag3 = this.canDoUnsafeEnchants; // Purpur - Anvil API
                                 ++i;
                             }
                         }
@@ -281,6 +302,12 @@ public class AnvilMenu extends ItemCombinerMenu {
                 this.cost.set(this.maximumRepairCost - 1); // CraftBukkit
             }
 
+            // Purpur start - Anvil API
+            if (this.bypassCost && this.cost.get() >= this.maximumRepairCost) {
+                this.cost.set(this.maximumRepairCost - 1);
+            }
+            // Purpur end - Anvil API
+
             if (this.cost.get() >= this.maximumRepairCost && !this.player.getAbilities().instabuild) { // CraftBukkit
                 itemstack1 = ItemStack.EMPTY;
             }
@@ -302,6 +329,13 @@ public class AnvilMenu extends ItemCombinerMenu {
             org.bukkit.craftbukkit.event.CraftEventFactory.callPrepareAnvilEvent(this.getBukkitView(), itemstack1); // CraftBukkit
             this.sendAllDataToRemote(); // CraftBukkit - SPIGOT-6686: Always send completed inventory to stay in sync with client
             this.broadcastChanges();
+
+            // Purpur start - Anvil API
+            if (this.canDoUnsafeEnchants && itemstack1 != ItemStack.EMPTY) {
+                ((ServerPlayer) this.player).connection.send(new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), 2, itemstack1));
+                ((ServerPlayer) this.player).connection.send(new ClientboundContainerSetDataPacket(this.containerId, 0, this.cost.get()));
+            }
+            // Purpur end - Anvil API
         } else {
             org.bukkit.craftbukkit.event.CraftEventFactory.callPrepareAnvilEvent(this.getBukkitView(), ItemStack.EMPTY); // CraftBukkit
             this.cost.set(AnvilMenu.DEFAULT_DENIED_COST); // CraftBukkit - use a variable for set a cost for denied item
