@@ -487,6 +487,7 @@ public class PurpurWorldConfig {
     public double creeperMaxHealth = 20.0D;
     public double creeperScale = 1.0D;
     public double creeperChargedChance = 0.0D;
+    public boolean creeperAllowGriefing = true;
     private void creeperSettings() {
         creeperRidable = getBoolean("mobs.creeper.ridable", creeperRidable);
         creeperRidableInWater = getBoolean("mobs.creeper.ridable-in-water", creeperRidableInWater);
@@ -499,6 +500,7 @@ public class PurpurWorldConfig {
         creeperMaxHealth = getDouble("mobs.creeper.attributes.max_health", creeperMaxHealth);
         creeperScale = Mth.clamp(getDouble("mobs.creeper.attributes.scale", creeperScale), 0.0625D, 16.0D);
         creeperChargedChance = getDouble("mobs.creeper.naturally-charged-chance", creeperChargedChance);
+        creeperAllowGriefing = getBoolean("mobs.creeper.allow-griefing", creeperAllowGriefing);
     }
 
     public boolean dolphinRidable = false;
@@ -612,6 +614,7 @@ public class PurpurWorldConfig {
     public boolean endermanControllable = true;
     public double endermanMaxHealth = 40.0D;
     public double endermanScale = 1.0D;
+    public boolean endermanAllowGriefing = true;
     private void endermanSettings() {
         endermanRidable = getBoolean("mobs.enderman.ridable", endermanRidable);
         endermanRidableInWater = getBoolean("mobs.enderman.ridable-in-water", endermanRidableInWater);
@@ -623,6 +626,7 @@ public class PurpurWorldConfig {
         }
         endermanMaxHealth = getDouble("mobs.enderman.attributes.max_health", endermanMaxHealth);
         endermanScale = Mth.clamp(getDouble("mobs.enderman.attributes.scale", endermanScale), 0.0625D, 16.0D);
+        endermanAllowGriefing = getBoolean("mobs.enderman.allow-griefing", endermanAllowGriefing);
     }
 
     public boolean endermiteRidable = false;

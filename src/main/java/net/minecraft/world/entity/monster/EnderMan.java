@@ -533,6 +533,7 @@ public class EnderMan extends Monster implements NeutralMob {
 
         @Override
         public boolean canUse() {
+            if (!enderman.level().purpurConfig.endermanAllowGriefing) return false; // Purpur
             return this.enderman.getCarriedBlock() == null ? false : (!this.enderman.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) ? false : this.enderman.getRandom().nextInt(reducedTickDelay(2000)) == 0);
         }
 
@@ -578,6 +579,7 @@ public class EnderMan extends Monster implements NeutralMob {
 
         @Override
         public boolean canUse() {
+            if (!enderman.level().purpurConfig.endermanAllowGriefing) return false; // Purpur
             return this.enderman.getCarriedBlock() != null ? false : (!this.enderman.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) ? false : this.enderman.getRandom().nextInt(reducedTickDelay(20)) == 0);
         }
 
