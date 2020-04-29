@@ -1679,6 +1679,18 @@ public abstract class LivingEntity extends Entity implements Attackable {
                 }
             }
 
+            // Purpur start
+            if (level().purpurConfig.totemOfUndyingWorksInInventory && this instanceof ServerPlayer player && (itemstack == null || itemstack.getItem() != Items.TOTEM_OF_UNDYING) && player.getBukkitEntity().hasPermission("purpur.inventory_totem")) {
+                for (ItemStack item : player.getInventory().items) {
+                    if (item.getItem() == Items.TOTEM_OF_UNDYING) {
+                        itemstack1 = item;
+                        itemstack = item.copy();
+                        break;
+                    }
+                }
+            }
+            // Purpur end
+
             org.bukkit.inventory.EquipmentSlot handSlot = (hand != null) ? org.bukkit.craftbukkit.CraftEquipmentSlot.getHand(hand) : null;
             EntityResurrectEvent event = new EntityResurrectEvent((org.bukkit.entity.LivingEntity) this.getBukkitEntity(), handSlot);
             event.setCancelled(itemstack == null);
