@@ -279,9 +279,22 @@ public final class Shapes {
     }
 
     @VisibleForTesting
-    protected static IndexMerger createIndexMerger(int size, DoubleList list1, DoubleList list2, boolean excludeUpper, boolean excludeLower) {
+    private static IndexMerger createIndexMerger(int size, DoubleList list1, DoubleList list2, boolean excludeUpper, boolean excludeLower) { // Paper - private
+        // Paper start - fast track the most common scenario
+        // doublelist is usually a DoubleArrayList with Infinite head/tails that falls to the final else clause
+        // This is actually the most common path, so jump to it straight away
+        if (list1.getDouble(0) == Double.NEGATIVE_INFINITY && list1.getDouble(list1.size() - 1) == Double.POSITIVE_INFINITY) {
+            return new IndirectMerger(list1, list2, excludeUpper, excludeLower);
+        }
+        // Split out rest to hopefully inline the above
+        return lessCommonMerge(size, list1, list2, excludeUpper, excludeLower);
+    }
+
+    private static IndexMerger lessCommonMerge(int size, DoubleList list1, DoubleList list2, boolean excludeUpper, boolean excludeLower) {
+        // Paper end - fast track the most common scenario
         int i = list1.size() - 1;
         int i1 = list2.size() - 1;
+        // Paper note - Rewrite below as optimized order if instead of nasty ternary
         if (list1 instanceof CubePointRange && list2 instanceof CubePointRange) {
             long l = lcm(i, i1);
             if (size * l <= 256L) {
@@ -289,14 +302,21 @@ public final class Shapes {
             }
         }
 
-        if (list1.getDouble(i) < list2.getDouble(0) - 1.0E-7) {
+        // Paper start - Identical happens more often than Disjoint
+        if (i == i1 && Objects.equals(list1, list2)) {
+            if (list1 instanceof IdenticalMerger) {
+                return (IndexMerger) list1;
+            } else if (list2 instanceof IdenticalMerger) {
+                return (IndexMerger) list2;
+            }
+            return new IdenticalMerger(list1);
+        } else if (list1.getDouble(i) < list2.getDouble(0) - 1.0E-7) {
+            // Paper end - Identical happens more often than Disjoint
             return new NonOverlappingMerger(list1, list2, false);
         } else if (list2.getDouble(i1) < list1.getDouble(0) - 1.0E-7) {
             return new NonOverlappingMerger(list2, list1, true);
         } else {
-            return (IndexMerger)(i == i1 && Objects.equals(list1, list2)
-                ? new IdenticalMerger(list1)
-                : new IndirectMerger(list1, list2, excludeUpper, excludeLower));
+            return new IndirectMerger(list1, list2, excludeUpper, excludeLower); // Paper - Identical happens more often than Disjoint
         }
     }
 

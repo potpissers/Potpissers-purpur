@@ -10,12 +10,32 @@ public class IndirectMerger implements IndexMerger {
     private final int[] firstIndices;
     private final int[] secondIndices;
     private final int resultLength;
+    // Paper start
+    private static final int[] INFINITE_B_1 = {1, 1};
+    private static final int[] INFINITE_B_0 = {0, 0};
+    private static final int[] INFINITE_C = {0, 1};
+    // Paper end
 
     public IndirectMerger(DoubleList lower, DoubleList upper, boolean excludeUpper, boolean excludeLower) {
         double d = Double.NaN;
         int size = lower.size();
         int size1 = upper.size();
         int i = size + size1;
+        // Paper start - optimize common path of infinity doublelist
+        double tail = lower.getDouble(size - 1);
+        double head = lower.getDouble(0);
+        if (head == Double.NEGATIVE_INFINITY && tail == Double.POSITIVE_INFINITY && !excludeUpper && !excludeLower && (size == 2 || size == 4)) {
+            this.result = upper.toDoubleArray();
+            this.resultLength = upper.size();
+            if (size == 2) {
+                this.firstIndices = INFINITE_B_0;
+            } else {
+                this.firstIndices = INFINITE_B_1;
+            }
+            this.secondIndices = INFINITE_C;
+            return;
+        }
+        // Paper end
         this.result = new double[i];
         this.firstIndices = new int[i];
         this.secondIndices = new int[i];
