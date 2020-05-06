@@ -66,11 +66,13 @@ public class ServerConnectionListener {
 
     // Paper start - prevent blocking on adding a new connection while the server is ticking
     private final java.util.Queue<Connection> pending = new java.util.concurrent.ConcurrentLinkedQueue<>();
+    private static final boolean disableFlushConsolidation = Boolean.getBoolean("Paper.disableFlushConsolidate"); // Paper - Optimize network
 
     private final void addPending() {
         Connection connection;
         while ((connection = this.pending.poll()) != null) {
             this.connections.add(connection);
+            connection.isPending = false; // Paper - Optimize network
         }
     }
     // Paper end - prevent blocking on adding a new connection while the server is ticking
@@ -120,6 +122,7 @@ public class ServerConnectionListener {
                                     } catch (ChannelException var5) {
                                     }
 
+                                    if (!disableFlushConsolidation) channel.pipeline().addFirst(new io.netty.handler.flush.FlushConsolidationHandler()); // Paper - Optimize network
                                     ChannelPipeline channelPipeline = channel.pipeline().addLast("timeout", new ReadTimeoutHandler(30));
                                     if (ServerConnectionListener.this.server.repliesToStatus()) {
                                         channelPipeline.addLast("legacy_query", new LegacyQueryHandler(ServerConnectionListener.this.getServer()));
