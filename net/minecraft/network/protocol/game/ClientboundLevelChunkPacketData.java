@@ -27,6 +27,14 @@ public class ClientboundLevelChunkPacketData {
     private final CompoundTag heightmaps;
     private final byte[] buffer;
     private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
+    // Paper start - Handle oversized block entities in chunks
+    private final java.util.List<net.minecraft.network.protocol.Packet<?>> extraPackets = new java.util.ArrayList<>();
+    private static final int BLOCK_ENTITY_LIMIT = Integer.getInteger("Paper.excessiveTELimit", 750);
+
+    public List<net.minecraft.network.protocol.Packet<?>> getExtraPackets() {
+        return this.extraPackets;
+    }
+    // Paper end - Handle oversized block entities in chunks
 
     // Paper start - Anti-Xray - Add chunk packet info
     @Deprecated @io.papermc.paper.annotation.DoNotUse
@@ -50,8 +58,18 @@ public class ClientboundLevelChunkPacketData {
         }
         extractChunkData(new FriendlyByteBuf(this.getWriteBuffer()), levelChunk, chunkPacketInfo);
         this.blockEntitiesData = Lists.newArrayList();
+        int totalTileEntities = 0; // Paper - Handle oversized block entities in chunks
 
         for (Entry<BlockPos, BlockEntity> entryx : levelChunk.getBlockEntities().entrySet()) {
+            // Paper start - Handle oversized block entities in chunks
+            if (++totalTileEntities > BLOCK_ENTITY_LIMIT) {
+                net.minecraft.network.protocol.Packet<ClientGamePacketListener> packet = entryx.getValue().getUpdatePacket();
+                if (packet != null) {
+                    this.extraPackets.add(packet);
+                    continue;
+                }
+            }
+            // Paper end - Handle oversized block entities in chunks
             this.blockEntitiesData.add(ClientboundLevelChunkPacketData.BlockEntityInfo.create(entryx.getValue()));
         }
     }
