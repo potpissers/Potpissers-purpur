@@ -38,7 +38,7 @@ public class SectionPos extends Vec3i {
     }
 
     public static SectionPos of(BlockPos pos) {
-        return new SectionPos(blockToSectionCoord(pos.getX()), blockToSectionCoord(pos.getY()), blockToSectionCoord(pos.getZ()));
+        return new SectionPos(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4); // Paper
     }
 
     public static SectionPos of(ChunkPos chunkPos, int y) {
@@ -54,7 +54,7 @@ public class SectionPos extends Vec3i {
     }
 
     public static SectionPos of(long packed) {
-        return new SectionPos(x(packed), y(packed), z(packed));
+        return new SectionPos((int) (packed >> 42), (int) (packed << 44 >> 44), (int) (packed << 22 >> 42)); // Paper
     }
 
     public static SectionPos bottomOf(ChunkAccess chunk) {
@@ -65,8 +65,16 @@ public class SectionPos extends Vec3i {
         return offset(packed, direction.getStepX(), direction.getStepY(), direction.getStepZ());
     }
 
+    // Paper start
+    public static long getAdjacentFromBlockPos(int x, int y, int z, Direction direction) {
+        return (((long) ((x >> 4) + direction.getStepX()) & 4194303L) << 42) | (((long) ((y >> 4) + direction.getStepY()) & 1048575L)) | (((long) ((z >> 4) + direction.getStepZ()) & 4194303L) << 20);
+    }
+    public static long getAdjacentFromSectionPos(int x, int y, int z, Direction direction) {
+        return (((long) (x + direction.getStepX()) & 4194303L) << 42) | (((long) ((y) + direction.getStepY()) & 1048575L)) | (((long) (z + direction.getStepZ()) & 4194303L) << 20);
+    }
+    // Paper end
     public static long offset(long packed, int dx, int dy, int dz) {
-        return asLong(x(packed) + dx, y(packed) + dy, z(packed) + dz);
+        return (((long) ((int) (packed >> 42) + dx) & 4194303L) << 42) | (((long) ((int) (packed << 44 >> 44) + dy) & 1048575L)) | (((long) ((int) (packed << 22 >> 42) + dz) & 4194303L) << 20); // Simplify to reduce instruction count
     }
 
     public static int posToSectionCoord(double pos) {
@@ -86,10 +94,7 @@ public class SectionPos extends Vec3i {
     }
 
     public static short sectionRelativePos(BlockPos pos) {
-        int relativeBlockPosX = sectionRelative(pos.getX());
-        int relativeBlockPosY = sectionRelative(pos.getY());
-        int relativeBlockPosZ = sectionRelative(pos.getZ());
-        return (short)(relativeBlockPosX << 8 | relativeBlockPosZ << 4 | relativeBlockPosY << 0);
+        return (short) ((pos.getX() & 15) << 8 | (pos.getZ() & 15) << 4 | pos.getY() & 15); // Paper - simplify/inline
     }
 
     public static int sectionRelativeX(short x) {
@@ -152,16 +157,16 @@ public class SectionPos extends Vec3i {
         return this.getZ();
     }
 
-    public int minBlockX() {
-        return sectionToBlockCoord(this.x());
+    public final int minBlockX() { // Paper - final
+        return this.getX() << 4; // Paper - inline
     }
 
-    public int minBlockY() {
-        return sectionToBlockCoord(this.y());
+    public final int minBlockY() { // Paper - final
+        return this.getY() << 4; // Paper - inline
     }
 
-    public int minBlockZ() {
-        return sectionToBlockCoord(this.z());
+    public final int minBlockZ() { // Paper - final
+        return this.getZ() << 4; // Paper - inline
     }
 
     public int maxBlockX() {
@@ -177,7 +182,7 @@ public class SectionPos extends Vec3i {
     }
 
     public static long blockToSection(long levelPos) {
-        return asLong(blockToSectionCoord(BlockPos.getX(levelPos)), blockToSectionCoord(BlockPos.getY(levelPos)), blockToSectionCoord(BlockPos.getZ(levelPos)));
+        return (((long) (int) (levelPos >> 42) & 4194303L) << 42) | (((long) (int) ((levelPos << 52) >> 56) & 1048575L)) | (((long) (int) ((levelPos << 26) >> 42) & 4194303L) << 20); // Simplify to reduce instruction count
     }
 
     public static long getZeroNode(int x, int z) {
@@ -205,15 +210,17 @@ public class SectionPos extends Vec3i {
         return asLong(blockToSectionCoord(blockPos.getX()), blockToSectionCoord(blockPos.getY()), blockToSectionCoord(blockPos.getZ()));
     }
 
+    // Paper start
+    public static long blockPosAsSectionLong(int x, int y, int z) {
+        return (((long) (x >> 4) & 4194303L) << 42) | (((long) (y >> 4) & 1048575L)) | (((long) (z >> 4) & 4194303L) << 20);
+    }
+    // Paper end
     public static long asLong(int x, int y, int z) {
-        long l = 0L;
-        l |= (x & 4194303L) << 42;
-        l |= (y & 1048575L) << 0;
-        return l | (z & 4194303L) << 20;
+        return ((x & 4194303L) << 42) | ((y & 1048575L)) | ((z & 4194303L) << 20); // Paper - Simplify to reduce instruction count
     }
 
     public long asLong() {
-        return asLong(this.x(), this.y(), this.z());
+        return ((this.getX() & 4194303L) << 42) | ((this.getY() & 1048575L)) | ((this.getZ() & 4194303L) << 20); // Paper - Simplify to reduce instruction count
     }
 
     @Override
@@ -226,16 +233,13 @@ public class SectionPos extends Vec3i {
     }
 
     public static Stream<SectionPos> cube(SectionPos center, int radius) {
-        int sectionX = center.x();
-        int sectionY = center.y();
-        int sectionZ = center.z();
-        return betweenClosedStream(sectionX - radius, sectionY - radius, sectionZ - radius, sectionX + radius, sectionY + radius, sectionZ + radius);
+        return betweenClosedStream(center.getX() - radius, center.getY() - radius, center.getZ() - radius, center.getX() + radius, center.getY() + radius, center.getZ() + radius); // Paper - simplify/inline
     }
 
-    public static Stream<SectionPos> aroundChunk(ChunkPos chunkPos, int x, int y, int z) {
+    public static Stream<SectionPos> aroundChunk(ChunkPos chunkPos, int radius, int minY, int maxY) { // Paper - fix params
         int i = chunkPos.x;
         int i1 = chunkPos.z;
-        return betweenClosedStream(i - x, y, i1 - x, i + x, z, i1 + x);
+        return betweenClosedStream(i - radius, minY, i1 - radius, i + radius, maxY, i1 + radius); // Paper - simplify/inline
     }
 
     public static Stream<SectionPos> betweenClosedStream(final int x1, final int y1, final int z1, final int x2, final int y2, final int z2) {
