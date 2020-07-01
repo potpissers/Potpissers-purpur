@@ -24,13 +24,17 @@ public class NearestItemSensor extends Sensor<Mob> {
     @Override
     protected void doTick(ServerLevel level, Mob entity) {
         Brain<?> brain = entity.getBrain();
-        List<ItemEntity> entitiesOfClass = level.getEntitiesOfClass(ItemEntity.class, entity.getBoundingBox().inflate(32.0, 16.0, 32.0), itemEntity -> true);
+        List<ItemEntity> entitiesOfClass = level.getEntitiesOfClass(ItemEntity.class, entity.getBoundingBox().inflate(32.0, 16.0, 32.0), itemEntity -> itemEntity.closerThan(entity, MAX_DISTANCE_TO_WANTED_ITEM) && entity.wantsToPickUp(level, itemEntity.getItem())); // Paper - Perf: Move predicate into getEntities
         entitiesOfClass.sort(Comparator.comparingDouble(entity::distanceToSqr));
-        Optional<ItemEntity> optional = entitiesOfClass.stream()
-            .filter(itemEntity -> entity.wantsToPickUp(level, itemEntity.getItem()))
-            .filter(itemEntity -> itemEntity.closerThan(entity, 32.0))
-            .filter(entity::hasLineOfSight)
-            .findFirst();
-        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, optional);
+        // Paper start - Perf: remove streams from hot code
+        ItemEntity nearest = null;
+        for (final ItemEntity itemEntity : entitiesOfClass) {
+            if (entity.hasLineOfSight(itemEntity)) { // Paper - Perf: Move predicate into getEntities
+                nearest = itemEntity;
+                break;
+            }
+        }
+        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, Optional.ofNullable(nearest));
+        // Paper end - Perf: remove streams from hot code
     }
 }

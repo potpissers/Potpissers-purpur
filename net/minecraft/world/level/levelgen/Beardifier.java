@@ -35,9 +35,10 @@ public class Beardifier implements DensityFunctions.BeardifierOrMarker {
         int minBlockZ = chunkPos.getMinBlockZ();
         ObjectList<Beardifier.Rigid> list = new ObjectArrayList<>(10);
         ObjectList<JigsawJunction> list1 = new ObjectArrayList<>(32);
-        structureManager.startsForStructure(chunkPos, structure -> structure.terrainAdaptation() != TerrainAdjustment.NONE)
-            .forEach(
-                structureStart -> {
+        // Paper start - Perf: Remove streams from hot code
+        for (net.minecraft.world.level.levelgen.structure.StructureStart structureStart : structureManager.startsForStructure(chunkPos, structure -> {
+            return structure.terrainAdaptation() != TerrainAdjustment.NONE;
+        })) { // Paper end - Perf: Remove streams from hot code
                     TerrainAdjustment terrainAdjustment = structureStart.getStructure().terrainAdaptation();
 
                     for (StructurePiece structurePiece : structureStart.getPieces()) {
@@ -65,8 +66,7 @@ public class Beardifier implements DensityFunctions.BeardifierOrMarker {
                             }
                         }
                     }
-                }
-            );
+        } // Paper - Perf: Remove streams from hot code
         return new Beardifier(list.iterator(), list1.iterator());
     }
 
