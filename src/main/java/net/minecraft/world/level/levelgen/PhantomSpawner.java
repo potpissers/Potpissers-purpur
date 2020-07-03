@@ -48,7 +48,7 @@ public class PhantomSpawner implements CustomSpawner {
                 int spawnAttemptMaxSeconds = world.paperConfig().entities.behavior.phantomsSpawnAttemptMaxSeconds;
                 this.nextTick += (spawnAttemptMinSeconds + randomsource.nextInt(spawnAttemptMaxSeconds - spawnAttemptMinSeconds + 1)) * 20;
                 // Paper end - Ability to control player's insomnia and phantoms
-                if (world.getSkyDarken() < 5 && world.dimensionType().hasSkyLight()) {
+                if (world.getSkyDarken() < world.purpurConfig.phantomSpawnMinSkyDarkness && world.dimensionType().hasSkyLight()) { // Purpur
                     return 0;
                 } else {
                     int i = 0;
@@ -60,10 +60,10 @@ public class PhantomSpawner implements CustomSpawner {
                         if (!entityplayer.isSpectator() && (!world.paperConfig().entities.behavior.phantomsDoNotSpawnOnCreativePlayers || !entityplayer.isCreative())) { // Paper - Add phantom creative and insomniac controls
                             BlockPos blockposition = entityplayer.blockPosition();
 
-                            if (!world.dimensionType().hasSkyLight() || blockposition.getY() >= world.getSeaLevel() && world.canSeeSky(blockposition)) {
+                            if (!world.dimensionType().hasSkyLight() || (!world.purpurConfig.phantomSpawnOnlyAboveSeaLevel || blockposition.getY() >= world.getSeaLevel()) && (!world.purpurConfig.phantomSpawnOnlyWithVisibleSky || world.canSeeSky(blockposition))) { // Purpur
                                 DifficultyInstance difficultydamagescaler = world.getCurrentDifficultyAt(blockposition);
 
-                                if (difficultydamagescaler.isHarderThan(randomsource.nextFloat() * 3.0F)) {
+                                if (difficultydamagescaler.isHarderThan(randomsource.nextFloat() * (float) world.purpurConfig.phantomSpawnLocalDifficultyChance)) { // Purpur
                                     ServerStatsCounter serverstatisticmanager = entityplayer.getStats();
                                     int j = Mth.clamp(serverstatisticmanager.getValue(Stats.CUSTOM.get(Stats.TIME_SINCE_REST)), 1, Integer.MAX_VALUE);
                                     boolean flag2 = true;
@@ -75,7 +75,7 @@ public class PhantomSpawner implements CustomSpawner {
 
                                         if (NaturalSpawner.isValidEmptySpawnBlock(world, blockposition1, iblockdata, fluid, EntityType.PHANTOM)) {
                                             SpawnGroupData groupdataentity = null;
-                                            int k = 1 + randomsource.nextInt(difficultydamagescaler.getDifficulty().getId() + 1);
+                                            int k = world.purpurConfig.phantomSpawnMinPerAttempt + world.random.nextInt((world.purpurConfig.phantomSpawnMaxPerAttempt < 0 ? difficultydamagescaler.getDifficulty().getId() : world.purpurConfig.phantomSpawnMaxPerAttempt - world.purpurConfig.phantomSpawnMinPerAttempt) + 1); // Purpur
 
                                             for (int l = 0; l < k; ++l) {
                                                 // Paper start - PhantomPreSpawnEvent
