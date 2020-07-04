@@ -104,7 +104,7 @@ public class BedBlock extends HorizontalDirectionalBlock implements EntityBlock 
 
                 Vec3 vec3d = pos.getCenter();
 
-                world.explode((Entity) null, world.damageSources().badRespawnPointExplosion(vec3d), (ExplosionDamageCalculator) null, vec3d, 5.0F, true, Level.ExplosionInteraction.BLOCK);
+                if (world.purpurConfig.bedExplode) world.explode((Entity) null, world.damageSources().badRespawnPointExplosion(vec3d), (ExplosionDamageCalculator) null, vec3d, (float) world.purpurConfig.bedExplosionPower, world.purpurConfig.bedExplosionFire, world.purpurConfig.bedExplosionEffect); // Purpur
                 return InteractionResult.SUCCESS;
             } else if ((Boolean) state.getValue(BedBlock.OCCUPIED)) {
                 if (!BedBlock.canSetSpawn(world)) return this.explodeBed(state, world, pos); // Paper - check explode first
@@ -157,7 +157,7 @@ public class BedBlock extends HorizontalDirectionalBlock implements EntityBlock 
 
                 Vec3 vec3d = blockposition.getCenter();
 
-                world.explode((Entity) null, world.damageSources().badRespawnPointExplosion(vec3d, blockState), (ExplosionDamageCalculator) null, vec3d, 5.0F, true, Level.ExplosionInteraction.BLOCK); // CraftBukkit - add state
+                if (world.purpurConfig.bedExplode) world.explode((Entity) null, world.damageSources().badRespawnPointExplosion(vec3d, blockState), (ExplosionDamageCalculator) null, vec3d, (float) world.purpurConfig.bedExplosionPower, world.purpurConfig.bedExplosionFire, world.purpurConfig.bedExplosionEffect); // CraftBukkit - add state // Purpur
                 return InteractionResult.SUCCESS;
             }
         }
