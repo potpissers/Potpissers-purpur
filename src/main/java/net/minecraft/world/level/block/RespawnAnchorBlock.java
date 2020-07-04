@@ -150,7 +150,7 @@ public class RespawnAnchorBlock extends Block {
         };
         Vec3 vec3d = explodedPos.getCenter();
 
-        world.explode((Entity) null, world.damageSources().badRespawnPointExplosion(vec3d, blockState), explosiondamagecalculator, vec3d, 5.0F, true, Level.ExplosionInteraction.BLOCK); // CraftBukkit - add state
+        if (world.purpurConfig.respawnAnchorExplode) world.explode((Entity) null, world.damageSources().badRespawnPointExplosion(vec3d, blockState), explosiondamagecalculator, vec3d, (float) world.purpurConfig.respawnAnchorExplosionPower, world.purpurConfig.respawnAnchorExplosionFire, world.purpurConfig.respawnAnchorExplosionEffect); // CraftBukkit - add state // Purpur
     }
 
     public static boolean canSetSpawn(Level world) {
