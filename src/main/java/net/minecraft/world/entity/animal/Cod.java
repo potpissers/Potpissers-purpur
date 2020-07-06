@@ -13,6 +13,18 @@ public class Cod extends AbstractSchoolingFish {
         super(type, world);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.codRidable;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.codControllable;
+    }
+    // Purpur end
+
     @Override
     public ItemStack getBucketItemStack() {
         return new ItemStack(Items.COD_BUCKET);

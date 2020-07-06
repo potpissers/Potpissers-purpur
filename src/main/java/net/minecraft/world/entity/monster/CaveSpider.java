@@ -26,6 +26,23 @@ public class CaveSpider extends Spider {
         return Spider.createAttributes().add(Attributes.MAX_HEALTH, 12.0D);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.caveSpiderRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.caveSpiderRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.caveSpiderControllable;
+    }
+    // Purpur end
+
     @Override
     public boolean doHurtTarget(Entity target) {
         if (super.doHurtTarget(target)) {

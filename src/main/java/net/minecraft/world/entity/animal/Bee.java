@@ -144,6 +144,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
     public Bee(EntityType<? extends Bee> type, Level world) {
         super(type, world);
         this.remainingCooldownBeforeLocatingNewFlower = Mth.nextInt(this.random, 20, 60);
+        final org.purpurmc.purpur.controller.FlyingMoveControllerWASD flyingController = new org.purpurmc.purpur.controller.FlyingMoveControllerWASD(this, 0.25F, 1.0F, false); // Purpur
         // Paper start - Fix MC-167279
         class BeeFlyingMoveControl extends FlyingMoveControl {
             public BeeFlyingMoveControl(final Mob entity, final int maxPitchChange, final boolean noGravity) {
@@ -152,11 +153,24 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
 
             @Override
             public void tick() {
+                // Purpur start
+                if (mob.getRider() != null && mob.isControllable()) {
+                    flyingController.purpurTick(mob.getRider());
+                    return;
+                }
+                // Purpur end
                 if (this.mob.getY() <= Bee.this.level().getMinBuildHeight()) {
                     this.mob.setNoGravity(false);
                 }
                 super.tick();
             }
+
+            // Purpur start
+            @Override
+            public boolean hasWanted() {
+                return mob.getRider() != null || !mob.isControllable() || super.hasWanted();
+            }
+            // Purpur end
         }
         this.moveControl = new BeeFlyingMoveControl(this, 20, true);
         // Paper end - Fix MC-167279
@@ -167,6 +181,40 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
         this.setPathfindingMalus(PathType.COCOA, -1.0F);
         this.setPathfindingMalus(PathType.FENCE, -1.0F);
     }
+
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.beeRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.beeRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.beeControllable;
+    }
+
+    @Override
+    public double getMaxY() {
+        return level().purpurConfig.beeMaxY;
+    }
+
+    @Override
+    public void travel(Vec3 vec3) {
+        super.travel(vec3);
+        if (getRider() != null && this.isControllable() && !onGround) {
+            float speed = (float) getAttributeValue(Attributes.FLYING_SPEED) * 2;
+            setSpeed(speed);
+            Vec3 mot = getDeltaMovement();
+            move(net.minecraft.world.entity.MoverType.SELF, mot.multiply(speed, speed, speed));
+            setDeltaMovement(mot.scale(0.9D));
+        }
+    }
+    // Purpur end
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
@@ -182,6 +230,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
 
     @Override
     protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(0, new Bee.BeeAttackGoal(this, 1.399999976158142D, true));
         this.goalSelector.addGoal(1, new Bee.BeeEnterHiveGoal());
         this.goalSelector.addGoal(2, new BreedGoal(this, 1.0D));
@@ -199,6 +248,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
         this.goalSelector.addGoal(7, new Bee.BeeGrowCropGoal());
         this.goalSelector.addGoal(8, new Bee.BeeWanderGoal());
         this.goalSelector.addGoal(9, new FloatGoal(this));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.targetSelector.addGoal(1, (new Bee.BeeHurtByOtherGoal(this)).setAlertOthers(new Class[0]));
         this.targetSelector.addGoal(2, new Bee.BeeBecomeAngryTargetGoal(this));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, true));
@@ -883,16 +933,16 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
         }
     }
 
-    private class BeeLookControl extends LookControl {
+    private class BeeLookControl extends org.purpurmc.purpur.controller.LookControllerWASD { // Purpur
 
         BeeLookControl(final Mob entity) {
             super(entity);
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur
             if (!Bee.this.isAngry()) {
-                super.tick();
+                super.vanillaTick(); // Purpur
             }
         }
 

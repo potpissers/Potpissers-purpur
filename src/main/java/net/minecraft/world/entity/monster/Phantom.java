@@ -59,6 +59,64 @@ public class Phantom extends FlyingMob implements Enemy {
         this.lookControl = new Phantom.PhantomLookControl(this, this);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.phantomRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.phantomRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.phantomControllable;
+    }
+
+    @Override
+    public double getMaxY() {
+        return level().purpurConfig.phantomMaxY;
+    }
+
+    @Override
+    public void travel(Vec3 vec3) {
+        super.travel(vec3);
+        if (getRider() != null && this.isControllable() && !onGround) {
+            float speed = (float) getAttributeValue(Attributes.FLYING_SPEED);
+            setSpeed(speed);
+            Vec3 mot = getDeltaMovement();
+            move(net.minecraft.world.entity.MoverType.SELF, mot.multiply(speed, speed, speed));
+            setDeltaMovement(mot.scale(0.9D));
+        }
+    }
+
+    public static net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder createAttributes() {
+        return Monster.createMonsterAttributes().add(Attributes.FLYING_SPEED, 3.0D);
+    }
+
+    @Override
+    public boolean onSpacebar() {
+        if (getRider() != null && getRider().getBukkitEntity().hasPermission("allow.special.phantom")) {
+            shoot();
+        }
+        return false;
+    }
+
+    public boolean shoot() {
+        org.bukkit.Location loc = ((org.bukkit.entity.LivingEntity) getBukkitEntity()).getEyeLocation();
+        loc.setPitch(-loc.getPitch());
+        org.bukkit.util.Vector target = loc.getDirection().normalize().multiply(100).add(loc.toVector());
+
+        org.purpurmc.purpur.entity.PhantomFlames flames = new org.purpurmc.purpur.entity.PhantomFlames(level(), this);
+        flames.canGrief = level().purpurConfig.phantomAllowGriefing;
+        flames.shoot(target.getX() - getX(), target.getY() - getY(), target.getZ() - getZ(), 1.0F, 5.0F);
+        level().addFreshEntity(flames);
+        return true;
+    }
+    // Purpur end
+
     @Override
     public boolean isFlapping() {
         return (this.getUniqueFlapTickOffset() + this.tickCount) % Phantom.TICKS_PER_FLAP == 0;
@@ -71,9 +129,11 @@ public class Phantom extends FlyingMob implements Enemy {
 
     @Override
     protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new Phantom.PhantomAttackStrategyGoal());
         this.goalSelector.addGoal(2, new Phantom.PhantomSweepAttackGoal());
         this.goalSelector.addGoal(3, new Phantom.PhantomCircleAroundAnchorGoal());
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.targetSelector.addGoal(1, new Phantom.PhantomAttackPlayerTargetGoal());
     }
 
@@ -139,6 +199,7 @@ public class Phantom extends FlyingMob implements Enemy {
     @Override
     public void aiStep() {
         if (this.isAlive() && this.shouldBurnInDay && this.isSunBurnTick()) { // Paper - shouldBurnInDay API
+            if (getRider() == null || !this.isControllable()) // Purpur
             this.igniteForSeconds(8.0F);
         }
 
@@ -254,7 +315,7 @@ public class Phantom extends FlyingMob implements Enemy {
         private AttackPhase() {}
     }
 
-    private class PhantomMoveControl extends MoveControl {
+    private class PhantomMoveControl extends org.purpurmc.purpur.controller.FlyingMoveControllerWASD { // Purpur
 
         private float speed = 0.1F;
 
@@ -262,8 +323,19 @@ public class Phantom extends FlyingMob implements Enemy {
             super(entity);
         }
 
+        // Purpur start
+        public void purpurTick(Player rider) {
+            if (!Phantom.this.onGround) {
+                // phantom is always in motion when flying
+                // TODO - FIX THIS
+                // rider.setForward(1.0F);
+            }
+            super.purpurTick(rider);
+        }
+        // Purpur end
+
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur
             if (Phantom.this.horizontalCollision) {
                 Phantom.this.setYRot(Phantom.this.getYRot() + 180.0F);
                 this.speed = 0.1F;
@@ -309,14 +381,20 @@ public class Phantom extends FlyingMob implements Enemy {
         }
     }
 
-    private class PhantomLookControl extends LookControl {
+    private class PhantomLookControl extends org.purpurmc.purpur.controller.LookControllerWASD { // Purpur
 
         public PhantomLookControl(final Phantom entity, final Mob phantom) {
             super(phantom);
         }
 
+        // Purpur start
+        public void purpurTick(Player rider) {
+            setYawPitch(rider.getYRot(), -rider.xRotO * 0.75F);
+        }
+        // Purpur end
+
         @Override
-        public void tick() {}
+        public void vanillaTick() {} // Purpur
     }
 
     private class PhantomBodyRotationControl extends BodyRotationControl {

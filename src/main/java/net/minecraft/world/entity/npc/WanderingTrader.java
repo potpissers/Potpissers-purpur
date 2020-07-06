@@ -71,6 +71,23 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
         //this.setDespawnDelay(48000); // CraftBukkit - set default from MobSpawnerTrader // Paper - move back to MobSpawnerTrader - Vanilla behavior is that only traders spawned by it have this value set.
     }
 
+    // Purpur - start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.wanderingTraderRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.wanderingTraderRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.wanderingTraderControllable;
+    }
+    // Purpur end
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
@@ -119,9 +136,9 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
 
             if (!this.level().isClientSide) {
                 if (this.getOffers().isEmpty()) {
-                    return InteractionResult.CONSUME;
+                    return tryRide(player, hand, InteractionResult.CONSUME); // Purpur
                 }
-
+                if (level().purpurConfig.wanderingTraderRidable && itemstack.isEmpty()) return tryRide(player, hand); // Purpur
                 this.setTradingPlayer(player);
                 this.openTradingScreen(player, this.getDisplayName(), 1);
             }

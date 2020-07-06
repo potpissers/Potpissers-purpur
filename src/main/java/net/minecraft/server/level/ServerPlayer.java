@@ -805,6 +805,15 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
         this.trackEnteredOrExitedLavaOnVehicle();
         this.updatePlayerAttributes();
         this.advancements.flushDirty(this);
+
+        // Purpur start
+        if (this.level().purpurConfig.useNightVisionWhenRiding && this.getVehicle() != null && this.getVehicle().getRider() == this && this.level().getGameTime() % 100 == 0) { // 5 seconds
+            MobEffectInstance nightVision = this.getEffect(MobEffects.NIGHT_VISION);
+            if (nightVision == null || nightVision.getDuration() <= 300) { // 15 seconds
+                this.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 400, 0)); // 20 seconds
+            }
+        }
+        // Purpur end
     }
 
     private void updatePlayerAttributes() {

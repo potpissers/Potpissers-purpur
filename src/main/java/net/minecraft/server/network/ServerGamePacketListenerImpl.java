@@ -2801,6 +2801,8 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
 
                             ServerGamePacketListenerImpl.this.cserver.getPluginManager().callEvent(event);
 
+                            player.processClick(enumhand); // Purpur
+
                             // Entity in bucket - SPIGOT-4048 and SPIGOT-6859a
                             if ((entity instanceof Bucketable && entity instanceof LivingEntity && origItem != null && origItem.asItem() == Items.WATER_BUCKET) && (event.isCancelled() || ServerGamePacketListenerImpl.this.player.getInventory().getSelected() == null || ServerGamePacketListenerImpl.this.player.getInventory().getSelected().getItem() != origItem)) {
                                 entity.resendPossiblyDesyncedEntityData(ServerGamePacketListenerImpl.this.player); // Paper - The entire mob gets deleted, so resend it

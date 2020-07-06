@@ -219,11 +219,21 @@ public abstract class AbstractHorse extends Animal implements ContainerListener,
 
     protected AbstractHorse(EntityType<? extends AbstractHorse> type, Level world) {
         super(type, world);
+        this.moveControl = new net.minecraft.world.entity.ai.control.MoveControl(this); // Purpur - use vanilla controller
+        this.lookControl = new net.minecraft.world.entity.ai.control.LookControl(this); // Purpur - use vanilla controller
         this.createInventory();
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return false; // vanilla handles
+    }
+    // Purpur end
+
     @Override
     protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HorseHasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new PanicGoal(this, 1.2D));
         this.goalSelector.addGoal(1, new RunAroundLikeCrazyGoal(this, 1.2D));
         this.goalSelector.addGoal(2, new BreedGoal(this, 1.0D, AbstractHorse.class));
@@ -234,6 +244,7 @@ public abstract class AbstractHorse extends Animal implements ContainerListener,
         if (this.canPerformRearing()) {
             this.goalSelector.addGoal(9, new RandomStandGoal(this));
         }
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HorseHasRider(this)); // Purpur
 
         this.addBehaviourGoals();
     }

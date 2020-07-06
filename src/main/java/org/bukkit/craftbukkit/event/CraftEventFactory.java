@@ -603,6 +603,15 @@ public class CraftEventFactory {
         // Paper end
         craftServer.getPluginManager().callEvent(event);
 
+        // Purpur start
+        if (who != null) {
+            switch (action) {
+                case LEFT_CLICK_BLOCK, LEFT_CLICK_AIR -> who.processClick(InteractionHand.MAIN_HAND);
+                case RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR -> who.processClick(InteractionHand.OFF_HAND);
+            }
+        }
+        // Purpur end
+
         return event;
     }
 
@@ -1193,6 +1202,7 @@ public class CraftEventFactory {
         EntityDamageEvent event;
         if (damager != null) {
             event = new EntityDamageByEntityEvent(damager.getBukkitEntity(), damagee.getBukkitEntity(), cause, bukkitDamageSource, modifiers, modifierFunctions, critical);
+            damager.processClick(InteractionHand.MAIN_HAND); // Purpur
         } else {
             event = new EntityDamageEvent(damagee.getBukkitEntity(), cause, bukkitDamageSource, modifiers, modifierFunctions);
         }

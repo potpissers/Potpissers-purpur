@@ -42,6 +42,13 @@ public class SkeletonHorse extends AbstractHorse {
         super(type, world);
     }
 
+    // Purpur start
+    @Override
+    public boolean isTamed() {
+        return super.isTamed() || this.level().purpurConfig.skeletonHorseRidable;
+    }
+    // Purpur end
+
     public static AttributeSupplier.Builder createAttributes() {
         return createBaseHorseAttributes().add(Attributes.MAX_HEALTH, 15.0D).add(Attributes.MOVEMENT_SPEED, 0.20000000298023224D);
     }
@@ -59,7 +66,9 @@ public class SkeletonHorse extends AbstractHorse {
     }
 
     @Override
-    protected void addBehaviourGoals() {}
+    protected void addBehaviourGoals() {
+        if (level().purpurConfig.skeletonHorseCanSwim) goalSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.FloatGoal(this));
+    }
 
     @Override
     protected SoundEvent getAmbientSound() {

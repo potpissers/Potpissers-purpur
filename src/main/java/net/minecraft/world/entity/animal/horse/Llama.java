@@ -79,7 +79,51 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
     public Llama(EntityType<? extends Llama> type, Level world) {
         super(type, world);
         this.maxDomestication = 30; // Paper - Missing entity API; configure max temper instead of a hardcoded value
+        // Purpur start
+        this.moveControl = new org.purpurmc.purpur.controller.MoveControllerWASD(this) {
+            @Override
+            public void tick() {
+                if (entity.getRider() != null && entity.isControllable() && isSaddled()) {
+                    purpurTick(entity.getRider());
+                } else {
+                    vanillaTick();
+                }
+            }
+        };
+        this.lookControl = new org.purpurmc.purpur.controller.LookControllerWASD(this) {
+            @Override
+            public void tick() {
+                if (entity.getRider() != null && entity.isControllable() && isSaddled()) {
+                    purpurTick(entity.getRider());
+                } else {
+                    vanillaTick();
+                }
+            }
+        };
+        // Purpur end
     }
+
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.llamaRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.llamaRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.llamaControllable;
+    }
+
+    @Override
+    public boolean isSaddled() {
+        return super.isSaddled() || (isTamed() && getSwag() != null);
+    }
+    // Purpur end
 
     public boolean isTraderLlama() {
         return false;
@@ -121,6 +165,7 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.LlamaHasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new RunAroundLikeCrazyGoal(this, 1.2D));
         this.goalSelector.addGoal(2, new LlamaFollowCaravanGoal(this, 2.0999999046325684D));
         this.goalSelector.addGoal(3, new RangedAttackGoal(this, 1.25D, 40, 20.0F));
@@ -133,6 +178,7 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.7D));
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(9, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.LlamaHasRider(this)); // Purpur
         this.targetSelector.addGoal(1, new Llama.LlamaHurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new Llama.LlamaAttackWolfGoal(this));
     }

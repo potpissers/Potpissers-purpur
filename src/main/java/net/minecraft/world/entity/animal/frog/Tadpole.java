@@ -51,12 +51,49 @@ public class Tadpole extends AbstractFish {
     protected static final ImmutableList<SensorType<? extends Sensor<? super Tadpole>>> SENSOR_TYPES = ImmutableList.of(SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS, SensorType.HURT_BY, SensorType.FROG_TEMPTATIONS);
     protected static final ImmutableList<MemoryModuleType<?>> MEMORY_TYPES = ImmutableList.of(MemoryModuleType.LOOK_TARGET, MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES, MemoryModuleType.WALK_TARGET, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, MemoryModuleType.PATH, MemoryModuleType.NEAREST_VISIBLE_ADULT, MemoryModuleType.TEMPTATION_COOLDOWN_TICKS, MemoryModuleType.IS_TEMPTED, MemoryModuleType.TEMPTING_PLAYER, MemoryModuleType.BREED_TARGET, MemoryModuleType.IS_PANICKING);
     public boolean ageLocked; // Paper
+    private org.purpurmc.purpur.controller.WaterMoveControllerWASD purpurController; // Purpur
 
     public Tadpole(EntityType<? extends AbstractFish> type, Level world) {
         super(type, world);
-        this.moveControl = new SmoothSwimmingMoveControl(this, 85, 10, 0.02F, 0.1F, true);
+        // Purpur start
+        this.purpurController = new org.purpurmc.purpur.controller.WaterMoveControllerWASD(this, 0.5F);
+        this.moveControl = new SmoothSwimmingMoveControl(this, 85, 10, 0.02F, 0.1F, true) {
+            @Override
+            public void tick() {
+                Player rider = mob.getRider();
+                if (rider != null && mob.isControllable()) {
+                    purpurController.purpurTick(rider);
+                    mob.setDeltaMovement(mob.getDeltaMovement().add(0.0D, 0.002D, 0.0D));
+                } else {
+                    super.tick();
+                }
+            }
+        };
+        // Purpur end
         this.lookControl = new SmoothSwimmingLookControl(this, 10);
     }
+
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.tadpoleRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.tadpoleRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.tadpoleControllable;
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
+    }
+    // Purpur end
 
     @Override
     protected PathNavigation createNavigation(Level world) {
@@ -87,7 +124,7 @@ public class Tadpole extends AbstractFish {
     @Override
     protected void customServerAiStep() {
         this.level().getProfiler().push("tadpoleBrain");
-        if (this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish
+        if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick((ServerLevel) this.level(), this);
         this.level().getProfiler().pop();
         this.level().getProfiler().push("tadpoleActivityUpdate");

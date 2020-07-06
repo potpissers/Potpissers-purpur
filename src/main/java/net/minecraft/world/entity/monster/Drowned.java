@@ -71,6 +71,23 @@ public class Drowned extends Zombie implements RangedAttackMob {
         return Zombie.createAttributes().add(Attributes.STEP_HEIGHT, 1.0D);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.drownedRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.drownedRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.drownedControllable;
+    }
+    // Purpur end
+
     @Override
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new Drowned.DrownedGoToWaterGoal(this, 1.0D));
@@ -262,8 +279,7 @@ public class Drowned extends Zombie implements RangedAttackMob {
         this.searchingForLand = targetingUnderwater;
     }
 
-    private static class DrownedMoveControl extends MoveControl {
-
+    private static class DrownedMoveControl extends org.purpurmc.purpur.controller.MoveControllerWASD { // Purpur
         private final Drowned drowned;
 
         public DrownedMoveControl(Drowned drowned) {
@@ -272,7 +288,7 @@ public class Drowned extends Zombie implements RangedAttackMob {
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur
             LivingEntity entityliving = this.drowned.getTarget();
 
             if (this.drowned.wantsToSwim() && this.drowned.isInWater()) {
@@ -295,7 +311,7 @@ public class Drowned extends Zombie implements RangedAttackMob {
 
                 this.drowned.setYRot(this.rotlerp(this.drowned.getYRot(), f, 90.0F));
                 this.drowned.yBodyRot = this.drowned.getYRot();
-                float f1 = (float) (this.speedModifier * this.drowned.getAttributeValue(Attributes.MOVEMENT_SPEED));
+                float f1 = (float) (this.getSpeedModifier() * this.drowned.getAttributeValue(Attributes.MOVEMENT_SPEED)); // Purpur
                 float f2 = Mth.lerp(0.125F, this.drowned.getSpeed(), f1);
 
                 this.drowned.setSpeed(f2);
@@ -305,7 +321,7 @@ public class Drowned extends Zombie implements RangedAttackMob {
                     this.drowned.setDeltaMovement(this.drowned.getDeltaMovement().add(0.0D, -0.008D, 0.0D));
                 }
 
-                super.tick();
+                super.vanillaTick(); // Purpur
             }
 
         }

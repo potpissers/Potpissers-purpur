@@ -90,6 +90,23 @@ public class Hoglin extends Animal implements Enemy, HoglinBase {
         this.xpReward = 5;
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.hoglinRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.hoglinRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.hoglinControllable;
+    }
+    // Purpur end
+
     @Override
     public boolean canBeLeashed() {
         return true;
@@ -157,7 +174,7 @@ public class Hoglin extends Animal implements Enemy, HoglinBase {
     @Override
     protected void customServerAiStep() {
         this.level().getProfiler().push("hoglinBrain");
-        if (this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish
+        if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick((ServerLevel)this.level(), this);
         this.level().getProfiler().pop();
         HoglinAi.updateActivity(this);

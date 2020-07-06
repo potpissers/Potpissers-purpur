@@ -87,6 +87,13 @@ public class Camel extends AbstractHorse implements PlayerRideableJumping, Saddl
         navigation.setCanWalkOverFences(true);
     }
 
+    // Purpur start
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.camelRidableInWater;
+    }
+    // Purpur end
+
     @Override
     public void addAdditionalSaveData(CompoundTag nbt) {
         super.addAdditionalSaveData(nbt);

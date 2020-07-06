@@ -61,21 +61,98 @@ public class Creeper extends Monster implements PowerableMob {
     public int explosionRadius = 3;
     private int droppedSkulls;
     public Entity entityIgniter; // CraftBukkit
+    // Purpur start
+    private int spacebarCharge = 0;
+    private int prevSpacebarCharge = 0;
+    private int powerToggleDelay = 0;
+    // Purpur end
 
     public Creeper(EntityType<? extends Creeper> type, Level world) {
         super(type, world);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.creeperRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.creeperRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.creeperControllable;
+    }
+
+    @Override
+    protected void customServerAiStep() {
+        if (powerToggleDelay > 0) {
+            powerToggleDelay--;
+        }
+        if (getRider() != null && this.isControllable()) {
+            if (getRider().getForwardMot() != 0 || getRider().getStrafeMot() != 0) {
+                spacebarCharge = 0;
+                setIgnited(false);
+                setSwellDir(-1);
+            }
+            if (spacebarCharge == prevSpacebarCharge) {
+                spacebarCharge = 0;
+            }
+            prevSpacebarCharge = spacebarCharge;
+        }
+        super.customServerAiStep();
+    }
+
+    @Override
+    public void onMount(Player rider) {
+        super.onMount(rider);
+        setIgnited(false);
+        setSwellDir(-1);
+    }
+
+    @Override
+    public boolean onSpacebar() {
+        if (powerToggleDelay > 0) {
+            return true; // just toggled power, do not jump or ignite
+        }
+        spacebarCharge++;
+        if (spacebarCharge > maxSwell - 2) {
+            spacebarCharge = 0;
+            if (getRider() != null && getRider().getBukkitEntity().hasPermission("allow.powered.creeper")) {
+                powerToggleDelay = 20;
+                setPowered(!isPowered());
+                setIgnited(false);
+                setSwellDir(-1);
+                return true;
+            }
+        }
+        if (!isIgnited()) {
+            if (getRider() != null && getRider().getForwardMot() == 0 && getRider().getStrafeMot() == 0 &&
+                    getRider().getBukkitEntity().hasPermission("allow.special.creeper")) {
+                setIgnited(true);
+                setSwellDir(1);
+                return true;
+            }
+        }
+        return getForwardMot() == 0 && getStrafeMot() == 0; // do not jump if standing still
+    }
+    // Purpur end
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, new SwellGoal(this));
+        this.goalSelector.addGoal(3, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(3, new AvoidEntityGoal<>(this, Ocelot.class, 6.0F, 1.0D, 1.2D));
         this.goalSelector.addGoal(3, new AvoidEntityGoal<>(this, Cat.class, 6.0F, 1.0D, 1.2D));
         this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0D, false));
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.8D));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this, new Class[0]));
     }
@@ -324,6 +401,7 @@ public class Creeper extends Monster implements PowerableMob {
             com.destroystokyo.paper.event.entity.CreeperIgniteEvent event = new com.destroystokyo.paper.event.entity.CreeperIgniteEvent((org.bukkit.entity.Creeper) getBukkitEntity(), ignited);
             if (event.callEvent()) {
                 this.entityData.set(Creeper.DATA_IS_IGNITED, event.isIgnited());
+                if (!event.isIgnited()) setSwellDir(-1); // Purpur
             }
         }
         // Paper end - CreeperIgniteEvent

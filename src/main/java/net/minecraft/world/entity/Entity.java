@@ -383,7 +383,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     private final Set<String> tags;
     private final double[] pistonDeltas;
     private long pistonDeltasGameTime;
-    private EntityDimensions dimensions;
+    protected EntityDimensions dimensions; // Purpur - private -> protected
     private float eyeHeight;
     public boolean isInPowderSnow;
     public boolean wasInPowderSnow;
@@ -3135,6 +3135,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                 this.passengers = ImmutableList.copyOf(list);
             }
 
+            // Purpur start
+            if (isRidable() && this.passengers.get(0) == passenger && passenger instanceof Player player) {
+                onMount(player);
+                this.rider = player;
+            }
+            // Purpur end
+
             this.gameEvent(GameEvent.ENTITY_MOUNT, passenger);
         }
     }
@@ -3174,6 +3181,14 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                 return false;
             }
             // CraftBukkit end
+
+            // Purpur start
+            if (this.rider != null && this.passengers.get(0) == this.rider) {
+                onDismount(this.rider);
+                this.rider = null;
+            }
+            // Purpur end
+
             if (this.passengers.size() == 1 && this.passengers.get(0) == entity) {
                 this.passengers = ImmutableList.of();
             } else {
@@ -5067,4 +5082,44 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return ((net.minecraft.server.level.ServerChunkCache) level.getChunkSource()).isPositionTicking(this);
     }
     // Paper end - Expose entity id counter
+    // Purpur start
+    @Nullable
+    private Player rider = null;
+
+    @Nullable
+    public Player getRider() {
+        return rider;
+    }
+
+    public boolean isRidable() {
+        return false;
+    }
+
+    public boolean isControllable() {
+        return true;
+    }
+
+    public void onMount(Player rider) {
+        if (this instanceof Mob) {
+            ((Mob) this).setTarget(null, null, false);
+            ((Mob) this).getNavigation().stop();
+        }
+        rider.setJumping(false); // fixes jump on mount
+    }
+
+    public void onDismount(Player player) {
+    }
+
+    public boolean onSpacebar() {
+        return false;
+    }
+
+    public boolean onClick(InteractionHand hand) {
+        return false;
+    }
+
+    public boolean processClick(InteractionHand hand) {
+        return false;
+    }
+    // Purpur end
 }

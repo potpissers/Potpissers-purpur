@@ -23,6 +23,19 @@ public class GlowSquid extends Squid {
         super(type, world);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.glowSquidRidable;
+    }
+
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.glowSquidControllable;
+    }
+    // Purpur end
+
     @Override
     protected ParticleOptions getInkParticle() {
         return ParticleTypes.GLOW_SQUID_INK;

@@ -81,13 +81,81 @@ public class Dolphin extends WaterAnimal {
     public static final Predicate<ItemEntity> ALLOWED_ITEMS = (entityitem) -> {
         return !entityitem.hasPickUpDelay() && entityitem.isAlive() && entityitem.isInWater();
     };
+    private int spitCooldown; // Purpur
 
     public Dolphin(EntityType<? extends Dolphin> type, Level world) {
         super(type, world);
-        this.moveControl = new SmoothSwimmingMoveControl(this, 85, 10, 0.02F, 0.1F, true);
+        // Purpur start
+        class DolphinMoveControl extends SmoothSwimmingMoveControl {
+            private final org.purpurmc.purpur.controller.WaterMoveControllerWASD waterMoveControllerWASD;
+            private final Dolphin dolphin;
+
+            public DolphinMoveControl(Dolphin dolphin, int pitchChange, int yawChange, float speedInWater, float speedInAir, boolean buoyant) {
+                super(dolphin, pitchChange, yawChange, speedInWater, speedInAir, buoyant);
+                this.dolphin = dolphin;
+                this.waterMoveControllerWASD = new org.purpurmc.purpur.controller.WaterMoveControllerWASD(dolphin);
+            }
+
+            @Override
+            public void tick() {
+                if (dolphin.getRider() != null && dolphin.isControllable()) {
+                    purpurTick(dolphin.getRider());
+                } else {
+                    super.tick();
+                }
+            }
+
+            public void purpurTick(Player rider) {
+                if (dolphin.getAirSupply() < 150) {
+                    // if drowning override player WASD controls to find air
+                    super.tick();
+                } else {
+                    waterMoveControllerWASD.purpurTick(rider);
+                    dolphin.setDeltaMovement(dolphin.getDeltaMovement().add(0.0D, 0.005D, 0.0D));
+                }
+            }
+        };
+        this.moveControl = new DolphinMoveControl(this, 85, 10, 0.02F, 0.1F, true);
+        // Purpur end
         this.lookControl = new SmoothSwimmingLookControl(this, 10);
         this.setCanPickUpLoot(true);
     }
+
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.dolphinRidable;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.dolphinControllable;
+    }
+
+    @Override
+    public boolean onSpacebar() {
+        if (spitCooldown == 0 && getRider() != null) {
+            spitCooldown = level().purpurConfig.dolphinSpitCooldown;
+
+            org.bukkit.craftbukkit.entity.CraftPlayer player = (org.bukkit.craftbukkit.entity.CraftPlayer) getRider().getBukkitEntity();
+            if (!player.hasPermission("allow.special.dolphin")) {
+                return false;
+            }
+
+            org.bukkit.Location loc = player.getEyeLocation();
+            loc.setPitch(loc.getPitch() - 10);
+            org.bukkit.util.Vector target = loc.getDirection().normalize().multiply(10).add(loc.toVector());
+
+            org.purpurmc.purpur.entity.DolphinSpit spit = new org.purpurmc.purpur.entity.DolphinSpit(level(), this);
+            spit.shoot(target.getX() - getX(), target.getY() - getY(), target.getZ() - getZ(), level().purpurConfig.dolphinSpitSpeed, 5.0F);
+
+            level().addFreshEntity(spit);
+            playSound(SoundEvents.DOLPHIN_ATTACK, 1.0F, 1.0F + (random.nextFloat() - random.nextFloat()) * 0.2F);
+            return true;
+        }
+        return false;
+    }
+    // Purpur end
 
     @Nullable
     @Override
@@ -158,6 +226,7 @@ public class Dolphin extends WaterAnimal {
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new BreathAirGoal(this));
         this.goalSelector.addGoal(0, new TryFindWaterGoal(this));
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new Dolphin.DolphinSwimToTreasureGoal(this));
         this.goalSelector.addGoal(2, new Dolphin.DolphinSwimWithPlayerGoal(this, 4.0D));
         this.goalSelector.addGoal(4, new RandomSwimmingGoal(this, 1.0D, 10));
@@ -168,6 +237,7 @@ public class Dolphin extends WaterAnimal {
         this.goalSelector.addGoal(8, new Dolphin.PlayWithItemsGoal());
         this.goalSelector.addGoal(8, new FollowBoatGoal(this));
         this.goalSelector.addGoal(9, new AvoidEntityGoal<>(this, Guardian.class, 8.0F, 1.0D, 1.0D));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this, new Class[]{Guardian.class})).setAlertOthers());
     }
 
@@ -207,7 +277,7 @@ public class Dolphin extends WaterAnimal {
 
     @Override
     protected boolean canRide(Entity entity) {
-        return true;
+        return boardingCooldown <= 0; // Purpur - make dolphin honor ride cooldown like all other non-boss mobs;
     }
 
     @Override
@@ -242,6 +312,11 @@ public class Dolphin extends WaterAnimal {
     @Override
     public void tick() {
         super.tick();
+        // Purpur start
+        if (spitCooldown > 0) {
+            spitCooldown--;
+        }
+        // Purpur end
         if (this.isNoAi()) {
             this.setAirSupply(this.getMaxAirSupply());
         } else {

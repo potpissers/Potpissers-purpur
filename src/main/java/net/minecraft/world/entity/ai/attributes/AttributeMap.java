@@ -24,15 +24,22 @@ public class AttributeMap {
     private final Set<AttributeInstance> attributesToUpdate = new ObjectOpenHashSet<>();
     private final AttributeSupplier supplier;
     private final java.util.function.Function<Holder<Attribute>, AttributeInstance> createInstance; // Pufferfish
+    private final net.minecraft.world.entity.LivingEntity entity; // Purpur
 
     public AttributeMap(AttributeSupplier defaultAttributes) {
+        // Purpur start
+        this(defaultAttributes, null);
+    }
+    public AttributeMap(AttributeSupplier defaultAttributes, net.minecraft.world.entity.LivingEntity entity) {
+        this.entity = entity;
+        // Purpur end
         this.supplier = defaultAttributes;
         this.createInstance = attributex -> this.supplier.createInstance(this::onAttributeModified, attributex); // Pufferfish
     }
 
     private void onAttributeModified(AttributeInstance instance) {
         this.attributesToUpdate.add(instance);
-        if (instance.getAttribute().value().isClientSyncable()) {
+        if (instance.getAttribute().value().isClientSyncable() && (entity == null || entity.shouldSendAttribute(instance.getAttribute().value()))) { // Purpur
             this.attributesToSync.add(instance);
         }
     }
@@ -46,7 +53,7 @@ public class AttributeMap {
     }
 
     public Collection<AttributeInstance> getSyncableAttributes() {
-        return this.attributes.values().stream().filter(attribute -> attribute.getAttribute().value().isClientSyncable()).collect(Collectors.toList());
+        return this.attributes.values().stream().filter(attribute -> attribute.getAttribute().value().isClientSyncable() && (entity == null || entity.shouldSendAttribute(attribute.getAttribute().value()))).collect(Collectors.toList()); // Purpur
     }
 
 

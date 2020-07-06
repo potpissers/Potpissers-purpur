@@ -13,6 +13,18 @@ public class Salmon extends AbstractSchoolingFish {
         super(type, world);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.salmonRidable;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.salmonControllable;
+    }
+    // Purpur end
+
     @Override
     public int getMaxSchoolSize() {
         return 5;

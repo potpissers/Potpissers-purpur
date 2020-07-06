@@ -158,6 +158,28 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
         this.setVillagerData(this.getVillagerData().setType(type).setProfession(VillagerProfession.NONE));
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.villagerRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.villagerRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.villagerControllable;
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this));
+    }
+    // Purpur end
+
     @Override
     public Brain<Villager> getBrain() {
         return (Brain<Villager>) super.getBrain(); // CraftBukkit - decompile error
@@ -259,7 +281,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
         // Paper end
         this.level().getProfiler().push("villagerBrain");
         // Pufferfish start
-        if (!inactive && this.behaviorTick++ % this.activatedPriority == 0) {
+        if (!inactive && (getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) { // Purpur - only use brain if no rider
             this.getBrain().tick((ServerLevel) this.level(), this); // Paper
         }
         // Pufferfish end
@@ -319,7 +341,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
         if (!itemstack.is(Items.VILLAGER_SPAWN_EGG) && this.isAlive() && !this.isTrading() && !this.isSleeping()) {
             if (this.isBaby()) {
                 this.setUnhappy();
-                return InteractionResult.sidedSuccess(this.level().isClientSide);
+                return tryRide(player, hand, InteractionResult.sidedSuccess(this.level().isClientSide)); // Purpur
             } else {
                 if (!this.level().isClientSide) {
                     boolean flag = this.getOffers().isEmpty();
@@ -333,9 +355,10 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
                     }
 
                     if (flag) {
-                        return InteractionResult.CONSUME;
+                        return tryRide(player, hand, InteractionResult.CONSUME); // Purpur
                     }
 
+                    if (level().purpurConfig.villagerRidable && itemstack.isEmpty()) return tryRide(player, hand); // Purpur
                     this.startTrading(player);
                 }
 

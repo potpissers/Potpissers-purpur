@@ -59,10 +59,39 @@ public class PolarBear extends Animal implements NeutralMob {
     private int remainingPersistentAngerTime;
     @Nullable
     private UUID persistentAngerTarget;
+    private int standTimer = 0; // Purpur
 
     public PolarBear(EntityType<? extends PolarBear> type, Level world) {
         super(type, world);
     }
+
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.polarBearRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.polarBearRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.polarBearControllable;
+    }
+
+    @Override
+    public boolean onSpacebar() {
+        if (!isStanding()) {
+            if (getRider() != null && getRider().getForwardMot() == 0 && getRider().getStrafeMot() == 0) {
+                setStanding(true);
+                playSound(SoundEvents.POLAR_BEAR_WARNING, 1.0F, 1.0F);
+            }
+        }
+        return false;
+    }
+    // Purpur end
 
     @Nullable
     @Override
@@ -79,6 +108,7 @@ public class PolarBear extends Animal implements NeutralMob {
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new PolarBear.PolarBearMeleeAttackGoal());
         this.goalSelector
             .addGoal(1, new PanicGoal(this, 2.0, polarBear -> polarBear.isBaby() ? DamageTypeTags.PANIC_CAUSES : DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
@@ -86,6 +116,7 @@ public class PolarBear extends Animal implements NeutralMob {
         this.goalSelector.addGoal(5, new RandomStrollGoal(this, 1.0));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.targetSelector.addGoal(1, new PolarBear.PolarBearHurtByTargetGoal());
         this.targetSelector.addGoal(2, new PolarBear.PolarBearAttackPlayersGoal());
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::isAngryAt));
@@ -202,6 +233,12 @@ public class PolarBear extends Animal implements NeutralMob {
         if (!this.level().isClientSide) {
             this.updatePersistentAnger((ServerLevel)this.level(), true);
         }
+
+        // Purpur start
+        if (isStanding() && --standTimer <= 0) {
+            setStanding(false);
+        }
+        // Purpur end
     }
 
     @Override
@@ -221,6 +258,7 @@ public class PolarBear extends Animal implements NeutralMob {
 
     public void setStanding(boolean warning) {
         this.entityData.set(DATA_STANDING_ID, warning);
+        standTimer = warning ? 20 : -1; // Purpur
     }
 
     public float getStandingAnimationScale(float tickDelta) {

@@ -3,7 +3,7 @@ package net.minecraft.world.entity.ai.control;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
 
-public class SmoothSwimmingLookControl extends LookControl {
+public class SmoothSwimmingLookControl extends org.purpurmc.purpur.controller.LookControllerWASD { // Purpur
     private final int maxYRotFromCenter;
     private static final int HEAD_TILT_X = 10;
     private static final int HEAD_TILT_Y = 20;
@@ -14,7 +14,7 @@ public class SmoothSwimmingLookControl extends LookControl {
     }
 
     @Override
-    public void tick() {
+    public void vanillaTick() { // Purpur
         if (this.lookAtCooldown > 0) {
             this.lookAtCooldown--;
             this.getYRotD().ifPresent(yaw -> this.mob.yHeadRot = this.rotateTowards(this.mob.yHeadRot, yaw + 20.0F, this.yMaxRotSpeed));

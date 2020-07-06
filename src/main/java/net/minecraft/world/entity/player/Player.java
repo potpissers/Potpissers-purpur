@@ -208,6 +208,19 @@ public abstract class Player extends LivingEntity {
     }
     // CraftBukkit end
 
+    // Purpur start
+    public abstract void resetLastActionTime();
+
+    @Override
+    public boolean processClick(InteractionHand hand) {
+        Entity vehicle = getRootVehicle();
+        if (vehicle != null && vehicle.getRider() == this) {
+            return vehicle.onClick(hand);
+        }
+        return false;
+    }
+    // Purpur end
+
     public Player(Level world, BlockPos pos, float yaw, GameProfile gameProfile) {
         super(EntityType.PLAYER, world);
         this.lastItemInMainHand = ItemStack.EMPTY;

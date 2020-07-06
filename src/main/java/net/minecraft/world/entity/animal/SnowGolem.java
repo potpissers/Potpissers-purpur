@@ -52,12 +52,31 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
         super(type, world);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.snowGolemRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.snowGolemRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.snowGolemControllable;
+    }
+    // Purpur end
+
     @Override
     protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new RangedAttackGoal(this, 1.25D, 20, 10.0F));
         this.goalSelector.addGoal(2, new WaterAvoidingRandomStrollGoal(this, 1.0D, 1.0000001E-5F));
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(4, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Mob.class, 10, true, false, (entityliving) -> {
             return entityliving instanceof Enemy;
         }));
@@ -105,6 +124,7 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
                 return;
             }
 
+            if (getRider() != null && this.isControllable() && !level().purpurConfig.snowGolemLeaveTrailWhenRidden) return; // Purpur - don't leave snow trail when being ridden
             BlockState iblockdata = Blocks.SNOW.defaultBlockState();
 
             for (int i = 0; i < 4; ++i) {
@@ -151,7 +171,7 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
             org.bukkit.event.player.PlayerShearEntityEvent event = CraftEventFactory.handlePlayerShearEntityEvent(player, this, itemstack, hand, drops);
             if (event != null) {
                 if (event.isCancelled()) {
-                    return InteractionResult.PASS;
+                    return tryRide(player, hand); // Purpur
                 }
                 drops = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getDrops());
             }
@@ -165,7 +185,7 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
 
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         } else {
-            return InteractionResult.PASS;
+            return tryRide(player, hand); // Purpur
         }
     }
 

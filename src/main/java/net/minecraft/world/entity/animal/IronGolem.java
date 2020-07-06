@@ -62,8 +62,27 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
         super(type, world);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.ironGolemRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.ironGolemRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.ironGolemControllable;
+    }
+    // Purpur end
+
     @Override
     protected void registerGoals() {
+        if (level().purpurConfig.ironGolemCanSwim) this.goalSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.FloatGoal(this)); // Purpur
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(2, new MoveTowardsTargetGoal(this, 0.9D, 32.0F));
         this.goalSelector.addGoal(2, new MoveBackToVillageGoal(this, 0.6D, false));
@@ -71,6 +90,7 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
         this.goalSelector.addGoal(5, new OfferFlowerGoal(this));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.targetSelector.addGoal(1, new DefendVillageTargetGoal(this));
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this, new Class[0]));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::isAngryAt));
@@ -273,13 +293,13 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
         ItemStack itemstack = player.getItemInHand(hand);
 
         if (!itemstack.is(Items.IRON_INGOT)) {
-            return InteractionResult.PASS;
+            return tryRide(player, hand); // Purpur
         } else {
             float f = this.getHealth();
 
             this.heal(25.0F);
             if (this.getHealth() == f) {
-                return InteractionResult.PASS;
+                return tryRide(player, hand); // Purpur
             } else {
                 float f1 = 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F;
 

@@ -115,6 +115,14 @@ public class WitherSkull extends AbstractHurtingProjectile {
 
     }
 
+    // Purpur start
+    @Override
+    public boolean canHitEntity(Entity target) {
+        // do not hit rider
+        return target != this.getRider() && super.canHitEntity(target);
+    }
+    // Purpur end
+
     @Override
     public boolean hurt(DamageSource source, float amount) {
         return false;

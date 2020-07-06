@@ -61,6 +61,12 @@ public class BlockPos extends Vec3i {
     private static final int X_OFFSET = 38;
     // Paper end - Optimize Bit Operations by inlining
 
+    // Purpur start
+    public BlockPos(net.minecraft.world.entity.Entity entity) {
+        super(entity.getBlockX(), entity.getBlockY(), entity.getBlockZ());
+    }
+    // Purpur end
+
     public BlockPos(int x, int y, int z) {
         super(x, y, z);
     }

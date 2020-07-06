@@ -43,11 +43,47 @@ public class Ghast extends FlyingMob implements Enemy {
         this.moveControl = new Ghast.GhastMoveControl(this);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.ghastRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.ghastRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.ghastControllable;
+    }
+
+    @Override
+    public double getMaxY() {
+        return level().purpurConfig.ghastMaxY;
+    }
+
+    @Override
+    public void travel(Vec3 vec3) {
+        super.travel(vec3);
+        if (getRider() != null && this.isControllable() && !onGround) {
+            float speed = (float) getAttributeValue(Attributes.FLYING_SPEED);
+            setSpeed(speed);
+            Vec3 mot = getDeltaMovement();
+            move(net.minecraft.world.entity.MoverType.SELF, mot.multiply(speed, 1.0, speed));
+            setDeltaMovement(mot.scale(0.9D));
+        }
+    }
+    // Purpur end
+
     @Override
     protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(5, new Ghast.RandomFloatAroundGoal(this));
         this.goalSelector.addGoal(7, new Ghast.GhastLookGoal(this));
         this.goalSelector.addGoal(7, new Ghast.GhastShootFireballGoal(this));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, (entityliving) -> {
             return Math.abs(entityliving.getY() - this.getY()) <= 4.0D;
         }));
@@ -102,7 +138,7 @@ public class Ghast extends FlyingMob implements Enemy {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 10.0D).add(Attributes.FOLLOW_RANGE, 100.0D);
+        return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 10.0D).add(Attributes.FOLLOW_RANGE, 100.0D).add(Attributes.FLYING_SPEED, 0.6D); // Purpur
     }
 
     @Override
@@ -154,7 +190,7 @@ public class Ghast extends FlyingMob implements Enemy {
 
     }
 
-    private static class GhastMoveControl extends MoveControl {
+    private static class GhastMoveControl extends org.purpurmc.purpur.controller.FlyingMoveControllerWASD { // Purpur
 
         private final Ghast ghast;
         private int floatDuration;
@@ -165,7 +201,7 @@ public class Ghast extends FlyingMob implements Enemy {
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur
             if (this.operation == MoveControl.Operation.MOVE_TO) {
                 if (this.floatDuration-- <= 0) {
                     this.floatDuration += this.ghast.getRandom().nextInt(5) + 2;

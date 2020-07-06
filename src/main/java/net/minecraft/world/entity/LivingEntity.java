@@ -236,9 +236,9 @@ public abstract class LivingEntity extends Entity implements Attackable {
     protected int deathScore;
     public float lastHurt;
     public boolean jumping;
-    public float xxa;
-    public float yya;
-    public float zza;
+    public float xxa; public float getStrafeMot() { return xxa; } public void setStrafeMot(float strafe) { xxa = strafe; } // Purpur - OBFHELPER
+    public float yya; public float getVerticalMot() { return yya; } public void setVerticalMot(float vertical) { yya = vertical; } // Purpur - OBFHELPER
+    public float zza; public float getForwardMot() { return zza; } public void setForwardMot(float forward) { zza = forward; } // Purpur - OBFHELPER
     protected int lerpSteps;
     protected double lerpX;
     protected double lerpY;
@@ -312,7 +312,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
         this.lastClimbablePos = Optional.empty();
         this.activeLocationDependentEnchantments = new Reference2ObjectArrayMap();
         this.appliedScale = 1.0F;
-        this.attributes = new AttributeMap(DefaultAttributes.getSupplier(type));
+        this.attributes = new AttributeMap(DefaultAttributes.getSupplier(type), this); // Purpur
         this.craftAttributes = new CraftAttributeMap(this.attributes); // CraftBukkit
         // CraftBukkit - setHealth(getMaxHealth()) inlined and simplified to skip the instanceof check for EntityPlayer, as getBukkitEntity() is not initialized in constructor
         this.entityData.set(LivingEntity.DATA_HEALTH_ID, (float) this.getAttribute(Attributes.MAX_HEALTH).getValue());
@@ -362,6 +362,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
     public static AttributeSupplier.Builder createLivingAttributes() {
         return AttributeSupplier.builder().add(Attributes.MAX_HEALTH).add(Attributes.KNOCKBACK_RESISTANCE).add(Attributes.MOVEMENT_SPEED).add(Attributes.ARMOR).add(Attributes.ARMOR_TOUGHNESS).add(Attributes.MAX_ABSORPTION).add(Attributes.STEP_HEIGHT).add(Attributes.SCALE).add(Attributes.GRAVITY).add(Attributes.SAFE_FALL_DISTANCE).add(Attributes.FALL_DAMAGE_MULTIPLIER).add(Attributes.JUMP_STRENGTH).add(Attributes.OXYGEN_BONUS).add(Attributes.BURNING_TIME).add(Attributes.EXPLOSION_KNOCKBACK_RESISTANCE).add(Attributes.WATER_MOVEMENT_EFFICIENCY).add(Attributes.MOVEMENT_EFFICIENCY).add(Attributes.ATTACK_KNOCKBACK);
     }
+    public boolean shouldSendAttribute(Attribute attribute) { return true; } // Purpur
 
     @Override
     protected void checkFallDamage(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition) {
@@ -3579,8 +3580,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
         this.pushEntities();
         this.level().getProfiler().pop();
         // Paper start - Add EntityMoveEvent
-        if (((ServerLevel) this.level()).hasEntityMoveEvent && !(this instanceof net.minecraft.world.entity.player.Player)) {
-            if (this.xo != this.getX() || this.yo != this.getY() || this.zo != this.getZ() || this.yRotO != this.getYRot() || this.xRotO != this.getXRot()) {
+        // Purpur start
+        if (this.xo != this.getX() || this.yo != this.getY() || this.zo != this.getZ() || this.yRotO != this.getYRot() || this.xRotO != this.getXRot()) {
+            if (((ServerLevel) this.level()).hasEntityMoveEvent && !(this instanceof net.minecraft.world.entity.player.Player)) {
+                // Purpur end
                 Location from = new Location(this.level().getWorld(), this.xo, this.yo, this.zo, this.yRotO, this.xRotO);
                 Location to = new Location(this.level().getWorld(), this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
                 io.papermc.paper.event.entity.EntityMoveEvent event = new io.papermc.paper.event.entity.EntityMoveEvent(this.getBukkitLivingEntity(), from, to.clone());
@@ -3590,6 +3593,21 @@ public abstract class LivingEntity extends Entity implements Attackable {
                     this.absMoveTo(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ(), event.getTo().getYaw(), event.getTo().getPitch());
                 }
             }
+            // Purpur start
+            if (getRider() != null) {
+                getRider().resetLastActionTime();
+                if (((ServerLevel) level()).hasRidableMoveEvent && this instanceof Mob) {
+                    Location from = new Location(level().getWorld(), xo, yo, zo, this.yRotO, this.xRotO);
+                    Location to = new Location(level().getWorld(), getX(), getY(), getZ(), this.getYRot(), this.getXRot());
+                    org.purpurmc.purpur.event.entity.RidableMoveEvent event = new org.purpurmc.purpur.event.entity.RidableMoveEvent((org.bukkit.entity.Mob) getBukkitLivingEntity(), (Player) getRider().getBukkitEntity(), from, to.clone());
+                    if (!event.callEvent()) {
+                        absMoveTo(from.getX(), from.getY(), from.getZ(), from.getYaw(), from.getPitch());
+                    } else if (!to.equals(event.getTo())) {
+                        absMoveTo(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch());
+                    }
+                }
+            }
+            // Purpur end
         }
         // Paper end - Add EntityMoveEvent
         if (!this.level().isClientSide && this.isSensitiveToWater() && this.isInWaterRainOrBubble()) {

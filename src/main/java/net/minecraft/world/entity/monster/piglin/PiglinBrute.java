@@ -62,6 +62,23 @@ public class PiglinBrute extends AbstractPiglin {
         this.xpReward = 20;
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.piglinBruteRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.piglinBruteRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.piglinBruteControllable;
+    }
+    // Purpur end
+
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 50.0).add(Attributes.MOVEMENT_SPEED, 0.35F).add(Attributes.ATTACK_DAMAGE, 7.0);
     }
@@ -107,6 +124,7 @@ public class PiglinBrute extends AbstractPiglin {
     @Override
     protected void customServerAiStep() {
         this.level().getProfiler().push("piglinBruteBrain");
+        if (getRider() == null || this.isControllable()) // Purpur - only use brain if no rider
         this.getBrain().tick((ServerLevel)this.level(), this);
         this.level().getProfiler().pop();
         PiglinBruteAi.updateActivity(this);

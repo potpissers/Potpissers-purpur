@@ -44,9 +44,27 @@ public class Cow extends Animal {
         super(type, world);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.cowRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.cowRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.cowControllable;
+    }
+    // Purpur end
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new PanicGoal(this, 2.0D));
         this.goalSelector.addGoal(2, new BreedGoal(this, 1.0D));
         this.goalSelector.addGoal(3, new TemptGoal(this, 1.25D, (itemstack) -> {
@@ -94,6 +112,7 @@ public class Cow extends Animal {
 
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
+        if (getRider() != null) return InteractionResult.PASS; // Purpur
         ItemStack itemstack = player.getItemInHand(hand);
 
         if (itemstack.is(Items.BUCKET) && !this.isBaby()) {
@@ -102,7 +121,7 @@ public class Cow extends Animal {
 
             if (event.isCancelled()) {
                 player.containerMenu.sendAllDataToRemote(); // Paper - Fix inventory desync
-                return InteractionResult.PASS;
+                return tryRide(player, hand); // Purpur
             }
             // CraftBukkit end
 

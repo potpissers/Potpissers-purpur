@@ -97,6 +97,23 @@ public class Axolotl extends Animal implements LerpingModel, VariantHolder<Axolo
         this.lookControl = new Axolotl.AxolotlLookControl(this, 20);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.axolotlRidable;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.axolotlControllable;
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
+    }
+    // Purpur end
+
     @Override
     public Map<String, Vector3f> getModelRotationValues() {
         return this.modelRotationValues;
@@ -273,7 +290,7 @@ public class Axolotl extends Animal implements LerpingModel, VariantHolder<Axolo
     @Override
     protected void customServerAiStep() {
         this.level().getProfiler().push("axolotlBrain");
-        if (this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish
+        if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick((ServerLevel) this.level(), this);
         this.level().getProfiler().pop();
         this.level().getProfiler().push("axolotlActivityUpdate");
@@ -499,14 +516,22 @@ public class Axolotl extends Animal implements LerpingModel, VariantHolder<Axolo
     private static class AxolotlMoveControl extends SmoothSwimmingMoveControl {
 
         private final Axolotl axolotl;
+        private final org.purpurmc.purpur.controller.WaterMoveControllerWASD waterController; // Purpur
 
         public AxolotlMoveControl(Axolotl axolotl) {
             super(axolotl, 85, 10, 0.1F, 0.5F, false);
             this.axolotl = axolotl;
+            waterController = new org.purpurmc.purpur.controller.WaterMoveControllerWASD(axolotl, 0.5D); // Purpur
         }
 
         @Override
         public void tick() {
+            // Purpur start
+            if (axolotl.getRider() != null && axolotl.isControllable()) {
+                waterController.purpurTick(axolotl.getRider());
+                return;
+            }
+            // Purpur end
             if (!this.axolotl.isPlayingDead()) {
                 super.tick();
             }
@@ -521,9 +546,9 @@ public class Axolotl extends Animal implements LerpingModel, VariantHolder<Axolo
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur
             if (!Axolotl.this.isPlayingDead()) {
-                super.tick();
+                super.vanillaTick(); // Purpur
             }
 
         }

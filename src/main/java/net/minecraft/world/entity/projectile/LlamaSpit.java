@@ -33,6 +33,12 @@ public class LlamaSpit extends Projectile {
         this.setPos(owner.getX() - (double) (owner.getBbWidth() + 1.0F) * 0.5D * (double) Mth.sin(owner.yBodyRot * 0.017453292F), owner.getEyeY() - 0.10000000149011612D, owner.getZ() + (double) (owner.getBbWidth() + 1.0F) * 0.5D * (double) Mth.cos(owner.yBodyRot * 0.017453292F));
     }
 
+    // Purpur start
+    public void super_tick() {
+        super.tick();
+    }
+    // Purpur end
+
     @Override
     protected double getDefaultGravity() {
         return 0.06D;

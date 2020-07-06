@@ -89,6 +89,7 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
     private boolean wasOnGround;
     private int jumpDelayTicks;
     public int moreCarrotTicks;
+    private boolean actualJump; // Purpur
 
     public Rabbit(EntityType<? extends Rabbit> type, Level world) {
         super(type, world);
@@ -96,9 +97,55 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
         this.moveControl = new Rabbit.RabbitMoveControl(this);
     }
 
+    // Purpur start
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.rabbitRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.rabbitRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.rabbitControllable;
+    }
+
+    @Override
+    public boolean onSpacebar() {
+        if (onGround) {
+            actualJump = true;
+            jumpFromGround();
+            actualJump = false;
+        }
+        return true;
+    }
+
+    private void handleJumping() {
+        if (onGround) {
+            RabbitJumpControl jumpController = (RabbitJumpControl) jumpControl;
+            if (!wasOnGround) {
+                setJumping(false);
+                jumpController.setCanJump(false);
+            }
+            if (!jumpController.wantJump()) {
+                if (moveControl.hasWanted()) {
+                    startJumping();
+                }
+            } else if (!jumpController.canJump()) {
+                jumpController.setCanJump(true);
+            }
+        }
+        wasOnGround = onGround;
+    }
+    // Purpur end
+
     @Override
     public void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new ClimbOnTopOfPowderSnowGoal(this, this.level()));
         this.goalSelector.addGoal(1, new Rabbit.RabbitPanicGoal(this, 2.2D));
         this.goalSelector.addGoal(2, new BreedGoal(this, 0.8D));
@@ -115,6 +162,14 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
 
     @Override
     protected float getJumpPower() {
+        // Purpur start
+        if (getRider() != null && this.isControllable()) {
+            if (getForwardMot() < 0) {
+                setSpeed(getForwardMot() * 2F);
+            }
+            return actualJump ? 0.5F : 0.3F;
+        }
+        // Purpur end
         float f = 0.3F;
 
         if (this.horizontalCollision || this.moveControl.hasWanted() && this.moveControl.getWantedY() > this.getY() + 0.5D) {
@@ -189,6 +244,13 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
 
     @Override
     public void customServerAiStep() {
+        // Purpur start
+        if (getRider() != null && this.isControllable()) {
+            handleJumping();
+            return;
+        }
+        // Purpur end
+
         if (this.jumpDelayTicks > 0) {
             --this.jumpDelayTicks;
         }
@@ -470,7 +532,7 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
         }
     }
 
-    private static class RabbitMoveControl extends MoveControl {
+    private static class RabbitMoveControl extends org.purpurmc.purpur.controller.MoveControllerWASD { // Purpur
 
         private final Rabbit rabbit;
         private double nextJumpSpeed;
@@ -481,14 +543,14 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur
             if (this.rabbit.onGround() && !this.rabbit.jumping && !((Rabbit.RabbitJumpControl) this.rabbit.jumpControl).wantJump()) {
                 this.rabbit.setSpeedModifier(0.0D);
             } else if (this.hasWanted()) {
                 this.rabbit.setSpeedModifier(this.nextJumpSpeed);
             }
 
-            super.tick();
+            super.vanillaTick(); // Purpur
         }
 
         @Override

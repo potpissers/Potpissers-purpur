@@ -26,6 +26,13 @@ public class EnderDragonPart extends Entity {
         this.name = name;
     }
 
+    // Purpur start
+    @Override
+    public net.minecraft.world.InteractionResult interact(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+        return parentMob.isAlive() ? parentMob.tryRide(player, hand) : net.minecraft.world.InteractionResult.PASS;
+    }
+    // Purpur end
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
     }
