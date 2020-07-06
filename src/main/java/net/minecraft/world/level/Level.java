@@ -2044,4 +2044,13 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
         return null;
     }
     // Paper end - optimize redstone (Alternate Current)
+    // Purpur start
+    public boolean isNether() {
+        return getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER;
+    }
+
+    public boolean isTheEnd() {
+        return getWorld().getEnvironment() == org.bukkit.World.Environment.THE_END;
+    }
+    // Purpur end
 }

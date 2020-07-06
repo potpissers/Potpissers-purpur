@@ -196,7 +196,7 @@ public class BucketItem extends Item implements DispensibleContainerItem {
             // CraftBukkit end
             if (!flag2) {
                 return movingobjectpositionblock != null && this.emptyContents(entityhuman, world, movingobjectpositionblock.getBlockPos().relative(movingobjectpositionblock.getDirection()), (BlockHitResult) null, enumdirection, clicked, itemstack, enumhand); // CraftBukkit
-            } else if (world.dimensionType().ultraWarm() && this.content.is(FluidTags.WATER)) {
+            } else if ((world.dimensionType().ultraWarm() || (world.isTheEnd() && !org.purpurmc.purpur.PurpurConfig.allowWaterPlacementInTheEnd)) && this.content.is(FluidTags.WATER)) { // Purpur
                 int i = blockposition.getX();
                 int j = blockposition.getY();
                 int k = blockposition.getZ();
@@ -204,7 +204,7 @@ public class BucketItem extends Item implements DispensibleContainerItem {
                 world.playSound(entityhuman, blockposition, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
 
                 for (int l = 0; l < 8; ++l) {
-                    world.addParticle(ParticleTypes.LARGE_SMOKE, (double) i + Math.random(), (double) j + Math.random(), (double) k + Math.random(), 0.0D, 0.0D, 0.0D);
+                    ((ServerLevel) world).sendParticles(null, ParticleTypes.LARGE_SMOKE, (double) i + Math.random(), (double) j + Math.random(), (double) k + Math.random(), 1, 0.0D, 0.0D, 0.0D, 0.0D, true); // Purpur
                 }
 
                 return true;
