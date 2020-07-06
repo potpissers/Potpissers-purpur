@@ -2835,6 +2835,8 @@ public class ServerGamePacketListenerImpl
 
                                     ServerGamePacketListenerImpl.this.cserver.getPluginManager().callEvent(event);
 
+                                    player.processClick(hand); // Purpur - Ridables
+
                                     // Entity in bucket - SPIGOT-4048 and SPIGOT-6859a
                                     if ((target instanceof Bucketable && target instanceof LivingEntity && origItem != null && origItem.asItem() == Items.WATER_BUCKET) && (event.isCancelled() || ServerGamePacketListenerImpl.this.player.getInventory().getSelected() == null || ServerGamePacketListenerImpl.this.player.getInventory().getSelected().getItem() != origItem)) {
                                         target.resendPossiblyDesyncedEntityData(ServerGamePacketListenerImpl.this.player); // Paper - The entire mob gets deleted, so resend it

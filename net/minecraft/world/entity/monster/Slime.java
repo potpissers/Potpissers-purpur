@@ -57,6 +57,7 @@ public class Slime extends Mob implements Enemy {
     public float oSquish;
     private boolean wasOnGround;
     private boolean canWander = true; // Paper - Slime pathfinder events
+    protected boolean actualJump; // Purpur - Ridables
 
     public Slime(EntityType<? extends Slime> entityType, Level level) {
         super(entityType, level);
@@ -64,12 +65,48 @@ public class Slime extends Mob implements Enemy {
         this.moveControl = new Slime.SlimeMoveControl(this);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.slimeRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.slimeRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.slimeControllable;
+    }
+
+    @Override
+    public float getJumpPower() {
+        float height = super.getJumpPower();
+        return getRider() != null && this.isControllable() && actualJump ? height * 1.5F : height;
+    }
+
+    @Override
+    public boolean onSpacebar() {
+        if (onGround && getRider() != null && this.isControllable()) {
+            actualJump = true;
+            if (getRider().getForwardMot() == 0 || getRider().getStrafeMot() == 0) {
+                jumpFromGround(); // jump() here if not moving
+            }
+        }
+        return true; // do not jump() in wasd controller, let vanilla controller handle
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(1, new Slime.SlimeFloatGoal(this));
         this.goalSelector.addGoal(2, new Slime.SlimeAttackGoal(this));
         this.goalSelector.addGoal(3, new Slime.SlimeRandomDirectionGoal(this));
         this.goalSelector.addGoal(5, new Slime.SlimeKeepOnJumpingGoal(this));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.targetSelector
             .addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, (entity, level) -> Math.abs(entity.getY() - this.getY()) <= 4.0));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolem.class, true));
@@ -371,6 +408,7 @@ public class Slime extends Mob implements Enemy {
         Vec3 deltaMovement = this.getDeltaMovement();
         this.setDeltaMovement(deltaMovement.x, this.getJumpPower(), deltaMovement.z);
         this.hasImpulse = true;
+        this.actualJump = false; // Purpur - Ridables
     }
 
     @Nullable
@@ -535,7 +573,7 @@ public class Slime extends Mob implements Enemy {
         }
     }
 
-    static class SlimeMoveControl extends MoveControl {
+    static class SlimeMoveControl extends org.purpurmc.purpur.controller.MoveControllerWASD { // Purpur - Ridables
         private float yRot;
         private int jumpDelay;
         private final Slime slime;
@@ -553,21 +591,33 @@ public class Slime extends Mob implements Enemy {
         }
 
         public void setWantedMovement(double speed) {
-            this.speedModifier = speed;
+            this.setSpeedModifier(speed); // Purpur - Ridables
             this.operation = MoveControl.Operation.MOVE_TO;
         }
 
         @Override
         public void tick() {
+            // Purpur start - Ridables
+            if (slime.getRider() != null && slime.isControllable()) {
+                purpurTick(slime.getRider());
+                if (slime.getForwardMot() != 0 || slime.getStrafeMot() != 0) {
+                    if (jumpDelay > 10) {
+                        jumpDelay = 6;
+                    }
+                } else {
+                    jumpDelay = 20;
+                }
+            } else {
+            // Purpur end - Ridables
             this.mob.setYRot(this.rotlerp(this.mob.getYRot(), this.yRot, 90.0F));
             this.mob.yHeadRot = this.mob.getYRot();
             this.mob.yBodyRot = this.mob.getYRot();
-            if (this.operation != MoveControl.Operation.MOVE_TO) {
+            } if ((slime.getRider() == null || !slime.isControllable()) && this.operation != MoveControl.Operation.MOVE_TO) { // Purpur - Ridables
                 this.mob.setZza(0.0F);
             } else {
                 this.operation = MoveControl.Operation.WAIT;
                 if (this.mob.onGround()) {
-                    this.mob.setSpeed((float)(this.speedModifier * this.mob.getAttributeValue(Attributes.MOVEMENT_SPEED)));
+                    this.mob.setSpeed((float)(this.getSpeedModifier() * this.mob.getAttributeValue(Attributes.MOVEMENT_SPEED) * (slime.getRider() != null && slime.isControllable() && (slime.getRider().getForwardMot() != 0 || slime.getRider().getStrafeMot() != 0) ? 2.0D : 1.0D))); // Purpur - Ridables
                     if (this.jumpDelay-- <= 0) {
                         this.jumpDelay = this.slime.getJumpDelay();
                         if (this.isAggressive) {
@@ -584,7 +634,7 @@ public class Slime extends Mob implements Enemy {
                         this.mob.setSpeed(0.0F);
                     }
                 } else {
-                    this.mob.setSpeed((float)(this.speedModifier * this.mob.getAttributeValue(Attributes.MOVEMENT_SPEED)));
+                    this.mob.setSpeed((float)(this.getSpeedModifier() * this.mob.getAttributeValue(Attributes.MOVEMENT_SPEED) * (slime.getRider() != null && slime.isControllable() && (slime.getRider().getForwardMot() != 0 || slime.getRider().getStrafeMot() != 0) ? 2.0D : 1.0D))); // Purpur - Ridables
                 }
             }
         }

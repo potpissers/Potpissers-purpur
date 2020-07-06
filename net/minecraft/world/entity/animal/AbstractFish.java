@@ -87,6 +87,7 @@ public abstract class AbstractFish extends WaterAnimal implements Bucketable {
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(0, new PanicGoal(this, 1.25));
         this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, Player.class, 8.0F, 1.6, 1.4, EntitySelector.NO_SPECTATORS::test));
         this.goalSelector.addGoal(4, new AbstractFish.FishSwimGoal(this));
@@ -100,7 +101,7 @@ public abstract class AbstractFish extends WaterAnimal implements Bucketable {
     @Override
     public void travel(Vec3 travelVector) {
         if (this.isControlledByLocalInstance() && this.isInWater()) {
-            this.moveRelative(0.01F, travelVector);
+            this.moveRelative(getRider() != null ? getSpeed() : 0.01F, travelVector); // Purpur - Ridables
             this.move(MoverType.SELF, this.getDeltaMovement());
             this.setDeltaMovement(this.getDeltaMovement().scale(0.9));
             if (this.getTarget() == null) {
@@ -160,7 +161,7 @@ public abstract class AbstractFish extends WaterAnimal implements Bucketable {
     protected void playStepSound(BlockPos pos, BlockState block) {
     }
 
-    static class FishMoveControl extends MoveControl {
+    static class FishMoveControl extends org.purpurmc.purpur.controller.WaterMoveControllerWASD { // Purpur - Ridables
         private final AbstractFish fish;
 
         FishMoveControl(AbstractFish mob) {
@@ -168,14 +169,22 @@ public abstract class AbstractFish extends WaterAnimal implements Bucketable {
             this.fish = mob;
         }
 
+        // Purpur start - Ridables
         @Override
-        public void tick() {
+        public void purpurTick(Player rider) {
+            super.purpurTick(rider);
+            fish.setDeltaMovement(fish.getDeltaMovement().add(0.0D, 0.005D, 0.0D));
+        }
+        // Purpur end - Ridables
+
+        @Override
+        public void vanillaTick() { // Purpur - Ridables
             if (this.fish.isEyeInFluid(FluidTags.WATER)) {
                 this.fish.setDeltaMovement(this.fish.getDeltaMovement().add(0.0, 0.005, 0.0));
             }
 
             if (this.operation == MoveControl.Operation.MOVE_TO && !this.fish.getNavigation().isDone()) {
-                float f = (float)(this.speedModifier * this.fish.getAttributeValue(Attributes.MOVEMENT_SPEED));
+                float f = (float)(this.getSpeedModifier() * this.fish.getAttributeValue(Attributes.MOVEMENT_SPEED)); // Purpur - Ridables
                 this.fish.setSpeed(Mth.lerp(0.125F, this.fish.getSpeed(), f));
                 double d = this.wantedX - this.fish.getX();
                 double d1 = this.wantedY - this.fish.getY();

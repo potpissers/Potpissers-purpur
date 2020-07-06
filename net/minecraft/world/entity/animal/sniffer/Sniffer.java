@@ -88,6 +88,23 @@ public class Sniffer extends Animal {
         this.setPathfindingMalus(PathType.DAMAGE_CAUTIOUS, -1.0F);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.snifferRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.snifferRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.snifferControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);

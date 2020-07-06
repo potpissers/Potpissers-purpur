@@ -16,6 +16,13 @@ public class Donkey extends AbstractChestedHorse {
         super(entityType, level);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.donkeyRidableInWater;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.DONKEY_AMBIENT;

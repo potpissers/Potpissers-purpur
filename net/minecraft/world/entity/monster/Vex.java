@@ -58,6 +58,50 @@ public class Vex extends Monster implements TraceableEntity {
         this.xpReward = 3;
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.vexRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.vexRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.vexControllable;
+    }
+
+    @Override
+    public double getMaxY() {
+        return level().purpurConfig.vexMaxY;
+    }
+
+    @Override
+    public void travel(Vec3 vec3) {
+        super.travel(vec3);
+        if (getRider() != null && this.isControllable()) {
+            float speed;
+            if (onGround) {
+                speed = (float) getAttributeValue(Attributes.MOVEMENT_SPEED) * 0.1F;
+            } else {
+                speed = (float) getAttributeValue(Attributes.FLYING_SPEED);
+            }
+            setSpeed(speed);
+            Vec3 mot = getDeltaMovement();
+            move(net.minecraft.world.entity.MoverType.SELF, mot.multiply(speed, 1.0, speed));
+            setDeltaMovement(mot.scale(0.9D));
+        }
+    }
+
+    @Override
+    public boolean causeFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
+        return false; //  no fall damage please
+    }
+    // Purpur end - Ridables
+
     @Override
     public boolean isFlapping() {
         return this.tickCount % TICKS_PER_FLAP == 0;
@@ -70,7 +114,7 @@ public class Vex extends Monster implements TraceableEntity {
 
     @Override
     public void tick() {
-        this.noPhysics = true;
+        this.noPhysics = getRider() == null || !this.isControllable(); // Purpur - Ridables
         super.tick();
         this.noPhysics = false;
         this.setNoGravity(true);
@@ -84,17 +128,19 @@ public class Vex extends Monster implements TraceableEntity {
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(4, new Vex.VexChargeAttackGoal());
         this.goalSelector.addGoal(8, new Vex.VexRandomMoveGoal());
         this.goalSelector.addGoal(9, new LookAtPlayerGoal(this, Player.class, 3.0F, 1.0F));
         this.goalSelector.addGoal(10, new LookAtPlayerGoal(this, Mob.class, 8.0F));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this, Raider.class).setAlertOthers());
         this.targetSelector.addGoal(2, new Vex.VexCopyOwnerTargetGoal(this));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 14.0).add(Attributes.ATTACK_DAMAGE, 4.0);
+        return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 14.0).add(Attributes.ATTACK_DAMAGE, 4.0).add(Attributes.FLYING_SPEED, 0.6D); // Purpur;
     }
 
     @Override
@@ -301,13 +347,13 @@ public class Vex extends Monster implements TraceableEntity {
         }
     }
 
-    class VexMoveControl extends MoveControl {
+    class VexMoveControl extends org.purpurmc.purpur.controller.FlyingMoveControllerWASD { // Purpur - Ridables
         public VexMoveControl(final Vex mob) {
             super(mob);
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur - Ridables
             if (this.operation == MoveControl.Operation.MOVE_TO) {
                 Vec3 vec3 = new Vec3(this.wantedX - Vex.this.getX(), this.wantedY - Vex.this.getY(), this.wantedZ - Vex.this.getZ());
                 double len = vec3.length();
@@ -315,7 +361,7 @@ public class Vex extends Monster implements TraceableEntity {
                     this.operation = MoveControl.Operation.WAIT;
                     Vex.this.setDeltaMovement(Vex.this.getDeltaMovement().scale(0.5));
                 } else {
-                    Vex.this.setDeltaMovement(Vex.this.getDeltaMovement().add(vec3.scale(this.speedModifier * 0.05 / len)));
+                    Vex.this.setDeltaMovement(Vex.this.getDeltaMovement().add(vec3.scale(this.getSpeedModifier() * 0.05 / len))); // Purpur - Ridables
                     if (Vex.this.getTarget() == null) {
                         Vec3 deltaMovement = Vex.this.getDeltaMovement();
                         Vex.this.setYRot(-((float)Mth.atan2(deltaMovement.x, deltaMovement.z)) * (180.0F / (float)Math.PI));

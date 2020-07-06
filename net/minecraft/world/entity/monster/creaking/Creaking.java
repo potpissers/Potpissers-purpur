@@ -102,6 +102,29 @@ public class Creaking extends Monster {
         return this.getHomePos() != null;
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.creakingRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.creakingRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.creakingControllable;
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
+    }
+    // Purpur end - Ridables
+
     @Override
     protected BodyRotationControl createBodyControl() {
         return new Creaking.CreakingBodyRotationControl(this);
@@ -580,28 +603,28 @@ public class Creaking extends Monster {
         }
     }
 
-    class CreakingLookControl extends LookControl {
+    class CreakingLookControl extends org.purpurmc.purpur.controller.LookControllerWASD { // Purpur - Ridables {
         public CreakingLookControl(final Creaking mob) {
             super(mob);
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur - Ridables
             if (Creaking.this.canMove()) {
-                super.tick();
+                super.vanillaTick(); // Purpur - Ridables
             }
         }
     }
 
-    class CreakingMoveControl extends MoveControl {
+    class CreakingMoveControl extends org.purpurmc.purpur.controller.MoveControllerWASD { // Purpur - Ridables
         public CreakingMoveControl(final Creaking mob) {
             super(mob);
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur - Ridables
             if (Creaking.this.canMove()) {
-                super.tick();
+                super.vanillaTick(); // Purpur - Ridables
             }
         }
     }

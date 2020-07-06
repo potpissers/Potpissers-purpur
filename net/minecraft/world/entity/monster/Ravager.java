@@ -66,15 +66,40 @@ public class Ravager extends Raider {
         this.setPathfindingMalus(PathType.LEAVES, 0.0F);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.ravagerRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.ravagerRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.ravagerControllable;
+    }
+
+    @Override
+    public void onMount(Player rider) {
+        super.onMount(rider);
+        getNavigation().stop();
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));
         if (level().purpurConfig.ravagerAvoidRabbits) this.goalSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.AvoidEntityGoal<>(this, net.minecraft.world.entity.animal.Rabbit.class, 6.0F, 1.0D, 1.2D)); // Purpur - option to make ravagers afraid of rabbits
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0, true));
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.4));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(10, new LookAtPlayerGoal(this, Mob.class, 8.0F));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this, Raider.class).setAlertOthers());
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, true));
         this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, true, (entity, level) -> !entity.isBaby()));
@@ -131,7 +156,7 @@ public class Ravager extends Raider {
     @Override
     public void aiStep() {
         super.aiStep();
-        if (this.isAlive()) {
+        if (this.isAlive() && (getRider() == null || !this.isControllable())) { // Purpur - Ridables
             if (this.isImmobile()) {
                 this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.0);
             } else {

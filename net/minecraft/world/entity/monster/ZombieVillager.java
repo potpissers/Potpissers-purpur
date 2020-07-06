@@ -78,6 +78,23 @@ public class ZombieVillager extends Zombie implements VillagerDataHolder {
             .ifPresent(profession -> this.setVillagerData(this.getVillagerData().setProfession(profession.value())));
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.zombieVillagerRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.zombieVillagerRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.zombieVillagerControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);

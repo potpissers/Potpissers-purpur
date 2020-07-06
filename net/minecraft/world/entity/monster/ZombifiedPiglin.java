@@ -63,6 +63,23 @@ public class ZombifiedPiglin extends Zombie implements NeutralMob {
         this.setPathfindingMalus(PathType.LAVA, 8.0F);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.zombifiedPiglinRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.zombifiedPiglinRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.zombifiedPiglinControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     public void setPersistentAngerTarget(@Nullable UUID target) {
         this.persistentAngerTarget = target;

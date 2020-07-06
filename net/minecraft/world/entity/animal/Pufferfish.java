@@ -45,6 +45,18 @@ public class Pufferfish extends AbstractFish {
         this.refreshDimensions();
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.pufferfishRidable;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.pufferfishControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);

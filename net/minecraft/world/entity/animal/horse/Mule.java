@@ -15,6 +15,13 @@ public class Mule extends AbstractChestedHorse {
         super(entityType, level);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.muleRidableInWater;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.MULE_AMBIENT;

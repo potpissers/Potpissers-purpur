@@ -76,6 +76,23 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
     }
     // Purpur end - Allow leashing villagers
 
+    // Purpur - start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.wanderingTraderRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.wanderingTraderRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.wanderingTraderControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
@@ -137,8 +154,9 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
 
             if (!this.level().isClientSide) {
                 if (this.getOffers().isEmpty()) {
-                    return InteractionResult.CONSUME;
+                    return tryRide(player, hand, InteractionResult.CONSUME); // Purpur - Ridables
                 }
+                if (level().purpurConfig.wanderingTraderRidable && itemInHand.isEmpty()) return tryRide(player, hand); // Purpur - Ridables
 
                 if (this.level().purpurConfig.wanderingTraderAllowTrading) { // Purpur - Add config for villager trading
                 this.setTradingPlayer(player);

@@ -62,6 +62,23 @@ public class Ocelot extends Animal {
         this.reassessTrustingGoals();
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.ocelotRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.ocelotRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.ocelotControllable;
+    }
+    // Purpur end - Ridables
+
     public boolean isTrusting() {
         return this.entityData.get(DATA_TRUSTING);
     }
@@ -93,12 +110,14 @@ public class Ocelot extends Animal {
     protected void registerGoals() {
         this.temptGoal = new Ocelot.OcelotTemptGoal(this, 0.6, itemStack -> itemStack.is(ItemTags.OCELOT_FOOD), true);
         this.goalSelector.addGoal(1, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(3, this.temptGoal);
         this.goalSelector.addGoal(7, new LeapAtTargetGoal(this, 0.3F));
         this.goalSelector.addGoal(8, new OcelotAttackGoal(this));
         this.goalSelector.addGoal(9, new BreedGoal(this, 0.8));
         this.goalSelector.addGoal(10, new WaterAvoidingRandomStrollGoal(this, 0.8, 1.0000001E-5F));
         this.goalSelector.addGoal(11, new LookAtPlayerGoal(this, Player.class, 10.0F));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Chicken.class, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Turtle.class, 10, false, false, Turtle.BABY_ON_LAND_SELECTOR));
     }

@@ -83,6 +83,7 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
     private boolean wasOnGround;
     private int jumpDelayTicks;
     public int moreCarrotTicks;
+    private boolean actualJump; // Purpur - Ridables
 
     public Rabbit(EntityType<? extends Rabbit> entityType, Level level) {
         super(entityType, level);
@@ -91,9 +92,55 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
         //this.setSpeedModifier(0.0); // CraftBukkit
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.rabbitRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.rabbitRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.rabbitControllable;
+    }
+
+    @Override
+    public boolean onSpacebar() {
+        if (onGround) {
+            actualJump = true;
+            jumpFromGround();
+            actualJump = false;
+        }
+        return true;
+    }
+
+    private void handleJumping() {
+        if (onGround) {
+            RabbitJumpControl jumpController = (RabbitJumpControl) jumpControl;
+            if (!wasOnGround) {
+                setJumping(false);
+                jumpController.setCanJump(false);
+            }
+            if (!jumpController.wantJump()) {
+                if (moveControl.hasWanted()) {
+                    startJumping();
+                }
+            } else if (!jumpController.canJump()) {
+                jumpController.setCanJump(true);
+            }
+        }
+        wasOnGround = onGround;
+    }
+    // Purpur end - Ridables
+
     @Override
     public void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(1, new ClimbOnTopOfPowderSnowGoal(this, this.level()));
         this.goalSelector.addGoal(1, new Rabbit.RabbitPanicGoal(this, 2.2));
         this.goalSelector.addGoal(2, new BreedGoal(this, 0.8));
@@ -108,6 +155,14 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
 
     @Override
     protected float getJumpPower() {
+        // Purpur start - Ridables
+        if (getRider() != null && this.isControllable()) {
+            if (getForwardMot() < 0) {
+                setSpeed(getForwardMot() * 2F);
+            }
+            return actualJump ? 0.5F : 0.3F;
+        }
+        // Purpur end - Ridables
         float f = 0.3F;
         if (this.moveControl.getSpeedModifier() <= 0.6) {
             f = 0.2F;
@@ -175,6 +230,12 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
 
     @Override
     public void customServerAiStep(ServerLevel level) {
+        // Purpur start - Ridables
+        if (getRider() != null && this.isControllable()) {
+            handleJumping();
+            return;
+        }
+        // Purpur end - Ridables
         if (this.jumpDelayTicks > 0) {
             this.jumpDelayTicks--;
         }
@@ -483,7 +544,7 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
         }
     }
 
-    static class RabbitMoveControl extends MoveControl {
+    static class RabbitMoveControl extends org.purpurmc.purpur.controller.MoveControllerWASD { // Purpur - Ridables
         private final Rabbit rabbit;
         private double nextJumpSpeed;
 
@@ -493,14 +554,14 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur - Ridables
             if (this.rabbit.onGround() && !this.rabbit.jumping && !((Rabbit.RabbitJumpControl)this.rabbit.jumpControl).wantJump()) {
                 this.rabbit.setSpeedModifier(0.0);
             } else if (this.hasWanted() || this.operation == MoveControl.Operation.JUMPING) {
                 this.rabbit.setSpeedModifier(this.nextJumpSpeed);
             }
 
-            super.tick();
+            super.vanillaTick(); // Purpur - Ridables
         }
 
         @Override

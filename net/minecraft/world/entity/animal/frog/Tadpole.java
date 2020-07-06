@@ -63,12 +63,49 @@ public class Tadpole extends AbstractFish {
         MemoryModuleType.IS_PANICKING
     );
     public boolean ageLocked; // Paper
+    private org.purpurmc.purpur.controller.WaterMoveControllerWASD purpurController; // Purpur - Ridables
 
     public Tadpole(EntityType<? extends AbstractFish> entityType, Level level) {
         super(entityType, level);
-        this.moveControl = new SmoothSwimmingMoveControl(this, 85, 10, 0.02F, 0.1F, true);
+        // Purpur start - Ridables
+        this.purpurController = new org.purpurmc.purpur.controller.WaterMoveControllerWASD(this, 0.5F);
+        this.moveControl = new SmoothSwimmingMoveControl(this, 85, 10, 0.02F, 0.1F, true) {
+            @Override
+            public void tick() {
+                Player rider = mob.getRider();
+                if (rider != null && mob.isControllable()) {
+                    purpurController.purpurTick(rider);
+                    mob.setDeltaMovement(mob.getDeltaMovement().add(0.0D, 0.002D, 0.0D));
+                } else {
+                    super.tick();
+                }
+            }
+        };
+        // Purpur end - Ridables
         this.lookControl = new SmoothSwimmingLookControl(this, 10);
     }
+
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.tadpoleRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.tadpoleRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.tadpoleControllable;
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
+    }
+    // Purpur end - Ridables
 
     @Override
     protected PathNavigation createNavigation(Level level) {
@@ -99,6 +136,7 @@ public class Tadpole extends AbstractFish {
     protected void customServerAiStep(ServerLevel level) {
         ProfilerFiller profilerFiller = Profiler.get();
         profilerFiller.push("tadpoleBrain");
+        //if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick(level, this);
         profilerFiller.pop();
         profilerFiller.push("tadpoleActivityUpdate");

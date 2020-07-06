@@ -115,6 +115,23 @@ public class Axolotl extends Animal implements VariantHolder<Axolotl.Variant>, B
         this.lookControl = new Axolotl.AxolotlLookControl(this, 20);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.axolotlRidable;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.axolotlControllable;
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
+    }
+    // Purpur end - Ridables
+
     @Override
     public float getWalkTargetValue(BlockPos pos, LevelReader level) {
         return 0.0F;
@@ -304,6 +321,7 @@ public class Axolotl extends Animal implements VariantHolder<Axolotl.Variant>, B
     protected void customServerAiStep(ServerLevel level) {
         ProfilerFiller profilerFiller = Profiler.get();
         profilerFiller.push("axolotlBrain");
+        //if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick(level, this);
         profilerFiller.pop();
         profilerFiller.push("axolotlActivityUpdate");
@@ -555,23 +573,31 @@ public class Axolotl extends Animal implements VariantHolder<Axolotl.Variant>, B
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur - Ridables
             if (!Axolotl.this.isPlayingDead()) {
-                super.tick();
+                super.vanillaTick(); // Purpur - Ridables
             }
         }
     }
 
     static class AxolotlMoveControl extends SmoothSwimmingMoveControl {
         private final Axolotl axolotl;
+        private final org.purpurmc.purpur.controller.WaterMoveControllerWASD waterController; // Purpur - Ridables
 
         public AxolotlMoveControl(Axolotl axolotl) {
             super(axolotl, 85, 10, 0.1F, 0.5F, false);
             this.axolotl = axolotl;
+            waterController = new org.purpurmc.purpur.controller.WaterMoveControllerWASD(axolotl, 0.5D); // Purpur - Ridables
         }
 
         @Override
         public void tick() {
+            // Purpur start - Ridables
+            if (axolotl.getRider() != null && axolotl.isControllable()) {
+                waterController.purpurTick(axolotl.getRider());
+                return;
+            }
+            // Purpur end - Ridables
             if (!this.axolotl.isPlayingDead()) {
                 super.tick();
             }

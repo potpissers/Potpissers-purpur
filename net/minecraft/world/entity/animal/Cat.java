@@ -93,10 +93,36 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
         this.reassessTameGoals();
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.catRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.catRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.catControllable;
+    }
+
+    @Override
+    public void onMount(Player rider) {
+        super.onMount(rider);
+        setInSittingPose(false);
+        setLying(false);
+        setRelaxStateOne(false);
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void registerGoals() {
         this.temptGoal = new Cat.CatTemptGoal(this, 0.6, itemStack -> itemStack.is(ItemTags.CAT_FOOD), true);
         this.goalSelector.addGoal(1, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(1, new TamableAnimal.TamableAnimalPanicGoal(1.5));
         this.goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(3, new Cat.CatRelaxOnOwnerGoal(this));
@@ -109,6 +135,7 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
         this.goalSelector.addGoal(10, new BreedGoal(this, 0.8));
         this.goalSelector.addGoal(11, new WaterAvoidingRandomStrollGoal(this, 0.8, 1.0000001E-5F));
         this.goalSelector.addGoal(12, new LookAtPlayerGoal(this, Player.class, 10.0F));
+        this.targetSelector.addGoal(1, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.targetSelector.addGoal(1, new NonTameRandomTargetGoal<>(this, Rabbit.class, false, null));
         this.targetSelector.addGoal(1, new NonTameRandomTargetGoal<>(this, Turtle.class, false, Turtle.BABY_ON_LAND_SELECTOR));
     }
@@ -360,6 +387,7 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
 
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
+        if (getRider() != null) return InteractionResult.PASS; // Purpur - Ridables
         ItemStack itemInHand = player.getItemInHand(hand);
         Item item = itemInHand.getItem();
         if (this.isTame()) {

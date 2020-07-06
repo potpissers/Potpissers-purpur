@@ -129,6 +129,44 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
         this.getNavigation().setRequiredPathLength(32.0F);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.foxRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.foxRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.foxControllable;
+    }
+
+    @Override
+    public float getJumpPower() {
+        return getRider() != null && this.isControllable() ? 0.5F : super.getJumpPower();
+    }
+
+    @Override
+    public void onMount(Player rider) {
+        super.onMount(rider);
+        setCanPickUpLoot(false);
+        clearStates();
+        setIsPouncing(false);
+        spitOutItem(getItemBySlot(EquipmentSlot.MAINHAND));
+        setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
+    }
+
+    @Override
+    public void onDismount(Player rider) {
+        super.onDismount(rider);
+        setCanPickUpLoot(true);
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
@@ -148,6 +186,7 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
             this, AbstractFish.class, 20, false, false, (entity, level) -> entity instanceof AbstractSchoolingFish
         );
         this.goalSelector.addGoal(0, new Fox.FoxFloatGoal());
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(0, new ClimbOnTopOfPowderSnowGoal(this, this.level()));
         this.goalSelector.addGoal(1, new Fox.FaceplantGoal());
         this.goalSelector.addGoal(2, new Fox.FoxPanicGoal(2.2));
@@ -175,6 +214,7 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
         this.goalSelector.addGoal(11, new Fox.FoxSearchForItemsGoal());
         this.goalSelector.addGoal(12, new Fox.FoxLookAtPlayerGoal(this, Player.class, 24.0F));
         this.goalSelector.addGoal(13, new Fox.PerchAndSearchGoal());
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.targetSelector
             .addGoal(
                 3,
@@ -1095,15 +1135,15 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
         }
     }
 
-    public class FoxLookControl extends LookControl {
+    public class FoxLookControl extends org.purpurmc.purpur.controller.LookControllerWASD { // Purpur - Ridables
         public FoxLookControl() {
             super(Fox.this);
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur - Ridables
             if (!Fox.this.isSleeping()) {
-                super.tick();
+                super.vanillaTick(); // Purpur - Ridables
             }
         }
 
@@ -1139,15 +1179,15 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
         }
     }
 
-    class FoxMoveControl extends MoveControl {
+    class FoxMoveControl extends org.purpurmc.purpur.controller.MoveControllerWASD { // Purpur - Ridables
         public FoxMoveControl() {
             super(Fox.this);
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur - Ridables
             if (Fox.this.canMove()) {
-                super.tick();
+                super.vanillaTick(); // Purpur - Ridables
             }
         }
     }

@@ -29,6 +29,20 @@ public class MoveControl implements Control {
         this.mob = mob;
     }
 
+    // Purpur start - Ridables
+    public void setSpeedModifier(double speed) {
+        this.speedModifier = speed;
+    }
+
+    public void setForward(float forward) {
+        this.strafeForwards = forward;
+    }
+
+    public void setStrafe(float strafe) {
+        this.strafeRight = strafe;
+    }
+    // Purpur end - Ridables
+
     public boolean hasWanted() {
         return this.operation == MoveControl.Operation.MOVE_TO;
     }

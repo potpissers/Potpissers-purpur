@@ -217,6 +217,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
     public boolean hasPhysicsEvent = true; // Paper - BlockPhysicsEvent
     public boolean hasEntityMoveEvent; // Paper - Add EntityMoveEvent
     private final alternate.current.wire.WireHandler wireHandler = new alternate.current.wire.WireHandler(this); // Paper - optimize redstone (Alternate Current)
+    public boolean hasRidableMoveEvent = false; // Purpur - Ridables
 
     public LevelChunk getChunkIfLoaded(int x, int z) {
         return this.chunkSource.getChunkAtIfLoadedImmediately(x, z); // Paper - Use getChunkIfLoadedImmediately

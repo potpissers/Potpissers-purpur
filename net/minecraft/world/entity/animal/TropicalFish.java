@@ -67,6 +67,18 @@ public class TropicalFish extends AbstractSchoolingFish implements VariantHolder
         super(entityType, level);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.tropicalFishRidable;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.tropicalFishControllable;
+    }
+    // Purpur end - Ridables
+
     public static String getPredefinedName(int variantId) {
         return "entity.minecraft.tropical_fish.predefined." + variantId;
     }

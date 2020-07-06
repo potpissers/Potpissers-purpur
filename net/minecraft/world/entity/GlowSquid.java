@@ -32,6 +32,19 @@ public class GlowSquid extends Squid {
     }
     // Purpur end - Flying squids! Oh my!
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.glowSquidRidable;
+    }
+
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.glowSquidControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected ParticleOptions getInkParticle() {
         return ParticleTypes.GLOW_SQUID_INK;

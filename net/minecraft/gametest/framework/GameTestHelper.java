@@ -281,6 +281,8 @@ public class GameTestHelper {
 
             public void setAfk(final boolean afk) {} // Purpur - AFK API
 
+            public void resetLastActionTime() {} // Purpur - Ridables
+
             @Override
             public boolean isLocalPlayer() {
                 return true;

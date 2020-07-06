@@ -23,14 +23,21 @@ public class AttributeMap {
     private final Set<AttributeInstance> attributesToSync = new ObjectOpenHashSet<>();
     private final Set<AttributeInstance> attributesToUpdate = new ObjectOpenHashSet<>();
     private final AttributeSupplier supplier;
+    private final net.minecraft.world.entity.LivingEntity entity; // Purpur - Ridables
 
     public AttributeMap(AttributeSupplier supplier) {
-        this.supplier = supplier;
+        // Purpur start - Ridables
+        this(supplier, null);
+    }
+    public AttributeMap(AttributeSupplier defaultAttributes, net.minecraft.world.entity.LivingEntity entity) {
+        this.entity = entity;
+        // Purpur end - Ridables
+        this.supplier = defaultAttributes;
     }
 
     private void onAttributeModified(AttributeInstance instance) {
         this.attributesToUpdate.add(instance);
-        if (instance.getAttribute().value().isClientSyncable()) {
+        if (instance.getAttribute().value().isClientSyncable() && (entity == null || entity.shouldSendAttribute(instance.getAttribute().value()))) { // Purpur - Ridables
             this.attributesToSync.add(instance);
         }
     }
@@ -44,7 +51,7 @@ public class AttributeMap {
     }
 
     public Collection<AttributeInstance> getSyncableAttributes() {
-        return this.attributes.values().stream().filter(instance -> instance.getAttribute().value().isClientSyncable()).collect(Collectors.toList());
+        return this.attributes.values().stream().filter(instance -> instance.getAttribute().value().isClientSyncable() && (entity == null || entity.shouldSendAttribute(instance.getAttribute().value()))).collect(Collectors.toList()); // Purpur - Ridables
     }
 
     @Nullable

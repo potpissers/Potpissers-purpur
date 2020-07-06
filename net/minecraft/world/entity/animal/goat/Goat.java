@@ -111,6 +111,23 @@ public class Goat extends Animal {
             .orElseGet(() -> new ItemStack(Items.GOAT_HORN));
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.goatRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.goatRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.goatControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected Brain.Provider<Goat> brainProvider() {
         return Brain.provider(MEMORY_TYPES, SENSOR_TYPES);
@@ -188,6 +205,7 @@ public class Goat extends Animal {
     protected void customServerAiStep(ServerLevel level) {
         ProfilerFiller profilerFiller = Profiler.get();
         profilerFiller.push("goatBrain");
+        //if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick(level, this);
         profilerFiller.pop();
         profilerFiller.push("goatActivityUpdate");

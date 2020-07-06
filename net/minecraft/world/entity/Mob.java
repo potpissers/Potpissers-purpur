@@ -151,8 +151,8 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
         super(entityType, level);
         this.goalSelector = new GoalSelector();
         this.targetSelector = new GoalSelector();
-        this.lookControl = new LookControl(this);
-        this.moveControl = new MoveControl(this);
+        this.lookControl = new org.purpurmc.purpur.controller.LookControllerWASD(this); // Purpur - Ridables
+        this.moveControl = new org.purpurmc.purpur.controller.MoveControllerWASD(this); // Purpur - Ridables
         this.jumpControl = new JumpControl(this);
         this.bodyRotationControl = this.createBodyControl();
         this.navigation = this.createNavigation(level);
@@ -1405,7 +1405,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
     }
 
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
-        return InteractionResult.PASS;
+        return tryRide(player, hand); // Purpur - Ridables
     }
 
     public boolean isWithinRestriction() {
@@ -1723,4 +1723,58 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
     public float[] getArmorDropChances() {
         return this.armorDropChances;
     }
+
+    // Purpur start - Ridables
+    public double getMaxY() {
+        return level().getHeight();
+    }
+
+    public InteractionResult tryRide(Player player, InteractionHand hand) {
+        return tryRide(player, hand, InteractionResult.PASS);
+    }
+
+    public InteractionResult tryRide(Player player, InteractionHand hand, InteractionResult result) {
+        if (!isRidable()) {
+            return result;
+        }
+        if (hand != InteractionHand.MAIN_HAND) {
+            return InteractionResult.PASS;
+        }
+        if (player.isShiftKeyDown()) {
+            return InteractionResult.PASS;
+        }
+        if (!player.getItemInHand(hand).isEmpty()) {
+            return InteractionResult.PASS;
+        }
+        if (!passengers.isEmpty() || player.isPassenger()) {
+            return InteractionResult.PASS;
+        }
+        if (this instanceof TamableAnimal tamable) {
+            if (tamable.isTame() && !tamable.isOwnedBy(player)) {
+                return InteractionResult.PASS;
+            }
+            if (!tamable.isTame() && !level().purpurConfig.untamedTamablesAreRidable) {
+                return InteractionResult.PASS;
+            }
+        }
+        if (this instanceof AgeableMob ageable) {
+            if (ageable.isBaby() && !level().purpurConfig.babiesAreRidable) {
+                return InteractionResult.PASS;
+            }
+        }
+        if (!player.getBukkitEntity().hasPermission("allow.ride." + net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath())) {
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                serverPlayer.sendMiniMessage(org.purpurmc.purpur.PurpurConfig.cannotRideMob);
+            }
+            return InteractionResult.PASS;
+        }
+        player.setYRot(this.getYRot());
+        player.setXRot(this.getXRot());
+        if (player.startRiding(this)) {
+            return InteractionResult.SUCCESS;
+        } else {
+            return InteractionResult.PASS;
+        }
+    }
+    // Purpur end - Ridables
 }

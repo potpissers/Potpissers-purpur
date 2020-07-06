@@ -90,9 +90,27 @@ public class EnderMan extends Monster implements NeutralMob {
         this.setPathfindingMalus(PathType.WATER, -1.0F);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.endermanRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.endermanRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.endermanControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(1, new EnderMan.EndermanFreezeWhenLookedAt(this));
         this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0, false));
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0, 0.0F));
@@ -100,6 +118,7 @@ public class EnderMan extends Monster implements NeutralMob {
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(10, new EnderMan.EndermanLeaveBlockGoal(this));
         this.goalSelector.addGoal(11, new EnderMan.EndermanTakeBlockGoal(this));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.targetSelector.addGoal(1, new EnderMan.EndermanLookForPlayerGoal(this, this::isAngryAt));
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Endermite.class, 10, true, false, (entityliving, ignored) -> entityliving.level().purpurConfig.endermanAggroEndermites && entityliving instanceof Endermite endermite && (!entityliving.level().purpurConfig.endermanAggroEndermitesOnlyIfPlayerSpawned || endermite.isPlayerSpawned()))); // Purpur
@@ -272,7 +291,7 @@ public class EnderMan extends Monster implements NeutralMob {
 
     @Override
     protected void customServerAiStep(ServerLevel level) {
-        if (level.isDay() && this.tickCount >= this.targetChangeTime + 600) {
+        if ((getRider() == null || !this.isControllable()) && level.isDay() && this.tickCount >= this.targetChangeTime + 600) { // Purpur - Ridables - no random teleporting
             float lightLevelDependentMagicValue = this.getLightLevelDependentMagicValue();
             if (lightLevelDependentMagicValue > 0.5F
                 && level.canSeeSky(this.blockPosition())
@@ -385,6 +404,7 @@ public class EnderMan extends Monster implements NeutralMob {
     public boolean hurtServer(ServerLevel level, DamageSource damageSource, float amount) {
         if (this.isInvulnerableTo(level, damageSource)) {
             return false;
+        } else if (getRider() != null && this.isControllable()) { return super.hurtServer(level, damageSource, amount); // Purpur - no teleporting on damage
         } else if (org.purpurmc.purpur.PurpurConfig.endermanShortHeight && damageSource.is(net.minecraft.world.damagesource.DamageTypes.IN_WALL)) { return false; // Purpur - no suffocation damage if short height - Short enderman height
         } else {
             boolean flag = damageSource.getDirectEntity() instanceof ThrownPotion;

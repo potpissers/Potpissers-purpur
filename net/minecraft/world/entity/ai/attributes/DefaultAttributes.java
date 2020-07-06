@@ -131,7 +131,7 @@ public class DefaultAttributes {
         .put(EntityType.OCELOT, Ocelot.createAttributes().build())
         .put(EntityType.PANDA, Panda.createAttributes().build())
         .put(EntityType.PARROT, Parrot.createAttributes().build())
-        .put(EntityType.PHANTOM, Monster.createMonsterAttributes().build())
+        .put(EntityType.PHANTOM, net.minecraft.world.entity.monster.Phantom.createAttributes().build()) // Purpur - Ridables
         .put(EntityType.PIG, Pig.createAttributes().build())
         .put(EntityType.PIGLIN, Piglin.createAttributes().build())
         .put(EntityType.PIGLIN_BRUTE, PiglinBrute.createAttributes().build())

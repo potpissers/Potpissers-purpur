@@ -129,7 +129,31 @@ public class Warden extends Monster implements VibrationSystem {
         this.setPathfindingMalus(PathType.LAVA, 8.0F);
         this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0F);
         this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
+        this.moveControl = new org.purpurmc.purpur.controller.MoveControllerWASD(this, 0.5F); // Purpur - Ridables
     }
+
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.wardenRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.wardenRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.wardenControllable;
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
+    }
+    // Purpur end - Ridables
 
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity entity) {
@@ -394,6 +418,7 @@ public class Warden extends Monster implements VibrationSystem {
 
     @Contract("null->false")
     public boolean canTargetEntity(@Nullable Entity entity) {
+        if (getRider() != null && isControllable()) return false; // Purpur - Ridables
         return entity instanceof LivingEntity livingEntity
             && this.level() == entity.level()
             && EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(entity)

@@ -35,6 +35,18 @@ public class Salmon extends AbstractSchoolingFish implements VariantHolder<Salmo
         this.refreshDimensions();
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.salmonRidable;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.salmonControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     public int getMaxSchoolSize() {
         return 5;

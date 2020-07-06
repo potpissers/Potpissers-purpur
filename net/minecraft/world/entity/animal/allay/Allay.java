@@ -119,10 +119,23 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
     private float spinningAnimationTicks;
     private float spinningAnimationTicks0;
     public boolean forceDancing = false; // CraftBukkit
+    private org.purpurmc.purpur.controller.FlyingMoveControllerWASD purpurController; // Purpur - Ridables
 
     public Allay(EntityType<? extends Allay> entityType, Level level) {
         super(entityType, level);
-        this.moveControl = new FlyingMoveControl(this, 20, true);
+        // Purpur start - Ridables
+        this.purpurController = new org.purpurmc.purpur.controller.FlyingMoveControllerWASD(this, 0.1F, 0.5F);
+        this.moveControl = new FlyingMoveControl(this, 20, true) {
+            @Override
+            public void tick() {
+                if (mob.getRider() != null && mob.isControllable()) {
+                    purpurController.purpurTick(mob.getRider());
+                } else {
+                    super.tick();
+                }
+            }
+        };
+        // Purpur end - Ridables
         this.setCanPickUpLoot(this.canPickUpLoot());
         this.vibrationUser = new Allay.VibrationUser();
         this.vibrationData = new VibrationSystem.Data();
@@ -137,6 +150,28 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
         this.entityData.set(Allay.DATA_CAN_DUPLICATE, canDuplicate);
     }
     // CraftBukkit end
+
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.allayRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.allayRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.allayControllable;
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
+    }
+    // Purpur end - Ridables
 
     @Override
     protected Brain.Provider<Allay> brainProvider() {
@@ -247,6 +282,7 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
     protected void customServerAiStep(ServerLevel level) {
         ProfilerFiller profilerFiller = Profiler.get();
         profilerFiller.push("allayBrain");
+        //if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick(level, this);
         profilerFiller.pop();
         profilerFiller.push("allayActivityUpdate");

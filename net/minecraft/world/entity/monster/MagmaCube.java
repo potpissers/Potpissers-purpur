@@ -24,6 +24,28 @@ public class MagmaCube extends Slime {
         super(entityType, level);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.magmaCubeRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.magmaCubeRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.magmaCubeControllable;
+    }
+
+    @Override
+    public float getJumpPower() {
+        return 0.42F * this.getBlockJumpFactor(); // from EntityLiving
+    }
+    // Purpur end - Ridables
+
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MOVEMENT_SPEED, 0.2F);
     }
@@ -71,6 +93,7 @@ public class MagmaCube extends Slime {
         float f = this.getSize() * 0.1F;
         this.setDeltaMovement(deltaMovement.x, this.getJumpPower() + f, deltaMovement.z);
         this.hasImpulse = true;
+        this.actualJump = false; // Purpur - Ridables
     }
 
     @Override

@@ -33,6 +33,12 @@ public class LlamaSpit extends Projectile {
         );
     }
 
+    // Purpur start - Ridables
+    public void projectileTick() {
+        super.tick();
+    }
+    // Purpur end - Ridables
+
     @Override
     protected double getDefaultGravity() {
         return 0.06;

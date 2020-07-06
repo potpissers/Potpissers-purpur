@@ -151,6 +151,23 @@ public class Piglin extends AbstractPiglin implements CrossbowAttackMob, Invento
         this.xpReward = 5;
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.piglinRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.piglinRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.piglinControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
@@ -346,6 +363,7 @@ public class Piglin extends AbstractPiglin implements CrossbowAttackMob, Invento
     protected void customServerAiStep(ServerLevel level) {
         ProfilerFiller profilerFiller = Profiler.get();
         profilerFiller.push("piglinBrain");
+        //if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick(level, this);
         profilerFiller.pop();
         PiglinAi.updateActivity(this);

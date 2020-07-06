@@ -85,6 +85,23 @@ public class Zoglin extends Monster implements HoglinBase {
         this.xpReward = 5;
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.zoglinRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.zoglinRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.zoglinControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected Brain.Provider<Zoglin> brainProvider() {
         return Brain.provider(MEMORY_TYPES, SENSOR_TYPES);
@@ -250,6 +267,7 @@ public class Zoglin extends Monster implements HoglinBase {
     protected void customServerAiStep(ServerLevel level) {
         ProfilerFiller profilerFiller = Profiler.get();
         profilerFiller.push("zoglinBrain");
+        if (getRider() == null || !this.isControllable()) // Purpur - only use brain if no rider
         this.getBrain().tick(level, this);
         profilerFiller.pop();
         this.updateActivity();

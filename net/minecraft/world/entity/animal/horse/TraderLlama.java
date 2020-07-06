@@ -29,6 +29,28 @@ public class TraderLlama extends Llama {
         super(entityType, level);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.traderLlamaRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.traderLlamaRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.traderLlamaControllable;
+    }
+
+    @Override
+    public boolean isSaddled() {
+        return super.isSaddled() || isTamed();
+    }
+    // Purpur end - Ridables
+
     @Override
     public boolean isTraderLlama() {
         return true;

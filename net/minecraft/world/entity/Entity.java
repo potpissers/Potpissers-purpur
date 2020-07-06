@@ -3151,6 +3151,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                 this.passengers = ImmutableList.copyOf(list);
             }
 
+            // Purpur start - Ridables
+            if (isRidable() && this.passengers.get(0) == passenger && passenger instanceof Player player) {
+                onMount(player);
+                this.rider = player;
+            }
+            // Purpur end - Ridables
+
             this.gameEvent(GameEvent.ENTITY_MOUNT, passenger);
         }
     }
@@ -3192,6 +3199,14 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                 return false;
             }
             // CraftBukkit end
+
+            // Purpur start - Ridables
+            if (this.rider != null && this.passengers.get(0) == this.rider) {
+                onDismount(this.rider);
+                this.rider = null;
+            }
+            // Purpur end - Ridables
+
             if (this.passengers.size() == 1 && this.passengers.get(0) == passenger) {
                 this.passengers = ImmutableList.of();
             } else {
@@ -5115,4 +5130,44 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return ((ServerLevel) this.level).isPositionEntityTicking(this.blockPosition());
     }
     // Paper end - Expose entity id counter
+    // Purpur start - Ridables
+    @Nullable
+    private Player rider = null;
+
+    @Nullable
+    public Player getRider() {
+        return rider;
+    }
+
+    public boolean isRidable() {
+        return false;
+    }
+
+    public boolean isControllable() {
+        return true;
+    }
+
+    public void onMount(Player rider) {
+        if (this instanceof Mob) {
+            ((Mob) this).setTarget(null, null, false);
+            ((Mob) this).getNavigation().stop();
+        }
+        rider.setJumping(false); // fixes jump on mount
+    }
+
+    public void onDismount(Player player) {
+    }
+
+    public boolean onSpacebar() {
+        return false;
+    }
+
+    public boolean onClick(InteractionHand hand) {
+        return false;
+    }
+
+    public boolean processClick(InteractionHand hand) {
+        return false;
+    }
+    // Purpur end - Ridables
 }

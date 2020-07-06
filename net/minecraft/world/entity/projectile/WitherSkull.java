@@ -110,6 +110,14 @@ public class WitherSkull extends AbstractHurtingProjectile {
     }
     // Purpur end - Add canSaveToDisk to Entity
 
+    // Purpur start - Ridables
+    @Override
+    public boolean canHitEntity(Entity target) {
+        // do not hit rider
+        return target != this.getRider() && super.canHitEntity(target);
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_DANGEROUS, false);

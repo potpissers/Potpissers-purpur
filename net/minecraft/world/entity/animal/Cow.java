@@ -38,9 +38,27 @@ public class Cow extends Animal {
         super(entityType, level);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.cowRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.cowRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.cowControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(1, new PanicGoal(this, 2.0));
         this.goalSelector.addGoal(2, new BreedGoal(this, 1.0));
         this.goalSelector.addGoal(3, new TemptGoal(this, 1.25, itemStack -> level().purpurConfig.cowFeedMushrooms > 0 && (itemStack.is(net.minecraft.world.level.block.Blocks.RED_MUSHROOM.asItem()) || itemStack.is(net.minecraft.world.level.block.Blocks.BROWN_MUSHROOM.asItem())) || itemStack.is(ItemTags.COW_FOOD), false)); // Purpur - Cows eat mushrooms
@@ -86,13 +104,14 @@ public class Cow extends Animal {
 
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
+        if (getRider() != null) return InteractionResult.PASS; // Purpur - Ridables
         ItemStack itemInHand = player.getItemInHand(hand);
         if (itemInHand.is(Items.BUCKET) && !this.isBaby()) {
             // CraftBukkit start - Got milk?
             org.bukkit.event.player.PlayerBucketFillEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callPlayerBucketFillEvent((ServerLevel) player.level(), player, this.blockPosition(), this.blockPosition(), null, itemInHand, Items.MILK_BUCKET, hand);
             if (event.isCancelled()) {
                 player.containerMenu.sendAllDataToRemote(); // Paper - Fix inventory desync
-                return InteractionResult.PASS;
+                return tryRide(player, hand); // Purpur - Ridables
             }
             // CraftBukkit end
             player.playSound(SoundEvents.COW_MILK, 1.0F, 1.0F);

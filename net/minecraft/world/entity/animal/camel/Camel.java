@@ -83,6 +83,13 @@ public class Camel extends AbstractHorse {
         groundPathNavigation.setCanWalkOverFences(true);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.camelRidableInWater;
+    }
+    // Purpur end - Ridables
+
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);

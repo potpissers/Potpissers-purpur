@@ -104,12 +104,31 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
     }
     // Purpur end - Shulker change color with dye
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.shulkerRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.shulkerRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.shulkerControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void registerGoals() {
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F, 0.02F, true));
         this.goalSelector.addGoal(4, new Shulker.ShulkerAttackGoal());
         this.goalSelector.addGoal(7, new Shulker.ShulkerPeekGoal());
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this, this.getClass()).setAlertOthers());
         this.targetSelector.addGoal(2, new Shulker.ShulkerNearestAttackGoal(this));
         this.targetSelector.addGoal(3, new Shulker.ShulkerDefenseAttackGoal(this));
@@ -697,7 +716,7 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
         }
     }
 
-    class ShulkerLookControl extends LookControl {
+    class ShulkerLookControl extends org.purpurmc.purpur.controller.LookControllerWASD { // Purpur - Ridables
         public ShulkerLookControl(final Mob mob) {
             super(mob);
         }

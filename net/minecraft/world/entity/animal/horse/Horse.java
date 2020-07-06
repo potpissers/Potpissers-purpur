@@ -43,6 +43,13 @@ public class Horse extends AbstractHorse implements VariantHolder<Variant> {
         super(entityType, level);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.horseRidableInWater;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void randomizeAttributes(RandomSource random) {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(generateMaxHealth(random::nextInt));

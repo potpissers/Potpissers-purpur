@@ -42,10 +42,57 @@ public class Bat extends AmbientCreature {
 
     public Bat(EntityType<? extends Bat> entityType, Level level) {
         super(entityType, level);
+        this.moveControl = new org.purpurmc.purpur.controller.FlyingWithSpacebarMoveControllerWASD(this, 0.075F); // Purpur - Ridables
         if (!level.isClientSide) {
             this.setResting(true);
         }
     }
+
+    // Purpur start - Ridables
+    @Override
+    public boolean shouldSendAttribute(net.minecraft.world.entity.ai.attributes.Attribute attribute) { return attribute != Attributes.FLYING_SPEED.value(); } // Fixes log spam on clients
+
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.batRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.batRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.batControllable;
+    }
+
+    @Override
+    public double getMaxY() {
+        return level().purpurConfig.batMaxY;
+    }
+
+    @Override
+    public void onMount(net.minecraft.world.entity.player.Player rider) {
+        super.onMount(rider);
+        if (isResting()) {
+            setResting(false);
+            level().levelEvent(null, 1025, new BlockPos(this).above(), 0);
+        }
+    }
+
+    @Override
+    public void travel(Vec3 vec3) {
+        super.travel(vec3);
+        if (getRider() != null && this.isControllable() && !onGround) {
+            float speed = (float) getAttributeValue(Attributes.FLYING_SPEED) * 2;
+            setSpeed(speed);
+            Vec3 mot = getDeltaMovement();
+            move(net.minecraft.world.entity.MoverType.SELF, mot.multiply(speed, 0.25, speed));
+            setDeltaMovement(mot.scale(0.9D));
+        }
+    }
+    // Purpur end - Ridables
 
     @Override
     public boolean isFlapping() {
@@ -98,7 +145,7 @@ public class Bat extends AmbientCreature {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 6.0);
+        return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 6.0).add(Attributes.FLYING_SPEED, 0.6D); // Purpur - Ridables
     }
 
     public boolean isResting() {
@@ -129,6 +176,14 @@ public class Bat extends AmbientCreature {
 
     @Override
     protected void customServerAiStep(ServerLevel level) {
+        // Purpur start - Ridables
+        if (getRider() != null && this.isControllable()) {
+            Vec3 mot = getDeltaMovement();
+            setDeltaMovement(mot.x(), mot.y() + (getVerticalMot() > 0 ? 0.07D : 0.0D), mot.z());
+            return;
+        }
+        // Purpur end - Ridables
+
         super.customServerAiStep(level);
         BlockPos blockPos = this.blockPosition();
         BlockPos blockPos1 = blockPos.above();

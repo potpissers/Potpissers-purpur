@@ -55,6 +55,23 @@ public class MushroomCow extends Cow implements Shearable, VariantHolder<Mushroo
         super(entityType, level);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.mooshroomRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.mooshroomRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.mooshroomControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     public float getWalkTargetValue(BlockPos pos, LevelReader level) {
         return level.getBlockState(pos.below()).is(Blocks.MYCELIUM) ? 10.0F : level.getPathfindingCostFromLightLevels(pos);
@@ -115,7 +132,7 @@ public class MushroomCow extends Cow implements Shearable, VariantHolder<Mushroo
                 java.util.List<ItemStack> drops = this.generateDefaultDrops(serverLevel, itemInHand);
                 org.bukkit.event.player.PlayerShearEntityEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.handlePlayerShearEntityEvent(player, this, itemInHand, hand, drops);
                 if (event != null) {
-                    if (event.isCancelled()) return InteractionResult.PASS;
+                    if (event.isCancelled()) return tryRide(player, hand); // Purpur - Ridables
                     drops = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getDrops());
                     // Paper end - custom shear drops
                 }

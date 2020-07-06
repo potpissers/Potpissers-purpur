@@ -94,6 +94,23 @@ public class Strider extends Animal implements ItemSteerable, Saddleable {
         this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0F);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.striderRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.striderRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.striderControllable;
+    }
+    // Purpur end - Ridables
+
     public static boolean checkStriderSpawnRules(
         EntityType<Strider> entityType, LevelAccessor level, EntitySpawnReason spawnReason, BlockPos pos, RandomSource random
     ) {
@@ -156,6 +173,7 @@ public class Strider extends Animal implements ItemSteerable, Saddleable {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new PanicGoal(this, 1.65));
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(2, new BreedGoal(this, 1.0));
         this.temptGoal = new TemptGoal(this, 1.4, itemStack -> itemStack.is(ItemTags.STRIDER_TEMPT_ITEMS), false);
         this.goalSelector.addGoal(3, this.temptGoal);
@@ -437,7 +455,7 @@ public class Strider extends Animal implements ItemSteerable, Saddleable {
             InteractionResult interactionResult = super.mobInteract(player, hand);
             if (!interactionResult.consumesAction()) {
                 ItemStack itemInHand = player.getItemInHand(hand);
-                return (InteractionResult)(itemInHand.is(Items.SADDLE) ? itemInHand.interactLivingEntity(player, this, hand) : InteractionResult.PASS);
+                return (InteractionResult)(itemInHand.is(Items.SADDLE) ? itemInHand.interactLivingEntity(player, this, hand) : tryRide(player, hand)); // Purpur - Ridables
             } else {
                 if (isFood && !this.isSilent()) {
                     this.level()

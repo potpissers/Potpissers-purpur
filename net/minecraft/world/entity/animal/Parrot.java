@@ -124,11 +124,67 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
 
     public Parrot(EntityType<? extends Parrot> entityType, Level level) {
         super(entityType, level);
-        this.moveControl = new FlyingMoveControl(this, 10, false);
+        // Purpur start - Ridables
+        final org.purpurmc.purpur.controller.FlyingWithSpacebarMoveControllerWASD flyingController = new org.purpurmc.purpur.controller.FlyingWithSpacebarMoveControllerWASD(this, 0.3F);
+        class ParrotMoveControl extends FlyingMoveControl {
+            public ParrotMoveControl(Mob entity, int maxPitchChange, boolean noGravity) {
+                super(entity, maxPitchChange, noGravity);
+            }
+
+            @Override
+            public void tick() {
+                if (mob.getRider() != null && mob.isControllable()) {
+                    flyingController.purpurTick(mob.getRider());
+                } else {
+                    super.tick();
+                }
+            }
+
+            @Override
+            public boolean hasWanted() {
+                return mob.getRider() != null && mob.isControllable() ? getForwardMot() != 0 || getStrafeMot() != 0 : super.hasWanted();
+            }
+        }
+        this.moveControl = new ParrotMoveControl(this, 10, false);
+        // Purpur end - Ridables
         this.setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
         this.setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
         this.setPathfindingMalus(PathType.COCOA, -1.0F);
     }
+
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.parrotRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.parrotRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.parrotControllable;
+    }
+
+    @Override
+    public double getMaxY() {
+        return level().purpurConfig.parrotMaxY;
+    }
+
+    @Override
+    public void travel(Vec3 vec3) {
+        super.travel(vec3);
+        if (getRider() != null && this.isControllable() && !onGround) {
+            float speed = (float) getAttributeValue(Attributes.FLYING_SPEED) * 2;
+            setSpeed(speed);
+            Vec3 mot = getDeltaMovement();
+            move(net.minecraft.world.entity.MoverType.SELF, mot.multiply(speed, 0.25, speed));
+            setDeltaMovement(mot.scale(0.9D));
+        }
+    }
+    // Purpur end - Ridables
 
     @Nullable
     @Override
@@ -150,9 +206,11 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(0, new TamableAnimal.TamableAnimalPanicGoal(1.25));
+        //this.goalSelector.addGoal(0, new TamableAnimal.TamableAnimalPanicGoal(1.25)); // Purpur - move down
         this.goalSelector.addGoal(0, new FloatGoal(this));
         if (this.level().purpurConfig.parrotBreedable) this.goalSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.BreedGoal(this, 1.0D)); // Purpur - Breedable parrots
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
+        this.goalSelector.addGoal(1, new TamableAnimal.TamableAnimalPanicGoal(1.25D)); // Purpur - Ridables
         this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(2, new FollowOwnerGoal(this, 1.0, 5.0F, 1.0F));

@@ -33,6 +33,18 @@ public class ZombieHorse extends AbstractHorse {
         super(entityType, level);
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.zombieHorseRidableInWater;
+    }
+
+    @Override
+    public boolean isTamed() {
+        return super.isTamed() || this.level().purpurConfig.zombieHorseRidable;
+    }
+    // Purpur end - Ridables
+
     public static AttributeSupplier.Builder createAttributes() {
         return createBaseHorseAttributes().add(Attributes.MAX_HEALTH, 15.0).add(Attributes.MOVEMENT_SPEED, 0.2F);
     }
@@ -78,6 +90,7 @@ public class ZombieHorse extends AbstractHorse {
 
     @Override
     protected void addBehaviourGoals() {
+        if (level().purpurConfig.zombieHorseCanSwim) goalSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.FloatGoal(this)); // Purpur - Ridables
     }
 
     @Override

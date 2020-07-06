@@ -73,9 +73,28 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     }
     // Purpur end - Summoner API
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.ironGolemRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.ironGolemRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.ironGolemControllable;
+    }
+    // Purpur end - Ridables
+
     @Override
     protected void registerGoals() {
         if (this.level().purpurConfig.ironGolemPoppyCalm) this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.ReceiveFlower(this)); // Purpur - Iron golem calm anger options
+        if (level().purpurConfig.ironGolemCanSwim) this.goalSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.FloatGoal(this)); // Purpur - Ridables
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0, true));
         this.goalSelector.addGoal(2, new MoveTowardsTargetGoal(this, 0.9, 32.0F));
         this.goalSelector.addGoal(2, new MoveBackToVillageGoal(this, 0.6, false));
@@ -83,6 +102,7 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
         this.goalSelector.addGoal(5, new OfferFlowerGoal(this));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.targetSelector.addGoal(1, new DefendVillageTargetGoal(this));
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::isAngryAt));
@@ -271,12 +291,12 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack itemInHand = player.getItemInHand(hand);
         if (!itemInHand.is(Items.IRON_INGOT)) {
-            return InteractionResult.PASS;
+            return tryRide(player, hand); // Purpur - Ridables
         } else {
             float health = this.getHealth();
             this.heal(25.0F);
             if (this.getHealth() == health) {
-                return InteractionResult.PASS;
+                return tryRide(player, hand); // Purpur - Ridables
             } else {
                 float f = 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F;
                 this.playSound(SoundEvents.IRON_GOLEM_REPAIR, 1.0F, f);

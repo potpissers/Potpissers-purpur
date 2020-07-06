@@ -105,6 +105,32 @@ public class Panda extends Animal {
         }
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.pandaRidable;
+    }
+
+    @Override
+    public boolean dismountsUnderwater() {
+        return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.pandaRidableInWater;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.pandaControllable;
+    }
+
+    @Override
+    public void onMount(Player rider) {
+        super.onMount(rider);
+        setForwardMot(0.0F);
+        sit(false);
+        eat(false);
+        setOnBack(false);
+    }
+    // Purpur end - Ridables
+
     @Override
     protected boolean canDispenserEquipIntoSlot(EquipmentSlot slot) {
         return slot == EquipmentSlot.MAINHAND && this.canPickUpLoot();
@@ -258,6 +284,7 @@ public class Panda extends Animal {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.goalSelector.addGoal(2, new Panda.PandaPanicGoal(this, 2.0));
         this.goalSelector.addGoal(2, new Panda.PandaBreedGoal(this, 1.0));
         this.goalSelector.addGoal(3, new Panda.PandaAttackGoal(this, 1.2F, true));
@@ -273,6 +300,7 @@ public class Panda extends Animal {
         this.goalSelector.addGoal(12, new Panda.PandaRollGoal(this));
         this.goalSelector.addGoal(13, new FollowParentGoal(this, 1.25));
         this.goalSelector.addGoal(14, new WaterAvoidingRandomStrollGoal(this, 1.0));
+        this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
         this.targetSelector.addGoal(1, new Panda.PandaHurtByTargetGoal(this).setAlertOthers(new Class[0]));
     }
 
@@ -616,7 +644,7 @@ public class Panda extends Animal {
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack itemInHand = player.getItemInHand(hand);
         if (this.isScared()) {
-            return InteractionResult.PASS;
+            return tryRide(player, hand); // Purpur - Ridables
         } else if (this.isOnBack()) {
             this.setOnBack(false);
             return InteractionResult.SUCCESS;
@@ -652,7 +680,7 @@ public class Panda extends Animal {
 
             return InteractionResult.SUCCESS_SERVER;
         } else {
-            return InteractionResult.PASS;
+            return tryRide(player, hand); // Purpur - Ridables
         }
     }
 
@@ -964,7 +992,7 @@ public class Panda extends Animal {
         }
     }
 
-    static class PandaMoveControl extends MoveControl {
+    static class PandaMoveControl extends org.purpurmc.purpur.controller.MoveControllerWASD { // Purpur - Ridables
         private final Panda panda;
 
         public PandaMoveControl(Panda mob) {
@@ -973,9 +1001,9 @@ public class Panda extends Animal {
         }
 
         @Override
-        public void tick() {
+        public void vanillaTick() { // Purpur - Ridables
             if (this.panda.canPerformAction()) {
-                super.tick();
+                super.vanillaTick(); // Purpur - Ridables
             }
         }
     }

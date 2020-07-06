@@ -31,6 +31,18 @@ public class ElderGuardian extends Guardian {
         }
     }
 
+    // Purpur start - Ridables
+    @Override
+    public boolean isRidable() {
+        return level().purpurConfig.elderGuardianRidable;
+    }
+
+    @Override
+    public boolean isControllable() {
+        return level().purpurConfig.elderGuardianControllable;
+    }
+    // Purpur end - Ridables
+
     public static AttributeSupplier.Builder createAttributes() {
         return Guardian.createAttributes().add(Attributes.MOVEMENT_SPEED, 0.3F).add(Attributes.ATTACK_DAMAGE, 8.0).add(Attributes.MAX_HEALTH, 80.0);
     }
