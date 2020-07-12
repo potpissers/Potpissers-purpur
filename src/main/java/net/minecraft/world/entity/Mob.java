@@ -146,6 +146,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
     private BlockPos restrictCenter;
     private float restrictRadius;
 
+    public int ticksSinceLastInteraction; // Purpur
     public boolean aware = true; // CraftBukkit
 
     protected Mob(EntityType<? extends Mob> type, Level world) {
@@ -333,6 +334,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
                 entityliving = null;
             }
         }
+        if (entityliving instanceof net.minecraft.server.level.ServerPlayer) this.ticksSinceLastInteraction = 0; // Purpur
         this.target = entityliving;
         return true;
         // CraftBukkit end
@@ -375,7 +377,27 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
         }
 
         this.level().getProfiler().pop();
+        incrementTicksSinceLastInteraction(); // Purpur
     }
+
+    // Purpur start
+    private void incrementTicksSinceLastInteraction() {
+        ++this.ticksSinceLastInteraction;
+        if (getRider() != null) {
+            this.ticksSinceLastInteraction = 0;
+            return;
+        }
+        if (this.level().purpurConfig.entityLifeSpan <= 0) {
+            return; // feature disabled
+        }
+        if (!this.removeWhenFarAway(0) || isPersistenceRequired() || requiresCustomPersistence() || hasCustomName()) {
+            return; // mob persistent
+        }
+        if (this.ticksSinceLastInteraction > this.level().purpurConfig.entityLifeSpan) {
+            this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DISCARD);
+        }
+    }
+    // Purpur end
 
     @Override
     protected void playHurtSound(DamageSource damageSource) {
@@ -551,6 +573,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
         }
 
         nbt.putBoolean("Bukkit.Aware", this.aware); // CraftBukkit
+        nbt.putInt("Purpur.ticksSinceLastInteraction", this.ticksSinceLastInteraction); // Purpur
     }
 
     @Override
@@ -628,6 +651,11 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
             this.aware = nbt.getBoolean("Bukkit.Aware");
         }
         // CraftBukkit end
+        // Purpur start
+        if (nbt.contains("Purpur.ticksSinceLastInteraction")) {
+            this.ticksSinceLastInteraction = nbt.getInt("Purpur.ticksSinceLastInteraction");
+        }
+        // Purpur end
     }
 
     @Override
@@ -1753,6 +1781,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
             this.playAttackSound();
         }
 
+        if (target instanceof net.minecraft.server.level.ServerPlayer) this.ticksSinceLastInteraction = 0; // Purpur
         return flag;
     }
 
