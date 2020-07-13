@@ -3037,4 +3037,26 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
         return (CraftPlayer) super.getBukkitEntity();
     }
     // CraftBukkit end
+
+    // Purpur start
+    public void teleport(Location to) {
+        this.ejectPassengers();
+        this.stopRiding(true);
+
+        if (this.isSleeping()) {
+            this.stopSleepInBed(true, false);
+        }
+
+        if (this.containerMenu != this.inventoryMenu) {
+            this.closeContainer(org.bukkit.event.inventory.InventoryCloseEvent.Reason.TELEPORT);
+        }
+
+        ServerLevel toLevel = ((CraftWorld) to.getWorld()).getHandle();
+        if (this.level() == toLevel) {
+            this.connection.internalTeleport(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch(), java.util.EnumSet.noneOf(net.minecraft.world.entity.RelativeMovement.class));
+        } else {
+            this.server.getPlayerList().respawn(this, true, RemovalReason.KILLED, org.bukkit.event.player.PlayerRespawnEvent.RespawnReason.DEATH, to);
+        }
+    }
+    // Purpur end
 }

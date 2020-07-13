@@ -461,6 +461,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
                         double d1 = this.level().getWorldBorder().getDamagePerBlock();
 
                         if (d1 > 0.0D) {
+                            if (level().purpurConfig.teleportIfOutsideBorder && this instanceof ServerPlayer serverPlayer) { serverPlayer.teleport(io.papermc.paper.util.MCUtil.toLocation(level(), ((ServerLevel) level()).getSharedSpawnPos())); return; } // Purpur
                             this.hurt(this.damageSources().outOfBorder(), (float) Math.max(1, Mth.floor(-d0 * d1)));
                         }
                     }
