@@ -404,6 +404,7 @@ public class ActivationRange
      */
     public static boolean checkIfActive(Entity entity)
     {
+        if (entity.level().purpurConfig.squidImmuneToEAR && entity instanceof net.minecraft.world.entity.animal.Squid) return true; // Purpur
         // Never safe to skip fireworks or entities not yet added to chunk
         if ( entity instanceof FireworkRocketEntity ) {
             return true;
