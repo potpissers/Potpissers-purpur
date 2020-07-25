@@ -152,6 +152,11 @@ public class Vindicator extends AbstractIllager {
         RandomSource randomSource = world.getRandom();
         this.populateDefaultEquipmentSlots(randomSource, difficulty);
         this.populateDefaultEquipmentEnchantments(world, randomSource, difficulty);
+        // Purpur start
+        if (level().purpurConfig.vindicatorJohnnySpawnChance > 0D && random.nextDouble() <= level().purpurConfig.vindicatorJohnnySpawnChance) {
+            setCustomName(Component.translatable("Johnny"));
+        }
+        // Purpur end
         return spawnGroupData;
     }
 

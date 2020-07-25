@@ -1774,6 +1774,7 @@ public class PurpurWorldConfig {
     public boolean vindicatorControllable = true;
     public double vindicatorMaxHealth = 24.0D;
     public double vindicatorScale = 1.0D;
+    public double vindicatorJohnnySpawnChance = 0D;
     private void vindicatorSettings() {
         vindicatorRidable = getBoolean("mobs.vindicator.ridable", vindicatorRidable);
         vindicatorRidableInWater = getBoolean("mobs.vindicator.ridable-in-water", vindicatorRidableInWater);
@@ -1785,6 +1786,7 @@ public class PurpurWorldConfig {
         }
         vindicatorMaxHealth = getDouble("mobs.vindicator.attributes.max_health", vindicatorMaxHealth);
         vindicatorScale = Mth.clamp(getDouble("mobs.vindicator.attributes.scale", vindicatorScale), 0.0625D, 16.0D);
+        vindicatorJohnnySpawnChance = getDouble("mobs.vindicator.johnny.spawn-chance", vindicatorJohnnySpawnChance);
     }
 
     public boolean wanderingTraderRidable = false;
