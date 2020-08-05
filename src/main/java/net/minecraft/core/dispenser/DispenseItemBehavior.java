@@ -1015,5 +1015,22 @@ public interface DispenseItemBehavior {
                 }
             }
         });
+        // Purpur start
+        DispenserBlock.registerBehavior(Items.ANVIL, (new OptionalDispenseItemBehavior() {
+            @Override
+            public ItemStack execute(BlockSource dispenser, ItemStack stack) {
+                net.minecraft.world.level.Level level = dispenser.level();
+                if (!level.purpurConfig.dispenserPlaceAnvils) return super.execute(dispenser, stack);
+                Direction facing = dispenser.blockEntity().getBlockState().getValue(DispenserBlock.FACING);
+                BlockPos pos = dispenser.pos().relative(facing);
+                BlockState state = level.getBlockState(pos);
+                if (state.isAir()) {
+                    level.setBlockAndUpdate(pos, Blocks.ANVIL.defaultBlockState().setValue(net.minecraft.world.level.block.AnvilBlock.FACING, facing.getAxis() == Direction.Axis.Y ? Direction.NORTH : facing.getClockWise()));
+                    stack.shrink(1);
+                }
+                return stack;
+            }
+        }));
+        // Purpur end
     }
 }
