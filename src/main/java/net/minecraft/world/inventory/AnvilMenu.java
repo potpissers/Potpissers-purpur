@@ -283,6 +283,54 @@ public class AnvilMenu extends ItemCombinerMenu {
                 if (!this.itemName.equals(itemstack.getHoverName().getString())) {
                     b0 = 1;
                     i += b0;
+                    // Purpur start
+                    if (this.player != null) {
+                        org.bukkit.craftbukkit.entity.CraftHumanEntity player = this.player.getBukkitEntity();
+                        String name = this.itemName;
+                        boolean removeItalics = false;
+                        if (player.hasPermission("purpur.anvil.remove_italics")) {
+                            if (name.startsWith("&r")) {
+                                name = name.substring(2);
+                                removeItalics = true;
+                            } else if (name.startsWith("<r>")) {
+                                name = name.substring(3);
+                                removeItalics = true;
+                            } else if (name.startsWith("<reset>")) {
+                                name = name.substring(7);
+                                removeItalics = true;
+                            }
+                        }
+                        if (this.player.level().purpurConfig.anvilAllowColors) {
+                            if (player.hasPermission("purpur.anvil.color")) {
+                                java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("(?i)&([0-9a-fr])").matcher(name);
+                                while (matcher.find()) {
+                                    String match = matcher.group(1);
+                                    name = name.replace("&" + match, "\u00a7" + match.toLowerCase(java.util.Locale.ROOT));
+                                }
+                                //name = name.replaceAll("(?i)&([0-9a-fr])", "\u00a7$1");
+                            }
+                            if (player.hasPermission("purpur.anvil.format")) {
+                                java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("(?i)&([k-or])").matcher(name);
+                                while (matcher.find()) {
+                                    String match = matcher.group(1);
+                                    name = name.replace("&" + match, "\u00a7" + match.toLowerCase(java.util.Locale.ROOT));
+                                }
+                                //name = name.replaceAll("(?i)&([l-or])", "\u00a7$1");
+                            }
+                        }
+                        net.kyori.adventure.text.Component component;
+                        if (this.player.level().purpurConfig.anvilColorsUseMiniMessage && player.hasPermission("purpur.anvil.minimessage")) {
+                            component = net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(org.bukkit.ChatColor.stripColor(name));
+                        } else {
+                            component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(name);
+                        }
+                        if (removeItalics) {
+                            component = component.decoration(net.kyori.adventure.text.format.TextDecoration.ITALIC, false);
+                        }
+                        itemstack1.set(DataComponents.CUSTOM_NAME, io.papermc.paper.adventure.PaperAdventure.asVanilla(component));
+                    }
+                    else
+                    // Purpur end
                     itemstack1.set(DataComponents.CUSTOM_NAME, Component.literal(this.itemName));
                 }
             } else if (itemstack.has(DataComponents.CUSTOM_NAME)) {
