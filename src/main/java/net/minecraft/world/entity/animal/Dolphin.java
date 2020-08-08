@@ -465,6 +465,7 @@ public class Dolphin extends WaterAnimal {
 
         @Override
         public boolean canUse() {
+            if (this.dolphin.level().purpurConfig.dolphinDisableTreasureSearching) return false; // Purpur
             return this.dolphin.gotFish() && this.dolphin.getAirSupply() >= 100;
         }
 
