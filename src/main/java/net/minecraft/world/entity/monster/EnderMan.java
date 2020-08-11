@@ -428,6 +428,7 @@ public class EnderMan extends Monster implements NeutralMob {
         if (this.isInvulnerableTo(source)) {
             return false;
         } else if (getRider() != null && this.isControllable()) { return super.hurt(source, amount); // Purpur - no teleporting on damage
+        } else if (org.purpurmc.purpur.PurpurConfig.endermanShortHeight && source.is(net.minecraft.world.damagesource.DamageTypes.IN_WALL)) { return false; // Purpur - no suffocation damage if short height
         } else {
             boolean flag = source.getDirectEntity() instanceof ThrownPotion;
             boolean flag1;

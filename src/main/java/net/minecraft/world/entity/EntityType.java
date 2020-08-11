@@ -324,7 +324,8 @@ public class EntityType<T extends Entity> implements FeatureElement, EntityTypeT
     private Component description;
     @Nullable
     private ResourceKey<LootTable> lootTable;
-    private final EntityDimensions dimensions;
+    private EntityDimensions dimensions; // Purpur - remove final
+    public void setDimensions(EntityDimensions dimensions) { this.dimensions = dimensions; } // Purpur
     private final float spawnDimensionsScale;
     private final FeatureFlagSet requiredFeatures;
 

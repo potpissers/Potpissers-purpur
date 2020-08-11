@@ -246,6 +246,12 @@ public class PurpurConfig {
         enderChestPermissionRows = getBoolean("settings.blocks.ender_chest.use-permissions-for-rows", enderChestPermissionRows);
     }
 
+    public static boolean endermanShortHeight = false;
+    private static void entitySettings() {
+        endermanShortHeight = getBoolean("settings.entity.enderman.short-height", endermanShortHeight);
+        if (endermanShortHeight) EntityType.ENDERMAN.setDimensions(EntityDimensions.scalable(0.6F, 1.9F));
+    }
+
     public static boolean allowWaterPlacementInTheEnd = true;
     private static void allowWaterPlacementInEnd() {
         allowWaterPlacementInTheEnd = getBoolean("settings.allow-water-placement-in-the-end", allowWaterPlacementInTheEnd);
