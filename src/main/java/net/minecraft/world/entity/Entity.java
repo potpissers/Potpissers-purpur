@@ -4496,6 +4496,12 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return Mth.lerp(delta, this.yRotO, this.yRot);
     }
 
+    // Purpur start
+    public AABB getAxisForFluidCheck() {
+        return this.getBoundingBox().deflate(0.001D);
+    }
+    // Purpur end
+
     public boolean updateFluidHeightAndDoFluidPushing(TagKey<Fluid> tag, double speed) {
         if (false && this.touchingUnloadedChunk()) { // Pufferfish - cost of a lookup here is the same cost as below, so skip
             return false;

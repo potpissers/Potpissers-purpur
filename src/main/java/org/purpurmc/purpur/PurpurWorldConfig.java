@@ -1598,6 +1598,7 @@ public class PurpurWorldConfig {
     public double squidMaxHealth = 10.0D;
     public double squidScale = 1.0D;
     public boolean squidImmuneToEAR = true;
+    public double squidOffsetWaterCheck = 0.0D;
     private void squidSettings() {
         squidRidable = getBoolean("mobs.squid.ridable", squidRidable);
         squidControllable = getBoolean("mobs.squid.controllable", squidControllable);
@@ -1609,6 +1610,7 @@ public class PurpurWorldConfig {
         squidMaxHealth = getDouble("mobs.squid.attributes.max_health", squidMaxHealth);
         squidScale = Mth.clamp(getDouble("mobs.squid.attributes.scale", squidScale), 0.0625D, 16.0D);
         squidImmuneToEAR = getBoolean("mobs.squid.immune-to-EAR", squidImmuneToEAR);
+        squidOffsetWaterCheck = getDouble("mobs.squid.water-offset-check", squidOffsetWaterCheck);
     }
 
     public boolean spiderRidable = false;

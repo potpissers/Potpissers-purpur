@@ -74,6 +74,12 @@ public class Squid extends WaterAnimal {
     }
 
     @Override
+    public net.minecraft.world.phys.AABB getAxisForFluidCheck() {
+        // Stops squids from floating just over the water
+        return super.getAxisForFluidCheck().offsetY(level().purpurConfig.squidOffsetWaterCheck);
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new Squid.SquidRandomMovementGoal(this));
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
