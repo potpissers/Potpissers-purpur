@@ -31,7 +31,7 @@ public class PortalShape {
     private static final int MIN_HEIGHT = 3;
     public static final int MAX_HEIGHT = 21;
     private static final BlockBehaviour.StatePredicate FRAME = (iblockdata, iblockaccess, blockposition) -> {
-        return iblockdata.is(Blocks.OBSIDIAN);
+        return iblockdata.is(Blocks.OBSIDIAN) || (org.purpurmc.purpur.PurpurConfig.cryingObsidianValidForPortalFrame && iblockdata.is(Blocks.CRYING_OBSIDIAN)); // Purpur
     };
     private static final float SAFE_TRAVEL_MAX_ENTITY_XY = 4.0F;
     private static final double SAFE_TRAVEL_MAX_VERTICAL_DELTA = 1.0D;
