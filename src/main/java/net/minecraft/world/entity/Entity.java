@@ -3277,7 +3277,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     public void setAsInsidePortal(Portal portal, BlockPos pos) {
         if (this.isOnPortalCooldown()) {
             this.setPortalCooldown();
-        } else {
+        } else if (this.level.purpurConfig.entitiesCanUsePortals || this instanceof ServerPlayer) { // Purpur - Entities can use portals
             if (this.portalProcess != null && this.portalProcess.isSamePortal(portal)) {
                 this.portalProcess.updateEntryPosition(pos.immutable());
                 this.portalProcess.setAsInsidePortalThisTick(true);
@@ -3902,7 +3902,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     // CraftBukkit end
 
     public boolean canUsePortal(boolean allowVehicles) {
-        return (allowVehicles || !this.isPassenger()) && this.isAlive();
+        return (allowVehicles || !this.isPassenger()) && this.isAlive() && (this.level.purpurConfig.entitiesCanUsePortals || this instanceof ServerPlayer); // Purpur - Entities can use portals
     }
 
     public boolean canChangeDimensions(Level from, Level to) {

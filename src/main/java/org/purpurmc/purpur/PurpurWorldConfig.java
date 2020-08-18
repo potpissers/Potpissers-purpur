@@ -99,12 +99,14 @@ public class PurpurWorldConfig {
     public boolean useBetterMending = false;
     public boolean boatEjectPlayersOnLand = false;
     public boolean disableDropsOnCrammingDeath = false;
+    public boolean entitiesCanUsePortals = true;
     public boolean milkCuresBadOmen = true;
     public double tridentLoyaltyVoidReturnHeight = 0.0D;
     private void miscGameplayMechanicsSettings() {
         useBetterMending = getBoolean("gameplay-mechanics.use-better-mending", useBetterMending);
         boatEjectPlayersOnLand = getBoolean("gameplay-mechanics.boat.eject-players-on-land", boatEjectPlayersOnLand);
         disableDropsOnCrammingDeath = getBoolean("gameplay-mechanics.disable-drops-on-cramming-death", disableDropsOnCrammingDeath);
+        entitiesCanUsePortals = getBoolean("gameplay-mechanics.entities-can-use-portals", entitiesCanUsePortals);
         milkCuresBadOmen = getBoolean("gameplay-mechanics.milk-cures-bad-omen", milkCuresBadOmen);
         tridentLoyaltyVoidReturnHeight = getDouble("gameplay-mechanics.trident-loyalty-void-return-height", tridentLoyaltyVoidReturnHeight);
     }
