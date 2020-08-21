@@ -529,8 +529,10 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
                 }
             }
 
-            if (this.tickCount % 20 == 0) {
-                this.heal(1.0F, EntityRegainHealthEvent.RegainReason.REGEN); // CraftBukkit
+            // Purpur start - customizable heal rate and amount
+            if (this.tickCount % level().purpurConfig.witherHealthRegenDelay == 0) {
+                this.heal(level().purpurConfig.witherHealthRegenAmount, EntityRegainHealthEvent.RegainReason.REGEN); // CraftBukkit
+                // Purpur end
             }
 
             this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
