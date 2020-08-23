@@ -46,11 +46,16 @@ public final class EntitySelector {
     }
 
     public static Predicate<Entity> pushableBy(Entity entity) {
+        // Paper start - Climbing should not bypass cramming gamerule
+        return pushable(entity, false);
+    }
+    public static Predicate<Entity> pushable(Entity entity, boolean ignoreClimbing) {
+        // Paper end - Climbing should not bypass cramming gamerule
         PlayerTeam scoreboardteam = entity.getTeam();
         Team.CollisionRule scoreboardteambase_enumteampush = scoreboardteam == null ? Team.CollisionRule.ALWAYS : scoreboardteam.getCollisionRule();
 
         return (Predicate) (scoreboardteambase_enumteampush == Team.CollisionRule.NEVER ? Predicates.alwaysFalse() : EntitySelector.NO_SPECTATORS.and((entity1) -> {
-            if (!entity1.canCollideWithBukkit(entity) || !entity.canCollideWithBukkit(entity1)) { // CraftBukkit - collidable API
+            if (!entity1.isCollidable(ignoreClimbing) || !entity1.canCollideWithBukkit(entity) || !entity.canCollideWithBukkit(entity1)) { // CraftBukkit - collidable API // Paper - Climbing should not bypass cramming gamerule
                 return false;
             } else if (entity1 instanceof Player && entity instanceof Player && !io.papermc.paper.configuration.GlobalConfiguration.get().collisions.enablePlayerCollisions) { // Paper - Configurable player collision
                 return false;
