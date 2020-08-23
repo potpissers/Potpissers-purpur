@@ -160,7 +160,17 @@ public class WanderingTraderSpawner implements CustomSpawner {
             int k = pos.getX() + this.random.nextInt(range * 2) - range;
             int l = pos.getZ() + this.random.nextInt(range * 2) - range;
             int i1 = world.getHeight(Heightmap.Types.WORLD_SURFACE, k, l);
-            BlockPos blockposition2 = new BlockPos(k, i1, l);
+            // Purpur start - allow traders to spawn below nether roof
+            BlockPos.MutableBlockPos blockposition2 = new BlockPos.MutableBlockPos(k, i1, l);
+            if (world.dimensionType().hasCeiling()) {
+                do {
+                    blockposition2.relative(net.minecraft.core.Direction.DOWN);
+                } while (!world.getBlockState(blockposition2).isAir());
+                do {
+                    blockposition2.relative(net.minecraft.core.Direction.DOWN);
+                } while (world.getBlockState(blockposition2).isAir() && blockposition2.getY() > 0);
+            }
+            // Purpur end
 
             if (spawnplacementtype.isSpawnPositionOk(world, blockposition2, EntityType.WANDERING_TRADER)) {
                 blockposition1 = blockposition2;

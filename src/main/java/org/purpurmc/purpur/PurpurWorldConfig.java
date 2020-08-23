@@ -70,6 +70,12 @@ public class PurpurWorldConfig {
         return PurpurConfig.config.getBoolean("world-settings." + worldName + "." + path, PurpurConfig.config.getBoolean("world-settings.default." + path));
     }
 
+    private boolean getBoolean(String path, Predicate<Boolean> predicate) {
+        String val = getString(path, "default").toLowerCase();
+        Boolean bool = BooleanUtils.toBooleanObject(val, "true", "false", "default");
+        return predicate.test(bool);
+    }
+
     private double getDouble(String path, double def) {
         PurpurConfig.config.addDefault("world-settings.default." + path, def);
         return PurpurConfig.config.getDouble("world-settings." + worldName + "." + path, PurpurConfig.config.getDouble("world-settings.default." + path));
@@ -230,6 +236,21 @@ public class PurpurWorldConfig {
             set("gameplay-mechanics.minecart.controllable.block-speed.grass_block", 0.3D);
             set("gameplay-mechanics.minecart.controllable.block-speed.stone", 0.5D);
         }
+    }
+
+    public boolean catSpawning;
+    public boolean patrolSpawning;
+    public boolean phantomSpawning;
+    public boolean villagerTraderSpawning;
+    public boolean villageSiegeSpawning;
+    private void mobSpawnerSettings() {
+        // values of "default" or null will default to true only if the world environment is normal (aka overworld)
+        Predicate<Boolean> predicate = (bool) -> (bool != null && bool) || (bool == null && environment == World.Environment.NORMAL);
+        catSpawning = getBoolean("gameplay-mechanics.mob-spawning.village-cats", predicate);
+        patrolSpawning = getBoolean("gameplay-mechanics.mob-spawning.raid-patrols", predicate);
+        phantomSpawning = getBoolean("gameplay-mechanics.mob-spawning.phantoms", predicate);
+        villagerTraderSpawning = getBoolean("gameplay-mechanics.mob-spawning.wandering-traders", predicate);
+        villageSiegeSpawning = getBoolean("gameplay-mechanics.mob-spawning.village-sieges", predicate);
     }
 
     public boolean idleTimeoutKick = true;

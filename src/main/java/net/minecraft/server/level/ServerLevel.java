@@ -520,7 +520,24 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
         this.dragonParts = new Int2ObjectOpenHashMap();
         this.tickTime = flag1;
         this.server = minecraftserver;
-        this.customSpawners = list;
+        // Purpur start - enable/disable MobSpawners per world
+        this.customSpawners = Lists.newArrayList();
+        if (purpurConfig.phantomSpawning) {
+            customSpawners.add(new net.minecraft.world.level.levelgen.PhantomSpawner());
+        }
+        if (purpurConfig.patrolSpawning) {
+            customSpawners.add(new net.minecraft.world.level.levelgen.PatrolSpawner());
+        }
+        if (purpurConfig.catSpawning) {
+            customSpawners.add(new net.minecraft.world.entity.npc.CatSpawner());
+        }
+        if (purpurConfig.villageSiegeSpawning) {
+            customSpawners.add(new net.minecraft.world.entity.ai.village.VillageSiege());
+        }
+        if (purpurConfig.villagerTraderSpawning) {
+            customSpawners.add(new net.minecraft.world.entity.npc.WanderingTraderSpawner(iworlddataserver));
+        }
+        // Purpur end
         this.serverLevelData = iworlddataserver;
         ChunkGenerator chunkgenerator = worlddimension.generator();
         // CraftBukkit start
