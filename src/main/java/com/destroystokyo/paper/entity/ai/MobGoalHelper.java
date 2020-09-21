@@ -136,6 +136,10 @@ public class MobGoalHelper {
     static {
         // TODO these kinda should be checked on each release, in case obfuscation changes
         deobfuscationMap.put("abstract_skeleton_1", "abstract_skeleton_melee");
+        // Purpur start
+        deobfuscationMap.put("zombie_1", "zombie_attack_villager");
+        deobfuscationMap.put("drowned_1", "drowned_attack_villager");
+        // Purpur end
 
         ignored.add("goal_selector_1");
         ignored.add("goal_selector_2");
