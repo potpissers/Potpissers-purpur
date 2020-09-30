@@ -100,6 +100,12 @@ public abstract class BlockEntity {
         if (persistentDataTag instanceof CompoundTag) {
             this.persistentDataContainer.putAll((CompoundTag) persistentDataTag);
         }
+        // Purpur start
+        if (nbt.contains("Purpur.persistentLore")) {
+            net.minecraft.world.item.component.ItemLore.CODEC.decode(net.minecraft.nbt.NbtOps.INSTANCE, nbt.getCompound("Purpur.persistentLore")).result()
+                .ifPresent(tag -> this.persistentLore = tag.getFirst());
+        }
+        // Purpur end
     }
     // CraftBukkit end
 
@@ -115,6 +121,15 @@ public abstract class BlockEntity {
     public final void loadCustomOnly(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         this.loadAdditional(nbt, registryLookup);
     }
+
+    // Purpur start
+    protected void saveAdditional(CompoundTag nbt) {
+        if (this.persistentLore != null) {
+            net.minecraft.world.item.component.ItemLore.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, this.persistentLore).result()
+                .ifPresent(tag -> nbt.put("Purpur.persistentLore", tag));
+        }
+    }
+    // Purpur end
 
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {}
 
@@ -423,4 +438,16 @@ public abstract class BlockEntity {
 
         <T> T getOrDefault(DataComponentType<? extends T> type, T fallback);
     }
+    // Purpur start
+    @Nullable
+    private net.minecraft.world.item.component.ItemLore persistentLore = null;
+
+    public void setPersistentLore(net.minecraft.world.item.component.ItemLore lore) {
+        this.persistentLore = lore;
+    }
+
+    public @org.jetbrains.annotations.Nullable net.minecraft.world.item.component.ItemLore getPersistentLore() {
+        return this.persistentLore;
+    }
+    // Purpur end
 }

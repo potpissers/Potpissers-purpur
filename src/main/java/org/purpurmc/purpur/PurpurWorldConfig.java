@@ -133,6 +133,8 @@ public class PurpurWorldConfig {
     public boolean milkCuresBadOmen = true;
     public boolean noteBlockIgnoreAbove = false;
     public boolean persistentDroppableEntityDisplayNames = true;
+    public boolean persistentTileEntityLore = false;
+    public boolean persistentTileEntityDisplayName = true;
     public boolean projectilesBypassMobGriefing = false;
     public boolean tickFluids = true;
     public double mobsBlindnessMultiplier = 1;
@@ -156,6 +158,14 @@ public class PurpurWorldConfig {
         imposeTeleportRestrictionsOnEndPortals = getBoolean("gameplay-mechanics.impose-teleport-restrictions-on-end-portals", imposeTeleportRestrictionsOnEndPortals);
         milkCuresBadOmen = getBoolean("gameplay-mechanics.milk-cures-bad-omen", milkCuresBadOmen);
         noteBlockIgnoreAbove = getBoolean("gameplay-mechanics.note-block-ignore-above", noteBlockIgnoreAbove);
+        if (PurpurConfig.version < 35) {
+            boolean oldVal = getBoolean("gameplay-mechanics.persistent-tileentity-display-names-and-lore", persistentTileEntityLore);
+            set("gameplay-mechanics.persistent-tileentity-display-names-and-lore", null);
+            set("gameplay-mechanics.persistent-tileentity-lore", oldVal);
+            set("gameplay-mechanics.persistent-tileentity-display-name", !oldVal);
+        }
+        persistentTileEntityLore = getBoolean("gameplay-mechanics.persistent-tileentity-lore", persistentTileEntityLore);
+        persistentTileEntityDisplayName = getBoolean("gameplay-mechanics.persistent-tileentity-display-name", persistentTileEntityDisplayName);
         persistentDroppableEntityDisplayNames = getBoolean("gameplay-mechanics.persistent-droppable-entity-display-names", persistentDroppableEntityDisplayNames);
         projectilesBypassMobGriefing = getBoolean("gameplay-mechanics.projectiles-bypass-mob-griefing", projectilesBypassMobGriefing);
         tickFluids = getBoolean("gameplay-mechanics.tick-fluids", tickFluids);

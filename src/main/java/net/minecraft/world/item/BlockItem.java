@@ -157,7 +157,16 @@ public class BlockItem extends Item {
     }
 
     protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, @Nullable Player player, ItemStack stack, BlockState state) {
-        return BlockItem.updateCustomBlockEntityTag(world, player, pos, stack);
+        // Purpur start
+        boolean handled = updateCustomBlockEntityTag(world, player, pos, stack);
+        if (world.purpurConfig.persistentTileEntityLore) {
+            BlockEntity blockEntity1 = world.getBlockEntity(pos);
+            if (blockEntity1 != null) {
+                blockEntity1.setPersistentLore(stack.getOrDefault(DataComponents.LORE, net.minecraft.world.item.component.ItemLore.EMPTY));
+            }
+        }
+        return handled;
+        // Purpur end
     }
 
     @Nullable

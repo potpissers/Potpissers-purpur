@@ -311,7 +311,7 @@ public class Block extends BlockBehaviour implements ItemLike {
     public static void dropResources(BlockState state, LevelAccessor world, BlockPos pos, @Nullable BlockEntity blockEntity) {
         if (world instanceof ServerLevel) {
             Block.getDrops(state, (ServerLevel) world, pos, blockEntity).forEach((itemstack) -> {
-                Block.popResource((ServerLevel) world, pos, itemstack);
+                Block.popResource((ServerLevel) world, pos, applyLoreFromTile(itemstack, blockEntity)); // Purpur
             });
             state.spawnAfterBreak((ServerLevel) world, pos, ItemStack.EMPTY, true);
         }
@@ -330,7 +330,7 @@ public class Block extends BlockBehaviour implements ItemLike {
             event.setExpToDrop(block.getExpDrop(state, serverLevel, pos, net.minecraft.world.item.ItemStack.EMPTY, true)); // Paper - Properly handle xp dropping
             event.callEvent();
             for (org.bukkit.inventory.ItemStack drop : event.getDrops()) {
-                popResource(serverLevel, pos, org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(drop));
+                popResource(serverLevel, pos, applyLoreFromTile(org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(drop), blockEntity)); // Purpur
             }
             state.spawnAfterBreak(serverLevel, pos, ItemStack.EMPTY, false); // Paper - Properly handle xp dropping
             block.popExperience(serverLevel, pos, event.getExpToDrop()); // Paper - Properly handle xp dropping
@@ -347,12 +347,31 @@ public class Block extends BlockBehaviour implements ItemLike {
     // Paper end - Properly handle xp dropping
         if (world instanceof ServerLevel) {
             Block.getDrops(state, (ServerLevel) world, pos, blockEntity, entity, tool).forEach((itemstack1) -> {
-                Block.popResource(world, pos, itemstack1);
+                Block.popResource(world, pos, applyLoreFromTile(itemstack1, blockEntity)); // Purpur
             });
             state.spawnAfterBreak((ServerLevel) world, pos, tool, dropExperience); // Paper - Properly handle xp dropping
         }
 
     }
+
+    // Purpur start
+    private static ItemStack applyLoreFromTile(ItemStack stack, @Nullable BlockEntity blockEntity) {
+        if (stack.getItem() instanceof BlockItem) {
+            if (blockEntity != null && blockEntity.getLevel() instanceof ServerLevel) {
+                net.minecraft.world.item.component.ItemLore lore = blockEntity.getPersistentLore();
+                net.minecraft.core.component.DataComponentPatch.Builder builder = net.minecraft.core.component.DataComponentPatch.builder();
+                if (blockEntity.getLevel().purpurConfig.persistentTileEntityLore && lore != null) {
+                    builder.set(net.minecraft.core.component.DataComponents.LORE, lore);
+                }
+                if (!blockEntity.getLevel().purpurConfig.persistentTileEntityDisplayName) {
+                    builder.remove(net.minecraft.core.component.DataComponents.CUSTOM_NAME);
+                }
+                stack.applyComponents(builder.build());
+            }
+        }
+        return stack;
+    }
+    // Purpur end
 
     public static void popResource(Level world, BlockPos pos, ItemStack stack) {
         double d0 = (double) EntityType.ITEM.getHeight() / 2.0D;
