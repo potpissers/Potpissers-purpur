@@ -41,6 +41,7 @@ public final class Ingredient implements Predicate<ItemStack> {
     @Nullable
     private IntList stackingIds;
     public boolean exact; // CraftBukkit
+    public Predicate<org.bukkit.inventory.ItemStack> predicate; // Purpur
     public static final Codec<Ingredient> CODEC = Ingredient.codec(true);
     public static final Codec<Ingredient> CODEC_NONEMPTY = Ingredient.codec(false);
 
@@ -72,6 +73,12 @@ public final class Ingredient implements Predicate<ItemStack> {
         } else if (this.isEmpty()) {
             return itemstack.isEmpty();
         } else {
+            // Purpur start
+            if (predicate != null) {
+                return predicate.test(itemstack.asBukkitCopy());
+            }
+            // Purpur end
+
             ItemStack[] aitemstack = this.getItems();
             int i = aitemstack.length;
 
