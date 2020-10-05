@@ -26,6 +26,11 @@ public class BowItem extends ProjectileWeaponItem {
     public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
         if (user instanceof Player player) {
             ItemStack itemStack = player.getProjectile(stack);
+            //  Purpur start
+            if (world.purpurConfig.infinityWorksWithoutArrows && itemStack.isEmpty() && net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.INFINITY, stack) > 0) {
+                itemStack = new ItemStack(Items.ARROW);
+            }
+            // Purpur end
             if (!itemStack.isEmpty()) {
                 int i = this.getUseDuration(stack, user) - remainingUseTicks;
                 float f = getPowerForTime(i);
@@ -82,7 +87,7 @@ public class BowItem extends ProjectileWeaponItem {
     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
         ItemStack itemStack = user.getItemInHand(hand);
         boolean bl = !user.getProjectile(itemStack).isEmpty();
-        if (!user.hasInfiniteMaterials() && !bl) {
+        if (!user.hasInfiniteMaterials() && !bl && !(world.purpurConfig.infinityWorksWithoutArrows && net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.INFINITY, itemStack) > 0)) { // Purpur
             return InteractionResultHolder.fail(itemStack);
         } else {
             user.startUsingItem(hand);
