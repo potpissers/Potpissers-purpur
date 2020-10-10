@@ -221,6 +221,8 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
     private final StructureManager structureManager;
     private final StructureCheck structureCheck;
     private final boolean tickTime;
+    private double preciseTime; // Purpur
+    private boolean forceTime; // Purpur
     private final RandomSequences randomSequences;
 
     // CraftBukkit start
@@ -608,6 +610,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
         this.chunkTaskScheduler = new ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler((ServerLevel)(Object)this, ca.spottedleaf.moonrise.common.util.MoonriseCommon.WORKER_POOL);
         // Paper end - rewrite chunk system
         this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
+        this.preciseTime = this.serverLevelData.getDayTime(); // Purpur
     }
 
     // Paper start
@@ -798,6 +801,13 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
             this.serverLevelData.setGameTime(i);
             this.serverLevelData.getScheduledEvents().tick(this.server, i);
             if (this.levelData.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)) {
+                // Purpur start
+                int incrementTicks = isDay() ? this.purpurConfig.daytimeTicks : this.purpurConfig.nighttimeTicks;
+                if (incrementTicks != 12000) {
+                    this.preciseTime += 12000 / (double) incrementTicks;
+                    this.setDayTime(this.preciseTime);
+                } else
+                // Purpur end
                 this.setDayTime(this.levelData.getDayTime() + 1L);
             }
 
@@ -806,7 +816,21 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
 
     public void setDayTime(long timeOfDay) {
         this.serverLevelData.setDayTime(timeOfDay);
+        // Purpur start
+        this.preciseTime = timeOfDay;
+        this.forceTime = false;
     }
+    public void setDayTime(double i) {
+        this.serverLevelData.setDayTime((long) i);
+        this.forceTime = true;
+        // Purpur end
+    }
+
+    // Purpur start
+    public boolean isForceTime() {
+        return this.forceTime;
+    }
+    // Purpur end
 
     public void tickCustomSpawners(boolean spawnMonsters, boolean spawnAnimals) {
         Iterator iterator = this.customSpawners.iterator();

@@ -10,7 +10,7 @@ public class ClientboundSetTimePacket implements Packet<ClientGamePacketListener
         ClientboundSetTimePacket::write, ClientboundSetTimePacket::new
     );
     private final long gameTime;
-    private final long dayTime;
+    private long dayTime; public void setDayTime(long dayTime) { this.dayTime = dayTime; } // Purpur
 
     public ClientboundSetTimePacket(long time, long timeOfDay, boolean doDaylightCycle) {
         this.gameTime = time;

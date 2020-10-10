@@ -1784,7 +1784,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
             long worldTime = level.getGameTime();
             final ClientboundSetTimePacket worldPacket = new ClientboundSetTimePacket(worldTime, dayTime, doDaylight);
             for (Player entityhuman : level.players()) {
-                if (!(entityhuman instanceof ServerPlayer) || (tickCount + entityhuman.getId()) % 20 != 0) {
+                if (!(entityhuman instanceof ServerPlayer) || (!level.isForceTime() && (tickCount + entityhuman.getId()) % 20 != 0)) { // Purpur
                     continue;
                 }
                 ServerPlayer entityplayer = (ServerPlayer) entityhuman;
