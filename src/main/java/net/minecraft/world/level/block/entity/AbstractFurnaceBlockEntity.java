@@ -335,6 +335,21 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
         }
 
         ItemStack itemstack = (ItemStack) blockEntity.items.get(1);
+        // Purpur start
+        boolean usedLavaFromUnderneath = false;
+        if (world.purpurConfig.furnaceUseLavaFromUnderneath && !blockEntity.isLit() && itemstack.isEmpty() && !blockEntity.items.get(0).isEmpty() && world.getGameTime() % 20 == 0) {
+            BlockPos below = blockEntity.getBlockPos().below();
+            BlockState belowState = world.getBlockStateIfLoaded(below);
+            if (belowState != null && belowState.is(Blocks.LAVA)) {
+                net.minecraft.world.level.material.FluidState fluidState = belowState.getFluidState();
+                if (fluidState != null && fluidState.isSource()) {
+                    world.setBlock(below, Blocks.AIR.defaultBlockState(), 3);
+                    itemstack = Items.LAVA_BUCKET.getDefaultInstance();
+                    usedLavaFromUnderneath = true;
+                }
+            }
+        }
+        // Purpur end
         ItemStack itemstack1 = (ItemStack) blockEntity.items.get(0);
         boolean flag2 = !itemstack1.isEmpty();
         boolean flag3 = !itemstack.isEmpty();
@@ -421,6 +436,7 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
             setChanged(world, pos, state);
         }
 
+        if (usedLavaFromUnderneath) blockEntity.items.set(1, ItemStack.EMPTY); // Purpur
     }
 
     private static boolean canBurn(RegistryAccess registryManager, @Nullable RecipeHolder<?> recipe, NonNullList<ItemStack> slots, int count) {
