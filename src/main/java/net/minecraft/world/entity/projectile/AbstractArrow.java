@@ -356,7 +356,7 @@ public abstract class AbstractArrow extends Projectile {
         Vec3 vec3d = this.getDeltaMovement();
 
         this.setDeltaMovement(vec3d.multiply((double) (this.random.nextFloat() * 0.2F), (double) (this.random.nextFloat() * 0.2F), (double) (this.random.nextFloat() * 0.2F)));
-        this.life = 0;
+        if (this.level().purpurConfig.arrowMovementResetsDespawnCounter) this.life = 0; // Purpur - do not reset despawn counter
     }
 
     @Override
