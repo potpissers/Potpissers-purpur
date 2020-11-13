@@ -114,6 +114,7 @@ public class PurpurWorldConfig {
     public boolean milkCuresBadOmen = true;
     public double tridentLoyaltyVoidReturnHeight = 0.0D;
     public int raidCooldownSeconds = 0;
+    public int animalBreedingCooldownSeconds = 0;
     private void miscGameplayMechanicsSettings() {
         useBetterMending = getBoolean("gameplay-mechanics.use-better-mending", useBetterMending);
         boatEjectPlayersOnLand = getBoolean("gameplay-mechanics.boat.eject-players-on-land", boatEjectPlayersOnLand);
@@ -122,6 +123,7 @@ public class PurpurWorldConfig {
         milkCuresBadOmen = getBoolean("gameplay-mechanics.milk-cures-bad-omen", milkCuresBadOmen);
         tridentLoyaltyVoidReturnHeight = getDouble("gameplay-mechanics.trident-loyalty-void-return-height", tridentLoyaltyVoidReturnHeight);
         raidCooldownSeconds = getInt("gameplay-mechanics.raid-cooldown-seconds", raidCooldownSeconds);
+        animalBreedingCooldownSeconds = getInt("gameplay-mechanics.animal-breeding-cooldown-seconds", animalBreedingCooldownSeconds);
     }
 
     public int daytimeTicks = 12000;
