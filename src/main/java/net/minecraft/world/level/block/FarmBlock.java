@@ -125,6 +125,14 @@ public class FarmBlock extends Block {
                 return;
             }
 
+            // Purpur start
+            if (world.purpurConfig.farmlandAlpha) {
+                Block block = world.getBlockState(pos.below()).getBlock();
+                if (block instanceof FenceBlock || block instanceof WallBlock) {
+                    return;
+                }
+            }
+            // Purpur end
             if (!CraftEventFactory.callEntityChangeBlockEvent(entity, pos, Blocks.DIRT.defaultBlockState())) {
                 return;
             }
