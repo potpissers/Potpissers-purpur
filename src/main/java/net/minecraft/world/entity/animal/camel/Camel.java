@@ -92,6 +92,10 @@ public class Camel extends AbstractHorse implements PlayerRideableJumping, Saddl
     public boolean dismountsUnderwater() {
         return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.camelRidableInWater;
     }
+
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.camelBreedingTicks;
+    }
     // Purpur end
 
     @Override

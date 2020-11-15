@@ -109,6 +109,11 @@ public class Goat extends Animal {
     // Purpur end
 
     @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.goatBreedingTicks;
+    }
+
+    @Override
     protected Brain.Provider<Goat> brainProvider() {
         return Brain.provider(Goat.MEMORY_TYPES, Goat.SENSOR_TYPES);
     }

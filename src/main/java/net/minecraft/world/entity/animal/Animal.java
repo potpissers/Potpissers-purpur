@@ -43,6 +43,7 @@ public abstract class Animal extends AgeableMob {
     @Nullable
     public UUID loveCause;
     public ItemStack breedItem; // CraftBukkit - Add breedItem variable
+    public abstract int getPurpurBreedTime(); // Purpur
 
     protected Animal(EntityType<? extends Animal> type, Level world) {
         super(type, world);
@@ -276,8 +277,10 @@ public abstract class Animal extends AgeableMob {
             entityplayer.awardStat(Stats.ANIMALS_BRED);
             CriteriaTriggers.BRED_ANIMALS.trigger(entityplayer, this, entityanimal, entityageable);
         } // Paper
-        this.setAge(6000);
-        entityanimal.setAge(6000);
+        // Purpur start
+        this.setAge(this.getPurpurBreedTime());
+        entityanimal.setAge(entityanimal.getPurpurBreedTime());
+        // Purpur end
         this.resetLove();
         entityanimal.resetLove();
         worldserver.broadcastEntityEvent(this, (byte) 18);

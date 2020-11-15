@@ -115,6 +115,11 @@ public class Sniffer extends Animal {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.snifferMaxHealth);
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.snifferScale);
     }
+
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.snifferBreedingTicks;
+    }
     // Purpur end
 
     @Override

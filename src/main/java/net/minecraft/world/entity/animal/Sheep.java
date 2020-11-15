@@ -139,6 +139,11 @@ public class Sheep extends Animal implements Shearable {
     }
 
     @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.sheepBreedingTicks;
+    }
+
+    @Override
     protected void registerGoals() {
         this.eatBlockGoal = new EatBlockGoal(this);
         this.goalSelector.addGoal(0, new FloatGoal(this));

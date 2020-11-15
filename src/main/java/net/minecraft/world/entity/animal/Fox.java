@@ -190,6 +190,11 @@ public class Fox extends Animal implements VariantHolder<Fox.Type> {
     }
 
     @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.foxBreedingTicks;
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(Fox.DATA_TRUSTED_ID_0, Optional.empty());
@@ -991,8 +996,10 @@ public class Fox extends Animal implements VariantHolder<Fox.Type> {
                     CriteriaTriggers.BRED_ANIMALS.trigger(entityplayer2, this.animal, this.partner, entityfox);
                 }
 
-                this.animal.setAge(6000);
-                this.partner.setAge(6000);
+                // Purpur start
+                this.animal.setAge(this.animal.getPurpurBreedTime());
+                this.partner.setAge(this.partner.getPurpurBreedTime());
+                // Purpur end
                 this.animal.resetLove();
                 this.partner.resetLove();
                 worldserver.addFreshEntityWithPassengers(entityfox, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.BREEDING); // CraftBukkit - added SpawnReason

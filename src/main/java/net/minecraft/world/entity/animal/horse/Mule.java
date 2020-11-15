@@ -37,6 +37,11 @@ public class Mule extends AbstractChestedHorse {
     }
 
     @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.muleBreedingTicks;
+    }
+
+    @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.MULE_AMBIENT;
     }

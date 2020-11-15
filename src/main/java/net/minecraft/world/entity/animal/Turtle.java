@@ -110,6 +110,11 @@ public class Turtle extends Animal {
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.turtleScale);
     }
 
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.turtleBreedingTicks;
+    }
+
     public void setHomePos(BlockPos pos) {
         this.entityData.set(Turtle.HOME_POS, pos);
     }

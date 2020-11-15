@@ -89,6 +89,11 @@ public class Ocelot extends Animal {
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.ocelotScale);
     }
 
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.ocelotBreedingTicks;
+    }
+
     public boolean isTrusting() {
         return (Boolean) this.entityData.get(Ocelot.DATA_TRUSTING);
     }

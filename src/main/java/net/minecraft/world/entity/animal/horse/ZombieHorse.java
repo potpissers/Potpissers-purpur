@@ -60,6 +60,11 @@ public class ZombieHorse extends AbstractHorse {
         return generateSpeed(this.level().purpurConfig.zombieHorseMovementSpeedMin, this.level().purpurConfig.zombieHorseMovementSpeedMax);
     }
 
+    @Override
+    public int getPurpurBreedTime() {
+        return 6000;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return createBaseHorseAttributes().add(Attributes.MAX_HEALTH, 15.0).add(Attributes.MOVEMENT_SPEED, 0.2F);
     }

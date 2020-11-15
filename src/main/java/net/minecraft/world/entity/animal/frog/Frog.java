@@ -162,6 +162,10 @@ public class Frog extends Animal implements VariantHolder<Holder<FrogVariant>> {
     }
     // Purpur end
 
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.frogBreedingTicks;
+    }
+
     @Override
     protected Brain.Provider<Frog> brainProvider() {
         return Brain.provider(MEMORY_TYPES, SENSOR_TYPES);

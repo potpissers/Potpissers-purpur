@@ -192,6 +192,11 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.parrotScale);
     }
 
+    @Override
+    public int getPurpurBreedTime() {
+        return 6000;
+    }
+
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor world, DifficultyInstance difficulty, MobSpawnType spawnReason, @Nullable SpawnGroupData entityData) {

@@ -68,6 +68,11 @@ public class Horse extends AbstractHorse implements VariantHolder<Variant> {
     }
 
     @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.horseBreedingTicks;
+    }
+
+    @Override
     protected void randomizeAttributes(RandomSource random) {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue((double)generateMaxHealth(random::nextInt));
         this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(generateSpeed(random::nextDouble));

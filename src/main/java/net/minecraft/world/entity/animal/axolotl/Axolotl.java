@@ -121,6 +121,11 @@ public class Axolotl extends Animal implements LerpingModel, VariantHolder<Axolo
     }
 
     @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.axolotlBreedingTicks;
+    }
+
+    @Override
     public Map<String, Vector3f> getModelRotationValues() {
         return this.modelRotationValues;
     }

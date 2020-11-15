@@ -114,6 +114,11 @@ public class Hoglin extends Animal implements Enemy, HoglinBase {
     // Purpur end
 
     @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.hoglinBreedingTicks;
+    }
+
+    @Override
     public boolean canBeLeashed() {
         return true;
     }

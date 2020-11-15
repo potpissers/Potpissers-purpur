@@ -141,6 +141,11 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
         return generateSpeed(this.level().purpurConfig.llamaMovementSpeedMin, this.level().purpurConfig.llamaMovementSpeedMax);
     }
 
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.llamaBreedingTicks;
+    }
+
     public boolean isTraderLlama() {
         return false;
     }

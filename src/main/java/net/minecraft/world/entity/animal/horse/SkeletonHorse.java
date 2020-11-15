@@ -64,6 +64,11 @@ public class SkeletonHorse extends AbstractHorse {
         return generateSpeed(this.level().purpurConfig.skeletonHorseMovementSpeedMin, this.level().purpurConfig.skeletonHorseMovementSpeedMax);
     }
 
+    @Override
+    public int getPurpurBreedTime() {
+        return 6000;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return createBaseHorseAttributes().add(Attributes.MAX_HEALTH, 15.0D).add(Attributes.MOVEMENT_SPEED, 0.20000000298023224D);
     }

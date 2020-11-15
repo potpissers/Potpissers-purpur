@@ -88,6 +88,11 @@ public class Pig extends Animal implements ItemSteerable, Saddleable {
     }
 
     @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.pigBreedingTicks;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur

@@ -155,6 +155,11 @@ public class Panda extends Animal {
     }
 
     @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.pandaBreedingTicks;
+    }
+
+    @Override
     public boolean canTakeItem(ItemStack stack) {
         EquipmentSlot enumitemslot = this.getEquipmentSlotForItem(stack);
 

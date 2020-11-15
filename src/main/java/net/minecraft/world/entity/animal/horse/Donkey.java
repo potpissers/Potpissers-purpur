@@ -38,6 +38,11 @@ public class Donkey extends AbstractChestedHorse {
     }
 
     @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.donkeyBreedingTicks;
+    }
+
+    @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.DONKEY_AMBIENT;
     }

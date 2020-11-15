@@ -103,6 +103,11 @@ public class Armadillo extends Animal {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.armadilloMaxHealth);
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.armadilloScale);
     }
+
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.armadilloBreedingTicks;
+    }
     // Purpur end
 
     @Override

@@ -134,6 +134,11 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.catMaxHealth);
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.catScale);
     }
+
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.catBreedingTicks;
+    }
     // Purpur end
 
     public ResourceLocation getTextureId() {

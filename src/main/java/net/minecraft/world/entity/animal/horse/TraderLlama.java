@@ -68,6 +68,11 @@ public class TraderLlama extends Llama {
     }
 
     @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.traderLlamaBreedingTicks;
+    }
+
+    @Override
     public boolean isTraderLlama() {
         return true;
     }

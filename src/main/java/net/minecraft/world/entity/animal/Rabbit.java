@@ -146,6 +146,11 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.rabbitMaxHealth);
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.rabbitScale);
     }
+
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.rabbitBreedingTicks;
+    }
     // Purpur end
 
     @Override

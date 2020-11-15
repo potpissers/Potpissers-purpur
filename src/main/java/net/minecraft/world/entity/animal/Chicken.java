@@ -81,6 +81,11 @@ public class Chicken extends Animal {
     // Purpur end
 
     @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.chickenBreedingTicks;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur

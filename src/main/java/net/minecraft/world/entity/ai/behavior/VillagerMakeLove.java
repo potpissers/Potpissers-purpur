@@ -125,8 +125,10 @@ public class VillagerMakeLove extends Behavior<Villager> {
                 return Optional.empty();
             }
             // Move age setting down
-            parent.setAge(6000);
-            partner.setAge(6000);
+            // Purpur start
+            parent.setAge(world.purpurConfig.villagerBreedingTicks);
+            partner.setAge(world.purpurConfig.villagerBreedingTicks);
+            // Purpur end
             world.addFreshEntityWithPassengers(entityvillager2, CreatureSpawnEvent.SpawnReason.BREEDING);
             // CraftBukkit end
             world.broadcastEntityEvent(entityvillager2, (byte) 12);
