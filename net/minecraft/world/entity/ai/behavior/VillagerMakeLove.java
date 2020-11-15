@@ -118,8 +118,10 @@ public class VillagerMakeLove extends Behavior<Villager> {
                 return Optional.empty();
             }
             // Move age setting down
-            parent.setAge(6000);
-            partner.setAge(6000);
+            // Purpur start - Make entity breeding times configurable
+            parent.setAge(level.purpurConfig.villagerBreedingTicks);
+            partner.setAge(level.purpurConfig.villagerBreedingTicks);
+            // Purpur end - Make entity breeding times configurable
             level.addFreshEntityWithPassengers(breedOffspring, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.BREEDING);
             // CraftBukkit end - call EntityBreedEvent
             level.broadcastEntityEvent(breedOffspring, (byte)12);

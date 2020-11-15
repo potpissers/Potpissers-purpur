@@ -480,6 +480,13 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.beeBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     public int getRemainingPersistentAngerTime() {
         return this.entityData.get(DATA_REMAINING_ANGER_TIME);

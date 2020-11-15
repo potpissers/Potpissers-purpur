@@ -79,6 +79,13 @@ public class MushroomCow extends Cow implements Shearable, VariantHolder<Mushroo
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.mooshroomBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     public float getWalkTargetValue(BlockPos pos, LevelReader level) {
         return level.getBlockState(pos.below()).is(Blocks.MYCELIUM) ? 10.0F : level.getPathfindingCostFromLightLevels(pos);

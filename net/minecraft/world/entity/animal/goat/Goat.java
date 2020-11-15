@@ -128,6 +128,13 @@ public class Goat extends Animal {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.goatBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     protected Brain.Provider<Goat> brainProvider() {
         return Brain.provider(MEMORY_TYPES, SENSOR_TYPES);

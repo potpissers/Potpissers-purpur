@@ -124,6 +124,13 @@ public class PolarBear extends Animal implements NeutralMob {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.polarBearBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob otherParent) {

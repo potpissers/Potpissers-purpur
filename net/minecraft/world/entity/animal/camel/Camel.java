@@ -90,6 +90,13 @@ public class Camel extends AbstractHorse {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.camelBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);

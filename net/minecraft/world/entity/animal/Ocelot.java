@@ -87,6 +87,13 @@ public class Ocelot extends Animal {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.ocelotBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     public boolean isTrusting() {
         return this.entityData.get(DATA_TRUSTING);
     }

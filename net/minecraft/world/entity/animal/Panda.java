@@ -140,6 +140,13 @@ public class Panda extends Animal {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.pandaBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     protected boolean canDispenserEquipIntoSlot(EquipmentSlot slot) {
         return slot == EquipmentSlot.MAINHAND && this.canPickUpLoot();

@@ -126,6 +126,13 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.catBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     protected void registerGoals() {
         this.temptGoal = new Cat.CatTemptGoal(this, 0.6, itemStack -> itemStack.is(ItemTags.CAT_FOOD), true);

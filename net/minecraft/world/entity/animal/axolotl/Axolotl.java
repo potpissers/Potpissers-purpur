@@ -140,6 +140,13 @@ public class Axolotl extends Animal implements VariantHolder<Axolotl.Variant>, B
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.axolotlBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     public float getWalkTargetValue(BlockPos pos, LevelReader level) {
         return 0.0F;

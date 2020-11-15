@@ -194,6 +194,13 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return 6000;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(

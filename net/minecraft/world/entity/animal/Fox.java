@@ -175,6 +175,13 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.foxBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
@@ -973,8 +980,10 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
                     CriteriaTriggers.BRED_ANIMALS.trigger(serverPlayer, this.animal, this.partner, fox);
                 }
 
-                this.animal.setAge(6000);
-                this.partner.setAge(6000);
+                // Purpur start - Make entity breeding times configurable
+                this.animal.setAge(this.animal.getPurpurBreedTime());
+                this.partner.setAge(this.partner.getPurpurBreedTime());
+                // Purpur end - Make entity breeding times configurable
                 this.animal.resetLove();
                 this.partner.resetLove();
                 serverLevel.addFreshEntityWithPassengers(fox, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.BREEDING); // CraftBukkit - added SpawnReason

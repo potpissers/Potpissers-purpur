@@ -39,6 +39,13 @@ public class Mule extends AbstractChestedHorse {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.muleBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.MULE_AMBIENT;

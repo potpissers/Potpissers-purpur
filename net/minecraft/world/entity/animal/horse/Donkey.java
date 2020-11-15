@@ -40,6 +40,13 @@ public class Donkey extends AbstractChestedHorse {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.donkeyBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.DONKEY_AMBIENT;

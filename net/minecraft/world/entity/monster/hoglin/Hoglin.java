@@ -117,6 +117,13 @@ public class Hoglin extends Animal implements Enemy, HoglinBase {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.hoglinBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @VisibleForTesting
     public void setTimeInOverworld(int timeInOverworld) {
         this.timeInOverworld = timeInOverworld;

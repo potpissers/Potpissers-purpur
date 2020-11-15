@@ -109,6 +109,13 @@ public class Turtle extends Animal {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.turtleBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     public void setHomePos(BlockPos homePos) {
         this.entityData.set(HOME_POS, homePos);
     }
@@ -394,8 +401,10 @@ public class Turtle extends Animal {
             }
 
             this.turtle.setHasEgg(true);
-            this.animal.setAge(6000);
-            this.partner.setAge(6000);
+            // Purpur start - Make entity breeding times configurable
+            this.animal.setAge(this.animal.getPurpurBreedTime());
+            this.partner.setAge(this.partner.getPurpurBreedTime());
+            // Purpur end - Make entity breeding times configurable
             this.animal.resetLove();
             this.partner.resetLove();
             RandomSource random = this.animal.getRandom();

@@ -141,6 +141,13 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.llamaBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     public boolean isTraderLlama() {
         return false;
     }

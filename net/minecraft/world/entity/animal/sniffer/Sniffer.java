@@ -113,6 +113,13 @@ public class Sniffer extends Animal {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.snifferBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);

@@ -68,6 +68,13 @@ public class TraderLlama extends Llama {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.traderLlamaBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     public boolean isTraderLlama() {
         return true;

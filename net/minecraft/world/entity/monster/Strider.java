@@ -119,6 +119,13 @@ public class Strider extends Animal implements ItemSteerable, Saddleable {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.striderBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     public static boolean checkStriderSpawnRules(
         EntityType<Strider> entityType, LevelAccessor level, EntitySpawnReason spawnReason, BlockPos pos, RandomSource random
     ) {

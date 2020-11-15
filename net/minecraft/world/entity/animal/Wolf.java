@@ -210,6 +210,13 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.wolfBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));

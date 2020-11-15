@@ -145,6 +145,13 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Make entity breeding times configurable
+    @Override
+    public int getPurpurBreedTime() {
+        return this.level().purpurConfig.rabbitBreedingTicks;
+    }
+    // Purpur end - Make entity breeding times configurable
+
     @Override
     public void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
