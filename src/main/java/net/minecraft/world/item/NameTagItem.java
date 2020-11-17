@@ -23,6 +23,7 @@ public class NameTagItem extends Item {
                 if (!event.callEvent()) return InteractionResult.PASS;
                 LivingEntity newEntity = ((org.bukkit.craftbukkit.entity.CraftLivingEntity) event.getEntity()).getHandle();
                 newEntity.setCustomName(event.getName() != null ? io.papermc.paper.adventure.PaperAdventure.asVanilla(event.getName()) : null);
+                if (user.level().purpurConfig.armorstandFixNametags && entity instanceof net.minecraft.world.entity.decoration.ArmorStand) entity.setCustomNameVisible(true); // Purpur
                 if (event.isPersistent() && newEntity instanceof Mob mob) {
                 // Paper end - Add PlayerNameEntityEvent
                     mob.setPersistenceRequired();
