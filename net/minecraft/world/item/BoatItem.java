@@ -63,6 +63,7 @@ public class BoatItem extends Item {
                     return InteractionResult.FAIL;
                 } else {
                     boat.setYRot(player.getYRot());
+                    if (!level.purpurConfig.persistentDroppableEntityDisplayNames) boat.setCustomName(null); // Purpur - Apply display names from item forms of entities to entities and vice versa
                     if (!level.noCollision(boat, boat.getBoundingBox())) {
                         return InteractionResult.FAIL;
                     } else {

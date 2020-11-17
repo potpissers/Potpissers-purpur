@@ -223,7 +223,11 @@ public class ItemFrame extends HangingEntity {
                 this.removeFramedMap(item);
             } else {
                 if (dropItem) {
-                    this.spawnAtLocation(level, this.getFrameItemStack());
+                    // Purpur start - Apply display names from item forms of entities to entities and vice versa
+                    final ItemStack itemFrame = this.getFrameItemStack();
+                    if (!level.purpurConfig.persistentDroppableEntityDisplayNames) itemFrame.set(DataComponents.CUSTOM_NAME, null);
+                    this.spawnAtLocation(level, itemFrame);
+                    // Purpur end - Apply display names from item forms of entities to entities and vice versa
                 }
 
                 if (!item.isEmpty()) {

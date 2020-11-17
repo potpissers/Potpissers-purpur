@@ -162,7 +162,11 @@ public class Painting extends HangingEntity implements VariantHolder<Holder<Pain
         if (level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
             this.playSound(SoundEvents.PAINTING_BREAK, 1.0F, 1.0F);
             if (!(entity instanceof Player player && player.hasInfiniteMaterials())) {
-                this.spawnAtLocation(level, Items.PAINTING);
+                // Purpur start - Apply display names from item forms of entities to entities and vice versa
+                final ItemStack painting = new ItemStack(Items.PAINTING);
+                if (!this.level().purpurConfig.persistentDroppableEntityDisplayNames) painting.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, null);
+                this.spawnAtLocation(level, painting);
+                // Purpur end - Apply display names from item forms of entities to entities and vice versa
             }
         }
     }

@@ -62,6 +62,7 @@ public class HangingEntityItem extends Item {
             CustomData customData = itemInHand.getOrDefault(DataComponents.ENTITY_DATA, CustomData.EMPTY);
             if (!customData.isEmpty()) {
                 EntityType.updateCustomEntityTag(level, player, hangingEntity, customData);
+                if (!level.purpurConfig.persistentDroppableEntityDisplayNames) hangingEntity.setCustomName(null); // Purpur - Apply display names from item forms of entities to entities and vice versa
             }
 
             if (hangingEntity.survives()) {

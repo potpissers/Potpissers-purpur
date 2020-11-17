@@ -51,6 +51,10 @@ public class ArmorStandItem extends Item {
                         return InteractionResult.FAIL;
                     }
                     // CraftBukkit end
+                    // Purpur start - Apply display names from item forms of entities to entities and vice versa
+                    if (!serverLevel.purpurConfig.persistentDroppableEntityDisplayNames) armorStand.setCustomName(null);
+                    if (serverLevel.purpurConfig.armorstandSetNameVisible && armorStand.getCustomName() != null) armorStand.setCustomNameVisible(true);
+                    // Purpur end - Apply display names from item forms of entities to entities and vice versa
                     serverLevel.addFreshEntityWithPassengers(armorStand);
                     level.playSound(
                         null, armorStand.getX(), armorStand.getY(), armorStand.getZ(), SoundEvents.ARMOR_STAND_PLACE, SoundSource.BLOCKS, 0.75F, 0.8F

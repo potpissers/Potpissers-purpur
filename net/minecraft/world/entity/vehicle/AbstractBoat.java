@@ -879,7 +879,13 @@ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
 
     @Override
     public final ItemStack getPickResult() {
-        return new ItemStack(this.dropItem.get());
+        // Purpur start - Apply display names from item forms of entities to entities and vice versa
+        final ItemStack boat = new ItemStack(this.dropItem.get());
+        if (!this.level().purpurConfig.persistentDroppableEntityDisplayNames) {
+            boat.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, null);
+        }
+        return boat;
+        // Purpur end - Apply display names from item forms of entities to entities and vice versa
     }
 
     public static enum Status {
