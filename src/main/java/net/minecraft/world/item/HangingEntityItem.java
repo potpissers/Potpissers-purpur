@@ -74,6 +74,11 @@ public class HangingEntityItem extends Item {
 
             if (!customdata.isEmpty()) {
                 EntityType.updateCustomEntityTag(world, entityhuman, (Entity) object, customdata);
+                // Purpur start
+                if (!world.purpurConfig.persistentDroppableEntityDisplayNames) {
+                    ((Entity) object).setCustomName(null);
+                }
+                // Purpur end
             }
 
             if (((HangingEntity) object).survives()) {

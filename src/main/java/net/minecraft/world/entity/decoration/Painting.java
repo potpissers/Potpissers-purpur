@@ -178,7 +178,13 @@ public class Painting extends HangingEntity implements VariantHolder<Holder<Pain
                 }
             }
 
-            this.spawnAtLocation((ItemLike) Items.PAINTING);
+            // Purpur start
+            final ItemStack painting = new ItemStack(Items.PAINTING);
+            if (!this.level().purpurConfig.persistentDroppableEntityDisplayNames) {
+                painting.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, null);
+            }
+            this.spawnAtLocation(painting);
+            // Purpur end
         }
     }
 

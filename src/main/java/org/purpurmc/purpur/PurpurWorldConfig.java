@@ -98,8 +98,10 @@ public class PurpurWorldConfig {
     }
 
     public float armorstandStepHeight = 0.0F;
+    public boolean armorstandSetNameVisible = false;
     private void armorstandSettings() {
         armorstandStepHeight = (float) getDouble("gameplay-mechanics.armorstand.step-height", armorstandStepHeight);
+        armorstandSetNameVisible = getBoolean("gameplay-mechanics.armorstand.set-name-visible-when-placing-with-custom-name", armorstandSetNameVisible);
     }
 
     public boolean arrowMovementResetsDespawnCounter = true;
@@ -112,6 +114,7 @@ public class PurpurWorldConfig {
     public boolean disableDropsOnCrammingDeath = false;
     public boolean entitiesCanUsePortals = true;
     public boolean milkCuresBadOmen = true;
+    public boolean persistentDroppableEntityDisplayNames = true;
     public double tridentLoyaltyVoidReturnHeight = 0.0D;
     public int raidCooldownSeconds = 0;
     public int animalBreedingCooldownSeconds = 0;
@@ -121,6 +124,7 @@ public class PurpurWorldConfig {
         disableDropsOnCrammingDeath = getBoolean("gameplay-mechanics.disable-drops-on-cramming-death", disableDropsOnCrammingDeath);
         entitiesCanUsePortals = getBoolean("gameplay-mechanics.entities-can-use-portals", entitiesCanUsePortals);
         milkCuresBadOmen = getBoolean("gameplay-mechanics.milk-cures-bad-omen", milkCuresBadOmen);
+        persistentDroppableEntityDisplayNames = getBoolean("gameplay-mechanics.persistent-droppable-entity-display-names", persistentDroppableEntityDisplayNames);
         tridentLoyaltyVoidReturnHeight = getDouble("gameplay-mechanics.trident-loyalty-void-return-height", tridentLoyaltyVoidReturnHeight);
         raidCooldownSeconds = getInt("gameplay-mechanics.raid-cooldown-seconds", raidCooldownSeconds);
         animalBreedingCooldownSeconds = getInt("gameplay-mechanics.animal-breeding-cooldown-seconds", animalBreedingCooldownSeconds);

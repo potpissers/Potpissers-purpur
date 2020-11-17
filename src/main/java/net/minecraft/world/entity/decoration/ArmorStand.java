@@ -620,6 +620,7 @@ public class ArmorStand extends LivingEntity {
     private org.bukkit.event.entity.EntityDeathEvent brokenByPlayer(ServerLevel world, DamageSource damageSource) { // Paper
         ItemStack itemstack = new ItemStack(Items.ARMOR_STAND);
 
+        if (this.level().purpurConfig.persistentDroppableEntityDisplayNames)
         itemstack.set(DataComponents.CUSTOM_NAME, this.getCustomName());
         this.drops.add(new DefaultDrop(itemstack, stack -> Block.popResource(this.level(), this.blockPosition(), stack))); // CraftBukkit - add to drops // Paper - Restore vanilla drops behavior
         return this.brokenByAnything(world, damageSource); // Paper

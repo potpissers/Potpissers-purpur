@@ -1017,7 +1017,13 @@ public class Boat extends VehicleEntity implements Leashable, VariantHolder<Boat
 
     @Override
     public ItemStack getPickResult() {
-        return new ItemStack(this.getDropItem());
+        // Purpur start
+        final ItemStack boat = new ItemStack(this.getDropItem());
+        if (!this.level().purpurConfig.persistentDroppableEntityDisplayNames) {
+            boat.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, null);
+        }
+        return boat;
+        // Purpur end
     }
 
     public static enum Type implements StringRepresentable {

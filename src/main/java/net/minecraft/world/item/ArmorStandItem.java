@@ -59,6 +59,14 @@ public class ArmorStandItem extends Item {
                         return InteractionResult.FAIL;
                     }
                     // CraftBukkit end
+                    // Purpur start
+                    if (!world.purpurConfig.persistentDroppableEntityDisplayNames) {
+                        entityarmorstand.setCustomName(null);
+                    }
+                    if (world.purpurConfig.armorstandSetNameVisible && entityarmorstand.getCustomName() != null) {
+                        entityarmorstand.setCustomNameVisible(true);
+                    }
+                    // Purpur end
                     worldserver.addFreshEntityWithPassengers(entityarmorstand);
                     world.playSound((Player) null, entityarmorstand.getX(), entityarmorstand.getY(), entityarmorstand.getZ(), SoundEvents.ARMOR_STAND_PLACE, SoundSource.BLOCKS, 0.75F, 0.8F);
                     entityarmorstand.gameEvent(GameEvent.ENTITY_PLACE, context.getPlayer());

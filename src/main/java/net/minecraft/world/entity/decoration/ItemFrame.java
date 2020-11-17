@@ -227,7 +227,13 @@ public class ItemFrame extends HangingEntity {
                 }
 
                 if (alwaysDrop) {
-                    this.spawnAtLocation(this.getFrameItemStack());
+                    // Purpur start
+                    final ItemStack itemFrame = this.getFrameItemStack();
+                    if (!this.level().purpurConfig.persistentDroppableEntityDisplayNames) {
+                        itemFrame.set(DataComponents.CUSTOM_NAME, null);
+                    }
+                    this.spawnAtLocation(itemFrame);
+                    // Purpur end
                 }
 
                 if (!itemstack.isEmpty()) {
