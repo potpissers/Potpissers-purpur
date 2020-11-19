@@ -1420,9 +1420,20 @@ public class EntityType<T extends Entity> implements FeatureElement, EntityTypeT
     public static Stream<Entity> loadEntitiesRecursive(final List<? extends Tag> entityTags, final Level level, final EntitySpawnReason spawnReason) {
         final Spliterator<? extends Tag> spliterator = entityTags.spliterator();
         return StreamSupport.stream(new Spliterator<Entity>() {
+            final java.util.Map<EntityType<?>, Integer> loadedEntityCounts = new java.util.HashMap<>(); // Paper - Entity load/save limit per chunk
             @Override
             public boolean tryAdvance(Consumer<? super Entity> consumer) {
                 return spliterator.tryAdvance(tag -> EntityType.loadEntityRecursive((CompoundTag)tag, level, spawnReason, entity -> {
+                        // Paper start - Entity load/save limit per chunk
+                        final EntityType<?> entityType = entity.getType();
+                        final int saveLimit = level.paperConfig().chunks.entityPerChunkSaveLimit.getOrDefault(entityType, -1);
+                        if (saveLimit > -1) {
+                            if (this.loadedEntityCounts.getOrDefault(entityType, 0) >= saveLimit) {
+                                return null;
+                            }
+                            this.loadedEntityCounts.merge(entityType, 1, Integer::sum);
+                        }
+                        // Paper end - Entity load/save limit per chunk
                     consumer.accept(entity);
                     return entity;
                 }));

@@ -104,7 +104,18 @@ public final class ChunkEntitySlices {
         }
 
         final ListTag entitiesTag = new ListTag();
+        final java.util.Map<net.minecraft.world.entity.EntityType<?>, Integer> savedEntityCounts = new java.util.HashMap<>(); // Paper - Entity load/save limit per chunk
         for (final Entity entity : PlatformHooks.get().modifySavedEntities(world, chunkPos.x, chunkPos.z, entities)) {
+            // Paper start - Entity load/save limit per chunk
+            final EntityType<?> entityType = entity.getType();
+            final int saveLimit = world.paperConfig().chunks.entityPerChunkSaveLimit.getOrDefault(entityType, -1);
+            if (saveLimit > -1) {
+                if (savedEntityCounts.getOrDefault(entityType, 0) >= saveLimit) {
+                    continue;
+                }
+                savedEntityCounts.merge(entityType, 1, Integer::sum);
+            }
+            // Paper end - Entity load/save limit per chunk
             CompoundTag compoundTag = new CompoundTag();
             if (entity.save(compoundTag)) {
                 entitiesTag.add(compoundTag);
