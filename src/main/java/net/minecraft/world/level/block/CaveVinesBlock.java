@@ -94,4 +94,11 @@ public class CaveVinesBlock extends GrowingPlantHeadBlock implements Bonemealabl
     public void performBonemeal(ServerLevel world, RandomSource random, BlockPos pos, BlockState state) {
         world.setBlock(pos, state.setValue(BERRIES, Boolean.valueOf(true)), 2);
     }
+
+    // Purpur start
+    @Override
+    public int getMaxGrowthAge() {
+        return org.purpurmc.purpur.PurpurConfig.caveVinesMaxGrowthAge;
+    }
+    // Purpur end
 }

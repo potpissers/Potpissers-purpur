@@ -34,12 +34,12 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
 
     @Override
     public BlockState getStateForPlacement(LevelAccessor world) {
-        return (BlockState) this.defaultBlockState().setValue(GrowingPlantHeadBlock.AGE, world.getRandom().nextInt(25));
+        return (BlockState) this.defaultBlockState().setValue(GrowingPlantHeadBlock.AGE, world.getRandom().nextInt(getMaxGrowthAge())); // Purpur
     }
 
     @Override
     protected boolean isRandomlyTicking(BlockState state) {
-        return (Integer) state.getValue(GrowingPlantHeadBlock.AGE) < 25;
+        return (Integer) state.getValue(GrowingPlantHeadBlock.AGE) < getMaxGrowthAge(); // Purpur
     }
 
     @Override
@@ -55,7 +55,7 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
         } else {
             modifier = world.spigotConfig.caveVinesModifier;
         }
-        if ((Integer) state.getValue(GrowingPlantHeadBlock.AGE) < 25 && random.nextDouble() < ((modifier / 100.0D) * this.growPerTickProbability)) { // Spigot - SPIGOT-7159: Better modifier resolution
+        if ((Integer) state.getValue(GrowingPlantHeadBlock.AGE) < getMaxGrowthAge() && random.nextDouble() < ((modifier / 100.0D) * this.growPerTickProbability)) { // Spigot - SPIGOT-7159: Better modifier resolution // Purpur
             // Spigot end
             BlockPos blockposition1 = pos.relative(this.growthDirection);
 
@@ -77,11 +77,11 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
     }
 
     public BlockState getMaxAgeState(BlockState state) {
-        return (BlockState) state.setValue(GrowingPlantHeadBlock.AGE, 25);
+        return (BlockState) state.setValue(GrowingPlantHeadBlock.AGE, getMaxGrowthAge()); // Purpur
     }
 
     public boolean isMaxAge(BlockState state) {
-        return (Integer) state.getValue(GrowingPlantHeadBlock.AGE) == 25;
+        return (Integer) state.getValue(GrowingPlantHeadBlock.AGE) >= getMaxGrowthAge(); // Purpur
     }
 
     protected BlockState updateBodyAfterConvertedFromHead(BlockState from, BlockState to) {
@@ -123,13 +123,13 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
     @Override
     public void performBonemeal(ServerLevel world, RandomSource random, BlockPos pos, BlockState state) {
         BlockPos blockposition1 = pos.relative(this.growthDirection);
-        int i = Math.min((Integer) state.getValue(GrowingPlantHeadBlock.AGE) + 1, 25);
+        int i = Math.min((Integer) state.getValue(GrowingPlantHeadBlock.AGE) + 1, getMaxGrowthAge()); // Purpur
         int j = this.getBlocksToGrowWhenBonemealed(random);
 
         for (int k = 0; k < j && this.canGrowInto(world.getBlockState(blockposition1)); ++k) {
             world.setBlockAndUpdate(blockposition1, (BlockState) state.setValue(GrowingPlantHeadBlock.AGE, i));
             blockposition1 = blockposition1.relative(this.growthDirection);
-            i = Math.min(i + 1, 25);
+            i = Math.min(i + 1, getMaxGrowthAge()); // Purpur
         }
 
     }
@@ -142,4 +142,6 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
     protected GrowingPlantHeadBlock getHeadBlock() {
         return this;
     }
+
+    public abstract int getMaxGrowthAge(); // Purpur
 }
