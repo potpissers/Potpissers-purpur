@@ -487,7 +487,7 @@ public class EnderMan extends Monster implements NeutralMob {
 
     @Override
     public boolean requiresCustomPersistence() {
-        return super.requiresCustomPersistence() || this.getCarriedBlock() != null;
+        return super.requiresCustomPersistence() || (!this.level().purpurConfig.endermanDespawnEvenWithBlock && this.getCarriedBlock() != null); // Purpur
     }
 
     private static class EndermanFreezeWhenLookedAt extends Goal {
