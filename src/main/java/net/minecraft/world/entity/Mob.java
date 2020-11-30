@@ -1441,7 +1441,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
             attributemodifiable.addPermanentModifier(new AttributeModifier(Mob.RANDOM_SPAWN_BONUS_ID, randomsource.triangle(0.0D, 0.11485000000000001D), AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
         }
 
-        this.setLeftHanded(randomsource.nextFloat() < 0.05F);
+        this.setLeftHanded(randomsource.nextFloat() < world.getLevel().purpurConfig.entityLeftHandedChance); // Purpur
         return entityData;
     }
 
