@@ -1182,7 +1182,16 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
         if (this.isInvulnerableTo(source)) {
             return false;
         } else {
-            if (source.is(DamageTypeTags.IS_FALL) && getRootVehicle() instanceof net.minecraft.world.entity.vehicle.AbstractMinecart && level().purpurConfig.minecartControllable && !level().purpurConfig.minecartControllableFallDamage) return false; // Purpur
+            // Purpur start
+            if (source.is(DamageTypeTags.IS_FALL)) { // Purpur
+                if (getRootVehicle() instanceof net.minecraft.world.entity.vehicle.AbstractMinecart && level().purpurConfig.minecartControllable && !level().purpurConfig.minecartControllableFallDamage) {
+                    return false;
+                }
+                if (getRootVehicle() instanceof net.minecraft.world.entity.vehicle.Boat && !level().purpurConfig.boatsDoFallDamage) {
+                    return false;
+                }
+            }
+            // Purpur end
             boolean flag = this.server.isDedicatedServer() && this.isPvpAllowed() && source.is(DamageTypeTags.IS_FALL);
 
             if (!flag && this.spawnInvulnerableTime > 0 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
