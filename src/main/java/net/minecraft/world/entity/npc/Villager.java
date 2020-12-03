@@ -142,6 +142,8 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     }, MemoryModuleType.MEETING_POINT, (entityvillager, holder) -> {
         return holder.is(PoiTypes.MEETING);
     });
+    private boolean isLobotomized = false; public boolean isLobotomized() { return this.isLobotomized; } // Purpur
+    private int notLobotomizedCount = 0; // Purpur
 
     public long nextGolemPanic = -1; // Pufferfish
 
@@ -200,6 +202,48 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     @Override
     protected boolean isAlwaysExperienceDropper() {
         return this.level().purpurConfig.villagerAlwaysDropExp;
+    }
+
+    private boolean checkLobotomized() {
+        int interval = this.level().purpurConfig.villagerLobotomizeCheckInterval;
+        boolean shouldCheckForTradeLocked = this.level().purpurConfig.villagerLobotomizeWaitUntilTradeLocked;
+        if (this.notLobotomizedCount > 3) {
+            // check half as often if not lobotomized for the last 3+ consecutive checks
+            interval *= 2;
+        }
+        if (this.level().getGameTime() % interval == 0) {
+            // offset Y for short blocks like dirt_path/farmland
+            this.isLobotomized = !(shouldCheckForTradeLocked && this.getVillagerXp() == 0) && !canTravelFrom(BlockPos.containing(this.position().x, this.getBoundingBox().minY + 0.0625D, this.position().z));
+
+            if (this.isLobotomized) {
+                this.notLobotomizedCount = 0;
+            } else {
+                this.notLobotomizedCount++;
+            }
+        }
+        return this.isLobotomized;
+    }
+
+    private boolean canTravelFrom(BlockPos pos) {
+        return canTravelTo(pos.east()) || canTravelTo(pos.west()) || canTravelTo(pos.north()) || canTravelTo(pos.south());
+    }
+
+    private boolean canTravelTo(BlockPos pos) {
+        net.minecraft.world.level.block.state.BlockState state = this.level().getBlockStateIfLoaded(pos);
+        if (state == null) {
+            // chunk not loaded
+            return false;
+        }
+        net.minecraft.world.level.block.Block bottom = state.getBlock();
+        if (bottom instanceof net.minecraft.world.level.block.FenceBlock ||
+                bottom instanceof net.minecraft.world.level.block.FenceGateBlock ||
+                bottom instanceof net.minecraft.world.level.block.WallBlock) {
+            // bottom block is too tall to get over
+            return false;
+        }
+        net.minecraft.world.level.block.Block top = level().getBlockState(pos.above()).getBlock();
+        // only if both blocks have no collision
+        return !bottom.hasCollision && !top.hasCollision;
     }
 
     @Override
@@ -299,13 +343,22 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
         // Paper start
         this.customServerAiStep(false);
     }
-    protected void customServerAiStep(final boolean inactive) {
+    protected void customServerAiStep(boolean inactive) { // Purpur - not final
         // Paper end
         this.level().getProfiler().push("villagerBrain");
+        // Purpur start
+        if (this.level().purpurConfig.villagerLobotomizeEnabled) {
+            // treat as inactive if lobotomized
+            inactive = inactive || checkLobotomized();
+        } else {
+            this.isLobotomized = false;
+        }
+        // Purpur end
         // Pufferfish start
         if (!inactive && (getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) { // Purpur - only use brain if no rider
             this.getBrain().tick((ServerLevel) this.level(), this); // Paper
         }
+        else if (this.isLobotomized && shouldRestock()) restock(); // Purpur
         // Pufferfish end
         this.level().getProfiler().pop();
         if (this.assignProfessionWhenSpawned) {
