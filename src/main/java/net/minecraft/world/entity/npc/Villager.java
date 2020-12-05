@@ -226,7 +226,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
             brain.addActivity(Activity.PLAY, VillagerGoalPackages.getPlayPackage(0.5F));
         } else {
             brain.setSchedule(Schedule.VILLAGER_DEFAULT);
-            brain.addActivityWithConditions(Activity.WORK, VillagerGoalPackages.getWorkPackage(villagerprofession, 0.5F), ImmutableSet.of(Pair.of(MemoryModuleType.JOB_SITE, MemoryStatus.VALUE_PRESENT)));
+            brain.addActivityWithConditions(Activity.WORK, VillagerGoalPackages.getWorkPackage(villagerprofession, 0.5F, this.level().purpurConfig.villagerClericsFarmWarts), ImmutableSet.of(Pair.of(MemoryModuleType.JOB_SITE, MemoryStatus.VALUE_PRESENT))); // Purpur
         }
 
         brain.addActivity(Activity.CORE, VillagerGoalPackages.getCorePackage(villagerprofession, 0.5F));
@@ -975,6 +975,11 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
 
     public boolean hasFarmSeeds() {
         return this.getInventory().hasAnyMatching((itemstack) -> {
+            // Purpur start
+            if (this.level().purpurConfig.villagerClericsFarmWarts && this.getVillagerData().getProfession() == VillagerProfession.CLERIC) {
+                return itemstack.is(Items.NETHER_WART);
+            }
+            // Purpur end
             return itemstack.is(ItemTags.VILLAGER_PLANTABLE_SEEDS);
         });
     }

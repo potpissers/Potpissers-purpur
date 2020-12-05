@@ -52,8 +52,13 @@ public class VillagerGoalPackages {
     }
 
     public static ImmutableList<Pair<Integer, ? extends BehaviorControl<? super Villager>>> getWorkPackage(VillagerProfession profession, float speed) {
+        // Purpur start
+        return getWorkPackage(profession, speed, false);
+    }
+    public static ImmutableList<Pair<Integer, ? extends BehaviorControl<? super Villager>>> getWorkPackage(VillagerProfession profession, float speed, boolean clericsFarmWarts) {
+        // Purpur end
         WorkAtPoi workAtPoi;
-        if (profession == VillagerProfession.FARMER) {
+        if (profession == VillagerProfession.FARMER || (clericsFarmWarts && profession == VillagerProfession.CLERIC)) { // Purpur
             workAtPoi = new WorkAtComposter();
         } else {
             workAtPoi = new WorkAtPoi();

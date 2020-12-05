@@ -1905,6 +1905,8 @@ public class PurpurWorldConfig {
     public boolean villagerCanBeLeashed = false;
     public boolean villagerCanBreed = true;
     public int villagerBreedingTicks = 6000;
+    public boolean villagerClericsFarmWarts = false;
+    public boolean villagerClericFarmersThrowWarts = true;
     private void villagerSettings() {
         villagerRidable = getBoolean("mobs.villager.ridable", villagerRidable);
         villagerRidableInWater = getBoolean("mobs.villager.ridable-in-water", villagerRidableInWater);
@@ -1920,6 +1922,8 @@ public class PurpurWorldConfig {
         villagerCanBeLeashed = getBoolean("mobs.villager.can-be-leashed", villagerCanBeLeashed);
         villagerCanBreed = getBoolean("mobs.villager.can-breed", villagerCanBreed);
         villagerBreedingTicks = getInt("mobs.villager.breeding-delay-ticks", villagerBreedingTicks);
+        villagerClericsFarmWarts = getBoolean("mobs.villager.clerics-farm-warts", villagerClericsFarmWarts);
+        villagerClericFarmersThrowWarts = getBoolean("mobs.villager.cleric-wart-farmers-throw-warts-at-villagers", villagerClericFarmersThrowWarts);
     }
 
     public boolean vindicatorRidable = false;

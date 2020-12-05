@@ -41,6 +41,7 @@ public class HarvestFarmland extends Behavior<Villager> {
     private long nextOkStartTime;
     private int timeWorkedSoFar;
     private final List<BlockPos> validFarmlandAroundVillager = Lists.newArrayList();
+    private boolean clericWartFarmer = false; // Purpur
 
     public HarvestFarmland() {
         super(ImmutableMap.of(MemoryModuleType.LOOK_TARGET, MemoryStatus.VALUE_ABSENT, MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT, MemoryModuleType.SECONDARY_JOB_SITE, MemoryStatus.VALUE_PRESENT));
@@ -49,9 +50,10 @@ public class HarvestFarmland extends Behavior<Villager> {
     protected boolean checkExtraStartConditions(ServerLevel world, Villager entity) {
         if (!world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
             return false;
-        } else if (entity.getVillagerData().getProfession() != VillagerProfession.FARMER) {
+        } else if (entity.getVillagerData().getProfession() != VillagerProfession.FARMER && !(world.purpurConfig.villagerClericsFarmWarts && entity.getVillagerData().getProfession() == VillagerProfession.CLERIC)) { // Purpur
             return false;
         } else {
+            if (!this.clericWartFarmer && entity.getVillagerData().getProfession() == VillagerProfession.CLERIC) this.clericWartFarmer = true; // Purpur
             BlockPos.MutableBlockPos blockposition_mutableblockposition = entity.blockPosition().mutable();
 
             this.validFarmlandAroundVillager.clear();
@@ -82,6 +84,7 @@ public class HarvestFarmland extends Behavior<Villager> {
         Block block = iblockdata.getBlock();
         Block block1 = world.getBlockState(pos.below()).getBlock();
 
+        if (this.clericWartFarmer) return block == Blocks.NETHER_WART && iblockdata.getValue(net.minecraft.world.level.block.NetherWartBlock.AGE) == 3 || iblockdata.isAir() && block1 == Blocks.SOUL_SAND; // Purpur
         return block instanceof CropBlock && ((CropBlock) block).isMaxAge(iblockdata) || iblockdata.isAir() && block1 instanceof FarmBlock;
     }
 
@@ -107,20 +110,20 @@ public class HarvestFarmland extends Behavior<Villager> {
                 Block block = iblockdata.getBlock();
                 Block block1 = world.getBlockState(this.aboveFarmlandPos.below()).getBlock();
 
-                if (block instanceof CropBlock && ((CropBlock) block).isMaxAge(iblockdata)) {
+                if (block instanceof CropBlock && ((CropBlock) block).isMaxAge(iblockdata) && !this.clericWartFarmer || this.clericWartFarmer && block == Blocks.NETHER_WART && iblockdata.getValue(net.minecraft.world.level.block.NetherWartBlock.AGE) == 3) { // Purpur
                     if (CraftEventFactory.callEntityChangeBlockEvent(entity, this.aboveFarmlandPos, iblockdata.getFluidState().createLegacyBlock())) { // CraftBukkit // Paper - fix wrong block state
                     world.destroyBlock(this.aboveFarmlandPos, true, entity);
                     } // CraftBukkit
                 }
 
-                if (iblockdata.isAir() && block1 instanceof FarmBlock && entity.hasFarmSeeds()) {
+                if (iblockdata.isAir() && (block1 instanceof FarmBlock && !this.clericWartFarmer || this.clericWartFarmer && block1 == Blocks.SOUL_SAND) && entity.hasFarmSeeds()) { // Purpur
                     SimpleContainer inventorysubcontainer = entity.getInventory();
 
                     for (int j = 0; j < inventorysubcontainer.getContainerSize(); ++j) {
                         ItemStack itemstack = inventorysubcontainer.getItem(j);
                         boolean flag = false;
 
-                        if (!itemstack.isEmpty() && itemstack.is(ItemTags.VILLAGER_PLANTABLE_SEEDS)) {
+                        if (!itemstack.isEmpty() && (itemstack.is(ItemTags.VILLAGER_PLANTABLE_SEEDS) || this.clericWartFarmer && itemstack.getItem() == net.minecraft.world.item.Items.NETHER_WART)) {
                             Item item = itemstack.getItem();
 
                             if (item instanceof BlockItem) {
@@ -136,7 +139,7 @@ public class HarvestFarmland extends Behavior<Villager> {
                         }
 
                         if (flag) {
-                            world.playSound((Player) null, (double) this.aboveFarmlandPos.getX(), (double) this.aboveFarmlandPos.getY(), (double) this.aboveFarmlandPos.getZ(), SoundEvents.CROP_PLANTED, SoundSource.BLOCKS, 1.0F, 1.0F);
+                            world.playSound((Player) null, (double) this.aboveFarmlandPos.getX(), (double) this.aboveFarmlandPos.getY(), (double) this.aboveFarmlandPos.getZ(), this.clericWartFarmer ? SoundEvents.NETHER_WART_PLANTED : SoundEvents.CROP_PLANTED, SoundSource.BLOCKS, 1.0F, 1.0F); // Purpur
                             itemstack.shrink(1);
                             if (itemstack.isEmpty()) {
                                 inventorysubcontainer.setItem(j, ItemStack.EMPTY);

@@ -59,6 +59,12 @@ public class TradeWithVillager extends Behavior<Villager> {
                 throwHalfStack(entity, ImmutableSet.of(Items.WHEAT), villager);
             }
 
+            // Purpur start
+            if (world.purpurConfig.villagerClericsFarmWarts && world.purpurConfig.villagerClericFarmersThrowWarts && entity.getVillagerData().getProfession() == VillagerProfession.CLERIC && entity.getInventory().countItem(Items.NETHER_WART) > Items.NETHER_WART.getDefaultMaxStackSize() / 2) {
+                throwHalfStack(entity, ImmutableSet.of(Items.NETHER_WART), villager);
+            }
+            // Purpur end
+
             if (!this.trades.isEmpty() && entity.getInventory().hasAnyOf(this.trades)) {
                 throwHalfStack(entity, this.trades, villager);
             }

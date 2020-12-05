@@ -22,6 +22,13 @@ public class SecondaryPoiSensor extends Sensor<Villager> {
 
     @Override
     protected void doTick(ServerLevel world, Villager entity) {
+        // Purpur start - make sure clerics don't wander to soul sand when the option is off
+        Brain<?> brain = entity.getBrain();
+        if (!world.purpurConfig.villagerClericsFarmWarts && entity.getVillagerData().getProfession() == net.minecraft.world.entity.npc.VillagerProfession.CLERIC) {
+            brain.eraseMemory(MemoryModuleType.SECONDARY_JOB_SITE);
+            return;
+        }
+        // Purpur end
         ResourceKey<Level> resourceKey = world.dimension();
         BlockPos blockPos = entity.blockPosition();
         List<GlobalPos> list = Lists.newArrayList();
@@ -38,7 +45,7 @@ public class SecondaryPoiSensor extends Sensor<Villager> {
             }
         }
 
-        Brain<?> brain = entity.getBrain();
+        //Brain<?> brain = entity.getBrain(); // Purpur - moved up
         if (!list.isEmpty()) {
             brain.setMemory(MemoryModuleType.SECONDARY_JOB_SITE, list);
         } else {
