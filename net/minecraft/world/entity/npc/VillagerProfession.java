@@ -31,7 +31,7 @@ public record VillagerProfession(
     public static final VillagerProfession ARMORER = register("armorer", PoiTypes.ARMORER, SoundEvents.VILLAGER_WORK_ARMORER);
     public static final VillagerProfession BUTCHER = register("butcher", PoiTypes.BUTCHER, SoundEvents.VILLAGER_WORK_BUTCHER);
     public static final VillagerProfession CARTOGRAPHER = register("cartographer", PoiTypes.CARTOGRAPHER, SoundEvents.VILLAGER_WORK_CARTOGRAPHER);
-    public static final VillagerProfession CLERIC = register("cleric", PoiTypes.CLERIC, SoundEvents.VILLAGER_WORK_CLERIC);
+    public static final VillagerProfession CLERIC = register("cleric", PoiTypes.CLERIC, ImmutableSet.of(Items.NETHER_WART), ImmutableSet.of(Blocks.SOUL_SAND), SoundEvents.VILLAGER_WORK_CLERIC); // Purpur - Option for Villager Clerics to farm Nether Wart
     public static final VillagerProfession FARMER = register(
         "farmer",
         PoiTypes.FARMER,

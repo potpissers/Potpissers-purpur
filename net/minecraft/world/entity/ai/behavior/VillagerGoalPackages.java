@@ -74,8 +74,13 @@ public class VillagerGoalPackages {
     }
 
     public static ImmutableList<Pair<Integer, ? extends BehaviorControl<? super Villager>>> getWorkPackage(VillagerProfession profession, float speedModifier) {
+        // Purpur start - Option for Villager Clerics to farm Nether Wart
+        return getWorkPackage(profession, speedModifier, false);
+    }
+    public static ImmutableList<Pair<Integer, ? extends BehaviorControl<? super Villager>>> getWorkPackage(VillagerProfession profession, float speedModifier, boolean clericsFarmWarts) {
+        // Purpur end - Option for Villager Clerics to farm Nether Wart
         WorkAtPoi workAtPoi;
-        if (profession == VillagerProfession.FARMER) {
+        if (profession == VillagerProfession.FARMER || (clericsFarmWarts && profession == VillagerProfession.CLERIC)) { // Purpur - Option for Villager Clerics to farm Nether Wart
             workAtPoi = new WorkAtComposter();
         } else {
             workAtPoi = new WorkAtPoi();

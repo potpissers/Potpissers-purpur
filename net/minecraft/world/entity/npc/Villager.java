@@ -311,7 +311,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
             villagerBrain.setSchedule(Schedule.VILLAGER_DEFAULT);
             villagerBrain.addActivityWithConditions(
                 Activity.WORK,
-                VillagerGoalPackages.getWorkPackage(profession, 0.5F),
+                VillagerGoalPackages.getWorkPackage(profession, 0.5F, this.level().purpurConfig.villagerClericsFarmWarts), // Purpur - Option for Villager Clerics to farm Nether Wart
                 ImmutableSet.of(Pair.of(MemoryModuleType.JOB_SITE, MemoryStatus.VALUE_PRESENT))
             );
         }
@@ -977,7 +977,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     }
 
     public boolean hasFarmSeeds() {
-        return this.getInventory().hasAnyMatching(itemStack -> itemStack.is(ItemTags.VILLAGER_PLANTABLE_SEEDS));
+        return this.getInventory().hasAnyMatching(itemStack -> this.level().purpurConfig.villagerClericsFarmWarts && this.getVillagerData().getProfession() == VillagerProfession.CLERIC ? itemStack.is(Items.NETHER_WART) : itemStack.is(ItemTags.VILLAGER_PLANTABLE_SEEDS)); // Purpur - Option for Villager Clerics to farm Nether Wart
     }
 
     @Override

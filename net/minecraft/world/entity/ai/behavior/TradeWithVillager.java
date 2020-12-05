@@ -59,6 +59,12 @@ public class TradeWithVillager extends Behavior<Villager> {
                 throwHalfStack(owner, ImmutableSet.of(Items.WHEAT), villager);
             }
 
+            // Purpur start - Option for Villager Clerics to farm Nether Wart
+            if (level.purpurConfig.villagerClericsFarmWarts && level.purpurConfig.villagerClericFarmersThrowWarts && owner.getVillagerData().getProfession() == VillagerProfession.CLERIC && owner.getInventory().countItem(Items.NETHER_WART) > Items.NETHER_WART.getDefaultMaxStackSize() / 2) {
+                throwHalfStack(owner, ImmutableSet.of(Items.NETHER_WART), villager);
+            }
+            // Purpur end - Option for Villager Clerics to farm Nether Wart
+
             if (!this.trades.isEmpty() && owner.getInventory().hasAnyOf(this.trades)) {
                 throwHalfStack(owner, this.trades, villager);
             }

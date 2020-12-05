@@ -22,6 +22,13 @@ public class SecondaryPoiSensor extends Sensor<Villager> {
 
     @Override
     protected void doTick(ServerLevel level, Villager entity) {
+        // Purpur start - Option for Villager Clerics to farm Nether Wart - make sure clerics don't wander to soul sand when the option is off
+        Brain<?> brain = entity.getBrain();
+        if (!level.purpurConfig.villagerClericsFarmWarts && entity.getVillagerData().getProfession() == net.minecraft.world.entity.npc.VillagerProfession.CLERIC) {
+            brain.eraseMemory(MemoryModuleType.SECONDARY_JOB_SITE);
+            return;
+        }
+        // Purpur end - Option for Villager Clerics to farm Nether Wart
         ResourceKey<Level> resourceKey = level.dimension();
         BlockPos blockPos = entity.blockPosition();
         List<GlobalPos> list = Lists.newArrayList();
@@ -38,7 +45,7 @@ public class SecondaryPoiSensor extends Sensor<Villager> {
             }
         }
 
-        Brain<?> brain = entity.getBrain();
+        //Brain<?> brain = entity.getBrain(); // Purpur - Option for Villager Clerics to farm Nether Wart - moved up
         if (!list.isEmpty()) {
             brain.setMemory(MemoryModuleType.SECONDARY_JOB_SITE, list);
         } else {

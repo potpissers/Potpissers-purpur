@@ -32,6 +32,7 @@ public class HarvestFarmland extends Behavior<Villager> {
     private long nextOkStartTime;
     private int timeWorkedSoFar;
     private final List<BlockPos> validFarmlandAroundVillager = Lists.newArrayList();
+    private boolean clericWartFarmer = false; // Purpur - Option for Villager Clerics to farm Nether Wart
 
     public HarvestFarmland() {
         super(
@@ -50,9 +51,10 @@ public class HarvestFarmland extends Behavior<Villager> {
     protected boolean checkExtraStartConditions(ServerLevel level, Villager owner) {
         if (!level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
             return false;
-        } else if (owner.getVillagerData().getProfession() != VillagerProfession.FARMER) {
+        } else if (owner.getVillagerData().getProfession() != VillagerProfession.FARMER && !(level.purpurConfig.villagerClericsFarmWarts && owner.getVillagerData().getProfession() == VillagerProfession.CLERIC)) { // Purpur - Option for Villager Clerics to farm Nether Wart
             return false;
         } else {
+            if (!this.clericWartFarmer && owner.getVillagerData().getProfession() == VillagerProfession.CLERIC) this.clericWartFarmer = true; // Purpur - Option for Villager Clerics to farm Nether Wart
             BlockPos.MutableBlockPos mutableBlockPos = owner.blockPosition().mutable();
             this.validFarmlandAroundVillager.clear();
 
@@ -83,6 +85,7 @@ public class HarvestFarmland extends Behavior<Villager> {
         BlockState blockState = serverLevel.getBlockState(pos);
         Block block = blockState.getBlock();
         Block block1 = serverLevel.getBlockState(pos.below()).getBlock();
+        if (this.clericWartFarmer) return block == net.minecraft.world.level.block.Blocks.NETHER_WART && blockState.getValue(net.minecraft.world.level.block.NetherWartBlock.AGE) == 3 || blockState.isAir() && block1 == net.minecraft.world.level.block.Blocks.SOUL_SAND; // Purpur - Option for Villager Clerics to farm Nether Wart
         return block instanceof CropBlock && ((CropBlock)block).isMaxAge(blockState) || blockState.isAir() && block1 instanceof FarmBlock;
     }
 
@@ -109,19 +112,19 @@ public class HarvestFarmland extends Behavior<Villager> {
                 BlockState blockState = level.getBlockState(this.aboveFarmlandPos);
                 Block block = blockState.getBlock();
                 Block block1 = level.getBlockState(this.aboveFarmlandPos.below()).getBlock();
-                if (block instanceof CropBlock && ((CropBlock)block).isMaxAge(blockState)) {
+                if (block instanceof CropBlock && ((CropBlock)block).isMaxAge(blockState) && !this.clericWartFarmer || this.clericWartFarmer && block == net.minecraft.world.level.block.Blocks.NETHER_WART && blockState.getValue(net.minecraft.world.level.block.NetherWartBlock.AGE) == 3) { // Purpur - Option for Villager Clerics to farm Nether Wart
                     if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(owner, this.aboveFarmlandPos, blockState.getFluidState().createLegacyBlock())) { // CraftBukkit // Paper - fix wrong block state
                     level.destroyBlock(this.aboveFarmlandPos, true, owner);
                     } // CraftBukkit
                 }
 
-                if (blockState.isAir() && block1 instanceof FarmBlock && owner.hasFarmSeeds()) {
+                if (blockState.isAir() && block1 instanceof FarmBlock && !this.clericWartFarmer || this.clericWartFarmer && block1 == net.minecraft.world.level.block.Blocks.SOUL_SAND && owner.hasFarmSeeds()) { // Purpur - Option for Villager Clerics to farm Nether Wart
                     SimpleContainer inventory = owner.getInventory();
 
                     for (int i = 0; i < inventory.getContainerSize(); i++) {
                         ItemStack item = inventory.getItem(i);
                         boolean flag = false;
-                        if (!item.isEmpty() && item.is(ItemTags.VILLAGER_PLANTABLE_SEEDS) && item.getItem() instanceof BlockItem blockItem) {
+                        if (!item.isEmpty() && (item.is(ItemTags.VILLAGER_PLANTABLE_SEEDS) || this.clericWartFarmer && item.getItem() == net.minecraft.world.item.Items.NETHER_WART) && item.getItem() instanceof BlockItem blockItem) { // Purpur - Option for Villager Clerics to farm Nether Wart
                             BlockState blockState1 = blockItem.getBlock().defaultBlockState();
                             if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(owner, this.aboveFarmlandPos, blockState1)) { // CraftBukkit
                             level.setBlockAndUpdate(this.aboveFarmlandPos, blockState1);
@@ -136,7 +139,7 @@ public class HarvestFarmland extends Behavior<Villager> {
                                 this.aboveFarmlandPos.getX(),
                                 this.aboveFarmlandPos.getY(),
                                 this.aboveFarmlandPos.getZ(),
-                                SoundEvents.CROP_PLANTED,
+                                this.clericWartFarmer ? SoundEvents.NETHER_WART_PLANTED : SoundEvents.CROP_PLANTED, // Purpur - Option for Villager Clerics to farm Nether Wart
                                 SoundSource.BLOCKS,
                                 1.0F,
                                 1.0F
