@@ -90,6 +90,14 @@ public class Guardian extends Monster {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.guardianMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.guardianScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     protected void registerGoals() {
         MoveTowardsRestrictionGoal moveTowardsRestrictionGoal = new MoveTowardsRestrictionGoal(this, 1.0);

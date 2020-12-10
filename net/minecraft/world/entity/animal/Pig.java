@@ -73,6 +73,14 @@ public class Pig extends Animal implements ItemSteerable, Saddleable {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.pigMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.pigScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));

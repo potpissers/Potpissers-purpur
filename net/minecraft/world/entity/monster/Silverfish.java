@@ -56,6 +56,16 @@ public class Silverfish extends Monster {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.silverfishMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.silverfishScale);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(this.level().purpurConfig.silverfishMovementSpeed);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(this.level().purpurConfig.silverfishAttackDamage);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     protected void registerGoals() {
         this.friendsGoal = new Silverfish.SilverfishWakeUpFriendsGoal(this);

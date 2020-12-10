@@ -168,6 +168,14 @@ public class Piglin extends AbstractPiglin implements CrossbowAttackMob, Invento
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.piglinMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.piglinScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);

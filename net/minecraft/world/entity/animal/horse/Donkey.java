@@ -23,6 +23,23 @@ public class Donkey extends AbstractChestedHorse {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public float generateMaxHealth(net.minecraft.util.RandomSource random) {
+        return (float) generateMaxHealth(this.level().purpurConfig.donkeyMaxHealthMin, this.level().purpurConfig.donkeyMaxHealthMax);
+    }
+
+    @Override
+    public double generateJumpStrength(net.minecraft.util.RandomSource random) {
+        return generateJumpStrength(this.level().purpurConfig.donkeyJumpStrengthMin, this.level().purpurConfig.donkeyJumpStrengthMax);
+    }
+
+    @Override
+    public double generateSpeed(net.minecraft.util.RandomSource random) {
+        return generateSpeed(this.level().purpurConfig.donkeyMovementSpeedMin, this.level().purpurConfig.donkeyMovementSpeedMax);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.DONKEY_AMBIENT;

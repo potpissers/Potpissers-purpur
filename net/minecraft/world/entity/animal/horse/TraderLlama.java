@@ -51,6 +51,23 @@ public class TraderLlama extends Llama {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public float generateMaxHealth(net.minecraft.util.RandomSource random) {
+        return (float) generateMaxHealth(this.level().purpurConfig.traderLlamaMaxHealthMin, this.level().purpurConfig.traderLlamaMaxHealthMax);
+    }
+
+    @Override
+    public double generateJumpStrength(net.minecraft.util.RandomSource random) {
+        return generateJumpStrength(this.level().purpurConfig.traderLlamaJumpStrengthMin, this.level().purpurConfig.traderLlamaJumpStrengthMax);
+    }
+
+    @Override
+    public double generateSpeed(net.minecraft.util.RandomSource random) {
+        return generateSpeed(this.level().purpurConfig.traderLlamaMovementSpeedMin, this.level().purpurConfig.traderLlamaMovementSpeedMax);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     public boolean isTraderLlama() {
         return true;

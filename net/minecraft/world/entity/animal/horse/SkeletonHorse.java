@@ -46,6 +46,23 @@ public class SkeletonHorse extends AbstractHorse {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public float generateMaxHealth(RandomSource random) {
+        return (float) generateMaxHealth(this.level().purpurConfig.skeletonHorseMaxHealthMin, this.level().purpurConfig.skeletonHorseMaxHealthMax);
+    }
+
+    @Override
+    public double generateJumpStrength(RandomSource random) {
+        return generateJumpStrength(this.level().purpurConfig.skeletonHorseJumpStrengthMin, this.level().purpurConfig.skeletonHorseJumpStrengthMax);
+    }
+
+    @Override
+    public double generateSpeed(RandomSource random) {
+        return generateSpeed(this.level().purpurConfig.skeletonHorseMovementSpeedMin, this.level().purpurConfig.skeletonHorseMovementSpeedMax);
+    }
+    // Purpur end - Configurable entity base attributes
+
     public static AttributeSupplier.Builder createAttributes() {
         return createBaseHorseAttributes().add(Attributes.MAX_HEALTH, 15.0).add(Attributes.MOVEMENT_SPEED, 0.2F);
     }

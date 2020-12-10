@@ -91,6 +91,14 @@ public class Squid extends AgeableWaterCreature {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.squidMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.squidScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new Squid.SquidRandomMovementGoal(this));

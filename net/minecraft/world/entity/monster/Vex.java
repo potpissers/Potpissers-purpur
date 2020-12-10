@@ -102,6 +102,14 @@ public class Vex extends Monster implements TraceableEntity {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.vexMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.vexScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     public boolean isFlapping() {
         return this.tickCount % TICKS_PER_FLAP == 0;

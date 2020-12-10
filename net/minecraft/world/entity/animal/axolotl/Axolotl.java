@@ -132,6 +132,14 @@ public class Axolotl extends Animal implements VariantHolder<Axolotl.Variant>, B
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.axolotlMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.axolotlScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     public float getWalkTargetValue(BlockPos pos, LevelReader level) {
         return 0.0F;

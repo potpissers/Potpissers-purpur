@@ -99,6 +99,39 @@ public class Slime extends Mob implements Enemy {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    protected String getMaxHealthEquation() {
+        return level().purpurConfig.slimeMaxHealth;
+    }
+
+    protected String getAttackDamageEquation() {
+        return level().purpurConfig.slimeAttackDamage;
+    }
+
+    protected java.util.Map<Integer, Double> getMaxHealthCache() {
+        return level().purpurConfig.slimeMaxHealthCache;
+    }
+
+    protected java.util.Map<Integer, Double> getAttackDamageCache() {
+        return level().purpurConfig.slimeAttackDamageCache;
+    }
+
+    protected double getFromCache(java.util.function.Supplier<String> equation, java.util.function.Supplier<java.util.Map<Integer, Double>> cache, java.util.function.Supplier<Double> defaultValue) {
+        int size = getSize();
+        Double value = cache.get().get(size);
+        if (value == null) {
+            try {
+                value = ((Number) scriptEngine.eval("let size = " + size + "; " + equation.get())).doubleValue();
+            } catch (javax.script.ScriptException e) {
+                e.printStackTrace();
+                value = defaultValue.get();
+            }
+            cache.get().put(size, value);
+        }
+        return value;
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
@@ -129,9 +162,9 @@ public class Slime extends Mob implements Enemy {
         this.entityData.set(ID_SIZE, i);
         this.reapplyPosition();
         this.refreshDimensions();
-        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(i * i);
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(getFromCache(this::getMaxHealthEquation, this::getMaxHealthCache, () -> (double) (size * size))); // Purpur - Configurable entity base attributes
         this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.2F + 0.1F * i);
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(i);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(getFromCache(this::getAttackDamageEquation, this::getAttackDamageCache, () -> (double) i)); // Purpur - Configurable entity base attributes
         if (resetHealth) {
             this.setHealth(this.getMaxHealth());
         }

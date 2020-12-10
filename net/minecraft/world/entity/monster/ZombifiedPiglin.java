@@ -80,6 +80,14 @@ public class ZombifiedPiglin extends Zombie implements NeutralMob {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.zombifiedPiglinMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.zombifiedPiglinScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     public void setPersistentAngerTarget(@Nullable UUID target) {
         this.persistentAngerTarget = target;
@@ -262,7 +270,7 @@ public class ZombifiedPiglin extends Zombie implements NeutralMob {
 
     @Override
     protected void randomizeReinforcementsChance() {
-        this.getAttribute(Attributes.SPAWN_REINFORCEMENTS_CHANCE).setBaseValue(0.0);
+        this.getAttribute(Attributes.SPAWN_REINFORCEMENTS_CHANCE).setBaseValue(this.random.nextDouble() * this.level().purpurConfig.zombifiedPiglinSpawnReinforcements); // Purpur - Configurable entity base attributes
     }
 
     @Nullable

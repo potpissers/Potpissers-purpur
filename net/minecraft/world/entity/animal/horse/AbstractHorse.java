@@ -218,6 +218,46 @@ public abstract class AbstractHorse extends Animal implements ContainerListener,
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.generateMaxHealth(random));
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(this.generateSpeed(random));
+        this.getAttribute(Attributes.JUMP_STRENGTH).setBaseValue(this.generateJumpStrength(random));
+    }
+
+    protected double generateMaxHealth(double min, double max) {
+        if (min == max) return min;
+        int diff = Mth.floor(max - min);
+        double base = max - diff;
+        int first = Mth.floor((double) diff / 2);
+        int rest = diff - first;
+        return base + random.nextInt(first + 1) + random.nextInt(rest + 1);
+    }
+
+    protected double generateJumpStrength(double min, double max) {
+        if (min == max) return min;
+        return min + (max - min) * this.random.nextDouble();
+    }
+
+    protected double generateSpeed(double min, double max) {
+        if (min == max) return min;
+        return min + (max - min) * this.random.nextDouble();
+    }
+
+    protected float generateMaxHealth(RandomSource random) {
+        return 15.0F + (float) random.nextInt(8) + (float) random.nextInt(9);
+    }
+
+    protected double generateJumpStrength(RandomSource random) {
+        return 0.4F + random.nextDouble() * 0.2 + random.nextDouble() * 0.2 + random.nextDouble() * 0.2;
+    }
+
+    protected double generateSpeed(RandomSource random) {
+        return (0.45F + random.nextDouble() * 0.3 + random.nextDouble() * 0.3 + random.nextDouble() * 0.3) * 0.25;
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HorseHasRider(this)); // Purpur - Ridables
@@ -1218,7 +1258,7 @@ public abstract class AbstractHorse extends Animal implements ContainerListener,
             spawnGroupData = new AgeableMob.AgeableMobGroupData(0.2F);
         }
 
-        this.randomizeAttributes(level.getRandom());
+        //this.randomizeAttributes(level.getRandom()); // Purpur - replaced by initAttributes()
         return super.finalizeSpawn(level, difficulty, spawnReason, spawnGroupData);
     }
 

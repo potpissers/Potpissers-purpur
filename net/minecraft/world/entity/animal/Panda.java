@@ -131,6 +131,15 @@ public class Panda extends Animal {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.pandaMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.pandaScale);
+        setAttributes();
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     protected boolean canDispenserEquipIntoSlot(EquipmentSlot slot) {
         return slot == EquipmentSlot.MAINHAND && this.canPickUpLoot();
@@ -624,7 +633,11 @@ public class Panda extends Animal {
 
     public void setAttributes() {
         if (this.isWeak()) {
-            this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(10.0);
+            // Purpur start - Configurable entity base attributes
+            net.minecraft.world.entity.ai.attributes.AttributeInstance maxHealth = this.getAttribute(Attributes.MAX_HEALTH);
+            maxHealth.setBaseValue(maxHealth.getValue() / 2);
+            // Purpur end - Configurable entity base attributes
+
         }
 
         if (this.isLazy()) {

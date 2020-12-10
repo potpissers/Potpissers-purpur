@@ -121,6 +121,14 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.shulkerMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.shulkerScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables
@@ -608,7 +616,7 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
 
     @Override
     protected float sanitizeScale(float scale) {
-        return Math.min(scale, 3.0F);
+        return Math.min(scale, MAX_SCALE); // Purpur - Configurable entity base attributes
     }
 
     @Override

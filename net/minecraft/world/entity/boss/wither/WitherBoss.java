@@ -211,6 +211,14 @@ public class WitherBoss extends Monster implements RangedAttackMob {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.witherMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.witherScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     protected PathNavigation createNavigation(Level level) {
         FlyingPathNavigation flyingPathNavigation = new FlyingPathNavigation(this, level);
@@ -433,7 +441,7 @@ public class WitherBoss extends Monster implements RangedAttackMob {
 
             this.setInvulnerableTicks(i);
             if (this.tickCount % 10 == 0) {
-                this.heal(10.0F, org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.WITHER_SPAWN); // CraftBukkit
+                this.heal(this.getMaxHealth() / 30, org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.WITHER_SPAWN); // CraftBukkit // Purpur - Configurable entity base attributes
             }
         } else {
             super.customServerAiStep(level);

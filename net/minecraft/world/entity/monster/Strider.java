@@ -111,6 +111,14 @@ public class Strider extends Animal implements ItemSteerable, Saddleable {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.striderMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.striderScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     public static boolean checkStriderSpawnRules(
         EntityType<Strider> entityType, LevelAccessor level, EntitySpawnReason spawnReason, BlockPos pos, RandomSource random
     ) {

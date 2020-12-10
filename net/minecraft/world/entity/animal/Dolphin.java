@@ -148,6 +148,14 @@ public class Dolphin extends AgeableWaterCreature {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.dolphinMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.dolphinScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(

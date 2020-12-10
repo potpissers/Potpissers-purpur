@@ -47,6 +47,13 @@ public class Salmon extends AbstractSchoolingFish implements VariantHolder<Salmo
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.salmonMaxHealth);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     public int getMaxSchoolSize() {
         return 5;

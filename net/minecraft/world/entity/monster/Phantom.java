@@ -151,7 +151,10 @@ public class Phantom extends FlyingMob implements Enemy {
     private void updatePhantomSizeInfo() {
         this.refreshDimensions();
         if (level().purpurConfig.phantomFlamesOnSwoop && attackPhase == AttackPhase.SWOOP) shoot(); // Purpur - Ridables - Phantom flames on swoop
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(6 + this.getPhantomSize());
+        // Purpur start - Configurable entity base attributes
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(getFromCache(() -> this.level().purpurConfig.phantomMaxHealth, () -> this.level().purpurConfig.phantomMaxHealthCache, () -> 20.0D));
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(getFromCache(() -> this.level().purpurConfig.phantomAttackDamage, () -> this.level().purpurConfig.phantomAttackDamageCache, () -> (double) (6 + this.getPhantomSize())));
+        // Purpur end - Configurable entity base attributes
     }
 
     public int getPhantomSize() {
@@ -175,6 +178,23 @@ public class Phantom extends FlyingMob implements Enemy {
     protected boolean shouldDespawnInPeaceful() {
         return true;
     }
+
+    // Purpur start - Configurable entity base attributes
+    private double getFromCache(java.util.function.Supplier<String> equation, java.util.function.Supplier<java.util.Map<Integer, Double>> cache, java.util.function.Supplier<Double> defaultValue) {
+        int size = getPhantomSize();
+        Double value = cache.get().get(size);
+        if (value == null) {
+            try {
+                value = ((Number) scriptEngine.eval("let size = " + size + "; " + equation.get())).doubleValue();
+            } catch (javax.script.ScriptException e) {
+                e.printStackTrace();
+                value = defaultValue.get();
+            }
+            cache.get().put(size, value);
+        }
+        return value;
+    }
+    // Purpur end - Configurable entity base attributes
 
     @Override
     public void tick() {

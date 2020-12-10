@@ -137,6 +137,14 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.rabbitMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.rabbitScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     public void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));

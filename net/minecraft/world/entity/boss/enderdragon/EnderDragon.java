@@ -163,6 +163,13 @@ public class EnderDragon extends Mob implements Enemy {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.enderDragonMaxHealth);
+    }
+    // Purpur end - Configurable entity base attributes
+
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 200.0);
     }
@@ -1076,7 +1083,7 @@ public class EnderDragon extends Mob implements Enemy {
 
     @Override
     protected float sanitizeScale(float scale) {
-        return 1.0F;
+        return 1.0F; // Purpur - Configurable entity base attributes
     }
 
     // CraftBukkit start - SPIGOT-2420: Special case, the ender dragon drops 12000 xp for the first kill and 500 xp for every other kill and this over time.

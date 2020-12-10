@@ -46,6 +46,28 @@ public class MagmaCube extends Slime {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    protected String getMaxHealthEquation() {
+        return level().purpurConfig.magmaCubeMaxHealth;
+    }
+
+    @Override
+    protected String getAttackDamageEquation() {
+        return level().purpurConfig.magmaCubeAttackDamage;
+    }
+
+    @Override
+    protected java.util.Map<Integer, Double> getMaxHealthCache() {
+        return level().purpurConfig.magmaCubeMaxHealthCache;
+    }
+
+    @Override
+    protected java.util.Map<Integer, Double> getAttackDamageCache() {
+        return level().purpurConfig.magmaCubeAttackDamageCache;
+    }
+    // Purpur end - Configurable entity base attributes
+
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MOVEMENT_SPEED, 0.2F);
     }

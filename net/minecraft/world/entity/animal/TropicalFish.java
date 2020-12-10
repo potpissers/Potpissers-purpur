@@ -79,6 +79,13 @@ public class TropicalFish extends AbstractSchoolingFish implements VariantHolder
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.tropicalFishMaxHealth);
+    }
+    // Purpur end - Configurable entity base attributes
+
     public static String getPredefinedName(int variantId) {
         return "entity.minecraft.tropical_fish.predefined." + variantId;
     }

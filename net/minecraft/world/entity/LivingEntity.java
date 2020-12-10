@@ -311,6 +311,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
     protected LivingEntity(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
         this.attributes = new AttributeMap(DefaultAttributes.getSupplier(entityType), this); // Purpur - Ridables
+        this.initAttributes(); // Purpur - Configurable entity base attributes
         this.craftAttributes = new CraftAttributeMap(this.attributes); // CraftBukkit
         // CraftBukkit - this.setHealth(this.getMaxHealth()) inlined and simplified to skip the instanceof check for Player, as getBukkitEntity() is not initialized in constructor
         this.entityData.set(LivingEntity.DATA_HEALTH_ID, this.getMaxHealth());
@@ -323,6 +324,8 @@ public abstract class LivingEntity extends Entity implements Attackable {
         NbtOps nbtOps = NbtOps.INSTANCE;
         this.brain = this.makeBrain(new Dynamic<>(nbtOps, nbtOps.createMap(ImmutableMap.of(nbtOps.createString("memories"), nbtOps.emptyMap()))));
     }
+
+    protected void initAttributes() {}// Purpur - Configurable entity base attributes
 
     public Brain<?> getBrain() {
         return this.brain;

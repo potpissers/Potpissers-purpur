@@ -268,6 +268,14 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.villagerMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.villagerScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     public Brain<Villager> getBrain() {
         return (Brain<Villager>)super.getBrain();

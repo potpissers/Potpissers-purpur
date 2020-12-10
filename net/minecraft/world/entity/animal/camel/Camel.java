@@ -322,6 +322,23 @@ public class Camel extends AbstractHorse {
         return this.dashCooldown;
     }
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public float generateMaxHealth(net.minecraft.util.RandomSource random) {
+        return (float) generateMaxHealth(this.level().purpurConfig.camelMaxHealthMin, this.level().purpurConfig.camelMaxHealthMax);
+    }
+
+    @Override
+    public double generateJumpStrength(net.minecraft.util.RandomSource random) {
+        return generateJumpStrength(this.level().purpurConfig.camelJumpStrengthMin, this.level().purpurConfig.camelJumpStrengthMax);
+    }
+
+    @Override
+    public double generateSpeed(net.minecraft.util.RandomSource random) {
+        return generateSpeed(this.level().purpurConfig.camelMovementSpeedMin, this.level().purpurConfig.camelMovementSpeedMax);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.CAMEL_AMBIENT;

@@ -186,6 +186,14 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.parrotMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.parrotScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(

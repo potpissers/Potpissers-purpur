@@ -72,6 +72,13 @@ public class MushroomCow extends Cow implements Shearable, VariantHolder<Mushroo
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.mooshroomMaxHealth);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     public float getWalkTargetValue(BlockPos pos, LevelReader level) {
         return level.getBlockState(pos.below()).is(Blocks.MYCELIUM) ? 10.0F : level.getPathfindingCostFromLightLevels(pos);

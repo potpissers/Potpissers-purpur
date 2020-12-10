@@ -43,6 +43,14 @@ public class CaveSpider extends Spider {
     }
     // Purpur end - Ridables
 
+    // Purpur start - Configurable entity base attributes
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.caveSpiderMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.caveSpiderScale);
+    }
+    // Purpur end - Configurable entity base attributes
+
     @Override
     public boolean doHurtTarget(ServerLevel level, Entity source) {
         if (super.doHurtTarget(level, source)) {
