@@ -479,6 +479,12 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
     }
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.beeMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.beeScale);
+    }
+
+    @Override
     public int getRemainingPersistentAngerTime() {
         return (Integer) this.entityData.get(Bee.DATA_REMAINING_ANGER_TIME);
     }

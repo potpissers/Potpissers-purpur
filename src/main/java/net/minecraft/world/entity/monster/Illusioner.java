@@ -75,6 +75,14 @@ public class Illusioner extends SpellcasterIllager implements RangedAttackMob {
     // Purpur end
 
     @Override
+    protected void initAttributes() {
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(this.level().purpurConfig.illusionerMovementSpeed);
+        this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(this.level().purpurConfig.illusionerFollowRange);
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.illusionerMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.illusionerScale);
+    }
+
+    @Override
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));

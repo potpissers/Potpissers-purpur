@@ -140,6 +140,12 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
         }
         wasOnGround = onGround;
     }
+
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.rabbitMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.rabbitScale);
+    }
     // Purpur end
 
     @Override

@@ -64,6 +64,11 @@ public class Pufferfish extends AbstractFish {
     // Purpur end
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.pufferfishMaxHealth);
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(Pufferfish.PUFF_STATE, 0);

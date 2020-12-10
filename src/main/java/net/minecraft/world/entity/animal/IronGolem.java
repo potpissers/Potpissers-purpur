@@ -77,6 +77,12 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     public boolean isControllable() {
         return level().purpurConfig.ironGolemControllable;
     }
+
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.ironGolemMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.ironGolemScale);
+    }
     // Purpur end
 
     @Override

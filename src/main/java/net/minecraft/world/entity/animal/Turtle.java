@@ -104,6 +104,12 @@ public class Turtle extends Animal {
     }
     // Purpur end
 
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.turtleMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.turtleScale);
+    }
+
     public void setHomePos(BlockPos pos) {
         this.entityData.set(Turtle.HOME_POS, pos);
     }

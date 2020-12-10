@@ -59,6 +59,12 @@ public class Cow extends Animal {
     public boolean isControllable() {
         return level().purpurConfig.cowControllable;
     }
+
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.cowMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.cowScale);
+    }
     // Purpur end
 
     @Override

@@ -97,6 +97,12 @@ public class Armadillo extends Animal {
     public boolean isControllable() {
         return level().purpurConfig.armadilloControllable;
     }
+
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.armadilloMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.armadilloScale);
+    }
     // Purpur end
 
     @Override

@@ -232,6 +232,44 @@ public abstract class AbstractHorse extends Animal implements ContainerListener,
     // Purpur end
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.generateMaxHealth(random));
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(this.generateSpeed(random));
+        this.getAttribute(Attributes.JUMP_STRENGTH).setBaseValue(this.generateJumpStrength(random));
+    }
+
+    protected double generateMaxHealth(double min, double max) {
+        if (min == max) return min;
+        int diff = Mth.floor(max - min);
+        double base = max - diff;
+        int first = Mth.floor((double) diff / 2);
+        int rest = diff - first;
+        return base + random.nextInt(first + 1) + random.nextInt(rest + 1);
+    }
+
+    protected double generateJumpStrength(double min, double max) {
+        if (min == max) return min;
+        return min + (max - min) * this.random.nextDouble();
+    }
+
+    protected double generateSpeed(double min, double max) {
+        if (min == max) return min;
+        return min + (max - min) * this.random.nextDouble();
+    }
+
+    protected float generateMaxHealth(RandomSource random) {
+        return 15.0F + (float) random.nextInt(8) + (float) random.nextInt(9);
+    }
+
+    protected double generateJumpStrength(RandomSource random) {
+        return 0.4000000059604645D + random.nextDouble() * 0.2D + random.nextDouble() * 0.2D + random.nextDouble() * 0.2D;
+    }
+
+    protected double generateSpeed(RandomSource random) {
+        return (0.44999998807907104D + random.nextDouble() * 0.3D + random.nextDouble() * 0.3D + random.nextDouble() * 0.3D) * 0.25D;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HorseHasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new PanicGoal(this, 1.2D));
@@ -1261,7 +1299,7 @@ public abstract class AbstractHorse extends Animal implements ContainerListener,
             entityData = new AgeableMob.AgeableMobGroupData(0.2F);
         }
 
-        this.randomizeAttributes(world.getRandom());
+        // this.randomizeAttributes(world.getRandom()); // Purpur - replaced by initAttributes()
         return super.finalizeSpawn(world, difficulty, spawnReason, (SpawnGroupData) entityData);
     }
 

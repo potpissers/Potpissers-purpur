@@ -125,6 +125,21 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
     }
     // Purpur end
 
+    @Override
+    public float generateMaxHealth(RandomSource random) {
+        return (float) generateMaxHealth(this.level().purpurConfig.llamaMaxHealthMin, this.level().purpurConfig.llamaMaxHealthMax);
+    }
+
+    @Override
+    public double generateJumpStrength(RandomSource random) {
+        return generateJumpStrength(this.level().purpurConfig.llamaJumpStrengthMin, this.level().purpurConfig.llamaJumpStrengthMax);
+    }
+
+    @Override
+    public double generateSpeed(RandomSource random) {
+        return generateSpeed(this.level().purpurConfig.llamaMovementSpeedMin, this.level().purpurConfig.llamaMovementSpeedMax);
+    }
+
     public boolean isTraderLlama() {
         return false;
     }

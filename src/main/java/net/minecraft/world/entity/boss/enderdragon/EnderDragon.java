@@ -187,6 +187,11 @@ public class EnderDragon extends Mob implements Enemy {
     }
     // Purpur end
 
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.enderDragonMaxHealth);
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 200.0D);
     }
@@ -1220,6 +1225,6 @@ public class EnderDragon extends Mob implements Enemy {
 
     @Override
     protected float sanitizeScale(float scale) {
-        return 1.0F;
+        return 1.0F; // Purpur - diff on change
     }
 }

@@ -37,6 +37,11 @@ public class GlowSquid extends Squid {
     // Purpur end
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.glowSquidMaxHealth);
+    }
+
+    @Override
     protected ParticleOptions getInkParticle() {
         return ParticleTypes.GLOW_SQUID_INK;
     }

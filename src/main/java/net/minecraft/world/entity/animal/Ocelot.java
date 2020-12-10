@@ -83,6 +83,12 @@ public class Ocelot extends Animal {
     }
     // Purpur end
 
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.ocelotMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.ocelotScale);
+    }
+
     public boolean isTrusting() {
         return (Boolean) this.entityData.get(Ocelot.DATA_TRUSTING);
     }

@@ -22,6 +22,21 @@ public class Mule extends AbstractChestedHorse {
     // Purpur end
 
     @Override
+    public float generateMaxHealth(net.minecraft.util.RandomSource random) {
+        return (float) generateMaxHealth(this.level().purpurConfig.muleMaxHealthMin, this.level().purpurConfig.muleMaxHealthMax);
+    }
+
+    @Override
+    public double generateJumpStrength(net.minecraft.util.RandomSource random) {
+        return generateJumpStrength(this.level().purpurConfig.muleJumpStrengthMin, this.level().purpurConfig.muleJumpStrengthMax);
+    }
+
+    @Override
+    public double generateSpeed(net.minecraft.util.RandomSource random) {
+        return generateSpeed(this.level().purpurConfig.muleMovementSpeedMin, this.level().purpurConfig.muleMovementSpeedMax);
+    }
+
+    @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.MULE_AMBIENT;
     }

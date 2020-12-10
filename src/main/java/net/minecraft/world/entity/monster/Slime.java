@@ -103,6 +103,37 @@ public class Slime extends Mob implements Enemy {
         }
         return true; // do not jump() in wasd controller, let vanilla controller handle
     }
+
+    protected String getMaxHealthEquation() {
+        return level().purpurConfig.slimeMaxHealth;
+    }
+
+    protected String getAttackDamageEquation() {
+        return level().purpurConfig.slimeAttackDamage;
+    }
+
+    protected java.util.Map<Integer, Double> getMaxHealthCache() {
+        return level().purpurConfig.slimeMaxHealthCache;
+    }
+
+    protected java.util.Map<Integer, Double> getAttackDamageCache() {
+        return level().purpurConfig.slimeAttackDamageCache;
+    }
+
+    protected double getFromCache(java.util.function.Supplier<String> equation, java.util.function.Supplier<java.util.Map<Integer, Double>> cache, java.util.function.Supplier<Double> defaultValue) {
+        int size = getSize();
+        Double value = cache.get().get(size);
+        if (value == null) {
+            try {
+                value = ((Number) scriptEngine.eval("let size = " + size + "; " + equation.get())).doubleValue();
+            } catch (javax.script.ScriptException e) {
+                e.printStackTrace();
+                value = defaultValue.get();
+            }
+            cache.get().put(size, value);
+        }
+        return value;
+    }
     // Purpur end
 
     @Override
@@ -137,9 +168,9 @@ public class Slime extends Mob implements Enemy {
         this.entityData.set(Slime.ID_SIZE, j);
         this.reapplyPosition();
         this.refreshDimensions();
-        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue((double) (j * j));
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(getFromCache(this::getMaxHealthEquation, this::getMaxHealthCache, () -> (double) size * size)); // Purpur
         this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue((double) (0.2F + 0.1F * (float) j));
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue((double) j);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(getFromCache(this::getAttackDamageEquation, this::getAttackDamageCache, () -> (double) j)); // Purpur
         if (heal) {
             this.setHealth(this.getMaxHealth());
         }

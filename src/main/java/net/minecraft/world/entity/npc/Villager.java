@@ -181,6 +181,12 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     // Purpur end
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.villagerMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.villagerScale);
+    }
+
+    @Override
     public Brain<Villager> getBrain() {
         return (Brain<Villager>) super.getBrain(); // CraftBukkit - decompile error
     }

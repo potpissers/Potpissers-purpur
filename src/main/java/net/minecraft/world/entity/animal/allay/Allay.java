@@ -152,6 +152,12 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
     }
+
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.allayMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.allayScale);
+    }
     // Purpur end
 
     @Override

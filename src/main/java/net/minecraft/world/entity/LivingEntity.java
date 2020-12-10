@@ -313,6 +313,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
         this.activeLocationDependentEnchantments = new Reference2ObjectArrayMap();
         this.appliedScale = 1.0F;
         this.attributes = new AttributeMap(DefaultAttributes.getSupplier(type), this); // Purpur
+        this.initAttributes(); // Purpur
         this.craftAttributes = new CraftAttributeMap(this.attributes); // CraftBukkit
         // CraftBukkit - setHealth(getMaxHealth()) inlined and simplified to skip the instanceof check for EntityPlayer, as getBukkitEntity() is not initialized in constructor
         this.entityData.set(LivingEntity.DATA_HEALTH_ID, (float) this.getAttribute(Attributes.MAX_HEALTH).getValue());
@@ -326,6 +327,8 @@ public abstract class LivingEntity extends Entity implements Attackable {
 
         this.brain = this.makeBrain(new Dynamic(dynamicopsnbt, (Tag) dynamicopsnbt.createMap((Map) ImmutableMap.of(dynamicopsnbt.createString("memories"), (Tag) dynamicopsnbt.emptyMap()))));
     }
+
+    protected void initAttributes() {}// Purpur
 
     public Brain<?> getBrain() {
         return this.brain;

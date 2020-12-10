@@ -102,6 +102,12 @@ public class Vex extends Monster implements TraceableEntity {
     public boolean causeFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
         return false; //  no fall damage please
     }
+
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.vexMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.vexScale);
+    }
     // Purpur end
 
     @Override

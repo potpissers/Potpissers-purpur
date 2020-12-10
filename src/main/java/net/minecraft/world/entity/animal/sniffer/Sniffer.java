@@ -109,6 +109,12 @@ public class Sniffer extends Animal {
     public boolean isControllable() {
         return level().purpurConfig.snifferControllable;
     }
+
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.snifferMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.snifferScale);
+    }
     // Purpur end
 
     @Override

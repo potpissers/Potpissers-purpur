@@ -63,6 +63,12 @@ public class Bogged extends AbstractSkeleton implements Shearable {
     public boolean isControllable() {
         return level().purpurConfig.boggedControllable;
     }
+
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.boggedMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.boggedScale);
+    }
     // Purpur end
 
     @Override

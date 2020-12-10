@@ -117,6 +117,12 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
     }
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.witherMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.witherScale);
+    }
+
+    @Override
     protected PathNavigation createNavigation(Level world) {
         FlyingPathNavigation navigationflying = new FlyingPathNavigation(this, world);
 
@@ -436,7 +442,7 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
 
             this.setInvulnerableTicks(i);
             if (this.tickCount % 10 == 0) {
-                this.heal(10.0F, EntityRegainHealthEvent.RegainReason.WITHER_SPAWN); // CraftBukkit
+                this.heal(this.getMaxHealth() / 33, EntityRegainHealthEvent.RegainReason.WITHER_SPAWN); // CraftBukkit // Purpur
             }
 
         } else {

@@ -115,6 +115,12 @@ public class Axolotl extends Animal implements LerpingModel, VariantHolder<Axolo
     // Purpur end
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.axolotlMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.axolotlScale);
+    }
+
+    @Override
     public Map<String, Vector3f> getModelRotationValues() {
         return this.modelRotationValues;
     }

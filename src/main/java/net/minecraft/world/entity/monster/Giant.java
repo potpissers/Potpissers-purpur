@@ -33,6 +33,15 @@ public class Giant extends Monster {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this));
         this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this));
     }
+
+    @Override
+    protected void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.giantMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.giantScale);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(this.level().purpurConfig.giantMovementSpeed);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(this.level().purpurConfig.giantAttackDamage);
+    }
+
     // Purpur end
 
     public static AttributeSupplier.Builder createAttributes() {

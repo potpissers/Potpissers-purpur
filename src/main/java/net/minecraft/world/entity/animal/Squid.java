@@ -68,6 +68,12 @@ public class Squid extends WaterAnimal {
     // Purpur end
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.squidMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.squidScale);
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new Squid.SquidRandomMovementGoal(this));
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur

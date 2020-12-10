@@ -26,6 +26,11 @@ public class Salmon extends AbstractSchoolingFish {
     // Purpur end
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.salmonMaxHealth);
+    }
+
+    @Override
     public int getMaxSchoolSize() {
         return 5;
     }

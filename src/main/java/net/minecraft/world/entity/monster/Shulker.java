@@ -83,7 +83,7 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
 
         return new Vector3f((float) baseblockposition.getX(), (float) baseblockposition.getY(), (float) baseblockposition.getZ());
     });
-    private static final float MAX_SCALE = 3.0F;
+    public static final float MAX_SCALE = 3.0F; // Purpur
     private float currentPeekAmountO;
     private float currentPeekAmount;
     @Nullable
@@ -113,6 +113,12 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
         return level().purpurConfig.shulkerControllable;
     }
     // Purpur end
+
+    @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.shulkerMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.shulkerScale);
+    }
 
     @Override
     protected void registerGoals() {
@@ -606,7 +612,7 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
 
     @Override
     protected float sanitizeScale(float scale) {
-        return Math.min(scale, 3.0F);
+        return Math.min(scale, 3.0F); // Purpur - diff on change
     }
 
     public void setVariant(Optional<DyeColor> variant) {

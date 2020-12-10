@@ -51,6 +51,12 @@ public class WitherSkeleton extends AbstractSkeleton {
     // Purpur end
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.witherSkeletonMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.witherSkeletonScale);
+    }
+
+    @Override
     protected void registerGoals() {
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractPiglin.class, true));
         super.registerGoals();

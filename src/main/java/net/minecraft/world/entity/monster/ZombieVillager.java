@@ -101,6 +101,16 @@ public class ZombieVillager extends Zombie implements VillagerDataHolder {
     // Purpur end
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.zombieVillagerMaxHealth);
+    }
+
+    @Override
+    protected void randomizeReinforcementsChance() {
+        this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.SPAWN_REINFORCEMENTS_CHANCE).setBaseValue(this.random.nextDouble() * this.level().purpurConfig.zombieVillagerSpawnReinforcements);
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(ZombieVillager.DATA_CONVERTING_ID, false);

@@ -149,7 +149,10 @@ public class Phantom extends FlyingMob implements Enemy {
 
     private void updatePhantomSizeInfo() {
         this.refreshDimensions();
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue((double) (6 + this.getPhantomSize()));
+        // Purpur start
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(getFromCache(() -> this.level().purpurConfig.phantomMaxHealth, () -> this.level().purpurConfig.phantomMaxHealthCache, () -> 20.0D));
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(getFromCache(() -> this.level().purpurConfig.phantomAttackDamage, () -> this.level().purpurConfig.phantomAttackDamageCache, () -> (double) 6 + this.getPhantomSize()));
+        // Purpur end
     }
 
     public int getPhantomSize() {
@@ -172,6 +175,21 @@ public class Phantom extends FlyingMob implements Enemy {
     @Override
     protected boolean shouldDespawnInPeaceful() {
         return true;
+    }
+
+    private double getFromCache(java.util.function.Supplier<String> equation, java.util.function.Supplier<java.util.Map<Integer, Double>> cache, java.util.function.Supplier<Double> defaultValue) {
+        int size = getPhantomSize();
+        Double value = cache.get().get(size);
+        if (value == null) {
+            try {
+                value = ((Number) scriptEngine.eval("let size = " + size + "; " + equation.get())).doubleValue();
+            } catch (javax.script.ScriptException e) {
+                e.printStackTrace();
+                value = defaultValue.get();
+            }
+            cache.get().put(size, value);
+        }
+        return value;
     }
 
     @Override

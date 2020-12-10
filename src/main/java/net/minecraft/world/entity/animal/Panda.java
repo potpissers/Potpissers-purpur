@@ -148,6 +148,13 @@ public class Panda extends Animal {
     // Purpur end
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.pandaMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.pandaScale);
+        setAttributes();
+    }
+
+    @Override
     public boolean canTakeItem(ItemStack stack) {
         EquipmentSlot enumitemslot = this.getEquipmentSlotForItem(stack);
 
@@ -665,7 +672,10 @@ public class Panda extends Animal {
 
     public void setAttributes() {
         if (this.isWeak()) {
-            this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(10.0D);
+            // Purpur start
+            net.minecraft.world.entity.ai.attributes.AttributeInstance maxHealth = this.getAttribute(Attributes.MAX_HEALTH);
+            maxHealth.setBaseValue(maxHealth.getValue() / 2);
+            // Purpur end
         }
 
         if (this.isLazy()) {

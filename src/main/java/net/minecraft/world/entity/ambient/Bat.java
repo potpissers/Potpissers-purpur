@@ -266,6 +266,19 @@ public class Bat extends AmbientCreature {
     }
 
     @Override
+    public void initAttributes() {
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.batMaxHealth);
+        this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.batScale);
+        this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(this.level().purpurConfig.batFollowRange);
+        this.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(this.level().purpurConfig.batKnockbackResistance);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(this.level().purpurConfig.batMovementSpeed);
+        this.getAttribute(Attributes.FLYING_SPEED).setBaseValue(this.level().purpurConfig.batFlyingSpeed);
+        this.getAttribute(Attributes.ARMOR).setBaseValue(this.level().purpurConfig.batArmor);
+        this.getAttribute(Attributes.ARMOR_TOUGHNESS).setBaseValue(this.level().purpurConfig.batArmorToughness);
+        this.getAttribute(Attributes.ATTACK_KNOCKBACK).setBaseValue(this.level().purpurConfig.batAttackKnockback);
+    }
+
+    @Override
     public void readAdditionalSaveData(CompoundTag nbt) {
         super.readAdditionalSaveData(nbt);
         this.entityData.set(Bat.DATA_ID_FLAGS, nbt.getByte("BatFlags"));
