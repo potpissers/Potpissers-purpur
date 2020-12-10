@@ -216,6 +216,12 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
     }
 
     @Override
+    public void tame(Player player) {
+        setCollarColor(level().purpurConfig.wolfDefaultCollarColor);
+        super.tame(player);
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(1, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur

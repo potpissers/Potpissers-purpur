@@ -348,6 +348,14 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
         return Mth.lerp(tickDelta, this.relaxStateOneAmountO, this.relaxStateOneAmount);
     }
 
+    // Purpur start
+    @Override
+    public void tame(Player player) {
+        setCollarColor(level().purpurConfig.catDefaultCollarColor);
+        super.tame(player);
+    }
+    // Purpur end
+
     @Nullable
     @Override
     public Cat getBreedOffspring(ServerLevel world, AgeableMob entity) {
