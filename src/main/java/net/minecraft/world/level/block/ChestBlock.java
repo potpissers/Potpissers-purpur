@@ -342,6 +342,7 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
     }
 
     public static boolean isBlockedChestByBlock(BlockGetter world, BlockPos pos) {
+        if (world instanceof Level && ((Level) world).purpurConfig.chestOpenWithBlockOnTop) return false; // Purpur
         BlockPos blockposition1 = pos.above();
 
         return world.getBlockState(blockposition1).isRedstoneConductor(world, blockposition1);
