@@ -237,6 +237,7 @@ public class Phantom extends FlyingMob implements Enemy {
             this.level().addParticle(ParticleTypes.MYCELIUM, this.getX() - (double) f3, this.getY() + (double) f5, this.getZ() - (double) f4, 0.0D, 0.0D, 0.0D);
         }
 
+        if (level().purpurConfig.phantomFlamesOnSwoop && attackPhase == AttackPhase.SWOOP) shoot(); // Purpur
     }
 
     @Override
