@@ -303,6 +303,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
     public @Nullable String clientBrandName = null; // Paper - Brand support
     public org.bukkit.event.player.PlayerQuitEvent.QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
     public boolean purpurClient = false; // Purpur
+    private boolean tpsBar = false; // Purpur
 
     // Paper start - rewrite chunk system
     private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
@@ -600,6 +601,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
             });
         }
 
+        if (nbt.contains("Purpur.TPSBar")) { this.tpsBar = nbt.getBoolean("Purpur.TPSBar"); } // Purpur
     }
 
     @Override
@@ -676,6 +678,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
             });
         }
 
+        nbt.putBoolean("Purpur.TPSBar", this.tpsBar); // Purpur
     }
 
     // CraftBukkit start - World fallback code, either respawn location or global spawn
@@ -3066,6 +3069,14 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
         } else {
             this.server.getPlayerList().respawn(this, true, RemovalReason.KILLED, org.bukkit.event.player.PlayerRespawnEvent.RespawnReason.DEATH, to);
         }
+    }
+
+    public boolean tpsBar() {
+        return this.tpsBar;
+    }
+
+    public void tpsBar(boolean tpsBar) {
+        this.tpsBar = tpsBar;
     }
     // Purpur end
 }

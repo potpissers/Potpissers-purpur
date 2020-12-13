@@ -1137,6 +1137,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
         this.safeShutdown(waitForShutdown, false);
     }
     public void safeShutdown(boolean waitForShutdown, boolean isRestarting) {
+        org.purpurmc.purpur.task.BossBarTask.stopAll(); // Purpur
         this.isRestarting = isRestarting;
         this.hasLoggedStop = true; // Paper - Debugging
         if (isDebugging()) io.papermc.paper.util.TraceUtil.dumpTraceForThread("Server stopped"); // Paper - Debugging

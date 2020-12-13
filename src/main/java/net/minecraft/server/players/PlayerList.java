@@ -480,6 +480,7 @@ public abstract class PlayerList {
             scoreboard.addPlayerToTeam(player.getScoreboardName(), collideRuleTeam);
         }
         // Paper end - Configurable player collision
+        org.purpurmc.purpur.task.BossBarTask.addToAll(player); // Purpur
         PlayerList.LOGGER.info("{}[{}] logged in with entity id {} at ([{}]{}, {}, {})", player.getName().getString(), s1, player.getId(), worldserver1.serverLevelData.getLevelName(), player.getX(), player.getY(), player.getZ());
     }
 
@@ -591,6 +592,7 @@ public abstract class PlayerList {
     }
     public net.kyori.adventure.text.Component remove(ServerPlayer entityplayer, net.kyori.adventure.text.Component leaveMessage) {
         // Paper end - Fix kick event leave message not being sent
+        org.purpurmc.purpur.task.BossBarTask.removeFromAll(entityplayer.getBukkitEntity()); // Purpur
         ServerLevel worldserver = entityplayer.serverLevel();
 
         entityplayer.awardStat(Stats.LEAVE_GAME);
