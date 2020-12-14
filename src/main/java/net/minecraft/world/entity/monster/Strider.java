@@ -485,6 +485,19 @@ public class Strider extends Animal implements ItemSteerable, Saddleable {
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         boolean flag = this.isFood(player.getItemInHand(hand));
 
+        // Purpur start
+        if (level().purpurConfig.striderGiveSaddleBack && player.isSecondaryUseActive() && !flag && isSaddled() && !isVehicle()) {
+            this.steering.setSaddle(false);
+            if (!player.getAbilities().instabuild) {
+                ItemStack saddle = new ItemStack(Items.SADDLE);
+                if (!player.getInventory().add(saddle)) {
+                    player.drop(saddle, false);
+                }
+            }
+            return InteractionResult.SUCCESS;
+        }
+        // Purpur end
+
         if (!flag && this.isSaddled() && !this.isVehicle() && !player.isSecondaryUseActive()) {
             if (!this.level().isClientSide) {
                 player.startRiding(this);
