@@ -387,6 +387,16 @@ public abstract class Player extends LivingEntity {
             this.addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, 200, 0, false, false, true), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.TURTLE_HELMET); // CraftBukkit
         }
 
+        // Purpur start
+        if (this.level().purpurConfig.playerNetheriteFireResistanceDuration > 0 && this.level().getGameTime() % 20 == 0) {
+            if (itemstack.is(Items.NETHERITE_HELMET)
+                    && this.getItemBySlot(EquipmentSlot.CHEST).is(Items.NETHERITE_CHESTPLATE)
+                    && this.getItemBySlot(EquipmentSlot.LEGS).is(Items.NETHERITE_LEGGINGS)
+                    && this.getItemBySlot(EquipmentSlot.FEET).is(Items.NETHERITE_BOOTS)) {
+                this.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, this.level().purpurConfig.playerNetheriteFireResistanceDuration, this.level().purpurConfig.playerNetheriteFireResistanceAmplifier, this.level().purpurConfig.playerNetheriteFireResistanceAmbient, this.level().purpurConfig.playerNetheriteFireResistanceShowParticles, this.level().purpurConfig.playerNetheriteFireResistanceShowIcon), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.NETHERITE_ARMOR);
+            }
+        }
+        // Purpur end
     }
 
     protected ItemCooldowns createItemCooldowns() {
