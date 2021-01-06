@@ -175,7 +175,7 @@ public class Ravager extends Raider {
 
             if (this.level() instanceof ServerLevel serverLevel
                 && this.horizontalCollision
-                && serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                && serverLevel.purpurConfig.ravagerBypassMobGriefing ^ serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur - Add mobGriefing bypass to everything affected
                 boolean flag = false;
                 AABB aabb = this.getBoundingBox().inflate(0.2);
 

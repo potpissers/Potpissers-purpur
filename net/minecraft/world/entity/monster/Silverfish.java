@@ -170,7 +170,7 @@ public class Silverfish extends Monster {
                 return false;
             } else {
                 RandomSource random = this.mob.getRandom();
-                if (getServerLevel(this.mob).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && random.nextInt(reducedTickDelay(10)) == 0) {
+                if (getServerLevel(this.mob).purpurConfig.silverfishBypassMobGriefing ^ getServerLevel(this.mob).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && random.nextInt(reducedTickDelay(10)) == 0) { // Purpur - Add mobGriefing bypass to everything affected
                     this.selectedDirection = Direction.getRandom(random);
                     BlockPos blockPos = BlockPos.containing(this.mob.getX(), this.mob.getY() + 0.5, this.mob.getZ()).relative(this.selectedDirection);
                     BlockState blockState = this.mob.level().getBlockState(blockPos);
@@ -247,7 +247,7 @@ public class Silverfish extends Monster {
                             Block block = blockState.getBlock();
                             if (block instanceof InfestedBlock) {
                                 // CraftBukkit start
-                                BlockState afterState = getServerLevel(level).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) ? blockState.getFluidState().createLegacyBlock() : ((InfestedBlock) block).hostStateByInfested(level.getBlockState(blockPos1)); // Paper - fix wrong block state
+                                BlockState afterState = getServerLevel(level).purpurConfig.silverfishBypassMobGriefing ^ getServerLevel(level).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) ? blockState.getFluidState().createLegacyBlock() : ((InfestedBlock) block).hostStateByInfested(level.getBlockState(blockPos1)); // Paper - fix wrong block state // Purpur - Add mobGriefing bypass to everything affected
                                 if (!org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(this.silverfish, blockPos1, afterState)) { // Paper - fix wrong block state
                                     continue;
                                 }

@@ -35,7 +35,7 @@ public class RemoveBlockGoal extends MoveToBlockGoal {
 
     @Override
     public boolean canUse() {
-        if (!getServerLevel(this.removerMob).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+        if (!getServerLevel(this.removerMob).purpurConfig.zombieBypassMobGriefing == !getServerLevel(this.removerMob).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur - Add mobGriefing bypass to everything affected
             return false;
         } else if (this.nextStartTick > 0) {
             this.nextStartTick--;

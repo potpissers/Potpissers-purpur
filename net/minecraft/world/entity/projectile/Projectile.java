@@ -454,7 +454,7 @@ public abstract class Projectile extends Entity implements TraceableEntity {
     @Override
     public boolean mayInteract(ServerLevel level, BlockPos pos) {
         Entity owner = this.getOwner();
-        return owner instanceof Player ? owner.mayInteract(level, pos) : owner == null || level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+        return owner instanceof Player ? owner.mayInteract(level, pos) : owner == null || level.purpurConfig.projectilesBypassMobGriefing ^ level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // Purpur - Add mobGriefing bypass to everything affected
     }
 
     public boolean mayBreak(ServerLevel level) {

@@ -648,7 +648,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
             && this.canPickUpLoot()
             && this.isAlive()
             && !this.dead
-            && serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+            && serverLevel.purpurConfig.entitiesPickUpLootBypassMobGriefing ^ serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur - Add mobGriefing bypass to everything affected
             Vec3i pickupReach = this.getPickupReach();
 
             for (ItemEntity itemEntity : this.level()

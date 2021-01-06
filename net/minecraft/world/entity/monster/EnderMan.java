@@ -516,7 +516,7 @@ public class EnderMan extends Monster implements NeutralMob {
         public boolean canUse() {
             if (!enderman.level().purpurConfig.endermanAllowGriefing) return false; // Purpur - Add enderman and creeper griefing controls
             return this.enderman.getCarriedBlock() != null
-                && getServerLevel(this.enderman).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
+                && getServerLevel(this.enderman).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) == !this.enderman.level().purpurConfig.endermanBypassMobGriefing // Purpur - Add mobGriefing bypass to everything affected
                 && this.enderman.getRandom().nextInt(reducedTickDelay(2000)) == 0;
         }
 
@@ -666,7 +666,7 @@ public class EnderMan extends Monster implements NeutralMob {
         public boolean canUse() {
             if (!enderman.level().purpurConfig.endermanAllowGriefing) return false; // Purpur - Add enderman and creeper griefing controls
             return this.enderman.getCarriedBlock() == null
-                && getServerLevel(this.enderman).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
+                && getServerLevel(this.enderman).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) == !this.enderman.level().purpurConfig.endermanBypassMobGriefing // Purpur - Add mobGriefing bypass to everything affected
                 && this.enderman.getRandom().nextInt(reducedTickDelay(20)) == 0;
         }
 

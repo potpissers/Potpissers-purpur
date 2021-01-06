@@ -547,7 +547,7 @@ public class EnderDragon extends Mob implements Enemy {
                     BlockPos blockPos = new BlockPos(i, i1, i2);
                     BlockState blockState = level.getBlockState(blockPos);
                     if (!blockState.isAir() && !blockState.is(BlockTags.DRAGON_TRANSPARENT)) {
-                        if (level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && !blockState.is(BlockTags.DRAGON_IMMUNE)) {
+                        if (level.purpurConfig.enderDragonBypassMobGriefing ^ level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && !blockState.is(BlockTags.DRAGON_IMMUNE)) { // Purpur - Add mobGriefing bypass to everything affected
                             // CraftBukkit start - Add blocks to list rather than destroying them
                             //flag1 = level.removeBlock(blockPos, false) || flag1;
                             flag1 = true;

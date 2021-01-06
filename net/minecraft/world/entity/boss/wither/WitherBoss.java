@@ -493,7 +493,7 @@ public class WitherBoss extends Monster implements RangedAttackMob {
 
             if (this.destroyBlocksTick > 0) {
                 this.destroyBlocksTick--;
-                if (this.destroyBlocksTick == 0 && level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                if (this.destroyBlocksTick == 0 && level.purpurConfig.witherBypassMobGriefing ^ level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur - Add mobGriefing bypass to everything affected
                     boolean flag = false;
                     int alternativeTarget = Mth.floor(this.getBbWidth() / 2.0F + 1.0F);
                     int floor = Mth.floor(this.getBbHeight());

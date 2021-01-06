@@ -216,7 +216,7 @@ public class TurtleEggBlock extends Block {
         // Purpur end - Option to disable turtle egg trampling with feather falling
         if (entity instanceof Player) return true;
 
-        return level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+        return level.purpurConfig.turtleEggsBypassMobGriefing ^ level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // Purpur - Add mobGriefing bypass to everything affected
         // Purpur end - Add turtle egg block options
     }
 }

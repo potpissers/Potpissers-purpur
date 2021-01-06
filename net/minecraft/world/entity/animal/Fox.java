@@ -1038,7 +1038,7 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
         }
 
         protected void onReachedTarget() {
-            if (getServerLevel(Fox.this.level()).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+            if (getServerLevel(Fox.this.level()).purpurConfig.foxBypassMobGriefing ^ getServerLevel(Fox.this.level()).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur - Add mobGriefing bypass to everything affected
                 BlockState blockState = Fox.this.level().getBlockState(this.blockPos);
                 if (blockState.is(Blocks.SWEET_BERRY_BUSH)) {
                     this.pickSweetBerries(blockState);

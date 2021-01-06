@@ -30,7 +30,7 @@ public class BreakDoorGoal extends DoorInteractGoal {
     @Override
     public boolean canUse() {
         return super.canUse()
-            && getServerLevel(this.mob).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
+            && this.mob.level().purpurConfig.zombieBypassMobGriefing == !getServerLevel(this.mob).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) // Purpur - Add mobGriefing bypass to everything affected
             && this.isValidDifficulty(this.mob.level().getDifficulty())
             && !this.isOpen();
     }

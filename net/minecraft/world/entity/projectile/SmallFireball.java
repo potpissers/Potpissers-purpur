@@ -25,7 +25,7 @@ public class SmallFireball extends Fireball {
         super(EntityType.SMALL_FIREBALL, owner, movement, level);
         // CraftBukkit start
         if (this.getOwner() != null && this.getOwner() instanceof Mob) {
-            this.isIncendiary = (level instanceof ServerLevel serverLevel) && serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+            this.isIncendiary = (level instanceof ServerLevel serverLevel) && serverLevel.purpurConfig.fireballsBypassMobGriefing ^ serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // Purpur - Add mobGriefing bypass to everything affected
         }
         // CraftBukkit end
     }

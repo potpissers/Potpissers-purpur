@@ -1818,7 +1818,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
         if (this.level() instanceof ServerLevel serverLevel) {
             boolean var6 = false;
             if (this.dead && entitySource instanceof WitherBoss) { // Paper
-                if (serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                if (serverLevel.purpurConfig.witherBypassMobGriefing ^ serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur - Add mobGriefing bypass to everything affected
                     BlockPos blockPos = this.blockPosition();
                     BlockState blockState = Blocks.WITHER_ROSE.defaultBlockState();
                     if (this.level().getBlockState(blockPos).isAir() && blockState.canSurvive(this.level(), blockPos)) {

@@ -18,20 +18,20 @@ public class LargeFireball extends Fireball {
 
     public LargeFireball(EntityType<? extends LargeFireball> entityType, Level level) {
         super(entityType, level);
-        this.isIncendiary = (level instanceof ServerLevel serverLevel) && serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // CraftBukkit
+        this.isIncendiary = (level instanceof ServerLevel serverLevel) && serverLevel.purpurConfig.fireballsBypassMobGriefing ^ serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // CraftBukkit // Purpur - Add mobGriefing bypass to everything affected
     }
 
     public LargeFireball(Level level, LivingEntity owner, Vec3 movement, int explosionPower) {
         super(EntityType.FIREBALL, owner, movement, level);
         this.explosionPower = explosionPower;
-        this.isIncendiary = (level instanceof ServerLevel serverLevel) && serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // CraftBukkit
+        this.isIncendiary = (level instanceof ServerLevel serverLevel) && serverLevel.purpurConfig.fireballsBypassMobGriefing ^ serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // CraftBukkit // Purpur - Add mobGriefing bypass to everything affected
     }
 
     @Override
     protected void onHit(HitResult result) {
         super.onHit(result);
         if (this.level() instanceof ServerLevel serverLevel) {
-            boolean _boolean = serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+            boolean _boolean = serverLevel.purpurConfig.fireballsBypassMobGriefing ^ serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // Purpur - Add mobGriefing bypass to everything affected
             // CraftBukkit start - fire ExplosionPrimeEvent
             org.bukkit.event.entity.ExplosionPrimeEvent event = new org.bukkit.event.entity.ExplosionPrimeEvent((org.bukkit.entity.Explosive) this.getBukkitEntity());
             this.level().getCraftServer().getPluginManager().callEvent(event);

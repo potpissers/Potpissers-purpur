@@ -323,7 +323,7 @@ public class Evoker extends SpellcasterIllager {
                 return false;
             } else {
                 ServerLevel serverLevel = getServerLevel(Evoker.this.level());
-                if (!serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                if (!serverLevel.purpurConfig.evokerBypassMobGriefing == !serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur - Add mobGriefing bypass to everything affected
                     return false;
                 } else {
                     List<Sheep> nearbyEntities = serverLevel.getNearbyEntities(

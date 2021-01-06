@@ -473,7 +473,7 @@ public class Piglin extends AbstractPiglin implements CrossbowAttackMob, Invento
 
     @Override
     public boolean wantsToPickUp(ServerLevel level, ItemStack stack) {
-        return level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && this.canPickUpLoot() && PiglinAi.wantsToPickup(this, stack);
+        return level.purpurConfig.piglinBypassMobGriefing ^ level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && this.canPickUpLoot() && PiglinAi.wantsToPickup(this, stack); // Purpur - Add mobGriefing bypass to everything affected
     }
 
     protected boolean canReplaceCurrentItem(ItemStack candidate) {

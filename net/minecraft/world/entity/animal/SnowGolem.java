@@ -136,7 +136,7 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
                 this.hurtServer(serverLevel, this.damageSources().melting(), 1.0F); // CraftBukkit - DamageSources.ON_FIRE -> CraftEventFactory.MELTING
             }
 
-            if (!serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+            if (!serverLevel.purpurConfig.snowGolemBypassMobGriefing == !serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur - Add mobGriefing bypass to everything affected
                 return;
             }
 

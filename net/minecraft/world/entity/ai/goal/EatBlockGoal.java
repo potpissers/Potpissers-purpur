@@ -67,7 +67,7 @@ public class EatBlockGoal extends Goal {
             BlockPos blockPos = this.mob.blockPosition();
             final BlockState blockState = this.level.getBlockState(blockPos); // Paper - fix wrong block state
             if (IS_TALL_GRASS.test(blockState)) { // Paper - fix wrong block state
-                if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(this.mob, blockPos, blockState.getFluidState().createLegacyBlock(), !getServerLevel(this.level).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))) { // CraftBukkit // Paper - fix wrong block state
+                if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(this.mob, blockPos, blockState.getFluidState().createLegacyBlock(), !getServerLevel(this.level).purpurConfig.sheepBypassMobGriefing == !getServerLevel(this.level).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))) { // CraftBukkit // Paper - fix wrong block state // Purpur - Add mobGriefing bypass to everything affected
                     this.level.destroyBlock(blockPos, false);
                 }
 
@@ -75,7 +75,7 @@ public class EatBlockGoal extends Goal {
             } else {
                 BlockPos blockPos1 = blockPos.below();
                 if (this.level.getBlockState(blockPos1).is(Blocks.GRASS_BLOCK)) {
-                    if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(this.mob, blockPos1, Blocks.DIRT.defaultBlockState(), !getServerLevel(this.level).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))) { // CraftBukkit // Paper - Fix wrong block state
+                    if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(this.mob, blockPos1, Blocks.DIRT.defaultBlockState(), !getServerLevel(this.level).purpurConfig.sheepBypassMobGriefing == !getServerLevel(this.level).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))) { // CraftBukkit // Paper - Fix wrong block state // Purpur - Add mobGriefing bypass to everything affected
                         this.level.levelEvent(2001, blockPos1, Block.getId(Blocks.GRASS_BLOCK.defaultBlockState()));
                         this.level.setBlock(blockPos1, Blocks.DIRT.defaultBlockState(), 2);
                     }

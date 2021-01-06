@@ -49,7 +49,7 @@ public class HarvestFarmland extends Behavior<Villager> {
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, Villager owner) {
-        if (!level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+        if (!level.purpurConfig.villagerBypassMobGriefing == !level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur - Add mobGriefing bypass to everything affected
             return false;
         } else if (owner.getVillagerData().getProfession() != VillagerProfession.FARMER && !(level.purpurConfig.villagerClericsFarmWarts && owner.getVillagerData().getProfession() == VillagerProfession.CLERIC)) { // Purpur - Option for Villager Clerics to farm Nether Wart
             return false;

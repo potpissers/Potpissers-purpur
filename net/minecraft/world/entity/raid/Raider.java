@@ -399,7 +399,7 @@ public abstract class Raider extends PatrollingMonster {
         }
 
         private boolean cannotPickUpBanner() {
-            if (!getServerLevel(this.mob).getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING) || !this.mob.canPickUpLoot()) return false; // Paper - respect game and entity rules for picking up items
+            if (!this.mob.level().purpurConfig.pillagerBypassMobGriefing == !getServerLevel(this.mob).getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING) || !this.mob.canPickUpLoot()) return false; // Paper - respect game and entity rules for picking up items // Purpur - Add mobGriefing bypass to everything affected
             if (!this.mob.hasActiveRaid()) {
                 return true;
             } else if (this.mob.getCurrentRaid().isOver()) {

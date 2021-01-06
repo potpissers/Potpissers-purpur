@@ -114,7 +114,7 @@ public class FarmBlock extends Block {
         if (level instanceof ServerLevel serverLevel
             && (serverLevel.purpurConfig.farmlandTrampleHeight >= 0D ? fallDistance >= serverLevel.purpurConfig.farmlandTrampleHeight : level.random.nextFloat() < fallDistance - 0.5F) // // Purpur - Configurable farmland trample height
             && entity instanceof LivingEntity
-            && (entity instanceof Player || serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))
+            && (entity instanceof Player || serverLevel.purpurConfig.farmlandBypassMobGriefing ^ serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))
             && entity.getBbWidth() * entity.getBbWidth() * entity.getBbHeight() > 0.512F) {
                 // CraftBukkit start - Interact soil
                 org.bukkit.event.Cancellable cancellable;
