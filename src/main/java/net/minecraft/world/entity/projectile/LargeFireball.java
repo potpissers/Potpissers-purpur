@@ -23,20 +23,20 @@ public class LargeFireball extends Fireball {
 
     public LargeFireball(EntityType<? extends LargeFireball> type, Level world) {
         super(type, world);
-        this.isIncendiary = this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // CraftBukkit
+        this.isIncendiary = this.level().purpurConfig.fireballsBypassMobGriefing || this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // CraftBukkit // Purpur
     }
 
     public LargeFireball(Level world, LivingEntity owner, Vec3 velocity, int explosionPower) {
         super(EntityType.FIREBALL, owner, velocity, world);
         this.explosionPower = explosionPower;
-        this.isIncendiary = this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // CraftBukkit
+        this.isIncendiary = this.level().purpurConfig.fireballsBypassMobGriefing || this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // CraftBukkit // Purpur
     }
 
     @Override
     protected void onHit(HitResult hitResult) {
         super.onHit(hitResult);
         if (!this.level().isClientSide) {
-            boolean flag = this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+            boolean flag = this.level().purpurConfig.fireballsBypassMobGriefing || this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // Purpur
 
             // CraftBukkit start - fire ExplosionPrimeEvent
             ExplosionPrimeEvent event = new ExplosionPrimeEvent((org.bukkit.entity.Explosive) this.getBukkitEntity());

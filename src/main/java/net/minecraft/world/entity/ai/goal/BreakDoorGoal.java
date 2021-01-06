@@ -32,7 +32,7 @@ public class BreakDoorGoal extends DoorInteractGoal {
 
     @Override
     public boolean canUse() {
-        return !super.canUse() ? false : (!this.mob.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) ? false : this.isValidDifficulty(this.mob.level().getDifficulty()) && !this.isOpen());
+        return !super.canUse() ? false : ((!this.mob.level().purpurConfig.zombieBypassMobGriefing && !this.mob.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) ? false : this.isValidDifficulty(this.mob.level().getDifficulty()) && !this.isOpen()); // Purpur
     }
 
     @Override

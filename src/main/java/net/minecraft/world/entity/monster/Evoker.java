@@ -365,7 +365,7 @@ public class Evoker extends SpellcasterIllager {
                 return false;
             } else if (Evoker.this.tickCount < this.nextAttackTickCount) {
                 return false;
-            } else if (!Evoker.this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+            } else if (!Evoker.this.level().purpurConfig.evokerBypassMobGriefing && !Evoker.this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur
                 return false;
             } else {
                 List<Sheep> list = Evoker.this.level().getNearbyEntities(Sheep.class, this.wololoTargeting, Evoker.this, Evoker.this.getBoundingBox().inflate(16.0D, 4.0D, 16.0D));

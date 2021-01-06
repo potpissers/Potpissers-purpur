@@ -194,7 +194,7 @@ public class Silverfish extends Monster {
                                     continue;
                                 }
                                 // CraftBukkit end
-                                if (world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                                if (world.purpurConfig.silverfishBypassMobGriefing || world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur
                                     world.destroyBlock(blockposition1, true, this.silverfish);
                                 } else {
                                     world.setBlock(blockposition1, ((InfestedBlock) block).hostStateByInfested(world.getBlockState(blockposition1)), 3);
@@ -232,7 +232,7 @@ public class Silverfish extends Monster {
             } else {
                 RandomSource randomsource = this.mob.getRandom();
 
-                if (this.mob.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && randomsource.nextInt(reducedTickDelay(10)) == 0) {
+                if ((this.mob.level().purpurConfig.silverfishBypassMobGriefing || this.mob.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) && randomsource.nextInt(reducedTickDelay(10)) == 0) { // Purpur
                     this.selectedDirection = Direction.getRandom(randomsource);
                     BlockPos blockposition = BlockPos.containing(this.mob.getX(), this.mob.getY() + 0.5D, this.mob.getZ()).relative(this.selectedDirection);
                     BlockState iblockdata = this.mob.level().getBlockState(blockposition);

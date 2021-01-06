@@ -707,7 +707,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
     public void aiStep() {
         super.aiStep();
         this.level().getProfiler().push("looting");
-        if (!this.level().isClientSide && this.canPickUpLoot() && this.isAlive() && !this.dead && this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+        if (!this.level().isClientSide && this.canPickUpLoot() && this.isAlive() && !this.dead && (this.level().purpurConfig.entitiesPickUpLootBypassMobGriefing || this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))) {
             Vec3i baseblockposition = this.getPickupReach();
             List<ItemEntity> list = this.level().getEntitiesOfClass(ItemEntity.class, this.getBoundingBox().inflate((double) baseblockposition.getX(), (double) baseblockposition.getY(), (double) baseblockposition.getZ()));
             Iterator iterator = list.iterator();

@@ -535,7 +535,15 @@ public class EnderMan extends Monster implements NeutralMob {
         @Override
         public boolean canUse() {
             if (!enderman.level().purpurConfig.endermanAllowGriefing) return false; // Purpur
-            return this.enderman.getCarriedBlock() == null ? false : (!this.enderman.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) ? false : this.enderman.getRandom().nextInt(reducedTickDelay(2000)) == 0);
+            // Purpur start
+            if (this.enderman.getCarriedBlock() == null) {
+                return false;
+            }
+            if (!this.enderman.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && !this.enderman.level().purpurConfig.endermanBypassMobGriefing) {
+                return false;
+            }
+            return this.enderman.getRandom().nextInt(reducedTickDelay(2000)) == 0;
+            // Purpur end
         }
 
         @Override
@@ -581,7 +589,15 @@ public class EnderMan extends Monster implements NeutralMob {
         @Override
         public boolean canUse() {
             if (!enderman.level().purpurConfig.endermanAllowGriefing) return false; // Purpur
-            return this.enderman.getCarriedBlock() != null ? false : (!this.enderman.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) ? false : this.enderman.getRandom().nextInt(reducedTickDelay(20)) == 0);
+            // Purpur start
+            if (this.enderman.getCarriedBlock() != null) {
+                return false;
+            }
+            if (!this.enderman.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && !this.enderman.level().purpurConfig.endermanBypassMobGriefing) {
+                return false;
+            }
+            return this.enderman.getRandom().nextInt(reducedTickDelay(20)) == 0;
+            // Purpur end
         }
 
         @Override

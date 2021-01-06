@@ -40,7 +40,7 @@ public class RemoveBlockGoal extends MoveToBlockGoal {
 
     @Override
     public boolean canUse() {
-        if (!this.removerMob.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+        if (!this.removerMob.level().purpurConfig.zombieBypassMobGriefing && !this.removerMob.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur
             return false;
         } else if (this.nextStartTick > 0) {
             --this.nextStartTick;

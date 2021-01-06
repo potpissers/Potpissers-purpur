@@ -30,7 +30,7 @@ public class SmallFireball extends Fireball {
         super(EntityType.SMALL_FIREBALL, owner, velocity, world);
         // CraftBukkit start
         if (this.getOwner() != null && this.getOwner() instanceof Mob) {
-            this.isIncendiary = this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+            this.isIncendiary = this.level().purpurConfig.fireballsBypassMobGriefing || this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING); // Purpur
         }
         // CraftBukkit end
     }

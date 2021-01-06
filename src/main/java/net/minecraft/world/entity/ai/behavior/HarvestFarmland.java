@@ -48,7 +48,7 @@ public class HarvestFarmland extends Behavior<Villager> {
     }
 
     protected boolean checkExtraStartConditions(ServerLevel world, Villager entity) {
-        if (!world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+        if (!world.purpurConfig.villagerBypassMobGriefing && !world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur
             return false;
         } else if (entity.getVillagerData().getProfession() != VillagerProfession.FARMER && !(world.purpurConfig.villagerClericsFarmWarts && entity.getVillagerData().getProfession() == VillagerProfession.CLERIC)) { // Purpur
             return false;

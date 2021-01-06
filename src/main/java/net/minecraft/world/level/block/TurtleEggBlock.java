@@ -221,7 +221,7 @@ public class TurtleEggBlock extends Block {
         }
         if (entity instanceof Player) return true;
 
-        return world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+        return world.purpurConfig.turtleEggsBypassMobGriefing || world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
         // Purpur end
     }
 }

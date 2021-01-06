@@ -636,7 +636,7 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
         @Override
         public boolean canUse() {
             if (this.nextStartTick <= 0) {
-                if (!this.rabbit.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                if (!this.rabbit.level().purpurConfig.rabbitBypassMobGriefing && !this.rabbit.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur
                     return false;
                 }
 

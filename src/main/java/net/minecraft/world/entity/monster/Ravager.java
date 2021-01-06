@@ -170,7 +170,7 @@ public class Ravager extends Raider {
                 this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(Mth.lerp(0.1D, d1, d0));
             }
 
-            if (this.horizontalCollision && this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+            if (this.horizontalCollision && (this.level().purpurConfig.ravagerBypassMobGriefing || this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))) { // Purpur
                 boolean flag = false;
                 AABB axisalignedbb = this.getBoundingBox().inflate(0.2D);
                 Iterator iterator = BlockPos.betweenClosed(Mth.floor(axisalignedbb.minX), Mth.floor(axisalignedbb.minY), Mth.floor(axisalignedbb.minZ), Mth.floor(axisalignedbb.maxX), Mth.floor(axisalignedbb.maxY), Mth.floor(axisalignedbb.maxZ)).iterator();

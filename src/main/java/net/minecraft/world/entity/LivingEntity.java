@@ -1857,7 +1857,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
             boolean flag = false;
 
             if (this.dead && adversary instanceof WitherBoss) { // Paper
-                if (this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                if (this.level().purpurConfig.witherBypassMobGriefing || this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur
                     BlockPos blockposition = this.blockPosition();
                     BlockState iblockdata = Blocks.WITHER_ROSE.defaultBlockState();
 

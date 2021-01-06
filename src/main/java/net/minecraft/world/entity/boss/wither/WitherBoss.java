@@ -502,7 +502,7 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
 
             if (this.destroyBlocksTick > 0) {
                 --this.destroyBlocksTick;
-                if (this.destroyBlocksTick == 0 && this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                if (this.destroyBlocksTick == 0 && (this.level().purpurConfig.witherBypassMobGriefing || this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))) { // Purpur
                     boolean flag = false;
 
                     j = Mth.floor(this.getBbWidth() / 2.0F + 1.0F);

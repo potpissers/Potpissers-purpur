@@ -80,7 +80,7 @@ public class PowderSnowBlock extends Block implements BucketPickup {
         if (!world.isClientSide) {
             // CraftBukkit start
             if (entity.isOnFire() && entity.mayInteract(world, pos)) {
-                if (!org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(entity, pos, Blocks.AIR.defaultBlockState(), !(world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) || entity instanceof Player))) {
+                if (!org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(entity, pos, Blocks.AIR.defaultBlockState(), !((world.purpurConfig.powderSnowBypassMobGriefing || world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) || entity instanceof Player))) {
                     return;
                 }
                 // CraftBukkit end

@@ -1385,7 +1385,7 @@ public class Fox extends Animal implements VariantHolder<Fox.Type> {
         }
 
         protected void onReachedTarget() {
-            if (Fox.this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+            if (Fox.this.level().purpurConfig.foxBypassMobGriefing || Fox.this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) { // Purpur
                 BlockState iblockdata = Fox.this.level().getBlockState(this.blockPos);
 
                 if (iblockdata.is(Blocks.SWEET_BERRY_BUSH)) {
