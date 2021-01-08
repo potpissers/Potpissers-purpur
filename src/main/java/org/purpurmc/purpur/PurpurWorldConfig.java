@@ -119,6 +119,7 @@ public class PurpurWorldConfig {
     public boolean entitiesPickUpLootBypassMobGriefing = false;
     public boolean fireballsBypassMobGriefing = false;
     public boolean milkCuresBadOmen = true;
+    public boolean noteBlockIgnoreAbove = false;
     public boolean persistentDroppableEntityDisplayNames = true;
     public boolean projectilesBypassMobGriefing = false;
     public double tridentLoyaltyVoidReturnHeight = 0.0D;
@@ -133,6 +134,7 @@ public class PurpurWorldConfig {
         entitiesPickUpLootBypassMobGriefing = getBoolean("gameplay-mechanics.entities-pick-up-loot-bypass-mob-griefing", entitiesPickUpLootBypassMobGriefing);
         fireballsBypassMobGriefing = getBoolean("gameplay-mechanics.fireballs-bypass-mob-griefing", fireballsBypassMobGriefing);
         milkCuresBadOmen = getBoolean("gameplay-mechanics.milk-cures-bad-omen", milkCuresBadOmen);
+        noteBlockIgnoreAbove = getBoolean("gameplay-mechanics.note-block-ignore-above", noteBlockIgnoreAbove);
         persistentDroppableEntityDisplayNames = getBoolean("gameplay-mechanics.persistent-droppable-entity-display-names", persistentDroppableEntityDisplayNames);
         projectilesBypassMobGriefing = getBoolean("gameplay-mechanics.projectiles-bypass-mob-griefing", projectilesBypassMobGriefing);
         tridentLoyaltyVoidReturnHeight = getDouble("gameplay-mechanics.trident-loyalty-void-return-height", tridentLoyaltyVoidReturnHeight);

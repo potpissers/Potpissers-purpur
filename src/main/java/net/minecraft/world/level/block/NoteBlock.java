@@ -95,7 +95,7 @@ public class NoteBlock extends Block {
     }
 
     private void playNote(@Nullable Entity entity, BlockState state, Level world, BlockPos pos) {
-        if (((NoteBlockInstrument) state.getValue(NoteBlock.INSTRUMENT)).worksAboveNoteBlock() || world.getBlockState(pos.above()).isAir()) {
+        if (world.purpurConfig.noteBlockIgnoreAbove || ((NoteBlockInstrument) state.getValue(NoteBlock.INSTRUMENT)).worksAboveNoteBlock() || world.getBlockState(pos.above()).isAir()) { // Purpur
             // CraftBukkit start
             // org.bukkit.event.block.NotePlayEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callNotePlayEvent(world, pos, state.getValue(NoteBlock.INSTRUMENT), state.getValue(NoteBlock.NOTE));
             // if (event.isCancelled()) {
