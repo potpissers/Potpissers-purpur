@@ -1937,7 +1937,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return this.isInWater() || flag;
     }
 
-    void updateInWaterStateAndDoWaterCurrentPushing() {
+    public void updateInWaterStateAndDoWaterCurrentPushing() { // Purpur - package-private -> public
         Entity entity = this.getVehicle();
 
         if (entity instanceof Boat entityboat) {

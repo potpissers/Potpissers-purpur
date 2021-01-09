@@ -102,10 +102,12 @@ public class ArmorStand extends LivingEntity {
     private boolean noTickPoseDirty = false;
     private boolean noTickEquipmentDirty = false;
     // Paper end - Allow ArmorStands not to tick
+    public boolean canMovementTick = true; // Purpur
 
     public ArmorStand(EntityType<? extends ArmorStand> type, Level world) {
         super(type, world);
         if (world != null) this.canTick = world.paperConfig().entities.armorStands.tick; // Paper - Allow ArmorStands not to tick
+        if (world != null) this.canMovementTick = world.purpurConfig.armorstandMovement; // Purpur
         this.handItems = NonNullList.withSize(2, ItemStack.EMPTY);
         this.armorItems = NonNullList.withSize(4, ItemStack.EMPTY);
         this.headPose = ArmorStand.DEFAULT_HEAD_POSE;
@@ -1017,4 +1019,18 @@ public class ArmorStand extends LivingEntity {
         }
     }
     // Paper end
+
+    // Purpur start
+    @Override
+    public void updateInWaterStateAndDoWaterCurrentPushing() {
+        if (this.level().purpurConfig.armorstandWaterMovement &&
+            (this.level().purpurConfig.armorstandWaterFence || !(level().getBlockState(blockPosition().below()).getBlock() instanceof net.minecraft.world.level.block.FenceBlock)))
+            super.updateInWaterStateAndDoWaterCurrentPushing();
+    }
+
+    @Override
+    public void aiStep() {
+        if (this.canMovementTick && this.canMove) super.aiStep();
+    }
+    // Purpur end
 }
