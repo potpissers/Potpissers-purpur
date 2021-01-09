@@ -126,9 +126,17 @@ public class FarmBlock extends Block {
             }
 
             // Purpur start
+            if (world.purpurConfig.farmlandTramplingDisabled) return;
+            if (world.purpurConfig.farmlandTramplingOnlyPlayers && !(entity instanceof Player)) return;
             if (world.purpurConfig.farmlandAlpha) {
                 Block block = world.getBlockState(pos.below()).getBlock();
                 if (block instanceof FenceBlock || block instanceof WallBlock) {
+                    return;
+                }
+            }
+            if (world.purpurConfig.farmlandTramplingFeatherFalling) {
+                Iterator<net.minecraft.world.item.ItemStack> armor = ((LivingEntity) entity).getArmorSlots().iterator();
+                if (armor.hasNext() && net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.FEATHER_FALLING, armor.next()) >= (int) entity.fallDistance) {
                     return;
                 }
             }
