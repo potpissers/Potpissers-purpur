@@ -58,6 +58,13 @@ public class EndPortalBlock extends BaseEntityBlock implements Portal {
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         if (!new io.papermc.paper.event.entity.EntityInsideBlockEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.block.CraftBlock.at(level, pos)).callEvent()) { return; } // Paper - Add EntityInsideBlockEvent
         if (entity.canUsePortal(false)) {
+            // Purpur start - Add EntityTeleportHinderedEvent
+            if (level.purpurConfig.imposeTeleportRestrictionsOnEndPortals && (entity.isVehicle() || entity.isPassenger())) {
+                if (!new org.purpurmc.purpur.event.entity.EntityTeleportHinderedEvent(entity.getBukkitEntity(), entity.isPassenger() ? org.purpurmc.purpur.event.entity.EntityTeleportHinderedEvent.Reason.IS_PASSENGER : org.purpurmc.purpur.event.entity.EntityTeleportHinderedEvent.Reason.IS_VEHICLE, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.END_PORTAL).callEvent()) {
+                    return;
+                }
+            }
+            // Purpur end - Add EntityTeleportHinderedEvent
             // CraftBukkit start - Entity in portal
             org.bukkit.event.entity.EntityPortalEnterEvent event = new org.bukkit.event.entity.EntityPortalEnterEvent(entity.getBukkitEntity(), new org.bukkit.Location(level.getWorld(), pos.getX(), pos.getY(), pos.getZ()), org.bukkit.PortalType.ENDER); // Paper - add portal type
             level.getCraftServer().getPluginManager().callEvent(event);
