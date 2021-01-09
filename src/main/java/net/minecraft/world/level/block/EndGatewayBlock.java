@@ -102,6 +102,13 @@ public class EndGatewayBlock extends BaseEntityBlock implements Portal {
                 TheEndGatewayBlockEntity tileentityendgateway = (TheEndGatewayBlockEntity) tileentity;
 
                 if (!tileentityendgateway.isCoolingDown()) {
+                    // Purpur start
+                    if (world.purpurConfig.imposeTeleportRestrictionsOnGateways && (entity.isVehicle() || entity.isPassenger())) {
+                        if (!new org.purpurmc.purpur.event.entity.EntityTeleportHinderedEvent(entity.getBukkitEntity(), entity.isPassenger() ? org.purpurmc.purpur.event.entity.EntityTeleportHinderedEvent.Reason.IS_PASSENGER : org.purpurmc.purpur.event.entity.EntityTeleportHinderedEvent.Reason.IS_VEHICLE, PlayerTeleportEvent.TeleportCause.END_GATEWAY).callEvent()) {
+                            return;
+                        }
+                    }
+                    // Purpur end
                     entity.setAsInsidePortal(this, pos);
                     TheEndGatewayBlockEntity.triggerCooldown(world, pos, state, tileentityendgateway);
                 }

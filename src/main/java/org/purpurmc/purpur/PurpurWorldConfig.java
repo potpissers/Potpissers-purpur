@@ -118,6 +118,9 @@ public class PurpurWorldConfig {
     public boolean entitiesCanUsePortals = true;
     public boolean entitiesPickUpLootBypassMobGriefing = false;
     public boolean fireballsBypassMobGriefing = false;
+    public boolean imposeTeleportRestrictionsOnGateways = false;
+    public boolean imposeTeleportRestrictionsOnNetherPortals = false;
+    public boolean imposeTeleportRestrictionsOnEndPortals = false;
     public boolean milkCuresBadOmen = true;
     public boolean noteBlockIgnoreAbove = false;
     public boolean persistentDroppableEntityDisplayNames = true;
@@ -133,6 +136,9 @@ public class PurpurWorldConfig {
         entitiesCanUsePortals = getBoolean("gameplay-mechanics.entities-can-use-portals", entitiesCanUsePortals);
         entitiesPickUpLootBypassMobGriefing = getBoolean("gameplay-mechanics.entities-pick-up-loot-bypass-mob-griefing", entitiesPickUpLootBypassMobGriefing);
         fireballsBypassMobGriefing = getBoolean("gameplay-mechanics.fireballs-bypass-mob-griefing", fireballsBypassMobGriefing);
+        imposeTeleportRestrictionsOnGateways = getBoolean("gameplay-mechanics.impose-teleport-restrictions-on-gateways", imposeTeleportRestrictionsOnGateways);
+        imposeTeleportRestrictionsOnNetherPortals = getBoolean("gameplay-mechanics.impose-teleport-restrictions-on-nether-portals", imposeTeleportRestrictionsOnNetherPortals);
+        imposeTeleportRestrictionsOnEndPortals = getBoolean("gameplay-mechanics.impose-teleport-restrictions-on-end-portals", imposeTeleportRestrictionsOnEndPortals);
         milkCuresBadOmen = getBoolean("gameplay-mechanics.milk-cures-bad-omen", milkCuresBadOmen);
         noteBlockIgnoreAbove = getBoolean("gameplay-mechanics.note-block-ignore-above", noteBlockIgnoreAbove);
         persistentDroppableEntityDisplayNames = getBoolean("gameplay-mechanics.persistent-droppable-entity-display-names", persistentDroppableEntityDisplayNames);

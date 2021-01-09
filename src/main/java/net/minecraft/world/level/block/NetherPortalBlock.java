@@ -109,6 +109,13 @@ public class NetherPortalBlock extends Block implements Portal {
     protected void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
         if (!new io.papermc.paper.event.entity.EntityInsideBlockEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.block.CraftBlock.at(world, pos)).callEvent()) { return; } // Paper - Add EntityInsideBlockEvent
         if (entity.canUsePortal(false)) {
+            // Purpur start
+            if (world.purpurConfig.imposeTeleportRestrictionsOnNetherPortals && (entity.isVehicle() || entity.isPassenger())) {
+                if (!new org.purpurmc.purpur.event.entity.EntityTeleportHinderedEvent(entity.getBukkitEntity(), entity.isPassenger() ? org.purpurmc.purpur.event.entity.EntityTeleportHinderedEvent.Reason.IS_PASSENGER : org.purpurmc.purpur.event.entity.EntityTeleportHinderedEvent.Reason.IS_VEHICLE, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.NETHER_PORTAL).callEvent()) {
+                    return;
+                }
+            }
+            // Purpur end
             // CraftBukkit start - Entity in portal
             EntityPortalEnterEvent event = new EntityPortalEnterEvent(entity.getBukkitEntity(), new org.bukkit.Location(world.getWorld(), pos.getX(), pos.getY(), pos.getZ()), org.bukkit.PortalType.NETHER); // Paper - add portal type
             world.getCraftServer().getPluginManager().callEvent(event);
