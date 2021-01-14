@@ -1424,6 +1424,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
                 worldserver1.removePlayerImmediately(this, Entity.RemovalReason.CHANGED_DIMENSION);
                 this.unsetRemoved();
                 // CraftBukkit end
+                this.portalPos = io.papermc.paper.util.MCUtil.toBlockPosition(exit); // Purpur - Fix stuck in portals
                 this.setServerLevel(worldserver);
                 this.connection.teleport(exit); // CraftBukkit - use internal teleport without event
                 this.connection.resetPosition();

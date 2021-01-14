@@ -3274,13 +3274,16 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return Vec3.directionFromRotation(this.getRotationVector());
     }
 
+    public BlockPos portalPos = BlockPos.ZERO; // Purpur
     public void setAsInsidePortal(Portal portal, BlockPos pos) {
         if (this.isOnPortalCooldown()) {
+            if (!(level().purpurConfig.playerFixStuckPortal && this instanceof Player && !pos.equals(this.portalPos))) // Purpur - Fix stuck in portals
             this.setPortalCooldown();
         } else if (this.level.purpurConfig.entitiesCanUsePortals || this instanceof ServerPlayer) { // Purpur - Entities can use portals
             if (this.portalProcess != null && this.portalProcess.isSamePortal(portal)) {
                 this.portalProcess.updateEntryPosition(pos.immutable());
                 this.portalProcess.setAsInsidePortalThisTick(true);
+                this.portalPos = BlockPos.ZERO; // Purpur - Fix stuck in portals
             } else {
                 this.portalProcess = new PortalProcessor(portal, pos.immutable());
             }
