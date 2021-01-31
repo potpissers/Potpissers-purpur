@@ -84,12 +84,16 @@ public class AcquirePoi {
                                     return true;
                                 }
                             };
-                            Set<Pair<Holder<PoiType>, BlockPos>> set = poiManager.findAllClosestFirstWithType(
-                                    acquirablePois, predicate1, mob.blockPosition(), 48, PoiManager.Occupancy.HAS_SPACE
-                                )
-                                .limit(5L)
-                                .filter(pair1 -> predicate.test(level, pair1.getSecond()))
-                                .collect(Collectors.toSet());
+                            // Paper start - optimise POI access
+                            final java.util.List<Pair<Holder<PoiType>, BlockPos>> poiposes = new java.util.ArrayList<>();
+                            io.papermc.paper.util.PoiAccess.findNearestPoiPositions(poiManager, acquirablePois, predicate1, mob.blockPosition(), 48, 48*48, PoiManager.Occupancy.HAS_SPACE, false, 5, poiposes);
+                            final Set<Pair<Holder<PoiType>, BlockPos>> set = new java.util.HashSet<>(poiposes.size());
+                            for (final Pair<Holder<PoiType>, BlockPos> poiPose : poiposes) {
+                                if (predicate.test(level, poiPose.getSecond())) {
+                                    set.add(poiPose);
+                                }
+                            }
+                            // Paper end - optimise POI access
                             Path path = findPathToPois(mob, set);
                             if (path != null && path.canReach()) {
                                 BlockPos target = path.getTarget();

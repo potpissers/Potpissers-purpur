@@ -254,36 +254,47 @@ public class PoiManager extends SectionStorage<PoiSection, PoiSection.Packed> im
     public Optional<BlockPos> find(
         Predicate<Holder<PoiType>> typePredicate, Predicate<BlockPos> posPredicate, BlockPos pos, int distance, PoiManager.Occupancy status
     ) {
-        return this.findAll(typePredicate, posPredicate, pos, distance, status).findFirst();
+        // Paper start - re-route to faster logic
+        BlockPos ret = io.papermc.paper.util.PoiAccess.findAnyPoiPosition(this, typePredicate, posPredicate, pos, distance, status, false);
+        return Optional.ofNullable(ret);
+        // Paper end
     }
 
     public Optional<BlockPos> findClosest(Predicate<Holder<PoiType>> typePredicate, BlockPos pos, int distance, PoiManager.Occupancy status) {
-        return this.getInRange(typePredicate, pos, distance, status).map(PoiRecord::getPos).min(Comparator.comparingDouble(blockPos -> blockPos.distSqr(pos)));
+        // Paper start - re-route to faster logic
+        BlockPos closestPos = io.papermc.paper.util.PoiAccess.findClosestPoiDataPosition(this, typePredicate, null, pos, distance, distance * distance, status, false);
+        return Optional.ofNullable(closestPos);
+        // Paper end - re-route to faster logic
     }
 
     public Optional<Pair<Holder<PoiType>, BlockPos>> findClosestWithType(
         Predicate<Holder<PoiType>> typePredicate, BlockPos pos, int distance, PoiManager.Occupancy status
     ) {
-        return this.getInRange(typePredicate, pos, distance, status)
-            .min(Comparator.comparingDouble(poiRecord -> poiRecord.getPos().distSqr(pos)))
-            .map(poiRecord -> Pair.of(poiRecord.getPoiType(), poiRecord.getPos()));
+        // Paper start - re-route to faster logic
+        return Optional.ofNullable(io.papermc.paper.util.PoiAccess.findClosestPoiDataTypeAndPosition(
+            this, typePredicate, null, pos, distance, distance * distance, status, false
+        ));
+        // Paper end - re-route to faster logic
     }
 
     public Optional<BlockPos> findClosest(
         Predicate<Holder<PoiType>> typePredicate, Predicate<BlockPos> posPredicate, BlockPos pos, int distance, PoiManager.Occupancy status
     ) {
-        return this.getInRange(typePredicate, pos, distance, status)
-            .map(PoiRecord::getPos)
-            .filter(posPredicate)
-            .min(Comparator.comparingDouble(blockPos -> blockPos.distSqr(pos)));
+        // Paper start - re-route to faster logic
+        BlockPos closestPos = io.papermc.paper.util.PoiAccess.findClosestPoiDataPosition(this, typePredicate, posPredicate, pos, distance, distance * distance, status, false);
+        return Optional.ofNullable(closestPos);
+        // Paper end - re-route to faster logic
     }
 
     public Optional<BlockPos> take(
         Predicate<Holder<PoiType>> typePredicate, BiPredicate<Holder<PoiType>, BlockPos> combinedTypePosPredicate, BlockPos pos, int distance
     ) {
-        return this.getInRange(typePredicate, pos, distance, PoiManager.Occupancy.HAS_SPACE)
-            .filter(poiRecord -> combinedTypePosPredicate.test(poiRecord.getPoiType(), poiRecord.getPos()))
-            .findFirst()
+        // Paper start - re-route to faster logic
+        final @javax.annotation.Nullable PoiRecord closest = io.papermc.paper.util.PoiAccess.findClosestPoiDataRecord(
+            this, typePredicate, combinedTypePosPredicate, pos, distance, distance * distance, Occupancy.HAS_SPACE, false
+        );
+        return Optional.ofNullable(closest)
+            // Paper end - re-route to faster logic
             .map(poiRecord -> {
                 poiRecord.acquireTicket();
                 return poiRecord.getPos();
@@ -298,8 +309,21 @@ public class PoiManager extends SectionStorage<PoiSection, PoiSection.Packed> im
         int distance,
         RandomSource random
     ) {
-        List<PoiRecord> list = Util.toShuffledList(this.getInRange(typePredicate, pos, distance, status), random);
-        return list.stream().filter(poiRecord -> posPredicate.test(poiRecord.getPos())).findFirst().map(PoiRecord::getPos);
+        // Paper start - re-route to faster logic
+        List<PoiRecord> list = new java.util.ArrayList<>();
+        io.papermc.paper.util.PoiAccess.findAnyPoiRecords(
+            this, typePredicate, posPredicate, pos, distance, status, false, Integer.MAX_VALUE, list
+        );
+
+        // the old method shuffled the list and then tried to find the first element in it that
+        // matched positionPredicate, however we moved positionPredicate into the poi search. This means we can avoid a
+        // shuffle entirely, and just pick a random element from list
+        if (list.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(list.get(random.nextInt(list.size())).getPos());
+        // Paper end - re-route to faster logic
     }
 
     public boolean release(BlockPos pos) {

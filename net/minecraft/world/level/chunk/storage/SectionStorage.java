@@ -131,11 +131,11 @@ public class SectionStorage<R, P> implements AutoCloseable, ca.spottedleaf.moonr
     }
 
     @Nullable
-    protected Optional<R> get(long sectionKey) {
+    public Optional<R> get(long sectionKey) { // Paper - public
         return this.storage.get(sectionKey);
     }
 
-    protected Optional<R> getOrLoad(long sectionKey) {
+    public Optional<R> getOrLoad(long sectionKey) { // Paper - public
         if (this.outsideStoredRange(sectionKey)) {
             return Optional.empty();
         } else {
