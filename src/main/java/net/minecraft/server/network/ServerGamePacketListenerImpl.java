@@ -1157,6 +1157,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
 
     @Override
     public void handleEditBook(ServerboundEditBookPacket packet) {
+        if (!gg.pufferfish.pufferfish.PufferfishConfig.enableBooks && !this.player.getBukkitEntity().hasPermission("pufferfish.usebooks")) return; // Pufferfish
         // Paper start - Book size limits
         final io.papermc.paper.configuration.type.number.IntOr.Disabled pageMax = io.papermc.paper.configuration.GlobalConfiguration.get().itemValidation.bookSize.pageMax;
         if (!this.cserver.isPrimaryThread() && pageMax.enabled()) {

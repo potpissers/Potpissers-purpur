@@ -157,7 +157,6 @@ import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 // CraftBukkit end
 
-import co.aikar.timings.MinecraftTimings; // Paper
 
 public abstract class LivingEntity extends Entity implements Attackable {
 
@@ -449,7 +448,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
             boolean flag = this instanceof net.minecraft.world.entity.player.Player;
 
             if (!this.level().isClientSide) {
-                if (this.isInWall()) {
+                if (shouldCheckForSuffocation() && this.isInWall()) { // Pufferfish - optimize suffocation
                     this.hurt(this.damageSources().inWall(), 1.0F);
                 } else if (flag && !this.level().getWorldBorder().isWithinBounds(this.getBoundingBox())) {
                     double d0 = this.level().getWorldBorder().getDistanceToBorder(this) + this.level().getWorldBorder().getDamageSafeZone();
@@ -1409,6 +1408,19 @@ public abstract class LivingEntity extends Entity implements Attackable {
         return this.getHealth() <= 0.0F;
     }
 
+    // Pufferfish start - optimize suffocation
+    public boolean couldPossiblyBeHurt(float amount) {
+        if ((float) this.invulnerableTime > (float) this.invulnerableDuration / 2.0F && amount <= this.lastHurt) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean shouldCheckForSuffocation() {
+        return !gg.pufferfish.pufferfish.PufferfishConfig.enableSuffocationOptimization || (tickCount % 10 == 0 && couldPossiblyBeHurt(1.0F));
+    }
+    // Pufferfish end
+
     @Override
     public boolean hurt(DamageSource source, float amount) {
         if (this.isInvulnerableTo(source)) {
@@ -2064,6 +2076,20 @@ public abstract class LivingEntity extends Entity implements Attackable {
     public Optional<BlockPos> getLastClimbablePos() {
         return this.lastClimbablePos;
     }
+
+
+    // Pufferfish start
+    private boolean cachedOnClimable = false;
+    private BlockPos lastClimbingPosition = null;
+
+    public boolean onClimableCached() {
+        if (!this.blockPosition().equals(this.lastClimbingPosition)) {
+            this.cachedOnClimable = this.onClimbable();
+            this.lastClimbingPosition = this.blockPosition();
+        }
+        return this.cachedOnClimable;
+    }
+    // Pufferfish end
 
     public boolean onClimbable() {
         if (this.isSpectator()) {

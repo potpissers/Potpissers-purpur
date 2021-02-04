@@ -193,6 +193,7 @@ public class ServerEntity {
                 boolean flag6 = k < -32768L || k > 32767L || l < -32768L || l > 32767L || i1 < -32768L || i1 > 32767L;
 
                 if (!this.forceStateResync && !flag6 && this.teleportDelay <= 400 && !this.wasRiding && this.wasOnGround == this.entity.onGround()) { // Paper - fix desync when a player is added to the tracker
+                    if (flag2 || flag3 || this.entity instanceof AbstractArrow) { // Pufferfish
                     if ((!flag2 || !flag3) && !(this.entity instanceof AbstractArrow)) {
                         if (flag2) {
                             packet1 = new ClientboundMoveEntityPacket.Pos(this.entity.getId(), (short) ((int) k), (short) ((int) l), (short) ((int) i1), this.entity.onGround());
@@ -206,6 +207,7 @@ public class ServerEntity {
                         flag4 = true;
                         flag5 = true;
                     }
+                    } // Pufferfish
                 } else {
                     this.wasOnGround = this.entity.onGround();
                     this.teleportDelay = 0;

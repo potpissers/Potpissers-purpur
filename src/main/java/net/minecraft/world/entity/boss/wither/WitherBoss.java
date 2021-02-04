@@ -154,6 +154,13 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
         this.bossEvent.setName(this.getDisplayName());
     }
 
+    // Pufferfish start - optimize suffocation
+    @Override
+    public boolean shouldCheckForSuffocation() {
+        return true;
+    }
+    // Pufferfish end
+
     @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.WITHER_AMBIENT;

@@ -232,14 +232,16 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
         return this.lookControl;
     }
 
+    int _pufferfish_inactiveTickDisableCounter = 0; // Pufferfish - throttle inactive goal selector ticking
     // Paper start
     @Override
     public void inactiveTick() {
         super.inactiveTick();
-        if (this.goalSelector.inactiveTick()) {
+        boolean isThrottled = gg.pufferfish.pufferfish.PufferfishConfig.throttleInactiveGoalSelectorTick && _pufferfish_inactiveTickDisableCounter++ % 20 != 0; // Pufferfish - throttle inactive goal selector ticking
+        if (this.goalSelector.inactiveTick(this.activatedPriority, true) && !isThrottled) { // Pufferfish - pass activated priroity // Pufferfish - throttle inactive goal selector ticking
             this.goalSelector.tick();
         }
-        if (this.targetSelector.inactiveTick()) {
+        if (this.targetSelector.inactiveTick(this.activatedPriority, true)) { // Pufferfish - pass activated priority
             this.targetSelector.tick();
         }
     }
@@ -929,16 +931,20 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
 
         if (i % 2 != 0 && this.tickCount > 1) {
             gameprofilerfiller.push("targetSelector");
+            if (this.targetSelector.inactiveTick(this.activatedPriority, false)) // Pufferfish - use this to alternate ticking
             this.targetSelector.tickRunningGoals(false);
             gameprofilerfiller.pop();
             gameprofilerfiller.push("goalSelector");
+            if (this.goalSelector.inactiveTick(this.activatedPriority, false)) // Pufferfish - use this to alternate ticking
             this.goalSelector.tickRunningGoals(false);
             gameprofilerfiller.pop();
         } else {
             gameprofilerfiller.push("targetSelector");
+            if (this.targetSelector.inactiveTick(this.activatedPriority, false)) // Pufferfish - use this to alternate ticking
             this.targetSelector.tick();
             gameprofilerfiller.pop();
             gameprofilerfiller.push("goalSelector");
+            if (this.goalSelector.inactiveTick(this.activatedPriority, false)) // Pufferfish - use this to alternate ticking
             this.goalSelector.tick();
             gameprofilerfiller.pop();
         }

@@ -21,8 +21,10 @@ public class LootParams {
 
     public LootParams(ServerLevel world, Map<LootContextParam<?>, Object> parameters, Map<ResourceLocation, LootParams.DynamicDrop> dynamicDrops, float luck) {
         this.level = world;
-        this.params = parameters;
-        this.dynamicDrops = dynamicDrops;
+        // Pufferfish start - use unmodifiable maps instead of immutable ones to skip the copy
+        this.params = java.util.Collections.unmodifiableMap(parameters);
+        this.dynamicDrops = java.util.Collections.unmodifiableMap(dynamicDrops);
+        // Pufferfish end
         this.luck = luck;
     }
 

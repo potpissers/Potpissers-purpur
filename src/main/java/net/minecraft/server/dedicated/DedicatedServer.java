@@ -239,6 +239,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
         this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
         com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
+        gg.pufferfish.pufferfish.PufferfishConfig.load(); // Pufferfish
+        gg.pufferfish.pufferfish.PufferfishCommand.init(); // Pufferfish
 
         this.setPvpAllowed(dedicatedserverproperties.pvp);
         this.setFlightAllowed(dedicatedserverproperties.allowFlight);
@@ -359,6 +361,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
                 DedicatedServer.LOGGER.info("JMX monitoring enabled");
             }
 
+            if (gg.pufferfish.pufferfish.PufferfishConfig.enableAsyncMobSpawning) mobSpawnExecutor.start(); // Pufferfish
             return true;
         }
     }

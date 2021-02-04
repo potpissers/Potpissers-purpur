@@ -322,6 +322,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
     public volatile Thread shutdownThread; // Paper
     public volatile boolean abnormalExit = false; // Paper
     public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
+    public gg.pufferfish.pufferfish.util.AsyncExecutor mobSpawnExecutor = new gg.pufferfish.pufferfish.util.AsyncExecutor("MobSpawning"); // Pufferfish - optimize mob spawning
 
     public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
         AtomicReference<S> atomicreference = new AtomicReference();
@@ -1312,6 +1313,12 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                 this.profiler.popPush("nextTickWait");
                 this.mayHaveDelayedTasks = true;
                 this.delayedTasksMaxNextTickTimeNanos = Math.max(Util.getNanos() + i, this.nextTickTimeNanos);
+                // Pufferfish start - tps catchup
+                if (!gg.pufferfish.pufferfish.PufferfishConfig.tpsCatchup) {
+                    this.nextTickTimeNanos = currentTime + i;
+                    this.delayedTasksMaxNextTickTimeNanos = nextTickTimeNanos;
+                }
+                // Pufferfish end
                 this.startMeasuringTaskExecutionTime();
                 this.waitUntilNextTick();
                 this.finishMeasuringTaskExecutionTime();
@@ -2575,6 +2582,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
     }
 
     public ProfilerFiller getProfiler() {
+        if (gg.pufferfish.pufferfish.PufferfishConfig.disableMethodProfiler) return net.minecraft.util.profiling.InactiveProfiler.INSTANCE;
         return this.profiler;
     }
 

@@ -43,9 +43,12 @@ public class GoalSelector {
     }
 
     // Paper start
-    public boolean inactiveTick() {
+    public boolean inactiveTick(int tickRate, boolean inactive) { // Pufferfish start
+        if (inactive && !gg.pufferfish.pufferfish.PufferfishConfig.dearEnabled) tickRate = 4; // reset to Paper's
+        tickRate = Math.min(tickRate, 3);
         this.curRate++;
-        return this.curRate % 3 == 0; // TODO newGoalRate was already unused in 1.20.4, check if this is correct
+        return this.curRate % tickRate == 0; // TODO newGoalRate was already unused in 1.20.4, check if this is correct
+        // Pufferfish end
     }
     public boolean hasTasks() {
         for (WrappedGoal task : this.availableGoals) {

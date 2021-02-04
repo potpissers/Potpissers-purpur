@@ -22,6 +22,7 @@ public class LevelChunkSection implements ca.spottedleaf.moonrise.patches.block_
     short nonEmptyBlockCount; // Paper - package private
     private short tickingBlockCount;
     private short tickingFluidCount;
+    public short fluidStateCount; // Pufferfish
     public final PalettedContainer<BlockState> states;
     // CraftBukkit start - read/write
     private PalettedContainer<Holder<Biome>> biomes;
@@ -104,6 +105,7 @@ public class LevelChunkSection implements ca.spottedleaf.moonrise.patches.block_
 
         if (!fluid.isEmpty()) {
             --this.tickingFluidCount;
+            --this.fluidStateCount; // Pufferfish
         }
 
         if (!state.isAir()) {
@@ -115,6 +117,7 @@ public class LevelChunkSection implements ca.spottedleaf.moonrise.patches.block_
 
         if (!fluid1.isEmpty()) {
             ++this.tickingFluidCount;
+            ++this.fluidStateCount; // Pufferfish
         }
 
         // Paper start - block counting
@@ -208,6 +211,7 @@ public class LevelChunkSection implements ca.spottedleaf.moonrise.patches.block_
                     if (fluid.isRandomlyTicking()) {
                         this.tickingFluidCount += paletteCount;
                     }
+                    this.fluidStateCount++; // Pufferfish
                 }
             }
         }

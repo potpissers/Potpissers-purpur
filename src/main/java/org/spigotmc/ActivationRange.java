@@ -38,6 +38,10 @@ import co.aikar.timings.MinecraftTimings;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+// Pufferfish start
+import net.minecraft.world.phys.Vec3;
+import java.util.List;
+// Pufferfish end
 
 public class ActivationRange
 {
@@ -223,6 +227,25 @@ public class ActivationRange
                 }
                 // Paper end - Configurable marker ticking
                 ActivationRange.activateEntity(entity);
+
+                // Pufferfish start
+                if (gg.pufferfish.pufferfish.PufferfishConfig.dearEnabled && entity.getType().dabEnabled) {
+                    if (!entity.activatedPriorityReset) {
+                        entity.activatedPriorityReset = true;
+                        entity.activatedPriority = gg.pufferfish.pufferfish.PufferfishConfig.maximumActivationPrio;
+                    }
+                    Vec3 playerVec = player.position();
+                    Vec3 entityVec = entity.position();
+                    double diffX = playerVec.x - entityVec.x, diffY = playerVec.y - entityVec.y, diffZ = playerVec.z - entityVec.z;
+                    int squaredDistance = (int) (diffX * diffX + diffY * diffY + diffZ * diffZ);
+                    entity.activatedPriority = squaredDistance > gg.pufferfish.pufferfish.PufferfishConfig.startDistanceSquared ?
+                      Math.max(1, Math.min(squaredDistance >> gg.pufferfish.pufferfish.PufferfishConfig.activationDistanceMod, entity.activatedPriority)) :
+                      1;
+                } else {
+                    entity.activatedPriority = 1;
+                }
+                // Pufferfish end
+
             }
             // Paper end
         }
@@ -239,12 +262,12 @@ public class ActivationRange
         if ( MinecraftServer.currentTick > entity.activatedTick )
         {
             if ( entity.defaultActivationState )
-            {
+            { // Pufferfish - diff on change
                 entity.activatedTick = MinecraftServer.currentTick;
                 return;
             }
             if ( entity.activationType.boundingBox.intersects( entity.getBoundingBox() ) )
-            {
+            {  // Pufferfish - diff on change
                 entity.activatedTick = MinecraftServer.currentTick;
             }
         }
@@ -298,7 +321,7 @@ public class ActivationRange
         if ( entity instanceof LivingEntity )
         {
             LivingEntity living = (LivingEntity) entity;
-            if ( living.onClimbable() || living.jumping || living.hurtTime > 0 || living.activeEffects.size() > 0 || living.isFreezing()) // Paper
+            if ( living.onClimableCached() || living.jumping || living.hurtTime > 0 || living.activeEffects.size() > 0 || living.isFreezing() ) // Paper // Pufferfish - use cached
             {
                 return 1; // Paper
             }

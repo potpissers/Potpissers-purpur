@@ -23,9 +23,11 @@ public class AttributeMap {
     private final Set<AttributeInstance> attributesToSync = new ObjectOpenHashSet<>();
     private final Set<AttributeInstance> attributesToUpdate = new ObjectOpenHashSet<>();
     private final AttributeSupplier supplier;
+    private final java.util.function.Function<Holder<Attribute>, AttributeInstance> createInstance; // Pufferfish
 
     public AttributeMap(AttributeSupplier defaultAttributes) {
         this.supplier = defaultAttributes;
+        this.createInstance = attributex -> this.supplier.createInstance(this::onAttributeModified, attributex); // Pufferfish
     }
 
     private void onAttributeModified(AttributeInstance instance) {
@@ -47,9 +49,10 @@ public class AttributeMap {
         return this.attributes.values().stream().filter(attribute -> attribute.getAttribute().value().isClientSyncable()).collect(Collectors.toList());
     }
 
+
     @Nullable
     public AttributeInstance getInstance(Holder<Attribute> attribute) {
-        return this.attributes.computeIfAbsent(attribute, attributex -> this.supplier.createInstance(this::onAttributeModified, attributex));
+        return this.attributes.computeIfAbsent(attribute, this.createInstance); // Pufferfish - cache lambda, as for some reason java allocates it anyways
     }
 
     public boolean hasAttribute(Holder<Attribute> attribute) {

@@ -10,6 +10,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 // CraftBukkit start
@@ -25,8 +26,13 @@ public class ShapelessRecipe extends io.papermc.paper.inventory.recipe.RecipeBoo
     final CraftingBookCategory category;
     final ItemStack result;
     final NonNullList<Ingredient> ingredients;
+    private final boolean isBukkit; // Pufferfish
 
+    // Pufferfish start
     public ShapelessRecipe(String group, CraftingBookCategory category, ItemStack result, NonNullList<Ingredient> ingredients) {
+        this(group, category, result, ingredients, false);
+    }
+    public ShapelessRecipe(String group, CraftingBookCategory category, ItemStack result, NonNullList<Ingredient> ingredients, boolean isBukkit) { this.isBukkit = isBukkit; // Pufferfish end
         this.group = group;
         this.category = category;
         this.result = result;
@@ -76,6 +82,28 @@ public class ShapelessRecipe extends io.papermc.paper.inventory.recipe.RecipeBoo
     }
 
     public boolean matches(CraftingInput input, Level world) {
+        // Pufferfish start
+        if (!this.isBukkit) {
+            java.util.List<Ingredient> ingredients = com.google.common.collect.Lists.newArrayList(this.ingredients.toArray(new Ingredient[0]));
+
+            inventory: for (int index = 0; index < input.size(); index++) {
+                ItemStack itemStack = input.getItem(index);
+
+                if (!itemStack.isEmpty()) {
+                    for (int i = 0; i < ingredients.size(); i++) {
+                        if (ingredients.get(i).test(itemStack)) {
+                            ingredients.remove(i);
+                            continue inventory;
+                        }
+                    }
+                    return false;
+                }
+            }
+
+            return ingredients.isEmpty();
+        }
+        // Pufferfish end
+
         // Paper start - unwrap ternary & better exact choice recipes
         if (input.ingredientCount() != this.ingredients.size()) {
             return false;

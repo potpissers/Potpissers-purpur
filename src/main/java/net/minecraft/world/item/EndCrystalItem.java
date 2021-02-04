@@ -57,7 +57,7 @@ public class EndCrystalItem extends Item {
                         world.gameEvent((Entity) context.getPlayer(), (Holder) GameEvent.ENTITY_PLACE, blockposition1);
                         EndDragonFight enderdragonbattle = ((ServerLevel) world).getDragonFight();
 
-                        if (enderdragonbattle != null) {
+                        if (enderdragonbattle != null && gg.pufferfish.pufferfish.PufferfishConfig.allowEndCrystalRespawn) { // Pufferfish
                             enderdragonbattle.tryRespawn(aboveBlockPosition); // Paper - Perf: Do crystal-portal proximity check before entity lookup
                         }
                     }

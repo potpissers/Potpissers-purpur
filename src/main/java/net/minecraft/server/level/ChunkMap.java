@@ -172,6 +172,10 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
         return null; // Paper - rewrite chunk system
     }
     // Paper end
+    // Paper start - optimise chunk tick iteration
+//    public final it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<ChunkHolder> needsChangeBroadcasting = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<>();
+//    public final com.destroystokyo.paper.util.misc.PlayerAreaMap playerMobSpawnMap = new gg.pufferfish.pufferfish.util.AsyncPlayerAreaMap(this.pooledLinkedPlayerHashSets); // Pufferfish
+    // Paper end - optimise chunk tick iteration
 
     public ChunkMap(ServerLevel world, LevelStorageSource.LevelStorageAccess session, DataFixer dataFixer, StructureTemplateManager structureTemplateManager, Executor executor, BlockableEventLoop<Runnable> mainThreadExecutor, LightChunkGetter chunkProvider, ChunkGenerator chunkGenerator, ChunkProgressListener worldGenerationProgressListener, ChunkStatusUpdateListener chunkStatusChangeListener, Supplier<DimensionDataStorage> persistentStateManagerFactory, int viewDistance, boolean dsync) {
         super(new RegionStorageInfo(session.getLevelId(), world.dimension(), "chunk"), session.getDimensionPath(world.dimension()).resolve("region"), dataFixer, dsync);
@@ -1282,8 +1286,28 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
             return ChunkMap.this.level.getServer().getScaledTrackingDistance(initialDistance);
         }
 
+        private static int getHighestRange(Entity parent, int highest) {
+            List<Entity> passengers = parent.getPassengers();
+
+            for (int i = 0, size = passengers.size(); i < size; i++) {
+                Entity entity = passengers.get(i);
+                int range = entity.getType().clientTrackingRange() * 16;
+                range = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, range); // Paper
+
+                if (range > highest) { // Paper - we need the lowest range thanks to the fact that our tracker doesn't account for passenger logic // Tuinity - not anymore!
+                    highest = range;
+                }
+
+                highest = getHighestRange(entity, highest);
+            }
+
+            return highest;
+        }
+
         private int getEffectiveRange() {
             int i = this.range;
+            // Pufferfish start - remove iterators and streams
+            /*
             Iterator iterator = this.entity.getIndirectPassengers().iterator();
 
             while (iterator.hasNext()) {
@@ -1295,6 +1319,9 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
                     i = j;
                 }
             }
+             */
+            i = getHighestRange(this.entity, i);
+            // Pufferfish end
 
             return this.scaledRange(i);
         }

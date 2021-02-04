@@ -13,7 +13,7 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
 val alsoShade: Configuration by configurations.creating
 
 dependencies {
-    implementation(project(":paper-api"))
+    implementation(project(":pufferfish-api")) // Pufferfish // Paper
     // Paper start
     implementation("org.jline:jline-terminal-jansi:3.21.0")
     implementation("net.minecrell:terminalconsoleappender:1.3.0")
@@ -47,6 +47,13 @@ dependencies {
     runtimeOnly("org.apache.maven.resolver:maven-resolver-connector-basic:1.9.18")
     runtimeOnly("org.apache.maven.resolver:maven-resolver-transport-http:1.9.18")
 
+    // Pufferfish start
+    implementation("org.yaml:snakeyaml:1.32")
+    implementation ("me.carleslc.Simple-YAML:Simple-Yaml:1.8.4") {
+        exclude(group="org.yaml", module="snakeyaml")
+    }
+    // Pufferfish end
+
     testImplementation("io.github.classgraph:classgraph:4.8.47") // Paper - mob goal test
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testImplementation("org.hamcrest:hamcrest:2.2")
@@ -71,6 +78,14 @@ paperweight {
     craftBukkitPackageVersion.set("v1_21_R1") // also needs to be updated in MappingEnvironment
 }
 
+
+// Pufferfish Start
+tasks.withType<JavaCompile> {
+    val compilerArgs = options.compilerArgs
+    compilerArgs.add("--add-modules=jdk.incubator.vector")
+}
+// Pufferfish End
+
 tasks.jar {
     archiveClassifier.set("dev")
 
@@ -84,14 +99,14 @@ tasks.jar {
         val gitBranch = git("rev-parse", "--abbrev-ref", "HEAD").getText().trim() // Paper
         attributes(
             "Main-Class" to "org.bukkit.craftbukkit.Main",
-            "Implementation-Title" to "Paper",
+            "Implementation-Title" to "Pufferfish", // Pufferfish
             "Implementation-Version" to implementationVersion,
             "Implementation-Vendor" to date, // Paper
-            "Specification-Title" to "Paper",
+            "Specification-Title" to "Pufferfish", // Pufferfish
             "Specification-Version" to project.version,
-            "Specification-Vendor" to "Paper Team",
-            "Brand-Id" to "papermc:paper",
-            "Brand-Name" to "Paper",
+            "Specification-Vendor" to "Pufferfish Studios LLC", // Pufferfish
+            "Brand-Id" to "pufferfish:pufferfish", // Pufferfish
+            "Brand-Name" to "Pufferfish", // Pufferfish
             "Build-Number" to (build ?: ""),
             "Build-Time" to Instant.now().toString(),
             "Git-Branch" to gitBranch, // Paper

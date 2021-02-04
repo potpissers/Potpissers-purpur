@@ -715,6 +715,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
             org.spigotmc.ActivationRange.activateEntities(this); // Spigot
             this.timings.entityTick.startTiming(); // Spigot
             this.entityTickList.forEach((entity) -> {
+                entity.activatedPriorityReset = false; // Pufferfish - DAB
                 if (!entity.isRemoved()) {
                     if (false && this.shouldDiscardEntity(entity)) { // CraftBukkit - We prevent spawning in general, so this butchering is not needed
                         entity.discard();
@@ -734,7 +735,20 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
                             }
 
                             gameprofilerfiller.push("tick");
-                            this.guardEntityTick(this::tickNonPassenger, entity);
+                        // Pufferfish start - copied from this.guardEntityTick
+                        try {
+                            this.tickNonPassenger(entity); // Pufferfish - changed
+                        } catch (Throwable throwable) {
+                            if (throwable instanceof ThreadDeath) throw throwable; // Paper
+                            // Paper start - Prevent tile entity and entity crashes
+                            final String msg = String.format("Entity threw exception at %s:%s,%s,%s", entity.level().getWorld().getName(), entity.getX(), entity.getY(), entity.getZ());
+                            MinecraftServer.LOGGER.error(msg, throwable);
+                            getCraftServer().getPluginManager().callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerInternalException(msg, throwable)));
+                            entity.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DISCARD);
+                            // Paper end
+                        }
+                        this.moonrise$midTickTasks(); // Paper - rewrite chunk system
+                        // Pufferfish end
                             gameprofilerfiller.pop();
                         }
                     }
@@ -861,9 +875,9 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
         int j = chunkcoordintpair.getMinBlockX();
         int k = chunkcoordintpair.getMinBlockZ();
         ProfilerFiller gameprofilerfiller = this.getProfiler();
-
         gameprofilerfiller.push("thunder");
-        if (!this.paperConfig().environment.disableThunder && flag && this.isThundering() && this.spigotConfig.thunderChance > 0 && this.random.nextInt(this.spigotConfig.thunderChance) == 0) { // Spigot // Paper - Option to disable thunder
+
+        if (!this.paperConfig().environment.disableThunder && flag && this.isThundering() && this.spigotConfig.thunderChance > 0 && /*this.random.nextInt(this.spigotConfig.thunderChance) == 0 &&*/ chunk.shouldDoLightning(this.random)) { // Spigot // Paper - Option to disable thunder // Pufferfish - replace random with shouldDoLightning
             BlockPos blockposition = this.findLightningTargetAround(this.getBlockRandomPos(j, 0, k, 15));
 
             if (this.isRainingAt(blockposition)) {

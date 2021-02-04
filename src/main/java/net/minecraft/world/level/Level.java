@@ -1418,16 +1418,16 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
     public <T extends Entity> void guardEntityTick(Consumer<T> tickConsumer, T entity) {
         try {
             tickConsumer.accept(entity);
-        } catch (Throwable throwable) {
+        } catch (Throwable throwable) { // Pufferfish - diff on change ServerLevel.tick
             if (throwable instanceof ThreadDeath) throw throwable; // Paper
             // Paper start - Prevent block entity and entity crashes
             final String msg = String.format("Entity threw exception at %s:%s,%s,%s", entity.level().getWorld().getName(), entity.getX(), entity.getY(), entity.getZ());
             MinecraftServer.LOGGER.error(msg, throwable);
             getCraftServer().getPluginManager().callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerInternalException(msg, throwable))); // Paper - ServerExceptionEvent
-            entity.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DISCARD);
+            entity.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DISCARD); // Pufferfish - diff on change ServerLevel.tick
             // Paper end - Prevent block entity and entity crashes
         }
-        this.moonrise$midTickTasks(); // Paper - rewrite chunk system
+        this.moonrise$midTickTasks(); // Paper - rewrite chunk system // Pufferfish - diff on change ServerLevel.tick
     }
     // Paper start - Option to prevent armor stands from doing entity lookups
     @Override
@@ -1961,6 +1961,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
     }
 
     public ProfilerFiller getProfiler() {
+        if (gg.pufferfish.pufferfish.PufferfishConfig.disableMethodProfiler) return net.minecraft.util.profiling.InactiveProfiler.INSTANCE; // Pufferfish
         return (ProfilerFiller) this.profiler.get();
     }
 
