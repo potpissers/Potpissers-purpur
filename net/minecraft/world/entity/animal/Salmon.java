@@ -54,6 +54,13 @@ public class Salmon extends AbstractSchoolingFish implements VariantHolder<Salmo
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.salmonTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     public int getMaxSchoolSize() {
         return 5;

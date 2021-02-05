@@ -70,6 +70,13 @@ public class SkeletonHorse extends AbstractHorse {
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.skeletonHorseTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     public static AttributeSupplier.Builder createAttributes() {
         return createBaseHorseAttributes().add(Attributes.MAX_HEALTH, 15.0).add(Attributes.MOVEMENT_SPEED, 0.2F);
     }

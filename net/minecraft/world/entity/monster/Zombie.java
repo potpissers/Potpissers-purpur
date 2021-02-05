@@ -139,6 +139,13 @@ public class Zombie extends Monster {
     }
     // Purpur end -  Configurable jockey options
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.zombieTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables

@@ -34,7 +34,7 @@ public class Blaze extends Monster {
     public Blaze(EntityType<? extends Blaze> entityType, Level level) {
         super(entityType, level);
         this.moveControl = new org.purpurmc.purpur.controller.FlyingWithSpacebarMoveControllerWASD(this, 0.3F); // Purpur - Ridables
-        this.setPathfindingMalus(PathType.WATER, -1.0F);
+        if (isSensitiveToWater()) this.setPathfindingMalus(PathType.WATER, -1.0F); // Purpur - Toggle for water sensitive mob damage
         this.setPathfindingMalus(PathType.LAVA, 8.0F);
         this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
         this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0F);
@@ -157,7 +157,7 @@ public class Blaze extends Monster {
 
     @Override
     public boolean isSensitiveToWater() {
-        return true;
+        return this.level().purpurConfig.blazeTakeDamageFromWater; // Purpur - Toggle for water sensitive mob damage
     }
 
     @Override

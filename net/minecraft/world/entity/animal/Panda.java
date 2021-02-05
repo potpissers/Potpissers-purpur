@@ -147,6 +147,13 @@ public class Panda extends Animal {
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.pandaTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected boolean canDispenserEquipIntoSlot(EquipmentSlot slot) {
         return slot == EquipmentSlot.MAINHAND && this.canPickUpLoot();

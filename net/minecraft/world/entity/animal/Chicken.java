@@ -88,6 +88,13 @@ public class Chicken extends Animal {
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.chickenTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));

@@ -147,6 +147,13 @@ public class Axolotl extends Animal implements VariantHolder<Axolotl.Variant>, B
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.axolotlTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     public float getWalkTargetValue(BlockPos pos, LevelReader level) {
         return 0.0F;

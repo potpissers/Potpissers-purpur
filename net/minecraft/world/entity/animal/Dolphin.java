@@ -156,6 +156,13 @@ public class Dolphin extends AgeableWaterCreature {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.dolphinTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(

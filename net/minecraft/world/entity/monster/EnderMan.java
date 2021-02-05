@@ -87,7 +87,7 @@ public class EnderMan extends Monster implements NeutralMob {
 
     public EnderMan(EntityType<? extends EnderMan> entityType, Level level) {
         super(entityType, level);
-        this.setPathfindingMalus(PathType.WATER, -1.0F);
+        if (isSensitiveToWater()) this.setPathfindingMalus(PathType.WATER, -1.0F); // Purpur - Toggle for water sensitive mob damage
     }
 
     // Purpur start - Ridables
@@ -294,7 +294,7 @@ public class EnderMan extends Monster implements NeutralMob {
 
     @Override
     public boolean isSensitiveToWater() {
-        return true;
+        return this.level().purpurConfig.endermanTakeDamageFromWater; // Purpur - Toggle for water sensitive mob damage
     }
 
     @Override

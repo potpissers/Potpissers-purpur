@@ -110,6 +110,13 @@ public class Zoglin extends Monster implements HoglinBase {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.zoglinTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected Brain.Provider<Zoglin> brainProvider() {
         return Brain.provider(MEMORY_TYPES, SENSOR_TYPES);

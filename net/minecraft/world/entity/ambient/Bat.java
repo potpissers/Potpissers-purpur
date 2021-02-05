@@ -109,6 +109,13 @@ public class Bat extends AmbientCreature {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.batTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     public boolean isFlapping() {
         return !this.isResting() && this.tickCount % 10.0F == 0.0F;

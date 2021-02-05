@@ -182,6 +182,13 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.foxTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);

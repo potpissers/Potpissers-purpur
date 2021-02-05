@@ -51,6 +51,13 @@ public class CaveSpider extends Spider {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.caveSpiderTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     public boolean doHurtTarget(ServerLevel level, Entity source) {
         if (super.doHurtTarget(level, source)) {

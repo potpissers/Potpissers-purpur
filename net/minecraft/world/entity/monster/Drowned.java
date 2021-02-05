@@ -122,6 +122,13 @@ public class Drowned extends Zombie implements RangedAttackMob {
     }
     // Purpur end - Configurable jockey options
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.drownedTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new Drowned.DrownedGoToWaterGoal(this, 1.0));

@@ -124,6 +124,13 @@ public class Hoglin extends Animal implements Enemy, HoglinBase {
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.hoglinTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @VisibleForTesting
     public void setTimeInOverworld(int timeInOverworld) {
         this.timeInOverworld = timeInOverworld;

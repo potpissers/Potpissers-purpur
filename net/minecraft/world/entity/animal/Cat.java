@@ -133,6 +133,13 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.catTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected void registerGoals() {
         this.temptGoal = new Cat.CatTemptGoal(this, 0.6, itemStack -> itemStack.is(ItemTags.CAT_FOOD), true);

@@ -90,6 +90,13 @@ public class PiglinBrute extends AbstractPiglin {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.piglinBruteTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
             .add(Attributes.MAX_HEALTH, 50.0)

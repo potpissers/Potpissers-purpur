@@ -46,6 +46,13 @@ public class Mule extends AbstractChestedHorse {
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.muleTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.MULE_AMBIENT;

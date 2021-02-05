@@ -267,6 +267,13 @@ public class Creeper extends Monster {
     }
     // Purpur end - Config to make Creepers explode on death
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.creeperTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSource) {
         return SoundEvents.CREEPER_HURT;

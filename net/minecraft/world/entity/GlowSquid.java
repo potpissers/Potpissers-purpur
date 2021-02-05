@@ -52,6 +52,13 @@ public class GlowSquid extends Squid {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.glowSquidTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected ParticleOptions getInkParticle() {
         return ParticleTypes.GLOW_SQUID_INK;

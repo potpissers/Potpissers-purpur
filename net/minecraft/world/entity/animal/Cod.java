@@ -32,6 +32,13 @@ public class Cod extends AbstractSchoolingFish {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.codTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     public ItemStack getBucketItemStack() {
         return new ItemStack(Items.COD_BUCKET);

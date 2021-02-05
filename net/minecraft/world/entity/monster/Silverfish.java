@@ -66,6 +66,13 @@ public class Silverfish extends Monster {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.silverfishTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected void registerGoals() {
         this.friendsGoal = new Silverfish.SilverfishWakeUpFriendsGoal(this);

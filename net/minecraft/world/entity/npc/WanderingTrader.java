@@ -107,6 +107,13 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
     }
     // Purpur end - Villagers follow emerald blocks
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.wanderingTraderTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));

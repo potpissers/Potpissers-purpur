@@ -105,6 +105,13 @@ public class ZombifiedPiglin extends Zombie implements NeutralMob {
     }
     // Purpur end - Configurable jockey options
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.zombifiedPiglinTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     public void setPersistentAngerTarget(@Nullable UUID target) {
         this.persistentAngerTarget = target;

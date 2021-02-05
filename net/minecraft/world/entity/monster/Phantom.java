@@ -139,6 +139,13 @@ public class Phantom extends FlyingMob implements Enemy {
     }
     // Purpur end - Phantoms attracted to crystals and crystals shoot phantoms
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.phantomTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     public boolean isFlapping() {
         return (this.getUniqueFlapTickOffset() + this.tickCount) % TICKS_PER_FLAP == 0;

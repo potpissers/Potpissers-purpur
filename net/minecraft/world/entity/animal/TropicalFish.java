@@ -86,6 +86,13 @@ public class TropicalFish extends AbstractSchoolingFish implements VariantHolder
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.tropicalFishTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     public static String getPredefinedName(int variantId) {
         return "entity.minecraft.tropical_fish.predefined." + variantId;
     }

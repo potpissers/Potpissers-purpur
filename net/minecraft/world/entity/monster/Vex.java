@@ -110,6 +110,13 @@ public class Vex extends Monster implements TraceableEntity {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.vexTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     public boolean isFlapping() {
         return this.tickCount % TICKS_PER_FLAP == 0;

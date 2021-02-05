@@ -124,6 +124,13 @@ public class ZombieVillager extends Zombie implements VillagerDataHolder {
     }
     // Purpur end - Configurable jockey options
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.zombieVillagerTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);

@@ -177,7 +177,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
         // Paper end - Fix MC-167279
         this.lookControl = new Bee.BeeLookControl(this);
         this.setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
-        if (this.level().purpurConfig.beeCanInstantlyStartDrowning) this.setPathfindingMalus(PathType.WATER, -1.0F); // Purpur - bee can instantly start drowning in water option
+        if (this.level().purpurConfig.beeCanInstantlyStartDrowning || isSensitiveToWater()) this.setPathfindingMalus(PathType.WATER, -1.0F); // Purpur - bee can instantly start drowning in water option // Purpur - Toggle for water sensitive mob damage
         this.setPathfindingMalus(PathType.WATER_BORDER, 16.0F);
         this.setPathfindingMalus(PathType.COCOA, -1.0F);
         this.setPathfindingMalus(PathType.FENCE, -1.0F);
@@ -486,6 +486,13 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
         return this.level().purpurConfig.beeBreedingTicks;
     }
     // Purpur end - Make entity breeding times configurable
+
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.beeTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
 
     @Override
     public int getRemainingPersistentAngerTime() {

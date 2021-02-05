@@ -278,6 +278,13 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.villagerTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     public Brain<Villager> getBrain() {
         return (Brain<Villager>)super.getBrain();

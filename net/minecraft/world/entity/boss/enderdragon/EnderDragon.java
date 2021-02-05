@@ -170,6 +170,13 @@ public class EnderDragon extends Mob implements Enemy {
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.enderDragonTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 200.0);
     }

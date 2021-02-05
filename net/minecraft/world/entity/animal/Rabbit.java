@@ -152,6 +152,13 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.rabbitTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     @Override
     public void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));

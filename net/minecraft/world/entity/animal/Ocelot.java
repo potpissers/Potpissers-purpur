@@ -94,6 +94,13 @@ public class Ocelot extends Animal {
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.ocelotTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     public boolean isTrusting() {
         return this.entityData.get(DATA_TRUSTING);
     }

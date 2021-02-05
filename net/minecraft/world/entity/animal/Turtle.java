@@ -116,6 +116,13 @@ public class Turtle extends Animal {
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.turtleTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     public void setHomePos(BlockPos homePos) {
         this.entityData.set(HOME_POS, homePos);
     }

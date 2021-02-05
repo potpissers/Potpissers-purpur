@@ -67,6 +67,13 @@ public class Husk extends Zombie {
     }
     // Purpur end - Configurable jockey options
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.huskTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     public static boolean checkHuskSpawnRules(
         EntityType<Husk> entityType, ServerLevelAccessor level, EntitySpawnReason spawnReason, BlockPos pos, RandomSource random
     ) {

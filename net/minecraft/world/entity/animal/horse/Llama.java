@@ -148,6 +148,13 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Toggle for water sensitive mob damage
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.llamaTakeDamageFromWater;
+    }
+    // Purpur end - Toggle for water sensitive mob damage
+
     public boolean isTraderLlama() {
         return false;
     }
