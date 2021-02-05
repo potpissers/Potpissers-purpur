@@ -100,6 +100,11 @@ public class Drowned extends Zombie implements RangedAttackMob {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.drownedTakeDamageFromWater;
+    }
+
+    @Override
     public boolean jockeyOnlyBaby() {
         return level().purpurConfig.drownedJockeyOnlyBaby;
     }

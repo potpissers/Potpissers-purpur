@@ -279,6 +279,11 @@ public class Bat extends AmbientCreature {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.batTakeDamageFromWater;
+    }
+
+    @Override
     public void readAdditionalSaveData(CompoundTag nbt) {
         super.readAdditionalSaveData(nbt);
         this.entityData.set(Bat.DATA_ID_FLAGS, nbt.getByte("BatFlags"));

@@ -43,6 +43,11 @@ public class Donkey extends AbstractChestedHorse {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.donkeyTakeDamageFromWater;
+    }
+
+    @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.DONKEY_AMBIENT;
     }

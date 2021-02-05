@@ -176,7 +176,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
         // Paper end - Fix MC-167279
         this.lookControl = new Bee.BeeLookControl(this);
         this.setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
-        this.setPathfindingMalus(PathType.WATER, -1.0F);
+        if (isSensitiveToWater()) this.setPathfindingMalus(PathType.WATER, -1.0F); // Purpur
         this.setPathfindingMalus(PathType.WATER_BORDER, 16.0F);
         this.setPathfindingMalus(PathType.COCOA, -1.0F);
         this.setPathfindingMalus(PathType.FENCE, -1.0F);
@@ -487,6 +487,11 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
     @Override
     public int getPurpurBreedTime() {
         return this.level().purpurConfig.beeBreedingTicks;
+    }
+
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.beeTakeDamageFromWater;
     }
 
     @Override

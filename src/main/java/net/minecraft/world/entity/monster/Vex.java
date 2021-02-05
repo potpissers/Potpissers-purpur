@@ -108,6 +108,11 @@ public class Vex extends Monster implements TraceableEntity {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.vexMaxHealth);
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.vexScale);
     }
+
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.vexTakeDamageFromWater;
+    }
     // Purpur end
 
     @Override

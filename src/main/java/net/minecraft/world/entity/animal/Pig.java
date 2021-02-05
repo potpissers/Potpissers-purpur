@@ -93,6 +93,11 @@ public class Pig extends Animal implements ItemSteerable, Saddleable {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.pigTakeDamageFromWater;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur

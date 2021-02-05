@@ -77,6 +77,11 @@ public class Vindicator extends AbstractIllager {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.vindicatorTakeDamageFromWater;
+    }
+
+    @Override
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));

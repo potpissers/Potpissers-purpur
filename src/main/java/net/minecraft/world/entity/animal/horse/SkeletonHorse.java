@@ -69,6 +69,11 @@ public class SkeletonHorse extends AbstractHorse {
         return 6000;
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.skeletonHorseTakeDamageFromWater;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return createBaseHorseAttributes().add(Attributes.MAX_HEALTH, 15.0D).add(Attributes.MOVEMENT_SPEED, 0.20000000298023224D);
     }

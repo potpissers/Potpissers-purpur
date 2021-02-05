@@ -151,6 +151,11 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
     public int getPurpurBreedTime() {
         return this.level().purpurConfig.rabbitBreedingTicks;
     }
+
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.rabbitTakeDamageFromWater;
+    }
     // Purpur end
 
     @Override

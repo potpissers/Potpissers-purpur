@@ -49,6 +49,13 @@ public class Skeleton extends AbstractSkeleton {
         this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.skeletonMaxHealth);
     }
 
+    // Purpur start
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.skeletonTakeDamageFromWater;
+    }
+    // Purpur end
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);

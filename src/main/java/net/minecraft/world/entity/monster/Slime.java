@@ -78,6 +78,11 @@ public class Slime extends Mob implements Enemy {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.slimeTakeDamageFromWater;
+    }
+
+    @Override
     public boolean dismountsUnderwater() {
         return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.slimeRidableInWater;
     }

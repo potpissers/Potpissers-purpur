@@ -144,6 +144,11 @@ public class Sheep extends Animal implements Shearable {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.sheepTakeDamageFromWater;
+    }
+
+    @Override
     protected void registerGoals() {
         this.eatBlockGoal = new EatBlockGoal(this);
         this.goalSelector.addGoal(0, new FloatGoal(this));

@@ -83,6 +83,11 @@ public class Illusioner extends SpellcasterIllager implements RangedAttackMob {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.illusionerTakeDamageFromWater;
+    }
+
+    @Override
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));

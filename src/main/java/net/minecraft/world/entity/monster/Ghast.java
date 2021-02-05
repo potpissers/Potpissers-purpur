@@ -138,6 +138,11 @@ public class Ghast extends FlyingMob implements Enemy {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.ghastTakeDamageFromWater;
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(Ghast.DATA_IS_CHARGING, false);

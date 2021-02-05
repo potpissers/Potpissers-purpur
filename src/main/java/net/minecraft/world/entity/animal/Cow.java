@@ -73,6 +73,11 @@ public class Cow extends Animal {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.cowTakeDamageFromWater;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur

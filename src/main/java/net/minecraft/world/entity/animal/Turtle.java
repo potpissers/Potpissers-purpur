@@ -115,6 +115,11 @@ public class Turtle extends Animal {
         return this.level().purpurConfig.turtleBreedingTicks;
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.turtleTakeDamageFromWater;
+    }
+
     public void setHomePos(BlockPos pos) {
         this.entityData.set(Turtle.HOME_POS, pos);
     }

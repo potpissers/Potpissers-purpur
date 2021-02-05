@@ -51,6 +51,11 @@ public class ElderGuardian extends Guardian {
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.elderGuardianScale);
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.elderGuardianTakeDamageFromWater;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return Guardian.createAttributes().add(Attributes.MOVEMENT_SPEED, 0.30000001192092896D).add(Attributes.ATTACK_DAMAGE, 8.0D).add(Attributes.MAX_HEALTH, 80.0D);
     }

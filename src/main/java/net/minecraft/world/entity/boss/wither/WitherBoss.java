@@ -123,6 +123,11 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.witherTakeDamageFromWater;
+    }
+
+    @Override
     protected PathNavigation createNavigation(Level world) {
         FlyingPathNavigation navigationflying = new FlyingPathNavigation(this, world);
 

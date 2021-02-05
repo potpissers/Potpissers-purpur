@@ -47,6 +47,11 @@ public class GlowSquid extends Squid {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.glowSquidTakeDamageFromWater;
+    }
+
+    @Override
     protected ParticleOptions getInkParticle() {
         return ParticleTypes.GLOW_SQUID_INK;
     }

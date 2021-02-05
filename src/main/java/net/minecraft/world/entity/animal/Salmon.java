@@ -31,6 +31,11 @@ public class Salmon extends AbstractSchoolingFish {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.salmonTakeDamageFromWater;
+    }
+
+    @Override
     public int getMaxSchoolSize() {
         return 5;
     }

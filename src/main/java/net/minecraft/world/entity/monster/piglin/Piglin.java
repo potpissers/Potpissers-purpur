@@ -117,6 +117,11 @@ public class Piglin extends AbstractPiglin implements CrossbowAttackMob, Invento
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.piglinTakeDamageFromWater;
+    }
+
+    @Override
     public void addAdditionalSaveData(CompoundTag nbt) {
         super.addAdditionalSaveData(nbt);
         if (this.isBaby()) {

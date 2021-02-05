@@ -92,6 +92,11 @@ public class MushroomCow extends Cow implements Shearable, VariantHolder<Mushroo
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.mooshroomTakeDamageFromWater;
+    }
+
+    @Override
     public float getWalkTargetValue(BlockPos pos, LevelReader world) {
         return world.getBlockState(pos.below()).is(Blocks.MYCELIUM) ? 10.0F : world.getPathfindingCostFromLightLevels(pos);
     }

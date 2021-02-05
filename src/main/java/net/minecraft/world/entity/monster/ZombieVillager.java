@@ -111,6 +111,11 @@ public class ZombieVillager extends Zombie implements VillagerDataHolder {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.zombieVillagerTakeDamageFromWater;
+    }
+
+    @Override
     public boolean jockeyOnlyBaby() {
         return level().purpurConfig.zombieVillagerJockeyOnlyBaby;
     }

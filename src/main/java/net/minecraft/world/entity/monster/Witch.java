@@ -80,6 +80,11 @@ public class Witch extends Raider implements RangedAttackMob {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.witchTakeDamageFromWater;
+    }
+
+    @Override
     protected void registerGoals() {
         super.registerGoals();
         this.healRaidersGoal = new NearestHealableRaiderTargetGoal<>(this, Raider.class, true, (entityliving) -> {

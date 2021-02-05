@@ -119,6 +119,11 @@ public class Hoglin extends Animal implements Enemy, HoglinBase {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.hoglinTakeDamageFromWater;
+    }
+
+    @Override
     public boolean canBeLeashed() {
         return true;
     }

@@ -97,6 +97,11 @@ public class Guardian extends Monster {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.guardianTakeDamageFromWater;
+    }
+
+    @Override
     protected void registerGoals() {
         MoveTowardsRestrictionGoal pathfindergoalmovetowardsrestriction = new MoveTowardsRestrictionGoal(this, 1.0D);
 

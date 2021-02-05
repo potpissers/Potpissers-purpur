@@ -31,6 +31,11 @@ public class Cod extends AbstractSchoolingFish {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.codTakeDamageFromWater;
+    }
+
+    @Override
     public ItemStack getBucketItemStack() {
         return new ItemStack(Items.COD_BUCKET);
     }

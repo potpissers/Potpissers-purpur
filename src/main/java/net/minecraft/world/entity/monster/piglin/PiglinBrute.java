@@ -85,6 +85,11 @@ public class PiglinBrute extends AbstractPiglin {
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.piglinBruteScale);
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.piglinBruteTakeDamageFromWater;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 50.0).add(Attributes.MOVEMENT_SPEED, 0.35F).add(Attributes.ATTACK_DAMAGE, 7.0);
     }

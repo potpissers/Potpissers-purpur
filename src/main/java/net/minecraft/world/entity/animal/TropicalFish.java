@@ -84,6 +84,11 @@ public class TropicalFish extends AbstractSchoolingFish implements VariantHolder
         this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.tropicalFishMaxHealth);
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.tropicalFishTakeDamageFromWater;
+    }
+
     public static String getPredefinedName(int variant) {
         return "entity.minecraft.tropical_fish.predefined." + variant;
     }

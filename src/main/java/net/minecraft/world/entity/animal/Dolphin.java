@@ -163,6 +163,11 @@ public class Dolphin extends WaterAnimal {
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.dolphinScale);
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.dolphinTakeDamageFromWater;
+    }
+
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor world, DifficultyInstance difficulty, MobSpawnType spawnReason, @Nullable SpawnGroupData entityData) {

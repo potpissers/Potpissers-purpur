@@ -126,6 +126,11 @@ public class Axolotl extends Animal implements LerpingModel, VariantHolder<Axolo
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.axolotlTakeDamageFromWater;
+    }
+
+    @Override
     public Map<String, Vector3f> getModelRotationValues() {
         return this.modelRotationValues;
     }

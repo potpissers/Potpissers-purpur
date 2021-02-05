@@ -57,6 +57,11 @@ public class WitherSkeleton extends AbstractSkeleton {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.witherSkeletonTakeDamageFromWater;
+    }
+
+    @Override
     protected void registerGoals() {
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractPiglin.class, true));
         super.registerGoals();

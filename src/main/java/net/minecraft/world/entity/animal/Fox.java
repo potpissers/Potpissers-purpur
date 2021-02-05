@@ -195,6 +195,11 @@ public class Fox extends Animal implements VariantHolder<Fox.Type> {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.foxTakeDamageFromWater;
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(Fox.DATA_TRUSTED_ID_0, Optional.empty());

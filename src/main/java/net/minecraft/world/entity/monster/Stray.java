@@ -44,6 +44,11 @@ public class Stray extends AbstractSkeleton {
         this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.strayMaxHealth);
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.strayTakeDamageFromWater;
+    }
+
     public static boolean checkStraySpawnRules(EntityType<Stray> type, ServerLevelAccessor world, MobSpawnType spawnReason, BlockPos pos, RandomSource random) {
         BlockPos blockPos = pos;
 

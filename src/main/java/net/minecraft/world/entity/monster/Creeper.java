@@ -267,6 +267,11 @@ public class Creeper extends Monster implements PowerableMob {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.creeperTakeDamageFromWater;
+    }
+
+    @Override
     protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.CREEPER_HURT;
     }

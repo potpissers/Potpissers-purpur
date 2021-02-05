@@ -193,6 +193,11 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.villagerTakeDamageFromWater;
+    }
+
+    @Override
     public Brain<Villager> getBrain() {
         return (Brain<Villager>) super.getBrain(); // CraftBukkit - decompile error
     }

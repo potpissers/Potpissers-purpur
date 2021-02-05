@@ -50,6 +50,11 @@ public class Giant extends Monster {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.giantTakeDamageFromWater;
+    }
+
+    @Override
     protected void initAttributes() {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.giantMaxHealth);
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.giantScale);

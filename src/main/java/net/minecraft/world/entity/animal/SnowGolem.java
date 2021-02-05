@@ -115,7 +115,7 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
 
     @Override
     public boolean isSensitiveToWater() {
-        return true;
+        return this.level().purpurConfig.snowGolemTakeDamageFromWater; // Purpur
     }
 
     @Override

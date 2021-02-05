@@ -114,6 +114,11 @@ public class Goat extends Animal {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.goatTakeDamageFromWater;
+    }
+
+    @Override
     protected Brain.Provider<Goat> brainProvider() {
         return Brain.provider(Goat.MEMORY_TYPES, Goat.SENSOR_TYPES);
     }

@@ -139,6 +139,11 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
     public int getPurpurBreedTime() {
         return this.level().purpurConfig.catBreedingTicks;
     }
+
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.catTakeDamageFromWater;
+    }
     // Purpur end
 
     public ResourceLocation getTextureId() {

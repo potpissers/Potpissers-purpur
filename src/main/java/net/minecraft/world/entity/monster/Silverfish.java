@@ -69,6 +69,11 @@ public class Silverfish extends Monster {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.silverfishTakeDamageFromWater;
+    }
+
+    @Override
     protected void registerGoals() {
         this.friendsGoal = new Silverfish.SilverfishWakeUpFriendsGoal(this);
         this.goalSelector.addGoal(1, new FloatGoal(this));

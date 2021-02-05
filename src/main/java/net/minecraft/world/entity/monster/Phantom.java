@@ -137,6 +137,11 @@ public class Phantom extends FlyingMob implements Enemy {
     // Purpur end
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.phantomTakeDamageFromWater;
+    }
+
+    @Override
     public boolean isFlapping() {
         return (this.getUniqueFlapTickOffset() + this.tickCount) % Phantom.TICKS_PER_FLAP == 0;
     }

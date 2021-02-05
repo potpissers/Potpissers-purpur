@@ -99,6 +99,11 @@ public class Ravager extends Raider {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.ravagerTakeDamageFromWater;
+    }
+
+    @Override
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));

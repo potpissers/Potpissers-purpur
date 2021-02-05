@@ -91,7 +91,7 @@ public class Strider extends Animal implements ItemSteerable, Saddleable {
         super(type, world);
         this.steering = new ItemBasedSteering(this.entityData, Strider.DATA_BOOST_TIME, Strider.DATA_SADDLE_ID);
         this.blocksBuilding = true;
-        this.setPathfindingMalus(PathType.WATER, -1.0F);
+        if (isSensitiveToWater()) this.setPathfindingMalus(PathType.WATER, -1.0F); // Purpur
         this.setPathfindingMalus(PathType.LAVA, 0.0F);
         this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
         this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0F);
@@ -443,7 +443,7 @@ public class Strider extends Animal implements ItemSteerable, Saddleable {
 
     @Override
     public boolean isSensitiveToWater() {
-        return true;
+        return this.level().purpurConfig.striderTakeDamageFromWater; // Purpur
     }
 
     @Override

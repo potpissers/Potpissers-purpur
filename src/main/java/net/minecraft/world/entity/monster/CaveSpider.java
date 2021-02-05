@@ -50,6 +50,11 @@ public class CaveSpider extends Spider {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.caveSpiderTakeDamageFromWater;
+    }
+
+    @Override
     public boolean doHurtTarget(Entity target) {
         if (super.doHurtTarget(target)) {
             if (target instanceof LivingEntity) {

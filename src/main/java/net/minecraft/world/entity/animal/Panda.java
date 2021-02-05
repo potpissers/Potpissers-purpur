@@ -160,6 +160,11 @@ public class Panda extends Animal {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.pandaTakeDamageFromWater;
+    }
+
+    @Override
     public boolean canTakeItem(ItemStack stack) {
         EquipmentSlot enumitemslot = this.getEquipmentSlotForItem(stack);
 

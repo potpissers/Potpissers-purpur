@@ -86,6 +86,11 @@ public class Pillager extends AbstractIllager implements CrossbowAttackMob, Inve
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.pillagerTakeDamageFromWater;
+    }
+
+    @Override
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));

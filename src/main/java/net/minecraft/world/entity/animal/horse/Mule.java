@@ -42,6 +42,11 @@ public class Mule extends AbstractChestedHorse {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.muleTakeDamageFromWater;
+    }
+
+    @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.MULE_AMBIENT;
     }

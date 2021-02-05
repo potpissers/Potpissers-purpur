@@ -89,6 +89,11 @@ public class Squid extends WaterAnimal {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.squidTakeDamageFromWater;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new Squid.SquidRandomMovementGoal(this));
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur

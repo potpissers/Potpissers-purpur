@@ -192,6 +192,11 @@ public class EnderDragon extends Mob implements Enemy {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.enderDragonMaxHealth);
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.enderDragonTakeDamageFromWater;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 200.0D);
     }

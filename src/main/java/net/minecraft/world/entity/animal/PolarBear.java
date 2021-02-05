@@ -125,6 +125,11 @@ public class PolarBear extends Animal implements NeutralMob {
         return this.level().purpurConfig.polarBearBreedingTicks;
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.polarBearTakeDamageFromWater;
+    }
+
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel world, AgeableMob entity) {

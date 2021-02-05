@@ -65,6 +65,11 @@ public class ZombieHorse extends AbstractHorse {
         return 6000;
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.zombieHorseTakeDamageFromWater;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return createBaseHorseAttributes().add(Attributes.MAX_HEALTH, 15.0).add(Attributes.MOVEMENT_SPEED, 0.2F);
     }

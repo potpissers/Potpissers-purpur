@@ -73,6 +73,11 @@ public class TraderLlama extends Llama {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.traderLlamaTakeDamageFromWater;
+    }
+
+    @Override
     public boolean isTraderLlama() {
         return true;
     }

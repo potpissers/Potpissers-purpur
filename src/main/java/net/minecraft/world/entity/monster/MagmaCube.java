@@ -66,6 +66,11 @@ public class MagmaCube extends Slime {
         return level().purpurConfig.magmaCubeAttackDamageCache;
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.magmaCubeTakeDamageFromWater;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MOVEMENT_SPEED, 0.2F);
     }

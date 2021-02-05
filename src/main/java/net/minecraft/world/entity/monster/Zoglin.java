@@ -103,6 +103,11 @@ public class Zoglin extends Monster implements Enemy, HoglinBase {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.zoglinTakeDamageFromWater;
+    }
+
+    @Override
     protected Brain.Provider<Zoglin> brainProvider() {
         return Brain.provider(MEMORY_TYPES, SENSOR_TYPES);
     }

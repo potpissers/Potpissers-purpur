@@ -94,6 +94,11 @@ public class Ocelot extends Animal {
         return this.level().purpurConfig.ocelotBreedingTicks;
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.ocelotTakeDamageFromWater;
+    }
+
     public boolean isTrusting() {
         return (Boolean) this.entityData.get(Ocelot.DATA_TRUSTING);
     }

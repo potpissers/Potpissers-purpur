@@ -146,6 +146,11 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
         return this.level().purpurConfig.llamaBreedingTicks;
     }
 
+    @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.llamaTakeDamageFromWater;
+    }
+
     public boolean isTraderLlama() {
         return false;
     }

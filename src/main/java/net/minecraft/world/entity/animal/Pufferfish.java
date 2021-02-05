@@ -69,6 +69,11 @@ public class Pufferfish extends AbstractFish {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.pufferfishTakeDamageFromWater;
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(Pufferfish.PUFF_STATE, 0);

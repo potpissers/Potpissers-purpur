@@ -87,6 +87,11 @@ public class ZombifiedPiglin extends Zombie implements NeutralMob {
     }
 
     @Override
+    public boolean isSensitiveToWater() {
+        return this.level().purpurConfig.zombifiedPiglinTakeDamageFromWater;
+    }
+
+    @Override
     public boolean jockeyOnlyBaby() {
         return level().purpurConfig.zombifiedPiglinJockeyOnlyBaby;
     }
