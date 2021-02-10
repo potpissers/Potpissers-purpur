@@ -322,7 +322,7 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
             }
 
             if (!this.level().isClientSide) {
-                if (this.random.nextInt(10) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit
+                if ((this.level().purpurConfig.alwaysTameInCreative && player.hasInfiniteMaterials()) || (this.random.nextInt(10) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled())) { // CraftBukkit // Purpur
                     this.tame(player);
                     this.level().broadcastEntityEvent(this, (byte) 7);
                 } else {

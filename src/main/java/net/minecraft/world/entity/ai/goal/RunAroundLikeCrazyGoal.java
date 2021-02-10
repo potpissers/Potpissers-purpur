@@ -67,7 +67,7 @@ public class RunAroundLikeCrazyGoal extends Goal {
                 int i = this.horse.getTemper();
                 int j = this.horse.getMaxTemper();
 
-                if (j > 0 && this.horse.getRandom().nextInt(j) < i && !CraftEventFactory.callEntityTameEvent(this.horse, ((CraftHumanEntity) this.horse.getBukkitEntity().getPassenger()).getHandle()).isCancelled()) { // CraftBukkit - fire EntityTameEvent
+                if ((this.horse.level().purpurConfig.alwaysTameInCreative && entityhuman.hasInfiniteMaterials()) || (j > 0 && this.horse.getRandom().nextInt(j) < i && !CraftEventFactory.callEntityTameEvent(this.horse, ((CraftHumanEntity) this.horse.getBukkitEntity().getPassenger()).getHandle()).isCancelled())) { // CraftBukkit - fire EntityTameEvent // Purpur
                     this.horse.tameWithName(entityhuman);
                     return;
                 }

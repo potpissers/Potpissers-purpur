@@ -513,7 +513,7 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
     }
 
     private void tryToTame(Player player) {
-        if (this.random.nextInt(3) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit
+        if ((this.level().purpurConfig.alwaysTameInCreative && player.hasInfiniteMaterials()) || this.random.nextInt(3) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit
             this.tame(player);
             this.setOrderedToSit(true);
             this.level().broadcastEntityEvent(this, (byte) 7);

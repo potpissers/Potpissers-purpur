@@ -655,7 +655,7 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
 
     private void tryToTame(Player player) {
         // CraftBukkit - added event call and isCancelled check.
-        if (this.random.nextInt(3) == 0 && !CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) {
+        if ((this.level().purpurConfig.alwaysTameInCreative && player.hasInfiniteMaterials()) || this.random.nextInt(3) == 0 && !CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) {
             this.tame(player);
             this.navigation.stop();
             this.setTarget((LivingEntity) null);
