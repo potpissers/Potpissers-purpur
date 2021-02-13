@@ -49,6 +49,22 @@ public class EndCrystal extends Entity {
         this.setPos(x, y, z);
     }
 
+    public boolean shouldExplode() {
+        return showsBottom() ? level().purpurConfig.basedEndCrystalExplode : level().purpurConfig.baselessEndCrystalExplode;
+    }
+
+    public float getExplosionPower() {
+        return (float) (showsBottom() ? level().purpurConfig.basedEndCrystalExplosionPower : level().purpurConfig.baselessEndCrystalExplosionPower);
+    }
+
+    public boolean hasExplosionFire() {
+        return showsBottom() ? level().purpurConfig.basedEndCrystalExplosionFire : level().purpurConfig.baselessEndCrystalExplosionFire;
+    }
+
+    public Level.ExplosionInteraction getExplosionEffect() {
+        return showsBottom() ? level().purpurConfig.basedEndCrystalExplosionEffect : level().purpurConfig.baselessEndCrystalExplosionEffect;
+    }
+
     @Override
     protected Entity.MovementEmission getMovementEmission() {
         return Entity.MovementEmission.NONE;
@@ -172,16 +188,18 @@ public class EndCrystal extends Entity {
                 }
                 // CraftBukkit end
                 if (!source.is(DamageTypeTags.IS_EXPLOSION)) {
+                    if (shouldExplode()) {// Purpur
                     DamageSource damagesource1 = source.getEntity() != null ? this.damageSources().explosion(this, source.getEntity()) : null;
 
                     // CraftBukkit start
-                    ExplosionPrimeEvent event = CraftEventFactory.callExplosionPrimeEvent(this, 6.0F, false);
+                    ExplosionPrimeEvent event = CraftEventFactory.callExplosionPrimeEvent(this, getExplosionPower(), hasExplosionFire()); // Purpur
                     if (event.isCancelled()) {
                         return false;
                     }
 
                     this.remove(Entity.RemovalReason.KILLED, EntityRemoveEvent.Cause.EXPLODE); // CraftBukkit - add Bukkit remove cause
-                    this.level().explode(this, damagesource1, (ExplosionDamageCalculator) null, this.getX(), this.getY(), this.getZ(), event.getRadius(), event.getFire(), Level.ExplosionInteraction.BLOCK);
+                    this.level().explode(this, damagesource1, (ExplosionDamageCalculator) null, this.getX(), this.getY(), this.getZ(), event.getRadius(), event.getFire(), getExplosionEffect()); // Purpur
+                    } else this.unsetRemoved(); // Purpur
                 } else {
                     this.remove(Entity.RemovalReason.KILLED, EntityRemoveEvent.Cause.DEATH); // CraftBukkit - add Bukkit remove cause
                 }
