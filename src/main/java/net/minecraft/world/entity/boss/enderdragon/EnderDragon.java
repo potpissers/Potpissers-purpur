@@ -1204,6 +1204,7 @@ public class EnderDragon extends Mob implements Enemy {
 
     @Override
     protected boolean canRide(Entity entity) {
+        if (this.level().purpurConfig.enderDragonCanRideVehicles) return this.boardingCooldown <= 0; // Purpur
         return false;
     }
 

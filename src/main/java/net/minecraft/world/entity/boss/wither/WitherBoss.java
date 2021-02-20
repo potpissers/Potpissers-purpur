@@ -739,6 +739,7 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
 
     @Override
     protected boolean canRide(Entity entity) {
+        if (this.level().purpurConfig.witherCanRideVehicles) return this.boardingCooldown <= 0; // Purpur
         return false;
     }
 
