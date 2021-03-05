@@ -1441,6 +1441,24 @@ public abstract class LivingEntity extends Entity implements Attackable {
                 this.stopSleeping();
             }
 
+            // Purpur start
+            if (source.getEntity() instanceof net.minecraft.world.entity.player.Player player && source.getEntity().level().purpurConfig.creativeOnePunch && !source.is(DamageTypeTags.IS_PROJECTILE)) {
+                if (player.isCreative()) {
+                    org.apache.commons.lang3.mutable.MutableDouble attackDamage = new org.apache.commons.lang3.mutable.MutableDouble();
+                    player.getMainHandItem().forEachModifier(EquipmentSlot.MAINHAND, (attributeHolder, attributeModifier) -> {
+                        if (attributeModifier.operation() == AttributeModifier.Operation.ADD_VALUE) {
+                            attackDamage.addAndGet(attributeModifier.amount());
+                        }
+                    });
+
+                    if (attackDamage.doubleValue() == 0.0D) {
+                        // One punch!
+                        amount = 9999F;
+                    }
+                }
+            }
+            // Purpur end
+
             this.noActionTime = 0;
             float f1 = amount; final float originalAmount = f1; // Paper - revert to vanilla #hurt - OBFHELPER
             boolean flag = amount > 0.0F && this.isDamageSourceBlocked(source); // Copied from below
