@@ -45,11 +45,13 @@ public class DamageSources {
     // CraftBukkit start
     private final DamageSource melting;
     private final DamageSource poison;
+    private final DamageSource scissors; // Purpur
 
     public DamageSources(RegistryAccess registryManager) {
         this.damageTypes = registryManager.registryOrThrow(Registries.DAMAGE_TYPE);
         this.melting = this.source(DamageTypes.ON_FIRE).melting();
         this.poison = this.source(DamageTypes.MAGIC).poison();
+        this.scissors = this.source(DamageTypes.MAGIC).scissors(); // Purpur
         // CraftBukkit end
         this.inFire = this.source(DamageTypes.IN_FIRE);
         this.campfire = this.source(DamageTypes.CAMPFIRE);
@@ -98,6 +100,12 @@ public class DamageSources {
         return this.poison;
     }
     // CraftBukkit end
+
+    // Purpur start
+    public DamageSource scissors() {
+        return this.scissors;
+    }
+    // Purpur end
 
     public DamageSource inFire() {
         return this.inFire;

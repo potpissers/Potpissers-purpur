@@ -1654,6 +1654,13 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
                                     this.player.tryResetCurrentImpulseContext();
                                 }
 
+                                // Purpur Start
+                                if (this.player.level().purpurConfig.dontRunWithScissors && this.player.isSprinting() && !(this.player.level().purpurConfig.ignoreScissorsInWater && this.player.isInWater()) && !(this.player.level().purpurConfig.ignoreScissorsInLava && this.player.isInLava()) && (isScissor(this.player.getItemInHand(InteractionHand.MAIN_HAND)) || isScissor(this.player.getItemInHand(InteractionHand.OFF_HAND))) && (int) (Math.random() * 10) == 0) {
+                                    this.player.hurt(this.player.damageSources().scissors(), (float) this.player.level().purpurConfig.scissorsRunningDamage);
+                                    if (!org.purpurmc.purpur.PurpurConfig.dontRunWithScissors.isBlank()) this.player.sendActionBarMessage(org.purpurmc.purpur.PurpurConfig.dontRunWithScissors);
+                                }
+                                // Purpur End
+
                                 this.player.checkMovementStatistics(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5);
                                 this.lastGoodX = this.player.getX();
                                 this.lastGoodY = this.player.getY();
@@ -1680,6 +1687,14 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
             return false;
         }
     }
+
+    // Purpur start
+    public boolean isScissor(ItemStack stack) {
+        if (!stack.is(Items.SHEARS)) return false;
+        net.minecraft.world.item.component.CustomModelData customModelData = stack.get(net.minecraft.core.component.DataComponents.CUSTOM_MODEL_DATA);
+        return customModelData == null || customModelData.value() == 0;
+    }
+    // Purpur end
 
     // Paper start - optimise out extra getCubes
     private boolean hasNewCollision(final ServerLevel world, final Entity entity, final AABB oldBox, final AABB newBox) {

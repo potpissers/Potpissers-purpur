@@ -29,6 +29,7 @@ public class DamageSource {
     private boolean sweep = false;
     private boolean melting = false;
     private boolean poison = false;
+    private boolean scissors = false; // Purpur
     @Nullable
     private Entity customEventDamager = null; // This field is a helper for when causing entity damage is not set by vanilla // Paper - fix DamageSource API
 
@@ -58,6 +59,17 @@ public class DamageSource {
     public boolean isPoison() {
         return this.poison;
     }
+
+    // Purpur start
+    public DamageSource scissors() {
+        this.scissors = true;
+        return this;
+    }
+
+    public boolean isScissors() {
+        return this.scissors;
+    }
+    // Purpur end
 
     // Paper start - fix DamageSource API
     @Nullable
@@ -117,6 +129,7 @@ public class DamageSource {
         damageSource.sweep = this.isSweep();
         damageSource.poison = this.isPoison();
         damageSource.melting = this.isMelting();
+        damageSource.scissors = this.isScissors(); // Purpur
         return damageSource;
     }
     // CraftBukkit end

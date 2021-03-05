@@ -98,6 +98,11 @@ public class CombatTracker {
                 Component component = ComponentUtils.wrapInSquareBrackets(Component.translatable(string + ".link")).withStyle(INTENTIONAL_GAME_DESIGN_STYLE);
                 return Component.translatable(string + ".message", this.mob.getDisplayName(), component);
             } else {
+                // Purpur start
+                if (damageSource.isScissors()) {
+                    return damageSource.getLocalizedDeathMessage(org.purpurmc.purpur.PurpurConfig.deathMsgRunWithScissors, this.mob);
+                }
+                // Purpur end
                 return damageSource.getLocalizedDeathMessage(this.mob);
             }
         }
