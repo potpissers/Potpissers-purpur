@@ -77,7 +77,7 @@ public class ThrownEnderpearl extends ThrowableItemProjectile {
                                 return;
                             }
                             // CraftBukkit end
-                            if (this.random.nextFloat() < 0.05F && worldserver.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) {
+                            if (this.random.nextFloat() < this.level().purpurConfig.enderPearlEndermiteChance && worldserver.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) { // Purpur
                                 Endermite entityendermite = (Endermite) EntityType.ENDERMITE.create(worldserver);
 
                                 if (entityendermite != null) {
@@ -89,7 +89,7 @@ public class ThrownEnderpearl extends ThrowableItemProjectile {
                             // entity.changeDimension(new DimensionTransition(worldserver, this.position(), entity.getDeltaMovement(), entity.getYRot(), entity.getXRot(), DimensionTransition.DO_NOTHING)); // CraftBukkit - moved up
                             entity.resetFallDistance();
                             entityplayer.resetCurrentImpulseContext();
-                            entity.hurt(this.damageSources().fall().customEventDamager(this), 5.0F); // CraftBukkit // Paper - fix DamageSource API
+                            entity.hurt(this.damageSources().fall().customEventDamager(this), this.level().purpurConfig.enderPearlDamage); // CraftBukkit // Paper - fix DamageSource API // Purpur
                             this.playSound(worldserver, this.position());
                         }
                     } else {

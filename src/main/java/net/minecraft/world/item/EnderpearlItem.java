@@ -36,7 +36,7 @@ public class EnderpearlItem extends Item {
 
                 world.playSound((Player) null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENDER_PEARL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (net.minecraft.world.entity.Entity.SHARED_RANDOM.nextFloat() * 0.4F + 0.8F));
                 user.awardStat(Stats.ITEM_USED.get(this));
-                user.getCooldowns().addCooldown(this, 20);
+                user.getCooldowns().addCooldown(this, user.getAbilities().instabuild ? world.purpurConfig.enderPearlCooldownCreative : world.purpurConfig.enderPearlCooldown); // Purpur
             } else {
                 // Paper end - PlayerLaunchProjectileEvent
                 if (user instanceof net.minecraft.server.level.ServerPlayer) {
