@@ -1529,7 +1529,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
                             return entitymonster.isPreventingPlayerRest(this);
                         });
 
-                        if (!list.isEmpty()) {
+                        if (!this.level().purpurConfig.playerSleepNearMonsters && !list.isEmpty()) { // Purpur
                             return Either.left(net.minecraft.world.entity.player.Player.BedSleepingProblem.NOT_SAFE);
                         }
                     }
