@@ -269,7 +269,7 @@ public class EnderMan extends Monster implements NeutralMob {
         // Paper end - EndermanAttackPlayerEvent
         ItemStack itemstack = (ItemStack) player.getInventory().armor.get(3);
 
-        if (itemstack.is(Blocks.CARVED_PUMPKIN.asItem())) {
+        if (this.level().purpurConfig.endermanDisableStareAggro || itemstack.is(Blocks.CARVED_PUMPKIN.asItem()) || (this.level().purpurConfig.endermanIgnorePlayerDragonHead && itemstack.is(net.minecraft.world.item.Items.DRAGON_HEAD))) { // Purpur
             return false;
         } else {
             Vec3 vec3d = player.getViewVector(1.0F).normalize();
