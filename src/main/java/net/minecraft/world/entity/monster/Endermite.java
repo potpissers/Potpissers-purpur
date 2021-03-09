@@ -32,6 +32,7 @@ public class Endermite extends Monster {
 
     private static final int MAX_LIFE = 2400;
     public int life;
+    private boolean isPlayerSpawned; // Purpur
 
     public Endermite(EntityType<? extends Endermite> type, Level world) {
         super(type, world);
@@ -64,6 +65,14 @@ public class Endermite extends Monster {
     @Override
     public boolean isSensitiveToWater() {
         return this.level().purpurConfig.endermiteTakeDamageFromWater;
+    }
+
+    public boolean isPlayerSpawned() {
+        return this.isPlayerSpawned;
+    }
+
+    public void setPlayerSpawned(boolean playerSpawned) {
+        this.isPlayerSpawned = playerSpawned;
     }
 
     @Override
@@ -113,12 +122,14 @@ public class Endermite extends Monster {
     public void readAdditionalSaveData(CompoundTag nbt) {
         super.readAdditionalSaveData(nbt);
         this.life = nbt.getInt("Lifetime");
+        this.isPlayerSpawned = nbt.getBoolean("PlayerSpawned"); // Purpur
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag nbt) {
         super.addAdditionalSaveData(nbt);
         nbt.putInt("Lifetime", this.life);
+        nbt.putBoolean("PlayerSpawned", this.isPlayerSpawned); // Purpur
     }
 
     @Override

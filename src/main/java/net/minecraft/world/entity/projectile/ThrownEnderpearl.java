@@ -81,6 +81,7 @@ public class ThrownEnderpearl extends ThrowableItemProjectile {
                                 Endermite entityendermite = (Endermite) EntityType.ENDERMITE.create(worldserver);
 
                                 if (entityendermite != null) {
+                                    entityendermite.setPlayerSpawned(true); // Purpur
                                     entityendermite.moveTo(entity.getX(), entity.getY(), entity.getZ(), entity.getYRot(), entity.getXRot());
                                     worldserver.addFreshEntity(entityendermite, CreatureSpawnEvent.SpawnReason.ENDER_PEARL);
                                 }
