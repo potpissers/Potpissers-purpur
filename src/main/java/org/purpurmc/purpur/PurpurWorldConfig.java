@@ -132,6 +132,7 @@ public class PurpurWorldConfig {
     public boolean noteBlockIgnoreAbove = false;
     public boolean persistentDroppableEntityDisplayNames = true;
     public boolean projectilesBypassMobGriefing = false;
+    public boolean tickFluids = true;
     public double tridentLoyaltyVoidReturnHeight = 0.0D;
     public int raidCooldownSeconds = 0;
     public int animalBreedingCooldownSeconds = 0;
@@ -151,6 +152,7 @@ public class PurpurWorldConfig {
         noteBlockIgnoreAbove = getBoolean("gameplay-mechanics.note-block-ignore-above", noteBlockIgnoreAbove);
         persistentDroppableEntityDisplayNames = getBoolean("gameplay-mechanics.persistent-droppable-entity-display-names", persistentDroppableEntityDisplayNames);
         projectilesBypassMobGriefing = getBoolean("gameplay-mechanics.projectiles-bypass-mob-griefing", projectilesBypassMobGriefing);
+        tickFluids = getBoolean("gameplay-mechanics.tick-fluids", tickFluids);
         tridentLoyaltyVoidReturnHeight = getDouble("gameplay-mechanics.trident-loyalty-void-return-height", tridentLoyaltyVoidReturnHeight);
         raidCooldownSeconds = getInt("gameplay-mechanics.raid-cooldown-seconds", raidCooldownSeconds);
         animalBreedingCooldownSeconds = getInt("gameplay-mechanics.animal-breeding-cooldown-seconds", animalBreedingCooldownSeconds);
