@@ -66,6 +66,7 @@ public class Creeper extends Monster implements PowerableMob {
     private int prevSpacebarCharge = 0;
     private int powerToggleDelay = 0;
     // Purpur end
+    private boolean exploding = false; // Purpur - Config to make Creepers explode on death
 
     public Creeper(EntityType<? extends Creeper> type, Level world) {
         super(type, world);
@@ -271,6 +272,16 @@ public class Creeper extends Monster implements PowerableMob {
         return this.level().purpurConfig.creeperTakeDamageFromWater;
     }
 
+    // Purpur start - Config to make Creepers explode on death
+    @Override
+    protected org.bukkit.event.entity.EntityDeathEvent dropAllDeathLoot(ServerLevel world, DamageSource damageSource) {
+        if (!this.exploding && this.level().purpurConfig.creeperExplodeWhenKilled && damageSource.getEntity() instanceof net.minecraft.server.level.ServerPlayer) {
+            this.explodeCreeper();
+        }
+        return super.dropAllDeathLoot(world, damageSource);
+    }
+    // Purpur end - Config to make Creepers explode on death
+
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.CREEPER_HURT;
@@ -359,6 +370,8 @@ public class Creeper extends Monster implements PowerableMob {
     }
 
     public void explodeCreeper() {
+        this.exploding = true; // Purpur - Config to make Creepers explode on death
+
         if (!this.level().isClientSide) {
             float f = this.isPowered() ? 2.0F : 1.0F;
 
@@ -379,6 +392,7 @@ public class Creeper extends Monster implements PowerableMob {
             // CraftBukkit end
         }
 
+        this.exploding = false; // Purpur - Config to make Creepers explode on death
     }
 
     private void spawnLingeringCloud() {
