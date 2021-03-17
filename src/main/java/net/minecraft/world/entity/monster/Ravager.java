@@ -185,7 +185,7 @@ public class Ravager extends Raider {
                     BlockState iblockdata = this.level().getBlockState(blockposition);
                     Block block = iblockdata.getBlock();
 
-                    if (block instanceof LeavesBlock) {
+                    if (this.level().purpurConfig.ravagerGriefableBlocks.contains(block)) { // Purpur
                         // CraftBukkit start
                         if (!CraftEventFactory.callEntityChangeBlockEvent(this, blockposition, iblockdata.getFluidState().createLegacyBlock())) { // Paper - fix wrong block state
                             continue;
