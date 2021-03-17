@@ -22,7 +22,7 @@ public class LlamaFollowCaravanGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        if (!this.llama.shouldJoinCaravan) return false; // Purpur
+        if (!this.llama.level().purpurConfig.llamaJoinCaravans || !this.llama.shouldJoinCaravan) return false; // Purpur
         if (!this.llama.isLeashed() && !this.llama.inCaravan()) {
             List<Entity> list = this.llama.level().getEntities(this.llama, this.llama.getBoundingBox().inflate(9.0, 4.0, 9.0), entity -> {
                 EntityType<?> entityType = entity.getType();

@@ -477,7 +477,7 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
     }
 
     public void joinCaravan(Llama llama) {
-        if (!shouldJoinCaravan || !new org.purpurmc.purpur.event.entity.LlamaJoinCaravanEvent((org.bukkit.entity.Llama) getBukkitEntity(), (org.bukkit.entity.Llama) llama.getBukkitEntity()).callEvent()) return; // Purpur
+        if (!this.level().purpurConfig.llamaJoinCaravans || !shouldJoinCaravan || !new org.purpurmc.purpur.event.entity.LlamaJoinCaravanEvent((org.bukkit.entity.Llama) getBukkitEntity(), (org.bukkit.entity.Llama) llama.getBukkitEntity()).callEvent()) return; // Purpur
         this.caravanHead = llama;
         this.caravanHead.caravanTail = this;
     }
