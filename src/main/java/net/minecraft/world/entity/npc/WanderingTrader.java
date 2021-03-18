@@ -155,8 +155,10 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
                     return tryRide(player, hand, InteractionResult.CONSUME); // Purpur
                 }
                 if (level().purpurConfig.wanderingTraderRidable && itemstack.isEmpty()) return tryRide(player, hand); // Purpur
+                if (this.level().purpurConfig.wanderingTraderAllowTrading) { // Purpur
                 this.setTradingPlayer(player);
                 this.openTradingScreen(player, this.getDisplayName(), 1);
+                } // Purpur
             }
 
             return InteractionResult.sidedSuccess(this.level().isClientSide);

@@ -376,6 +376,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
                     }
 
                     if (level().purpurConfig.villagerRidable && itemstack.isEmpty()) return tryRide(player, hand); // Purpur
+                    if (this.level().purpurConfig.villagerAllowTrading) // Purpur
                     this.startTrading(player);
                 }
 
