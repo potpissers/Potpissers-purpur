@@ -3493,7 +3493,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
 
     public int getMaxAirSupply() {
-        return this.maxAirTicks; // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
+        return this.level == null? this.maxAirTicks : this.level().purpurConfig.drowningAirTicks; // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir() // Purpur
     }
 
     public int getAirSupply() {

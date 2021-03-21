@@ -473,7 +473,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
 
                 if (flag1) {
                     this.setAirSupply(this.decreaseAirSupply(this.getAirSupply()));
-                    if (this.getAirSupply() == -20) {
+                    if (this.getAirSupply() == -this.level().purpurConfig.drowningDamageInterval) { // Purpur
                         this.setAirSupply(0);
                         Vec3 vec3d = this.getDeltaMovement();
 
@@ -485,7 +485,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
                             this.level().addParticle(ParticleTypes.BUBBLE, this.getX() + d2, this.getY() + d3, this.getZ() + d4, vec3d.x, vec3d.y, vec3d.z);
                         }
 
-                        this.hurt(this.damageSources().drown(), 2.0F);
+                        this.hurt(this.damageSources().drown(), (float) this.level().purpurConfig.damageFromDrowning); // Purpur
                     }
                 }
 
