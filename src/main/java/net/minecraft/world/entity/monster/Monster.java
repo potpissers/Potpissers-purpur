@@ -87,6 +87,14 @@ public abstract class Monster extends PathfinderMob implements Enemy {
     }
 
     public static boolean isDarkEnoughToSpawn(ServerLevelAccessor world, BlockPos pos, RandomSource random) {
+        // Purpur start
+        if (!world.getMinecraftWorld().purpurConfig.mobsSpawnOnPackedIce || !world.getMinecraftWorld().purpurConfig.mobsSpawnOnBlueIce) {
+            net.minecraft.world.level.block.state.BlockState spawnBlock = world.getBlockState(pos.below());
+            if ((!world.getMinecraftWorld().purpurConfig.mobsSpawnOnPackedIce && spawnBlock.is(net.minecraft.world.level.block.Blocks.PACKED_ICE)) || (!world.getMinecraftWorld().purpurConfig.mobsSpawnOnBlueIce && spawnBlock.is(net.minecraft.world.level.block.Blocks.BLUE_ICE))) {
+                return false;
+            }
+        }
+        // Purpur end
         if (world.getBrightness(LightLayer.SKY, pos) > random.nextInt(32)) {
             return false;
         } else {
