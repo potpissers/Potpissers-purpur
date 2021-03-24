@@ -116,6 +116,7 @@ public class ArmorStand extends LivingEntity {
         this.rightArmPose = ArmorStand.DEFAULT_RIGHT_ARM_POSE;
         this.leftLegPose = ArmorStand.DEFAULT_LEFT_LEG_POSE;
         this.rightLegPose = ArmorStand.DEFAULT_RIGHT_LEG_POSE;
+        this.setShowArms(world != null && world.purpurConfig.armorstandPlaceWithArms); // Purpur
     }
 
     public ArmorStand(Level world, double x, double y, double z) {
