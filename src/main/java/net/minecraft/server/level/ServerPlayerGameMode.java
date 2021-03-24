@@ -405,6 +405,7 @@ public class ServerPlayerGameMode {
                 } else {capturedBlockEntity = true;} // Paper - Send block entities after destroy prediction
                 return false;
             }
+            if (this.player.level().purpurConfig.slabHalfBreak && this.player.isShiftKeyDown() && iblockdata.getBlock() instanceof net.minecraft.world.level.block.SlabBlock && ((net.minecraft.world.level.block.SlabBlock) iblockdata.getBlock()).halfBreak(iblockdata, pos, this.player)) return true; // Purpur
         }
         // CraftBukkit end
 
