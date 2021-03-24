@@ -1255,6 +1255,12 @@ public final class ItemStack implements DataComponentHolder {
         return !((ItemEnchantments) this.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY)).isEmpty();
     }
 
+    // Purpur start - Config to allow unsafe enchants
+    public boolean hasEnchantment(Holder<Enchantment> enchantment) {
+        return this.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY).getLevel(enchantment) > 0;
+    }
+    // Purpur end - Config to allow unsafe enchants
+
     public ItemEnchantments getEnchantments() {
         return (ItemEnchantments) this.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
     }

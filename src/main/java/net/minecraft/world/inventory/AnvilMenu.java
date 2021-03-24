@@ -232,7 +232,10 @@ public class AnvilMenu extends ItemCombinerMenu {
 
                         i2 = l1 == i2 ? i2 + 1 : Math.max(i2, l1);
                         Enchantment enchantment = (Enchantment) holder.value();
-                        boolean flag3 = enchantment.canEnchant(itemstack);
+                        // Purpur start - Config to allow unsafe enchants
+                        boolean flag3 = this.canDoUnsafeEnchants || org.purpurmc.purpur.PurpurConfig.allowInapplicableEnchants || enchantment.canEnchant(itemstack); // whether the enchantment can be applied on specific item type
+                        boolean flag4 = true; // whether two incompatible enchantments can be applied on a single item
+                        // Purpur end - Config to allow unsafe enchants
 
                         if (this.player.getAbilities().instabuild || itemstack.is(Items.ENCHANTED_BOOK)) {
                             flag3 = true;
@@ -244,16 +247,22 @@ public class AnvilMenu extends ItemCombinerMenu {
                             Holder<Enchantment> holder1 = (Holder) iterator1.next();
 
                             if (!holder1.equals(holder) && !Enchantment.areCompatible(holder, holder1)) {
-                                flag3 = this.canDoUnsafeEnchants; // Purpur - Anvil API
+                                flag4 = this.canDoUnsafeEnchants || org.purpurmc.purpur.PurpurConfig.allowIncompatibleEnchants; // Purpur - Anvil API // Purpur - flag3 -> flag4 - Config to allow unsafe enchants
+                                // Purpur start - Config to allow unsafe enchants
+                                if (!flag4 && org.purpurmc.purpur.PurpurConfig.replaceIncompatibleEnchants) {
+                                    iterator1.remove(); // replace current enchant with the incompatible one trying to be applied
+                                    flag4 = true;
+                                }
+                                // Purpur end - Config to allow unsafe enchants
                                 ++i;
                             }
                         }
 
-                        if (!flag3) {
+                        if (!flag3 || !flag4) { // Purpur - Config to allow unsafe enchants
                             flag2 = true;
                         } else {
                             flag1 = true;
-                            if (i2 > enchantment.getMaxLevel() && !this.bypassEnchantmentLevelRestriction) { // Paper - bypass anvil level restrictions
+                            if (!org.purpurmc.purpur.PurpurConfig.allowHigherEnchantsLevels && i2 > enchantment.getMaxLevel() && !this.bypassEnchantmentLevelRestriction) { // Paper - bypass anvil level restrictions // Purpur - Config to allow unsafe enchants
                                 i2 = enchantment.getMaxLevel();
                             }
 
@@ -379,7 +388,7 @@ public class AnvilMenu extends ItemCombinerMenu {
             this.broadcastChanges();
 
             // Purpur start - Anvil API
-            if (this.canDoUnsafeEnchants && itemstack1 != ItemStack.EMPTY) {
+            if ((this.canDoUnsafeEnchants || org.purpurmc.purpur.PurpurConfig.allowInapplicableEnchants || org.purpurmc.purpur.PurpurConfig.allowIncompatibleEnchants) && itemstack1 != ItemStack.EMPTY) { // Purpur - Config to allow unsafe enchants
                 ((ServerPlayer) this.player).connection.send(new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), 2, itemstack1));
                 ((ServerPlayer) this.player).connection.send(new ClientboundContainerSetDataPacket(this.containerId, 0, this.cost.get()));
             }
