@@ -58,7 +58,7 @@ public class SpongeBlock extends Block {
 
     private boolean removeWaterBreadthFirstSearch(Level world, BlockPos pos) {
         BlockStateListPopulator blockList = new BlockStateListPopulator(world); // CraftBukkit - Use BlockStateListPopulator
-        BlockPos.breadthFirstTraversal(pos, 6, 65, (blockposition1, consumer) -> {
+        BlockPos.breadthFirstTraversal(pos, world.purpurConfig.spongeAbsorptionRadius, world.purpurConfig.spongeAbsorptionArea, (blockposition1, consumer) -> { // Purpur
             Direction[] aenumdirection = SpongeBlock.ALL_DIRECTIONS;
             int i = aenumdirection.length;
 
