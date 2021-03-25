@@ -30,7 +30,7 @@ public class PoweredRailBlock extends BaseRailBlock {
     }
 
     protected boolean findPoweredRailSignal(Level world, BlockPos pos, BlockState state, boolean flag, int distance) {
-        if (distance >= 8) {
+        if (distance >= world.purpurConfig.railActivationRange) { // Purpur
             return false;
         } else {
             int j = pos.getX();
