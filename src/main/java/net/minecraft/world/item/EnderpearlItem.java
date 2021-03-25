@@ -24,7 +24,7 @@ public class EnderpearlItem extends Item {
             ThrownEnderpearl entityenderpearl = new ThrownEnderpearl(world, user);
 
             entityenderpearl.setItem(itemstack);
-            entityenderpearl.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 1.5F, 1.0F);
+            entityenderpearl.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 1.5F, (float) world.purpurConfig.enderPearlProjectileOffset); // Purpur
             // Paper start - PlayerLaunchProjectileEvent
             com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent event = new com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent((org.bukkit.entity.Player) user.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemstack), (org.bukkit.entity.Projectile) entityenderpearl.getBukkitEntity());
             if (event.callEvent() && world.addFreshEntity(entityenderpearl)) {

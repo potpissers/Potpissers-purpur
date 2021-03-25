@@ -81,7 +81,7 @@ public class TridentItem extends Item implements ProjectileItem {
                             if (f == 0.0F) {
                                 ThrownTrident entitythrowntrident = new ThrownTrident(world, entityhuman, stack);
 
-                                entitythrowntrident.shootFromRotation(entityhuman, entityhuman.getXRot(), entityhuman.getYRot(), 0.0F, 2.5F, 1.0F);
+                                entitythrowntrident.shootFromRotation(entityhuman, entityhuman.getXRot(), entityhuman.getYRot(), 0.0F, 2.5F, (float) world.purpurConfig.tridentProjectileOffset);  // Purpur
                                 if (entityhuman.hasInfiniteMaterials()) {
                                     entitythrowntrident.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                                 }

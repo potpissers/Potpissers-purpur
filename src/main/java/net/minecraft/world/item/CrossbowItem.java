@@ -69,7 +69,7 @@ public class CrossbowItem extends ProjectileWeaponItem {
         ItemStack itemStack = user.getItemInHand(hand);
         ChargedProjectiles chargedProjectiles = itemStack.get(DataComponents.CHARGED_PROJECTILES);
         if (chargedProjectiles != null && !chargedProjectiles.isEmpty()) {
-            this.performShooting(world, user, hand, itemStack, getShootingPower(chargedProjectiles), 1.0F, null);
+            this.performShooting(world, user, hand, itemStack, getShootingPower(chargedProjectiles), (float) world.purpurConfig.crossbowProjectileOffset, null); // Purpur
             return InteractionResultHolder.consume(itemStack);
         } else if (!user.getProjectile(itemStack).isEmpty()) {
             this.startSoundPlayed = false;

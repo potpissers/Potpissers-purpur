@@ -21,7 +21,7 @@ public class ThrowablePotionItem extends PotionItem implements ProjectileItem {
         if (!world.isClientSide) {
             ThrownPotion thrownPotion = new ThrownPotion(world, user);
             thrownPotion.setItem(itemStack);
-            thrownPotion.shootFromRotation(user, user.getXRot(), user.getYRot(), -20.0F, 0.5F, 1.0F);
+            thrownPotion.shootFromRotation(user, user.getXRot(), user.getYRot(), -20.0F, 0.5F, (float) world.purpurConfig.throwablePotionProjectileOffset); // Purpur
             // Paper start - PlayerLaunchProjectileEvent
             com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent event = new com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent((org.bukkit.entity.Player) user.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemStack), (org.bukkit.entity.Projectile) thrownPotion.getBukkitEntity());
             if (event.callEvent() && world.addFreshEntity(thrownPotion)) {

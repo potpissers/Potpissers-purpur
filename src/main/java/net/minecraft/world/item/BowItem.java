@@ -37,7 +37,7 @@ public class BowItem extends ProjectileWeaponItem {
                 if (!((double)f < 0.1)) {
                     List<ItemStack> list = draw(stack, itemStack, player);
                     if (world instanceof ServerLevel serverLevel && !list.isEmpty()) {
-                        this.shoot(serverLevel, player, player.getUsedItemHand(), stack, list, f * 3.0F, 1.0F, f == 1.0F, null);
+                        this.shoot(serverLevel, player, player.getUsedItemHand(), stack, list, f * 3.0F, (float) world.purpurConfig.bowProjectileOffset, f == 1.0F, null); // Purpur
                     }
 
                     world.playSound(
