@@ -77,7 +77,7 @@ public class NetherPortalBlock extends Block implements Portal {
 
     @Override
     protected void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
-        if (world.spigotConfig.enableZombiePigmenPortalSpawns && world.dimensionType().natural() && world.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING) && random.nextInt(2000) < world.getDifficulty().getId()) { // Spigot
+        if (world.spigotConfig.enableZombiePigmenPortalSpawns && world.dimensionType().natural() && world.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING) && random.nextInt(world.purpurConfig.piglinPortalSpawnModifier) < world.getDifficulty().getId()) { // Spigot // Purpur
             while (world.getBlockState(pos).is((Block) this)) {
                 pos = pos.below();
             }
