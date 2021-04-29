@@ -59,7 +59,7 @@ public class BeehiveBlockEntity extends BlockEntity {
     private List<BeehiveBlockEntity.BeeData> stored = Lists.newArrayList();
     @Nullable
     public BlockPos savedFlowerPos;
-    public int maxBees = 3; // CraftBukkit - allow setting max amount of bees a hive can hold
+    public int maxBees = org.purpurmc.purpur.PurpurConfig.beeInsideBeeHive; // CraftBukkit - allow setting max amount of bees a hive can hold // Purpur
 
     public BeehiveBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntityType.BEEHIVE, pos, state);
