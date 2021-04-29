@@ -103,7 +103,7 @@ public class WitherSkull extends AbstractHurtingProjectile {
         if (!this.level().isClientSide) {
             // CraftBukkit start
             // this.level().explode(this, this.getX(), this.getY(), this.getZ(), 1.0F, false, World.a.MOB);
-            ExplosionPrimeEvent event = new ExplosionPrimeEvent(this.getBukkitEntity(), 1.0F, false);
+            ExplosionPrimeEvent event = new ExplosionPrimeEvent(this.getBukkitEntity(), this.level().purpurConfig.witherExplosionRadius, false); // Purpur
             this.level().getCraftServer().getPluginManager().callEvent(event);
 
             if (!event.isCancelled()) {
