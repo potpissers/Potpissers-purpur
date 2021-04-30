@@ -374,9 +374,10 @@ public class Creeper extends Monster implements PowerableMob {
 
         if (!this.level().isClientSide) {
             float f = this.isPowered() ? 2.0F : 1.0F;
+            float multiplier = this.level().purpurConfig.creeperHealthRadius ? this.getHealth() / this.getMaxHealth() : 1; // Purpur
 
             // CraftBukkit start
-            ExplosionPrimeEvent event = CraftEventFactory.callExplosionPrimeEvent(this, this.explosionRadius * f, false);
+            ExplosionPrimeEvent event = CraftEventFactory.callExplosionPrimeEvent(this, (this.explosionRadius * f) * multiplier, false); // Purpur
             if (!event.isCancelled()) {
             // CraftBukkit end
             this.dead = true;

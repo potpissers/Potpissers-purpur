@@ -939,6 +939,7 @@ public class PurpurWorldConfig {
     public boolean creeperBypassMobGriefing = false;
     public boolean creeperTakeDamageFromWater = false;
     public boolean creeperExplodeWhenKilled = false;
+    public boolean creeperHealthRadius = false;
     private void creeperSettings() {
         creeperRidable = getBoolean("mobs.creeper.ridable", creeperRidable);
         creeperRidableInWater = getBoolean("mobs.creeper.ridable-in-water", creeperRidableInWater);
@@ -955,6 +956,7 @@ public class PurpurWorldConfig {
         creeperBypassMobGriefing = getBoolean("mobs.creeper.bypass-mob-griefing", creeperBypassMobGriefing);
         creeperTakeDamageFromWater = getBoolean("mobs.creeper.takes-damage-from-water", creeperTakeDamageFromWater);
         creeperExplodeWhenKilled = getBoolean("mobs.creeper.explode-when-killed", creeperExplodeWhenKilled);
+        creeperHealthRadius = getBoolean("mobs.creeper.health-impacts-explosion", creeperHealthRadius);
     }
 
     public boolean dolphinRidable = false;
