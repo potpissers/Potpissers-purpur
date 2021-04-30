@@ -57,6 +57,18 @@ public class GameModeCommand {
     }
 
     private static int setMode(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> targets, GameType gameMode) {
+        // Purpur start
+        if (org.purpurmc.purpur.PurpurConfig.commandGamemodeRequiresPermission) {
+            String gamemode = gameMode.getName();
+            CommandSourceStack sender = context.getSource();
+            if (!sender.testPermission(2, "minecraft.command.gamemode." + gamemode)) {
+                return 0;
+            }
+            if (sender.getEntity() instanceof ServerPlayer player && (targets.size() > 1 || !targets.contains(player)) && !sender.testPermission(2, "minecraft.command.gamemode." + gamemode + ".other")) {
+                return 0;
+            }
+        }
+        // Purpur end
         int i = 0;
 
         for (ServerPlayer serverPlayer : targets) {
