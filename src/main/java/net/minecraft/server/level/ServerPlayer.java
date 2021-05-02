@@ -1082,6 +1082,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
             }));
             PlayerTeam scoreboardteam = this.getTeam();
 
+            if (org.purpurmc.purpur.PurpurConfig.deathMessageOnlyBroadcastToAffectedPlayer) this.sendSystemMessage(ichatbasecomponent); else // Purpur
             if (scoreboardteam != null && scoreboardteam.getDeathMessageVisibility() != Team.Visibility.ALWAYS) {
                 if (scoreboardteam.getDeathMessageVisibility() == Team.Visibility.HIDE_FOR_OTHER_TEAMS) {
                     this.server.getPlayerList().broadcastSystemToTeam(this, ichatbasecomponent);

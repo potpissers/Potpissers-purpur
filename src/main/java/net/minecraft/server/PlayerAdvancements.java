@@ -250,6 +250,7 @@ public class PlayerAdvancements {
                 advancement.value().display().ifPresent((advancementdisplay) -> {
                     // Paper start - Add Adventure message to PlayerAdvancementDoneEvent
                     if (event.message() != null && this.player.level().getGameRules().getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)) {
+                        if (org.purpurmc.purpur.PurpurConfig.advancementOnlyBroadcastToAffectedPlayer) this.player.sendMessage(message); else // Purpur
                         this.playerList.broadcastSystemMessage(io.papermc.paper.adventure.PaperAdventure.asVanilla(event.message()), false);
                         // Paper end
                     }
