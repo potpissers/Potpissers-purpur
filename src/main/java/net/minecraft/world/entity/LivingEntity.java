@@ -1042,6 +1042,17 @@ public abstract class LivingEntity extends Entity implements Attackable {
             if (entitytypes == EntityType.SKELETON && itemstack.is(Items.SKELETON_SKULL) || entitytypes == EntityType.ZOMBIE && itemstack.is(Items.ZOMBIE_HEAD) || entitytypes == EntityType.PIGLIN && itemstack.is(Items.PIGLIN_HEAD) || entitytypes == EntityType.PIGLIN_BRUTE && itemstack.is(Items.PIGLIN_HEAD) || entitytypes == EntityType.CREEPER && itemstack.is(Items.CREEPER_HEAD)) {
                 d0 *= 0.5D;
             }
+
+            // Purpur start
+            if (entity instanceof LivingEntity entityliving) {
+                if (entityliving.hasEffect(MobEffects.BLINDNESS)) {
+                    int amplifier = entityliving.getEffect(MobEffects.BLINDNESS).getAmplifier();
+                    for (int i = 0; i < amplifier; i++) {
+                        d0 *= this.level().purpurConfig.mobsBlindnessMultiplier;
+                    }
+                }
+            }
+            // Purpur end
         }
 
         return d0;
