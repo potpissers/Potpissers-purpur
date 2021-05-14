@@ -683,7 +683,7 @@ public abstract class AbstractMinecart extends VehicleEntity {
             if (d18 > 0.01D) {
                 double d20 = 0.06D;
 
-                this.setDeltaMovement(vec3d4.add(vec3d4.x / d18 * 0.06D, 0.0D, vec3d4.z / d18 * 0.06D));
+                this.setDeltaMovement(vec3d4.add(vec3d4.x / d18 * this.level().purpurConfig.poweredRailBoostModifier, 0.0D, vec3d4.z / d18 * this.level().purpurConfig.poweredRailBoostModifier)); // Purpur
             } else {
                 Vec3 vec3d5 = this.getDeltaMovement();
                 double d21 = vec3d5.x;
