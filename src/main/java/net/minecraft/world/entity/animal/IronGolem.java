@@ -93,6 +93,7 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     @Override
     protected void registerGoals() {
         if (level().purpurConfig.ironGolemCanSwim) this.goalSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.FloatGoal(this)); // Purpur
+        if (this.level().purpurConfig.ironGolemPoppyCalm) this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.ReceiveFlower(this)); // Purpur
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(2, new MoveTowardsTargetGoal(this, 0.9D, 32.0F));
@@ -316,6 +317,7 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
 
                 this.playSound(SoundEvents.IRON_GOLEM_REPAIR, 1.0F, f1);
                 itemstack.consume(1, player);
+                if (this.level().purpurConfig.ironGolemHealCalm && isAngry() && getHealth() == getMaxHealth()) stopBeingAngry(); // Purpur
                 return InteractionResult.sidedSuccess(this.level().isClientSide);
             }
         }
