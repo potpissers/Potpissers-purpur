@@ -222,6 +222,7 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
     protected void registerGoals() {
         //this.goalSelector.addGoal(0, new TamableAnimal.TamableAnimalPanicGoal(1.25D)); // Purpur - move down
         this.goalSelector.addGoal(0, new FloatGoal(this));
+        if (this.level().purpurConfig.parrotBreedable) this.goalSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.BreedGoal(this, 1.0D)); // Purpur
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new TamableAnimal.TamableAnimalPanicGoal(1.25D)); // Purpur
         this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F));
@@ -330,6 +331,7 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
                 }
             }
 
+            if (this.level().purpurConfig.parrotBreedable) return super.mobInteract(player, hand); // Purpur
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         } else if (!itemstack.is(ItemTags.PARROT_POISONOUS_FOOD)) {
             if (!this.isFlying() && this.isTame() && this.isOwnedBy(player)) {
@@ -354,7 +356,7 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
 
     @Override
     public boolean isFood(ItemStack stack) {
-        return false;
+        return this.level().purpurConfig.parrotBreedable && stack.is(ItemTags.PARROT_FOOD); // Purpur
     }
 
     public static boolean checkParrotSpawnRules(EntityType<Parrot> type, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, RandomSource random) {
@@ -366,13 +368,13 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
 
     @Override
     public boolean canMate(Animal other) {
-        return false;
+        return super.canMate(other); // Purpur
     }
 
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel world, AgeableMob entity) {
-        return null;
+        return world.purpurConfig.parrotBreedable ? EntityType.PARROT.create(world) : null; // Purpur
     }
 
     @Nullable
