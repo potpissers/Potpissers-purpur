@@ -70,7 +70,7 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
     }
 
     @Override
-    public void kickPlayer(Component reason) {
+    public void kickPlayer(Component reason, org.bukkit.event.player.PlayerKickEvent.Cause cause) { // Paper - kick event causes - during login, no event can be called.
         this.disconnect(reason);
     }
     // CraftBukkit end
