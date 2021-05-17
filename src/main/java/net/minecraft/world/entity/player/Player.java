@@ -1348,7 +1348,7 @@ public abstract class Player extends LivingEntity {
                     flag2 = flag2 && !this.level().paperConfig().entities.behavior.disablePlayerCrits; // Paper - Toggleable player crits
                     if (flag2) {
                         damagesource = damagesource.critical(true); // Paper start - critical damage API
-                        f *= 1.5F;
+                        f *= this.level().purpurConfig.playerCriticalDamageMultiplier; // Purpur
                     }
 
                     float f3 = f + f1;
