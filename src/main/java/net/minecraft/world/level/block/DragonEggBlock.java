@@ -48,8 +48,8 @@ public class DragonEggBlock extends FallingBlock {
     }
 
     private void teleport(BlockState state, Level world, BlockPos pos) {
+        if (!world.purpurConfig.dragonEggTeleport) return; // Purpur
         WorldBorder worldborder = world.getWorldBorder();
-
         for (int i = 0; i < 1000; ++i) {
             BlockPos blockposition1 = pos.offset(world.random.nextInt(16) - world.random.nextInt(16), world.random.nextInt(8) - world.random.nextInt(8), world.random.nextInt(16) - world.random.nextInt(16));
 
