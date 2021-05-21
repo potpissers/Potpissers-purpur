@@ -400,7 +400,7 @@ public class AnvilMenu extends ItemCombinerMenu {
     }
 
     public static int calculateIncreasedRepairCost(int cost) {
-        return (int) Math.min((long) cost * 2L + 1L, 2147483647L);
+        return org.purpurmc.purpur.PurpurConfig.anvilCumulativeCost ? (int) Math.min((long) cost * 2L + 1L, 2147483647L) : 0; // Purpur - Make anvil cumulative cost configurable
     }
 
     public boolean setItemName(String newItemName) {
