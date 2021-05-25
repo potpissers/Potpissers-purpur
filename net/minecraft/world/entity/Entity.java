@@ -530,6 +530,24 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
     // Purpur end - Add canSaveToDisk to Entity
 
+    // Purpur start - copied from Mob - API for any mob to burn daylight
+    public boolean isSunBurnTick() {
+        if (this.level().isDay() && !this.level().isClientSide) {
+            float lightLevelDependentMagicValue = this.getLightLevelDependentMagicValue();
+            BlockPos blockPos = BlockPos.containing(this.getX(), this.getEyeY(), this.getZ());
+            boolean flag = this.isInWaterRainOrBubble() || this.isInPowderSnow || this.wasInPowderSnow;
+            if (lightLevelDependentMagicValue > 0.5F
+                && this.random.nextFloat() * 30.0F < (lightLevelDependentMagicValue - 0.4F) * 2.0F
+                && !flag
+                && this.level().canSeeSky(blockPos)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    // Purpur end - copied from Mob - API for any mob to burn daylight
+
     public Entity(EntityType<?> entityType, Level level) {
         this.type = entityType;
         this.level = level;

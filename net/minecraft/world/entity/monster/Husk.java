@@ -19,6 +19,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 public class Husk extends Zombie {
     public Husk(EntityType<? extends Husk> entityType, Level level) {
         super(entityType, level);
+        this.setShouldBurnInDay(false); // Purpur - API for any mob to burn daylight
     }
 
     // Purpur start - Ridables
@@ -82,7 +83,7 @@ public class Husk extends Zombie {
 
     @Override
     public boolean isSunSensitive() {
-        return false;
+        return this.shouldBurnInDay; // Purpur - moved to LivingEntity; keep methods for ABI compatibility - API for any mob to burn daylight
     }
 
     @Override

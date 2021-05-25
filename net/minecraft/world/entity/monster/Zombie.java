@@ -89,11 +89,12 @@ public class Zombie extends Monster {
     private boolean canBreakDoors;
     private int inWaterTime;
     public int conversionTime;
-    private boolean shouldBurnInDay = true; // Paper - Add more Zombie API
+    //private boolean shouldBurnInDay = true; // Paper - Add more Zombie API // Purpur - implemented in LivingEntity - API for any mob to burn daylight
 
     public Zombie(EntityType<? extends Zombie> entityType, Level level) {
         super(entityType, level);
         this.breakDoorGoal = new BreakDoorGoal(this, com.google.common.base.Predicates.in(level.paperConfig().entities.behavior.doorBreakingDifficulty.getOrDefault(entityType, level.paperConfig().entities.behavior.doorBreakingDifficulty.get(EntityType.ZOMBIE)))); // Paper - Configurable door breaking difficulty
+        this.setShouldBurnInDay(true); // Purpur - API for any mob to burn daylight
     }
 
     public Zombie(Level level) {
@@ -290,29 +291,7 @@ public class Zombie extends Monster {
 
     @Override
     public void aiStep() {
-        if (this.isAlive()) {
-            boolean flag = this.isSunSensitive() && this.isSunBurnTick();
-            if (flag) {
-                ItemStack itemBySlot = this.getItemBySlot(EquipmentSlot.HEAD);
-                if (!itemBySlot.isEmpty()) {
-                    if (itemBySlot.isDamageableItem()) {
-                        Item item = itemBySlot.getItem();
-                        itemBySlot.setDamageValue(itemBySlot.getDamageValue() + this.random.nextInt(2));
-                        if (itemBySlot.getDamageValue() >= itemBySlot.getMaxDamage()) {
-                            this.onEquippedItemBroken(item, EquipmentSlot.HEAD);
-                            this.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
-                        }
-                    }
-
-                    flag = false;
-                }
-
-                if (flag) {
-                    this.igniteForSeconds(8.0F);
-                }
-            }
-        }
-
+        // Purpur - implemented in LivingEntity - API for any mob to burn daylight
         super.aiStep();
     }
 
@@ -371,6 +350,7 @@ public class Zombie extends Monster {
         // CraftBukkit end
     }
 
+    public boolean shouldBurnInDay() { return this.isSunSensitive(); } // Purpur - for ABI compatibility - API for any mob to burn daylight
     public boolean isSunSensitive() {
         return this.shouldBurnInDay; // Paper - Add more Zombie API
     }
@@ -509,7 +489,7 @@ public class Zombie extends Monster {
         compound.putBoolean("CanBreakDoors", this.canBreakDoors());
         compound.putInt("InWaterTime", this.isInWater() ? this.inWaterTime : -1);
         compound.putInt("DrownedConversionTime", this.isUnderWaterConverting() ? this.conversionTime : -1);
-        compound.putBoolean("Paper.ShouldBurnInDay", this.shouldBurnInDay); // Paper - Add more Zombie API
+        //compound.putBoolean("Paper.ShouldBurnInDay", this.shouldBurnInDay); // Paper - Add more Zombie API // Purpur - implemented in LivingEntity - API for any mob to burn daylight
     }
 
     @Override
@@ -522,7 +502,7 @@ public class Zombie extends Monster {
             this.startUnderWaterConversion(compound.getInt("DrownedConversionTime"));
         }
         // Paper start - Add more Zombie API
-        if (compound.contains("Paper.ShouldBurnInDay")) {
+        if (false && compound.contains("Paper.ShouldBurnInDay")) { // Purpur - implemented in LivingEntity - API for any mob to burn daylight
             this.shouldBurnInDay = compound.getBoolean("Paper.ShouldBurnInDay");
         }
         // Paper end - Add more Zombie API

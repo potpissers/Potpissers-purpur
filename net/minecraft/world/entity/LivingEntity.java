@@ -301,6 +301,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
     public org.bukkit.craftbukkit.entity.CraftLivingEntity getBukkitLivingEntity() { return (org.bukkit.craftbukkit.entity.CraftLivingEntity) super.getBukkitEntity(); } // Paper
     public boolean silentDeath = false; // Paper - mark entity as dying silently for cancellable death event
     public net.kyori.adventure.util.TriState frictionState = net.kyori.adventure.util.TriState.NOT_SET; // Paper - Friction API
+    protected boolean shouldBurnInDay = false; public boolean shouldBurnInDay() { return this.shouldBurnInDay; } public void setShouldBurnInDay(boolean shouldBurnInDay) { this.shouldBurnInDay = shouldBurnInDay; } // Purpur - API for any mob to burn daylight
 
     @Override
     public float getBukkitYaw() {
@@ -809,6 +810,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
         });
         DataResult<Tag> dataResult = this.brain.serializeStart(NbtOps.INSTANCE);
         dataResult.resultOrPartial(LOGGER::error).ifPresent(brain -> compound.put("Brain", brain));
+        compound.putBoolean("Purpur.ShouldBurnInDay", this.shouldBurnInDay); // Purpur - API for any mob to burn daylight
     }
 
     @Override
@@ -892,6 +894,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
         if (compound.contains("Brain", 10)) {
             this.brain = this.makeBrain(new Dynamic<>(NbtOps.INSTANCE, compound.get("Brain")));
         }
+
+        // Purpur start - API for any mob to burn daylight
+        if (compound.contains("Purpur.ShouldBurnInDay")) {
+            this.shouldBurnInDay = compound.getBoolean("Purpur.ShouldBurnInDay");
+        }
+        // Purpur end - API for any mob to burn daylight
     }
 
     // CraftBukkit start
@@ -3574,6 +3582,32 @@ public abstract class LivingEntity extends Entity implements Attackable {
         if (this.level() instanceof ServerLevel serverLevel && this.isSensitiveToWater() && this.isInWaterRainOrBubble()) {
             this.hurtServer(serverLevel, this.damageSources().drown(), 1.0F);
         }
+
+        // Purpur start - copied from Zombie - API for any mob to burn daylight
+        if (this.isAlive()) {
+            boolean flag = this.shouldBurnInDay() && this.isSunBurnTick(); // Paper - shouldBurnInDay API // Purpur - use shouldBurnInDay() method to handle Phantoms properly - API for any mob to burn daylight
+            if (flag) {
+                ItemStack itemBySlot = this.getItemBySlot(EquipmentSlot.HEAD);
+                if (!itemBySlot.isEmpty()) {
+                    if (itemBySlot.isDamageableItem()) {
+                        Item item = itemBySlot.getItem();
+                        itemBySlot.setDamageValue(itemBySlot.getDamageValue() + this.random.nextInt(2));
+                        if (itemBySlot.getDamageValue() >= itemBySlot.getMaxDamage()) {
+                            this.onEquippedItemBroken(item, EquipmentSlot.HEAD);
+                            this.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
+                        }
+                    }
+
+                    flag = false;
+                }
+
+                if (flag) {
+                    if (getRider() == null || !this.isControllable()) // Purpur - ignore mobs which are uncontrollable or without rider - API for any mob to burn daylight
+                        this.igniteForSeconds(8.0F);
+                }
+            }
+        }
+        // Purpur end - copied from Zombie - API for any mob to burn daylight
     }
 
     public boolean isSensitiveToWater() {
