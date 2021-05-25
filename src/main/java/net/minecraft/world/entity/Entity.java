@@ -559,6 +559,22 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
     // Purpur end
 
+    // Purpur start - copied from Mob - API for any mob to burn daylight
+    public boolean isSunBurnTick() {
+        if (this.level().isDay() && !this.level().isClientSide) {
+            float f = this.getLightLevelDependentMagicValue();
+            BlockPos blockposition = BlockPos.containing(this.getX(), this.getEyeY(), this.getZ());
+            boolean flag = this.isInWaterRainOrBubble() || this.isInPowderSnow || this.wasInPowderSnow;
+
+            if (f > 0.5F && this.random.nextFloat() * 30.0F < (f - 0.4F) * 2.0F && !flag && this.level().canSeeSky(blockposition)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    // Purpur end - copied from Mob - API for any mob to burn daylight
+
     public Entity(EntityType<?> type, Level world) {
         this.id = Entity.ENTITY_COUNTER.incrementAndGet();
         this.passengers = ImmutableList.of();

@@ -86,6 +86,13 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         this.entityType = CraftEntityType.minecraftToBukkit(entity.getType());
     }
 
+    // Purpur start - API for any mob to burn daylight
+    @Override
+    public boolean isInDaylight() {
+        return getHandle().isSunBurnTick();
+    }
+    // Purpur end - API for any mob to burn daylight
+
     public static <T extends Entity> CraftEntity getEntity(CraftServer server, T entity) {
         Preconditions.checkArgument(entity != null, "Unknown entity");
 

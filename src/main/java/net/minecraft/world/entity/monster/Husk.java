@@ -20,6 +20,7 @@ public class Husk extends Zombie {
 
     public Husk(EntityType<? extends Husk> type, Level world) {
         super(type, world);
+        this.setShouldBurnInDay(false); // Purpur - API for any mob to burn daylight
     }
 
     // Purpur start
@@ -75,7 +76,7 @@ public class Husk extends Zombie {
 
     @Override
     public boolean isSunSensitive() {
-        return false;
+        return this.shouldBurnInDay; // Purpur - moved to LivingEntity; keep methods for ABI compatibility - API for any mob to burn daylight
     }
 
     @Override

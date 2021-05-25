@@ -1192,4 +1192,16 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
         return this.getHandle().canUseSlot(org.bukkit.craftbukkit.CraftEquipmentSlot.getNMS(slot));
     }
     // Paper end - Expose canUseSlot
+
+    // Purpur start - API for any mob to burn daylight
+    @Override
+    public boolean shouldBurnInDay() {
+        return this.getHandle().shouldBurnInDay();
+    }
+
+    @Override
+    public void setShouldBurnInDay(final boolean shouldBurnInDay) {
+        this.getHandle().setShouldBurnInDay(shouldBurnInDay);
+    }
+    // Purpur end - API for any mob to burn daylight
 }

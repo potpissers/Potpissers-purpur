@@ -1788,17 +1788,8 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
     protected void playAttackSound() {}
 
     public boolean isSunBurnTick() {
-        if (this.level().isDay() && !this.level().isClientSide) {
-            float f = this.getLightLevelDependentMagicValue();
-            BlockPos blockposition = BlockPos.containing(this.getX(), this.getEyeY(), this.getZ());
-            boolean flag = this.isInWaterRainOrBubble() || this.isInPowderSnow || this.wasInPowderSnow;
-
-            if (f > 0.5F && this.random.nextFloat() * 30.0F < (f - 0.4F) * 2.0F && !flag && this.level().canSeeSky(blockposition)) {
-                return true;
-            }
-        }
-
-        return false;
+        // Purpur - implemented in Entity - API for any mob to burn daylight
+        return super.isSunBurnTick();
     }
 
     @Override

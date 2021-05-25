@@ -59,6 +59,7 @@ public class Phantom extends FlyingMob implements Enemy {
         this.xpReward = 5;
         this.moveControl = new Phantom.PhantomMoveControl(this);
         this.lookControl = new Phantom.PhantomLookControl(this, this);
+        this.setShouldBurnInDay(true); // Purpur - API for any mob to burn daylight
     }
 
     // Purpur start
@@ -247,15 +248,7 @@ public class Phantom extends FlyingMob implements Enemy {
 
     @Override
     public void aiStep() {
-        // Purpur start
-        boolean burnFromDaylight = this.shouldBurnInDay && this.isSunBurnTick() && this.level().purpurConfig.phantomBurnInDaylight;
-        boolean burnFromLightSource = this.level().purpurConfig.phantomBurnInLight > 0 && this.level().getMaxLocalRawBrightness(blockPosition()) >= this.level().purpurConfig.phantomBurnInLight;
-        if (this.isAlive() && (burnFromDaylight || burnFromLightSource)) { // Paper - shouldBurnInDay API
-        // Purpur end
-            if (getRider() == null || !this.isControllable()) // Purpur
-            this.igniteForSeconds(8.0F);
-        }
-
+        // Purpur - implemented in LivingEntity; moved down to shouldBurnInDay() - API for any mob to burn daylight
         super.aiStep();
     }
 
@@ -283,7 +276,7 @@ public class Phantom extends FlyingMob implements Enemy {
         if (nbt.hasUUID("Paper.SpawningEntity")) {
             this.spawningEntity = nbt.getUUID("Paper.SpawningEntity");
         }
-        if (nbt.contains("Paper.ShouldBurnInDay")) {
+        if (false && nbt.contains("Paper.ShouldBurnInDay")) { // Purpur - implemented in LivingEntity - API for any mob to burn daylight
             this.shouldBurnInDay = nbt.getBoolean("Paper.ShouldBurnInDay");
         }
         // Paper end
@@ -300,7 +293,7 @@ public class Phantom extends FlyingMob implements Enemy {
         if (this.spawningEntity != null) {
             nbt.putUUID("Paper.SpawningEntity", this.spawningEntity);
         }
-        nbt.putBoolean("Paper.ShouldBurnInDay", shouldBurnInDay);
+        //nbt.putBoolean("Paper.ShouldBurnInDay", shouldBurnInDay); // Purpur - implemented in LivingEntity - API for any mob to burn daylight
         // Paper end
     }
 
@@ -356,8 +349,14 @@ public class Phantom extends FlyingMob implements Enemy {
         return this.spawningEntity;
     }
     public void setSpawningEntity(java.util.UUID entity) { this.spawningEntity = entity; }
-    private boolean shouldBurnInDay = true;
-    public boolean shouldBurnInDay() { return shouldBurnInDay; }
+    //private boolean shouldBurnInDay = true; // Purpur - moved to LivingEntity; keep methods for ABI compatibility - API for any mob to burn daylight
+    // Purpur start - API for any mob to burn daylight
+    public boolean shouldBurnInDay() {
+        boolean burnFromDaylight = this.shouldBurnInDay && this.level().purpurConfig.phantomBurnInDaylight;
+        boolean burnFromLightSource = this.level().purpurConfig.phantomBurnInLight > 0 && this.level().getMaxLocalRawBrightness(blockPosition()) >= this.level().purpurConfig.phantomBurnInLight;
+        return burnFromDaylight || burnFromLightSource;
+    }
+    // Purpur end - API for any mob to burn daylight
     public void setShouldBurnInDay(boolean shouldBurnInDay) { this.shouldBurnInDay = shouldBurnInDay; }
     // Paper end
 

@@ -66,6 +66,7 @@ public abstract class AbstractSkeleton extends Monster implements RangedAttackMo
     protected AbstractSkeleton(EntityType<? extends AbstractSkeleton> type, Level world) {
         super(type, world);
         this.reassessWeaponGoal();
+        this.setShouldBurnInDay(true); // Purpur - API for any mob to burn daylight
     }
 
     @Override
@@ -96,37 +97,14 @@ public abstract class AbstractSkeleton extends Monster implements RangedAttackMo
     abstract SoundEvent getStepSound();
 
     // Paper start - shouldBurnInDay API
-    private boolean shouldBurnInDay = true;
+    //private boolean shouldBurnInDay = true; // Purpur - moved to LivingEntity; keep methods for ABI compatibility - API for any mob to burn daylight
     public boolean shouldBurnInDay() { return shouldBurnInDay; }
     public void setShouldBurnInDay(boolean shouldBurnInDay) { this.shouldBurnInDay = shouldBurnInDay; }
     // Paper end - shouldBurnInDay API
 
     @Override
     public void aiStep() {
-        boolean flag = shouldBurnInDay && this.isSunBurnTick(); // Paper - shouldBurnInDay API
-
-        if (flag) {
-            ItemStack itemstack = this.getItemBySlot(EquipmentSlot.HEAD);
-
-            if (!itemstack.isEmpty()) {
-                if (itemstack.isDamageableItem()) {
-                    Item item = itemstack.getItem();
-
-                    itemstack.setDamageValue(itemstack.getDamageValue() + this.random.nextInt(2));
-                    if (itemstack.getDamageValue() >= itemstack.getMaxDamage()) {
-                        this.onEquippedItemBroken(item, EquipmentSlot.HEAD);
-                        this.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
-                    }
-                }
-
-                flag = false;
-            }
-
-            if (flag) {
-                this.igniteForSeconds(8.0F);
-            }
-        }
-
+        // Purpur - implemented in LivingEntity - API for any mob to burn daylight
         super.aiStep();
     }
 
@@ -241,7 +219,7 @@ public abstract class AbstractSkeleton extends Monster implements RangedAttackMo
         super.readAdditionalSaveData(nbt);
         this.reassessWeaponGoal();
         // Paper start - shouldBurnInDay API
-        if (nbt.contains("Paper.ShouldBurnInDay")) {
+        if (false && nbt.contains("Paper.ShouldBurnInDay")) { // Purpur - implemented in LivingEntity - API for any mob to burn daylight
             this.shouldBurnInDay = nbt.getBoolean("Paper.ShouldBurnInDay");
         }
         // Paper end - shouldBurnInDay API
@@ -251,7 +229,7 @@ public abstract class AbstractSkeleton extends Monster implements RangedAttackMo
     @Override
     public void addAdditionalSaveData(CompoundTag nbt) {
         super.addAdditionalSaveData(nbt);
-        nbt.putBoolean("Paper.ShouldBurnInDay", this.shouldBurnInDay);
+        //nbt.putBoolean("Paper.ShouldBurnInDay", this.shouldBurnInDay); // Purpur - implemented in LivingEntity - API for any mob to burn daylight
     }
     // Paper end - shouldBurnInDay API
 
