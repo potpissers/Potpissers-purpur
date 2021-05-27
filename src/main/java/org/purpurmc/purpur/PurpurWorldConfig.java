@@ -748,6 +748,8 @@ public class PurpurWorldConfig {
     public double beeScale = 1.0D;
     public int beeBreedingTicks = 6000;
     public boolean beeTakeDamageFromWater = false;
+    public boolean beeCanWorkAtNight = false;
+    public boolean beeCanWorkInRain = false;
     private void beeSettings() {
         beeRidable = getBoolean("mobs.bee.ridable", beeRidable);
         beeRidableInWater = getBoolean("mobs.bee.ridable-in-water", beeRidableInWater);
@@ -762,6 +764,8 @@ public class PurpurWorldConfig {
         beeScale = Mth.clamp(getDouble("mobs.bee.attributes.scale", beeScale), 0.0625D, 16.0D);
         beeBreedingTicks = getInt("mobs.bee.breeding-delay-ticks", beeBreedingTicks);
         beeTakeDamageFromWater = getBoolean("mobs.bee.takes-damage-from-water", beeTakeDamageFromWater);
+        beeCanWorkAtNight = getBoolean("mobs.bee.can-work-at-night", beeCanWorkAtNight);
+        beeCanWorkInRain = getBoolean("mobs.bee.can-work-in-rain", beeCanWorkInRain);
     }
 
     public boolean blazeRidable = false;

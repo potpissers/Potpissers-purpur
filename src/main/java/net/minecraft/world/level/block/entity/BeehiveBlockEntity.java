@@ -212,7 +212,7 @@ public class BeehiveBlockEntity extends BlockEntity {
     }
 
     private static boolean releaseOccupant(Level world, BlockPos blockposition, BlockState iblockdata, BeehiveBlockEntity.Occupant tileentitybeehive_c, @Nullable List<Entity> list, BeehiveBlockEntity.BeeReleaseStatus tileentitybeehive_releasestatus, @Nullable BlockPos blockposition1, boolean force) {
-        if (!force && (world.isNight() || world.isRaining()) && tileentitybeehive_releasestatus != BeehiveBlockEntity.BeeReleaseStatus.EMERGENCY) {
+        if (!force && ((world.isNight() && !world.purpurConfig.beeCanWorkAtNight) || (world.isRaining() && !world.purpurConfig.beeCanWorkInRain)) && tileentitybeehive_releasestatus != BeehiveBlockEntity.BeeReleaseStatus.EMERGENCY) { // Purpur
             // CraftBukkit end
             return false;
         } else {
