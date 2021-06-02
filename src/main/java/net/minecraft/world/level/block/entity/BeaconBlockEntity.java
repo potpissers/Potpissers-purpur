@@ -92,6 +92,16 @@ public class BeaconBlockEntity extends BlockEntity implements MenuProvider, Name
 
     public double getEffectRange() {
         if (this.effectRange < 0) {
+            // Purpur Start
+            if (this.level != null) {
+                switch (this.levels) {
+                    case 1: return this.level.purpurConfig.beaconLevelOne;
+                    case 2: return this.level.purpurConfig.beaconLevelTwo;
+                    case 3: return this.level.purpurConfig.beaconLevelThree;
+                    case 4: return this.level.purpurConfig.beaconLevelFour;
+                }
+            }
+            // Purpur End
             return this.levels * 10 + 10;
         } else {
             return effectRange;
