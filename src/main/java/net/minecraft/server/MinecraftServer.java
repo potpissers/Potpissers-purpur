@@ -1237,6 +1237,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                 } catch (Exception ignored) {
                 }
                 // CraftBukkit end
+                io.papermc.paper.log.CustomLogManager.forceReset(); // Paper - Reset loggers after shutdown
                 this.onServerExit();
             }
 
