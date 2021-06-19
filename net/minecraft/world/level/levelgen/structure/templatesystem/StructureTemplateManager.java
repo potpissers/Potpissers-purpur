@@ -245,7 +245,7 @@ public class StructureTemplateManager {
     public StructureTemplate readStructure(CompoundTag nbt) {
         StructureTemplate structureTemplate = new StructureTemplate();
         int dataVersion = NbtUtils.getDataVersion(nbt, 500);
-        structureTemplate.load(this.blockLookup, DataFixTypes.STRUCTURE.updateToCurrentVersion(this.fixerUpper, nbt, dataVersion));
+        structureTemplate.load(this.blockLookup, ca.spottedleaf.dataconverter.minecraft.MCDataConverter.convertTag(ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.STRUCTURE, nbt, dataVersion, SharedConstants.getCurrentVersion().getDataVersion().getVersion())); // Paper - rewrite data conversion system
         return structureTemplate;
     }
 

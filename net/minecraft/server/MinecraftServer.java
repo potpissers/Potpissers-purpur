@@ -305,6 +305,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
     public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
 
     public static <S extends MinecraftServer> S spin(Function<Thread, S> threadFunction) {
+        ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.init(); // Paper - rewrite data converter system
         AtomicReference<S> atomicReference = new AtomicReference<>();
         Thread thread = new ca.spottedleaf.moonrise.common.util.TickThread(() -> atomicReference.get().runServer(), "Server thread");
         thread.setUncaughtExceptionHandler((thread1, exception) -> LOGGER.error("Uncaught exception in server thread", exception));

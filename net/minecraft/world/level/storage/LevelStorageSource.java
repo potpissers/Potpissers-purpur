@@ -227,7 +227,7 @@ public class LevelStorageSource {
         CompoundTag compound = levelDataTagRaw.getCompound("Data");
         int dataVersion = NbtUtils.getDataVersion(compound, -1);
         Dynamic<?> dynamic = DataFixTypes.LEVEL.updateToCurrentVersion(dataFixer, new Dynamic<>(NbtOps.INSTANCE, compound), dataVersion);
-        dynamic = dynamic.update("Player", dynamic1 -> DataFixTypes.PLAYER.updateToCurrentVersion(dataFixer, dynamic1, dataVersion));
+        dynamic = dynamic.update("Player", dynamic1 -> new Dynamic(dynamic1.getOps(), ca.spottedleaf.dataconverter.minecraft.MCDataConverter.convertTag(ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.PLAYER, (net.minecraft.nbt.CompoundTag)dynamic1.getValue(), dataVersion, net.minecraft.SharedConstants.getCurrentVersion().getDataVersion().getVersion()))); // Paper - replace data conversion system
         return dynamic.update("WorldGenSettings", dynamic1 -> DataFixTypes.WORLD_GEN_SETTINGS.updateToCurrentVersion(dataFixer, dynamic1, dataVersion));
     }
 

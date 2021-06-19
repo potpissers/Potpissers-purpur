@@ -54,7 +54,7 @@ public class ChunkStorage implements AutoCloseable {
         } else {
             try {
                 // CraftBukkit start
-                if (version < 1466) {
+                if (false && version < 1466) { // Paper - no longer needed, data converter system / DFU handles it now
                     CompoundTag level = chunkData.getCompound("Level");
                     if (level.getBoolean("TerrainPopulated") && !level.getBoolean("LightPopulated")) {
                         // Light is purged updating to 1.14+. We need to set light populated to true so the converter recognizes the chunk as being "full"
@@ -63,7 +63,7 @@ public class ChunkStorage implements AutoCloseable {
                 }
                 // CraftBukkit end
                 if (version < 1493) {
-                    chunkData = DataFixTypes.CHUNK.update(this.fixerUpper, chunkData, version, 1493);
+                    chunkData = ca.spottedleaf.dataconverter.minecraft.MCDataConverter.convertTag(ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.CHUNK, chunkData, version, 1493); // Paper - replace chunk converter
                     if (chunkData.getCompound("Level").getBoolean("hasLegacyStructureData")) {
                         LegacyStructureDataHandler legacyStructureHandler = this.getLegacyStructureHandler(levelKey, storage);
                         chunkData = legacyStructureHandler.updateFromLegacy(chunkData);
@@ -80,7 +80,7 @@ public class ChunkStorage implements AutoCloseable {
                 // Spigot end
 
                 injectDatafixingContext(chunkData, levelKey, chunkGeneratorKey);
-                chunkData = DataFixTypes.CHUNK.updateToCurrentVersion(this.fixerUpper, chunkData, Math.max(1493, version));
+                chunkData = ca.spottedleaf.dataconverter.minecraft.MCDataConverter.convertTag(ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.CHUNK, chunkData, Math.max(1493, version), SharedConstants.getCurrentVersion().getDataVersion().getVersion()); // Paper - replace chunk converter
                 // Spigot start
                 if (stopBelowZero) {
                     chunkData.putString("Status", net.minecraft.core.registries.BuiltInRegistries.CHUNK_STATUS.getKey(net.minecraft.world.level.chunk.status.ChunkStatus.SPAWN).toString());

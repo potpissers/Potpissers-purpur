@@ -32,13 +32,30 @@ public class SimpleRegionStorage implements AutoCloseable {
         return this.worker.store(chunkPos, data);
     }
 
+    // Paper start - rewrite data conversion system
+    private ca.spottedleaf.dataconverter.minecraft.datatypes.MCDataType getDataConverterType() {
+        if (this.dataFixType == DataFixTypes.ENTITY_CHUNK) {
+            return ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.ENTITY_CHUNK;
+        } else if (this.dataFixType == DataFixTypes.POI_CHUNK) {
+            return ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.POI_CHUNK;
+        } else {
+            throw new UnsupportedOperationException("For " + this.dataFixType.name());
+        }
+    }
+    // Paper end - rewrite data conversion system
+
     public CompoundTag upgradeChunkTag(CompoundTag tag, int version) {
-        int dataVersion = NbtUtils.getDataVersion(tag, version);
-        return this.dataFixType.updateToCurrentVersion(this.fixerUpper, tag, dataVersion);
+        // Paper start - rewrite data conversion system
+        final int dataVer = NbtUtils.getDataVersion(tag, version);
+        return ca.spottedleaf.dataconverter.minecraft.MCDataConverter.convertTag(this.getDataConverterType(), tag, dataVer, net.minecraft.SharedConstants.getCurrentVersion().getDataVersion().getVersion());
+        // Paper end - rewrite data conversion system
     }
 
     public Dynamic<Tag> upgradeChunkTag(Dynamic<Tag> tag, int version) {
-        return this.dataFixType.updateToCurrentVersion(this.fixerUpper, tag, version);
+        // Paper start - rewrite data conversion system
+        final CompoundTag converted = ca.spottedleaf.dataconverter.minecraft.MCDataConverter.convertTag(this.getDataConverterType(), (CompoundTag)tag.getValue(), version, net.minecraft.SharedConstants.getCurrentVersion().getDataVersion().getVersion());
+        return new Dynamic<>(tag.getOps(), converted);
+        // Paper end - rewrite data conversion system
     }
 
     public CompletableFuture<Void> synchronize(boolean flushStorage) {
