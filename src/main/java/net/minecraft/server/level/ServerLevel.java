@@ -1021,7 +1021,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
             return holder.is(PoiTypes.LIGHTNING_ROD);
         }, (blockposition1) -> {
             return blockposition1.getY() == this.getHeight(Heightmap.Types.WORLD_SURFACE, blockposition1.getX(), blockposition1.getZ()) - 1;
-        }, pos, 128, PoiManager.Occupancy.ANY);
+        }, pos, org.purpurmc.purpur.PurpurConfig.lightningRodRange, PoiManager.Occupancy.ANY);
 
         return optional.map((blockposition1) -> {
             return blockposition1.above(1);
