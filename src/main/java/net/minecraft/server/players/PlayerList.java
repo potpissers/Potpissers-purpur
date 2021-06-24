@@ -748,7 +748,7 @@ public abstract class PlayerList {
             event.disallow(PlayerLoginEvent.Result.KICK_BANNED, io.papermc.paper.adventure.PaperAdventure.asAdventure(ichatmutablecomponent)); // Paper - Adventure
         } else {
             // return this.players.size() >= this.maxPlayers && !this.canBypassPlayerLimit(gameprofile) ? IChatBaseComponent.translatable("multiplayer.disconnect.server_full") : null;
-            if (this.players.size() >= this.maxPlayers && !this.canBypassPlayerLimit(gameprofile)) {
+            if (this.players.size() >= this.maxPlayers && !(player.hasPermission("purpur.joinfullserver") || this.canBypassPlayerLimit(gameprofile))) { // Purpur
                 event.disallow(PlayerLoginEvent.Result.KICK_FULL, net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(org.spigotmc.SpigotConfig.serverFullMessage)); // Spigot // Paper - Adventure
             }
         }
