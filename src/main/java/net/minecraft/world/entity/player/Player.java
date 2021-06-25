@@ -198,6 +198,7 @@ public abstract class Player extends LivingEntity {
     public boolean affectsSpawning = true; // Paper - Affects Spawning API
     public net.kyori.adventure.util.TriState flyingFallDamage = net.kyori.adventure.util.TriState.NOT_SET; // Paper - flying fall damage
     public int sixRowEnderchestSlotCount = -1; // Purpur
+    public int burpDelay = 0; // Purpur
 
     // CraftBukkit start
     public boolean fauxSleeping;
@@ -273,6 +274,12 @@ public abstract class Player extends LivingEntity {
 
     @Override
     public void tick() {
+        // Purpur start
+        if (this.burpDelay > 0 && --this.burpDelay == 0) {
+            this.level().playSound(null, getX(), getY(), getZ(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 1.0F, this.level().random.nextFloat() * 0.1F + 0.9F);
+        }
+        // Purpur end
+
         this.noPhysics = this.isSpectator();
         if (this.isSpectator()) {
             this.setOnGround(false);
@@ -2376,7 +2383,7 @@ public abstract class Player extends LivingEntity {
     public ItemStack eat(Level world, ItemStack stack, FoodProperties foodComponent) {
         this.getFoodData().eat(stack, foodComponent); // CraftBukkit
         this.awardStat(Stats.ITEM_USED.get(stack.getItem()));
-        world.playSound((Player) null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
+        // world.playSound((Player) null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F); // Purpur - moved to tick()
         if (this instanceof ServerPlayer) {
             CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer) this, stack);
         }

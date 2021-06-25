@@ -34,8 +34,10 @@ public class FoodData {
     // CraftBukkit end
 
     private void add(int nutrition, float saturation) {
+        int oldValue = this.foodLevel; // Purpur
         this.foodLevel = Mth.clamp(nutrition + this.foodLevel, 0, 20);
         this.saturationLevel = Mth.clamp(saturation + this.saturationLevel, 0.0F, (float) this.foodLevel);
+        if (this.entityhuman.level().purpurConfig.playerBurpWhenFull && this.foodLevel == 20 && oldValue < 20) this.entityhuman.burpDelay = this.entityhuman.level().purpurConfig.playerBurpDelay; // Purpur
     }
 
     public void eat(int food, float saturationModifier) {
