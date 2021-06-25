@@ -126,6 +126,7 @@ public class Drowned extends Zombie implements RangedAttackMob {
         this.goalSelector.addGoal(2, new Drowned.DrownedAttackGoal(this, 1.0D, false));
         this.goalSelector.addGoal(5, new Drowned.DrownedGoToBeachGoal(this, 1.0D));
         this.goalSelector.addGoal(6, new Drowned.DrownedSwimUpGoal(this, 1.0D, this.level().getSeaLevel()));
+        if (level().purpurConfig.drownedBreakDoors) this.goalSelector.addGoal(6, new net.minecraft.world.entity.ai.goal.MoveThroughVillageGoal(this, 1.0D, true, 4, this::canBreakDoors));
         this.goalSelector.addGoal(7, new RandomStrollGoal(this, 1.0D));
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this, new Class[]{Drowned.class})).setAlertOthers(ZombifiedPiglin.class));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::okTarget));
@@ -175,7 +176,7 @@ public class Drowned extends Zombie implements RangedAttackMob {
 
     @Override
     public boolean supportsBreakDoorGoal() {
-        return false;
+        return level().purpurConfig.drownedBreakDoors ? true : false;
     }
 
     @Override
