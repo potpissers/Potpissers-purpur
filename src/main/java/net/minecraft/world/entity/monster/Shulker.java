@@ -511,12 +511,21 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
         Vec3 vec3d = this.position();
         AABB axisalignedbb = this.getBoundingBox();
 
-        if (!this.isClosed() && this.teleportSomewhere()) {
-            int i = this.level().getEntities((EntityTypeTest) EntityType.SHULKER, axisalignedbb.inflate(8.0D), Entity::isAlive).size();
-            float f = (float) (i - 1) / 5.0F;
-
-            if (this.level().random.nextFloat() >= f) {
+        if ((!this.level().purpurConfig.shulkerSpawnFromBulletRequireOpenLid || !this.isClosed()) && this.teleportSomewhere()) {
+            // Purpur start
+            float chance = this.level().purpurConfig.shulkerSpawnFromBulletBaseChance;
+            if (!this.level().purpurConfig.shulkerSpawnFromBulletNearbyEquation.isBlank()) {
+                int nearby = this.level().getEntities((EntityTypeTest) EntityType.SHULKER, axisalignedbb.inflate(this.level().purpurConfig.shulkerSpawnFromBulletNearbyRange), Entity::isAlive).size();
+                try {
+                    chance -= ((Number) scriptEngine.eval("let nearby = " + nearby + "; " + this.level().purpurConfig.shulkerSpawnFromBulletNearbyEquation)).floatValue();
+                } catch (javax.script.ScriptException e) {
+                    e.printStackTrace();
+                    chance -= (nearby - 1) / 5.0F;
+                }
+            }
+            if (this.level().random.nextFloat() <= chance) {
                 Shulker entityshulker = (Shulker) EntityType.SHULKER.create(this.level());
+                // Purpur end
 
                 if (entityshulker != null) {
                     entityshulker.setVariant(this.getVariant());
@@ -628,7 +637,7 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
 
     @Override
     public Optional<DyeColor> getVariant() {
-        return Optional.ofNullable(this.getColor());
+        return Optional.ofNullable(this.level().purpurConfig.shulkerSpawnFromBulletRandomColor ? DyeColor.random(this.level().random) : this.getColor()); // Purpur
     }
 
     @Nullable

@@ -103,4 +103,10 @@ public enum DyeColor implements StringRepresentable {
     public String getSerializedName() {
         return this.name;
     }
+
+    // Purpur start
+    public static DyeColor random(net.minecraft.util.RandomSource random) {
+        return values()[random.nextInt(values().length)];
+    }
+    // Purpur end
 }
