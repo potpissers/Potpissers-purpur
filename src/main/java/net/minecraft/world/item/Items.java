@@ -1919,7 +1919,7 @@ public class Items {
         "sweet_berries", new ItemNameBlockItem(Blocks.SWEET_BERRY_BUSH, new Item.Properties().food(Foods.SWEET_BERRIES))
     );
     public static final Item GLOW_BERRIES = registerItem(
-        "glow_berries", new ItemNameBlockItem(Blocks.CAVE_VINES, new Item.Properties().food(Foods.GLOW_BERRIES))
+        "glow_berries", new org.purpurmc.purpur.item.GlowBerryItem(Blocks.CAVE_VINES, new Item.Properties().food(Foods.GLOW_BERRIES)) // Purpur
     );
     public static final Item CAMPFIRE = registerBlock(Blocks.CAMPFIRE, settings -> settings.component(DataComponents.CONTAINER, ItemContainerContents.EMPTY));
     public static final Item SOUL_CAMPFIRE = registerBlock(
