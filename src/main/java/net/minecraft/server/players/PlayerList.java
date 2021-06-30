@@ -1026,6 +1026,20 @@ public abstract class PlayerList {
     }
     // CraftBukkit end
 
+    // Purpur Start
+    public void broadcastMiniMessage(@Nullable String message, boolean overlay) {
+        if (message != null && !message.isEmpty()) {
+            this.broadcastMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(message), overlay);
+        }
+    }
+
+    public void broadcastMessage(@Nullable net.kyori.adventure.text.Component message, boolean overlay) {
+        if (message != null) {
+            this.broadcastSystemMessage(io.papermc.paper.adventure.PaperAdventure.asVanilla(message), overlay);
+        }
+    }
+    // Purpur end
+
     public void broadcastAll(Packet<?> packet, ResourceKey<Level> dimension) {
         Iterator iterator = this.players.iterator();
 

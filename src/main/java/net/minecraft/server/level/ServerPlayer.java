@@ -2008,6 +2008,26 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
         this.lastSentExp = -1; // CraftBukkit - Added to reset
     }
 
+    // Purpur start
+    public void sendActionBarMessage(@Nullable String message) {
+        if (message != null && !message.isEmpty()) {
+            sendActionBarMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(message));
+        }
+    }
+
+    public void sendActionBarMessage(@Nullable net.kyori.adventure.text.Component message) {
+        if (message != null) {
+            sendActionBarMessage(io.papermc.paper.adventure.PaperAdventure.asVanilla(message));
+        }
+    }
+
+    public void sendActionBarMessage(@Nullable Component message) {
+        if (message != null) {
+            displayClientMessage(message, true);
+        }
+    }
+    // Purpur end
+
     @Override
     public void displayClientMessage(Component message, boolean overlay) {
         this.sendSystemMessage(message, overlay);

@@ -198,6 +198,15 @@ public class DamageSource {
         }
     }
 
+    // Purpur start
+    public Component getLocalizedDeathMessage(String str, LivingEntity entity) {
+        net.kyori.adventure.text.Component name = io.papermc.paper.adventure.PaperAdventure.asAdventure(entity.getDisplayName());
+        net.kyori.adventure.text.minimessage.tag.resolver.TagResolver template = net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component("player", name);
+        net.kyori.adventure.text.Component component = net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(str, template);
+        return io.papermc.paper.adventure.PaperAdventure.asVanilla(component);
+    }
+    // Purpur end
+
     public String getMsgId() {
         return this.type().msgId();
     }

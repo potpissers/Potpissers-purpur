@@ -4189,6 +4189,20 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return SlotAccess.NULL;
     }
 
+    // Purpur Start
+    public void sendMiniMessage(@Nullable String message) {
+        if (message != null && !message.isEmpty()) {
+            this.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(message));
+        }
+    }
+
+    public void sendMessage(@Nullable net.kyori.adventure.text.Component message) {
+        if (message != null) {
+            this.sendSystemMessage(io.papermc.paper.adventure.PaperAdventure.asVanilla(message));
+        }
+    }
+    // Purpur end
+
     @Override
     public void sendSystemMessage(Component message) {}
 
