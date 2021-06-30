@@ -107,7 +107,7 @@ public class FoodData {
             ++this.tickTimer;
             if (this.tickTimer >= this.starvationRate) { // CraftBukkit - add regen rate manipulation
                 if (player.getHealth() > 10.0F || enumdifficulty == Difficulty.HARD || player.getHealth() > 1.0F && enumdifficulty == Difficulty.NORMAL) {
-                    player.hurt(player.damageSources().starve(), 1.0F);
+                    player.hurt(player.damageSources().starve(), player.level().purpurConfig.hungerStarvationDamage); // Purpur
                 }
 
                 this.tickTimer = 0;
