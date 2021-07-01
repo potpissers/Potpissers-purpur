@@ -253,6 +253,7 @@ public class Commands {
             org.purpurmc.purpur.command.CreditsCommand.register(this.dispatcher); // Purpur
             org.purpurmc.purpur.command.DemoCommand.register(this.dispatcher); // Purpur
             org.purpurmc.purpur.command.PingCommand.register(this.dispatcher); // Purpur
+            org.purpurmc.purpur.command.UptimeCommand.register(this.dispatcher); // Purpur
             org.purpurmc.purpur.command.TPSBarCommand.register(this.dispatcher); // Purpur
         }
 

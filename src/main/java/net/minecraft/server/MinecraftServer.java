@@ -304,6 +304,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
     public OptionSet options;
     public org.bukkit.command.ConsoleCommandSender console;
     public static int currentTick; // Paper - improve tick loop
+    public static final long startTimeMillis = System.currentTimeMillis();
     public java.util.Queue<Runnable> processQueue = new java.util.concurrent.ConcurrentLinkedQueue<Runnable>();
     public int autosavePeriod;
     // Paper - don't store the vanilla dispatcher
