@@ -46,15 +46,23 @@ public class HoeItem extends DiggerItem {
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos blockPos = context.getClickedPos();
-        Pair<Predicate<UseOnContext>, Consumer<UseOnContext>> pair = TILLABLES.get(level.getBlockState(blockPos).getBlock());
-        if (pair == null) {
-            return InteractionResult.PASS;
-        } else {
-            Predicate<UseOnContext> predicate = pair.getFirst();
-            Consumer<UseOnContext> consumer = pair.getSecond();
+        // Purpur start
+        Block clickedBlock = level.getBlockState(blockPos).getBlock();
+        var tillable = level.purpurConfig.hoeTillables.get(clickedBlock);
+        if (tillable == null) { return InteractionResult.PASS; } else {
+            Predicate<UseOnContext> predicate = tillable.condition().predicate();
+            Consumer<UseOnContext> consumer = (ctx) -> {
+                level.setBlock(blockPos, tillable.into().defaultBlockState(), 11);
+                tillable.drops().forEach((drop, chance) -> {
+                    if (level.random.nextDouble() < chance) {
+                        Block.popResourceFromFace(level, blockPos, ctx.getClickedFace(), new ItemStack(drop));
+                    }
+                });
+            };
+            // Purpur end
             if (predicate.test(context)) {
                 Player player = context.getPlayer();
-                level.playSound(player, blockPos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+                if (!TILLABLES.containsKey(clickedBlock)) level.playSound(null, blockPos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1.0F, 1.0F); // Purpur - force sound
                 if (!level.isClientSide) {
                     consumer.accept(context);
                     if (player != null) {
@@ -62,7 +70,7 @@ public class HoeItem extends DiggerItem {
                     }
                 }
 
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return InteractionResult.SUCCESS; // Purpur - force arm swing
             } else {
                 return InteractionResult.PASS;
             }

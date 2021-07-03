@@ -47,9 +47,12 @@ public class ShovelItem extends DiggerItem {
             BlockState blockState2 = FLATTENABLES.get(blockState.getBlock());
             BlockState blockState3 = null;
             Runnable afterAction = null; // Paper
-            if (blockState2 != null && level.getBlockState(blockPos.above()).isAir()) {
-                afterAction = () -> level.playSound(player, blockPos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F); // Paper
-                blockState3 = blockState2;
+            // Purpur start
+            var flattenable = level.purpurConfig.shovelFlattenables.get(blockState.getBlock());
+            if (flattenable != null && level.getBlockState(blockPos.above()).isAir()) {
+                afterAction = () -> {if (!FLATTENABLES.containsKey(blockState.getBlock())) level.playSound(null, blockPos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);}; // Paper
+                blockState3 = flattenable.into().defaultBlockState();
+            // Purpur end
             } else if (blockState.getBlock() instanceof CampfireBlock && blockState.getValue(CampfireBlock.LIT)) {
                 afterAction = () -> { // Paper
                 if (!level.isClientSide()) {
@@ -76,7 +79,7 @@ public class ShovelItem extends DiggerItem {
                     }
                 }
 
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return InteractionResult.SUCCESS; // Purpur - force arm swing
             } else {
                 return InteractionResult.PASS;
             }
