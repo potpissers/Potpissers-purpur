@@ -71,7 +71,7 @@ public class CarvedPumpkinBlock extends HorizontalDirectionalBlock {
             SnowGolem entitysnowman = (SnowGolem) EntityType.SNOW_GOLEM.create(world);
 
             if (entitysnowman != null) {
-                CarvedPumpkinBlock.spawnGolemInWorld(world, shapedetector_shapedetectorcollection, entitysnowman, shapedetector_shapedetectorcollection.getBlock(0, 2, 0).getPos());
+                CarvedPumpkinBlock.spawnGolemInWorld(world, shapedetector_shapedetectorcollection, entitysnowman, shapedetector_shapedetectorcollection.getBlock(0, 2, 0).getPos(), this.placer); // Purpur
             }
         } else {
             BlockPattern.BlockPatternMatch shapedetector_shapedetectorcollection1 = this.getOrCreateIronGolemFull().find(world, pos);
@@ -81,7 +81,7 @@ public class CarvedPumpkinBlock extends HorizontalDirectionalBlock {
 
                 if (entityirongolem != null) {
                     entityirongolem.setPlayerCreated(true);
-                    CarvedPumpkinBlock.spawnGolemInWorld(world, shapedetector_shapedetectorcollection1, entityirongolem, shapedetector_shapedetectorcollection1.getBlock(1, 2, 0).getPos());
+                    CarvedPumpkinBlock.spawnGolemInWorld(world, shapedetector_shapedetectorcollection1, entityirongolem, shapedetector_shapedetectorcollection1.getBlock(1, 2, 0).getPos(), this.placer); // Purpur
                 }
             }
         }
@@ -89,6 +89,16 @@ public class CarvedPumpkinBlock extends HorizontalDirectionalBlock {
     }
 
     private static void spawnGolemInWorld(Level world, BlockPattern.BlockPatternMatch patternResult, Entity entity, BlockPos pos) {
+        // Purpur start
+        spawnGolemInWorld(world, patternResult, entity, pos, null);
+    }
+    private static void spawnGolemInWorld(Level world, BlockPattern.BlockPatternMatch patternResult, Entity entity, BlockPos pos, net.minecraft.world.entity.LivingEntity placer) {
+        if (entity instanceof SnowGolem snowGolem) {
+            snowGolem.setSummoner(placer == null ? null : placer.getUUID());
+        } else if (entity instanceof IronGolem ironGolem) {
+            ironGolem.setSummoner(placer == null ? null : placer.getUUID());
+        }
+        // Purpur end
         // clearPatternBlocks(world, shapedetector_shapedetectorcollection); // CraftBukkit - moved down
         entity.moveTo((double) pos.getX() + 0.5D, (double) pos.getY() + 0.05D, (double) pos.getZ() + 0.5D, 0.0F, 0.0F);
         // CraftBukkit start

@@ -99,4 +99,17 @@ public class CraftWither extends CraftMonster implements Wither, com.destroystok
         this.getHandle().makeInvulnerable();
     }
     // Paper end
+
+    // Purpur start
+    @Override
+    @org.jetbrains.annotations.Nullable
+    public java.util.UUID getSummoner() {
+        return getHandle().getSummoner();
+    }
+
+    @Override
+    public void setSummoner(@org.jetbrains.annotations.Nullable java.util.UUID summoner) {
+        getHandle().setSummoner(summoner);
+    }
+    // Purpur end
 }

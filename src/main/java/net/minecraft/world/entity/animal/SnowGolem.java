@@ -47,6 +47,7 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
 
     private static final EntityDataAccessor<Byte> DATA_PUMPKIN_ID = SynchedEntityData.defineId(SnowGolem.class, EntityDataSerializers.BYTE);
     private static final byte PUMPKIN_FLAG = 16;
+    @Nullable private java.util.UUID summoner; // Purpur
 
     public SnowGolem(EntityType<? extends SnowGolem> type, Level world) {
         super(type, world);
@@ -73,6 +74,15 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
     public void initAttributes() {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.snowGolemMaxHealth);
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.snowGolemScale);
+    }
+
+    @Nullable
+    public java.util.UUID getSummoner() {
+        return summoner;
+    }
+
+    public void setSummoner(@Nullable java.util.UUID summoner) {
+        this.summoner = summoner;
     }
 
     @Override
@@ -102,6 +112,7 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
     public void addAdditionalSaveData(CompoundTag nbt) {
         super.addAdditionalSaveData(nbt);
         nbt.putBoolean("Pumpkin", this.hasPumpkin());
+        if (getSummoner() != null) nbt.putUUID("Purpur.Summoner", getSummoner()); // Purpur
     }
 
     @Override
@@ -110,6 +121,7 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
         if (nbt.contains("Pumpkin")) {
             this.setPumpkin(nbt.getBoolean("Pumpkin"));
         }
+        if (nbt.contains("Purpur.Summoner")) setSummoner(nbt.getUUID("Purpur.Summoner")); // Purpur
 
     }
 

@@ -57,6 +57,7 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     private int remainingPersistentAngerTime;
     @Nullable
     private UUID persistentAngerTarget;
+    @Nullable private UUID summoner; // Purpur
 
     public IronGolem(EntityType<? extends IronGolem> type, Level world) {
         super(type, world);
@@ -88,6 +89,15 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     @Override
     public boolean isSensitiveToWater() {
         return this.level().purpurConfig.ironGolemTakeDamageFromWater;
+    }
+
+    @Nullable
+    public UUID getSummoner() {
+        return summoner;
+    }
+
+    public void setSummoner(@Nullable UUID summoner) {
+        this.summoner = summoner;
     }
 
     @Override
@@ -167,6 +177,7 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     public void addAdditionalSaveData(CompoundTag nbt) {
         super.addAdditionalSaveData(nbt);
         nbt.putBoolean("PlayerCreated", this.isPlayerCreated());
+        if (getSummoner() != null) nbt.putUUID("Purpur.Summoner", getSummoner()); // Purpur
         this.addPersistentAngerSaveData(nbt);
     }
 
@@ -174,6 +185,7 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     public void readAdditionalSaveData(CompoundTag nbt) {
         super.readAdditionalSaveData(nbt);
         this.setPlayerCreated(nbt.getBoolean("PlayerCreated"));
+        if (nbt.contains("Purpur.Summoner")) setSummoner(nbt.getUUID("Purpur.Summoner")); // Purpur
         this.readPersistentAngerSaveData(this.level(), nbt);
     }
 

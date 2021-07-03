@@ -79,6 +79,7 @@ public class WitherSkullBlock extends SkullBlock {
                         entitywither.moveTo((double) blockposition1.getX() + 0.5D, (double) blockposition1.getY() + 0.55D, (double) blockposition1.getZ() + 0.5D, shapedetector_shapedetectorcollection.getForwards().getAxis() == Direction.Axis.X ? 0.0F : 90.0F, 0.0F);
                         entitywither.yBodyRot = shapedetector_shapedetectorcollection.getForwards().getAxis() == Direction.Axis.X ? 0.0F : 90.0F;
                         entitywither.makeInvulnerable();
+                        entitywither.setSummoner(iblockdata.getBlock().placer == null ? null : iblockdata.getBlock().placer.getUUID()); // Purpur
                         // CraftBukkit start
                         if (!world.addFreshEntity(entitywither, SpawnReason.BUILD_WITHER)) {
                             return;

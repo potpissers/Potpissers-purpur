@@ -88,6 +88,7 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
         return !entityliving.getType().is(EntityTypeTags.WITHER_FRIENDS) && entityliving.attackable();
     };
     private static final TargetingConditions TARGETING_CONDITIONS = TargetingConditions.forCombat().range(20.0D).selector(WitherBoss.LIVING_ENTITY_SELECTOR);
+    @Nullable private java.util.UUID summoner; // Purpur
     private int shootCooldown = 0; // Purpur
     // Paper start
     private boolean canPortal = false;
@@ -125,6 +126,15 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
     @Override
     public boolean isSensitiveToWater() {
         return this.level().purpurConfig.witherTakeDamageFromWater;
+    }
+
+    @Nullable
+    public java.util.UUID getSummoner() {
+        return summoner;
+    }
+
+    public void setSummoner(@Nullable java.util.UUID summoner) {
+        this.summoner = summoner;
     }
 
     @Override
@@ -262,6 +272,7 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
     public void addAdditionalSaveData(CompoundTag nbt) {
         super.addAdditionalSaveData(nbt);
         nbt.putInt("Invul", this.getInvulnerableTicks());
+        if (getSummoner() != null) nbt.putUUID("Purpur.Summoner", getSummoner()); // Purpur
     }
 
     @Override
@@ -271,6 +282,7 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
         if (this.hasCustomName()) {
             this.bossEvent.setName(this.getDisplayName());
         }
+        if (nbt.contains("Purpur.Summoner")) setSummoner(nbt.getUUID("Purpur.Summoner")); // Purpur
 
     }
 
