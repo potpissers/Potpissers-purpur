@@ -497,6 +497,7 @@ public final class ItemStack implements DataComponentHolder {
                     world.isBlockPlaceCancelled = true; // Paper - prevent calling cleanup logic when undoing a block place upon a cancelled BlockPlaceEvent
                     for (BlockState blockstate : blocks) {
                         blockstate.update(true, false);
+                        ((CraftBlock) blockstate.getBlock()).getNMS().getBlock().forgetPlacer(); // Purpur
                     }
                     world.isBlockPlaceCancelled = false; // Paper - prevent calling cleanup logic when undoing a block place upon a cancelled BlockPlaceEvent
                     world.preventPoiUpdated = false;
@@ -529,6 +530,7 @@ public final class ItemStack implements DataComponentHolder {
                         if (!(block.getBlock() instanceof BaseEntityBlock)) { // Containers get placed automatically
                             block.onPlace(world, newblockposition, oldBlock, true, context);
                         }
+                        block.getBlock().forgetPlacer(); // Purpur
 
                         world.notifyAndUpdatePhysics(newblockposition, null, oldBlock, block, world.getBlockState(newblockposition), updateFlag, 512); // send null chunk as chunk.k() returns false by this point
                     }

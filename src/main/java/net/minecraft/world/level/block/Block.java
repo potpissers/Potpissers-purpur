@@ -437,7 +437,17 @@ public class Block extends BlockBehaviour implements ItemLike {
         } // Paper - fix drops not preventing stats/food exhaustion
     }
 
-    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {}
+    // Purpur start
+    @Nullable protected LivingEntity placer = null;
+
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        this.placer = placer;
+    }
+
+    public void forgetPlacer() {
+        this.placer = null;
+    }
+    // Purpur end
 
     public boolean isPossibleToRespawnInThis(BlockState state) {
         return !state.isSolid() && !state.liquid();
