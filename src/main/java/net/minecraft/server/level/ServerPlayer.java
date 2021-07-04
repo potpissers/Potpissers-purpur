@@ -1570,7 +1570,19 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
                     });
 
                     if (!this.serverLevel().canSleepThroughNights()) {
-                        this.displayClientMessage(Component.translatable("sleep.not_possible"), true);
+                        // Purpur start
+                        Component clientMessage;
+                        if (org.purpurmc.purpur.PurpurConfig.sleepNotPossible.isBlank()) {
+                            clientMessage = null;
+                        } else if (!org.purpurmc.purpur.PurpurConfig.sleepNotPossible.equalsIgnoreCase("default")) {
+                            clientMessage = io.papermc.paper.adventure.PaperAdventure.asVanilla(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(org.purpurmc.purpur.PurpurConfig.sleepNotPossible));
+                        } else {
+                            clientMessage = Component.translatable("sleep.not_possible");
+                        }
+                        if (clientMessage != null) {
+                            this.displayClientMessage(clientMessage, true);
+                        }
+                        // Purpur end
                     }
 
                     ((ServerLevel) this.level()).updateSleepingPlayerList();

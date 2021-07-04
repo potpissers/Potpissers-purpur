@@ -1070,11 +1070,27 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
         if (this.canSleepThroughNights()) {
             if (!this.getServer().isSingleplayer() || this.getServer().isPublished()) {
                 int i = this.getGameRules().getInt(GameRules.RULE_PLAYERS_SLEEPING_PERCENTAGE);
-                MutableComponent ichatmutablecomponent;
+                Component ichatmutablecomponent;
 
                 if (this.sleepStatus.areEnoughSleeping(i)) {
+                    // Purpur start
+                    if (org.purpurmc.purpur.PurpurConfig.sleepSkippingNight.isBlank()) {
+                        return;
+                    }
+                    if (!org.purpurmc.purpur.PurpurConfig.sleepSkippingNight.equalsIgnoreCase("default")) {
+                        ichatmutablecomponent = io.papermc.paper.adventure.PaperAdventure.asVanilla(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(org.purpurmc.purpur.PurpurConfig.sleepSkippingNight));
+                    } else
                     ichatmutablecomponent = Component.translatable("sleep.skipping_night");
                 } else {
+                    if (org.purpurmc.purpur.PurpurConfig.sleepingPlayersPercent.isBlank()) {
+                        return;
+                    }
+                    if (!org.purpurmc.purpur.PurpurConfig.sleepingPlayersPercent.equalsIgnoreCase("default")) {
+                        ichatmutablecomponent = io.papermc.paper.adventure.PaperAdventure.asVanilla(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(org.purpurmc.purpur.PurpurConfig.sleepingPlayersPercent,
+                                net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.parsed("count", Integer.toString(this.sleepStatus.amountSleeping())),
+                                net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.parsed("total", Integer.toString(this.sleepStatus.sleepersNeeded(i)))));
+                    } else
+                    // Purpur end
                     ichatmutablecomponent = Component.translatable("sleep.players_sleeping", this.sleepStatus.amountSleeping(), this.sleepStatus.sleepersNeeded(i));
                 }
 
