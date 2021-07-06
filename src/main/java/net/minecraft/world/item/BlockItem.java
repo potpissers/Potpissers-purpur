@@ -260,6 +260,7 @@ public class BlockItem extends Item {
         ItemContainerContents itemcontainercontents = (ItemContainerContents) entity.getItem().set(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
 
         if (itemcontainercontents != null) {
+            if (entity.level().purpurConfig.shulkerBoxItemDropContentsWhenDestroyed && this.getBlock() instanceof ShulkerBoxBlock) // Purpur
             ItemUtils.onContainerDestroyed(entity, itemcontainercontents.nonEmptyItemsCopy());
         }
 
