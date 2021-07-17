@@ -244,7 +244,7 @@ public class BigDripleafBlock extends HorizontalDirectionalBlock implements Bone
             BigDripleafBlock.playTiltSound(world, blockposition, soundeffect);
         }
 
-        int i = BigDripleafBlock.DELAY_UNTIL_NEXT_TILT_STATE.getInt(tilt);
+        int i = world.purpurConfig.bigDripleafTiltDelay.getOrDefault(tilt, -1); // Purpur
 
         if (i != -1) {
             world.scheduleTick(blockposition, (Block) this, i);

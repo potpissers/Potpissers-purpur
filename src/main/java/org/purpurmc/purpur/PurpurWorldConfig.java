@@ -778,6 +778,22 @@ public class PurpurWorldConfig {
         }
     }
 
+    public Map<Tilt, Integer> bigDripleafTiltDelay = new HashMap<>();
+    private void bigDripleafSettings() {
+        bigDripleafTiltDelay.clear();
+        getMap("blocks.big_dripleaf.tilt-delay", Map.ofEntries(
+                Map.entry("UNSTABLE", 10),
+                Map.entry("PARTIAL", 10),
+                Map.entry("FULL", 100))
+        ).forEach((tilt, delay) -> {
+            try {
+                bigDripleafTiltDelay.put(Tilt.valueOf(tilt), (int) delay);
+            } catch (IllegalArgumentException e) {
+                PurpurConfig.log(Level.SEVERE, "Invalid big_dripleaf tilt key: " + tilt);
+            }
+        });
+    }
+
     public boolean chestOpenWithBlockOnTop = false;
     private void chestSettings() {
         chestOpenWithBlockOnTop = getBoolean("blocks.chest.open-with-solid-block-on-top", chestOpenWithBlockOnTop);
