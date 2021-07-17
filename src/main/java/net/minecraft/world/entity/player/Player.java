@@ -2087,6 +2087,13 @@ public abstract class Player extends LivingEntity {
         return slot != EquipmentSlot.BODY;
     }
 
+    // Purpur start
+    @Override
+    public boolean dismountsUnderwater() {
+        return !level().purpurConfig.playerRidableInWater;
+    }
+    // Purpur end
+
     public boolean setEntityOnShoulder(CompoundTag entityNbt) {
         if (!this.isPassenger() && this.onGround() && !this.isInWater() && !this.isInPowderSnow) {
             if (this.getShoulderEntityLeft().isEmpty()) {
