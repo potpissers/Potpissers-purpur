@@ -443,6 +443,7 @@ public class EnderMan extends Monster implements NeutralMob {
             } else {
                 flag1 = flag && this.hurtWithCleanWater(source, (ThrownPotion) source.getDirectEntity(), amount);
 
+                if (!flag1 && this.level().purpurConfig.endermanIgnoreProjectiles) return super.hurt(source, amount); // Purpur
                 if (this.tryEscape(com.destroystokyo.paper.event.entity.EndermanEscapeEvent.Reason.INDIRECT)) { // Paper - EndermanEscapeEvent
                 for (int i = 0; i < 64; ++i) {
                     if (this.teleport()) {
