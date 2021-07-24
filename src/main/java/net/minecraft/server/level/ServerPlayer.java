@@ -304,6 +304,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
     public org.bukkit.event.player.PlayerQuitEvent.QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
     public boolean purpurClient = false; // Purpur
     private boolean tpsBar = false; // Purpur
+    private boolean compassBar = false; // Purpur
 
     // Paper start - rewrite chunk system
     private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
@@ -602,6 +603,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
         }
 
         if (nbt.contains("Purpur.TPSBar")) { this.tpsBar = nbt.getBoolean("Purpur.TPSBar"); } // Purpur
+        if (nbt.contains("Purpur.CompassBar")) { this.compassBar = nbt.getBoolean("Purpur.CompassBar"); } // Purpur
     }
 
     @Override
@@ -679,6 +681,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
         }
 
         nbt.putBoolean("Purpur.TPSBar", this.tpsBar); // Purpur
+        nbt.putBoolean("Purpur.CompassBar", this.compassBar); // Purpur
     }
 
     // CraftBukkit start - World fallback code, either respawn location or global spawn
@@ -3091,6 +3094,14 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
 
     public void tpsBar(boolean tpsBar) {
         this.tpsBar = tpsBar;
+    }
+
+    public boolean compassBar() {
+        return this.compassBar;
+    }
+
+    public void compassBar(boolean compassBar) {
+        this.compassBar = compassBar;
     }
     // Purpur end
 }
