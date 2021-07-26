@@ -112,6 +112,11 @@ public class ServerConnectionListener {
             }
             // Paper end - Warn people with console access that HAProxy is in use.
 
+            // Paper start - Use Velocity cipher
+            ServerConnectionListener.LOGGER.info("Paper: Using " + com.velocitypowered.natives.util.Natives.compress.getLoadedVariant() + " compression from Velocity.");
+            ServerConnectionListener.LOGGER.info("Paper: Using " + com.velocitypowered.natives.util.Natives.cipher.getLoadedVariant() + " cipher from Velocity.");
+            // Paper end - Use Velocity cipher
+
             this.channels.add(((ServerBootstrap) ((ServerBootstrap) (new ServerBootstrap()).channel(oclass)).childHandler(new ChannelInitializer<Channel>() {
                 protected void initChannel(Channel channel) {
                     try {
