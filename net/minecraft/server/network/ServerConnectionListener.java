@@ -108,6 +108,10 @@ public class ServerConnectionListener {
                 LOGGER.warn("Using HAProxy, please ensure the server port is adequately firewalled.");
             }
             // Paper end - Warn people with console access that HAProxy is in use.
+            // Paper start - Use Velocity cipher
+            ServerConnectionListener.LOGGER.info("Paper: Using " + com.velocitypowered.natives.util.Natives.compress.getLoadedVariant() + " compression from Velocity.");
+            ServerConnectionListener.LOGGER.info("Paper: Using " + com.velocitypowered.natives.util.Natives.cipher.getLoadedVariant() + " cipher from Velocity.");
+            // Paper end - Use Velocity cipher
 
             this.channels
                 .add(

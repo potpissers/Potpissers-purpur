@@ -12,14 +12,22 @@ import java.util.zip.Inflater;
 public class CompressionDecoder extends ByteToMessageDecoder {
     public static final int MAXIMUM_COMPRESSED_LENGTH = 2097152;
     public static final int MAXIMUM_UNCOMPRESSED_LENGTH = 8388608;
+    private com.velocitypowered.natives.compression.VelocityCompressor compressor; // Paper - Use Velocity cipher
     private Inflater inflater;
     private int threshold;
     private boolean validateDecompressed;
 
+    // Paper start - Use Velocity cipher
+    @io.papermc.paper.annotation.DoNotUse
     public CompressionDecoder(int threshold, boolean validateDecompressed) {
+        this(null, threshold, validateDecompressed);
+    }
+    public CompressionDecoder(com.velocitypowered.natives.compression.VelocityCompressor compressor, int threshold, boolean validateDecompressed) {
         this.threshold = threshold;
         this.validateDecompressed = validateDecompressed;
-        this.inflater = new Inflater();
+        this.inflater = compressor == null ? new Inflater() : null;
+        this.compressor = compressor;
+        // Paper end - Use Velocity cipher
     }
 
     @Override
@@ -39,13 +47,41 @@ public class CompressionDecoder extends ByteToMessageDecoder {
                     }
                 }
 
+                if (inflater != null) { // Paper - Use Velocity cipher; fallback to vanilla inflater
                 this.setupInflaterInput(in);
                 ByteBuf byteBuf = this.inflate(context, i);
                 this.inflater.reset();
                 out.add(byteBuf);
+                return; // Paper - Use Velocity cipher
+                } // Paper - use velocity compression
+
+                // Paper start - Use Velocity cipher
+                int claimedUncompressedSize = i; // OBFHELPER
+                ByteBuf compatibleIn = com.velocitypowered.natives.util.MoreByteBufUtils.ensureCompatible(context.alloc(), this.compressor, in);
+                ByteBuf uncompressed = com.velocitypowered.natives.util.MoreByteBufUtils.preferredBuffer(context.alloc(), this.compressor, claimedUncompressedSize);
+                try {
+                    this.compressor.inflate(compatibleIn, uncompressed, claimedUncompressedSize);
+                    out.add(uncompressed);
+                    in.clear();
+                } catch (Exception e) {
+                    uncompressed.release();
+                    throw e;
+                } finally {
+                    compatibleIn.release();
+                }
+                // Paper end - Use Velocity cipher
             }
         }
     }
+
+    // Paper start - Use Velocity cipher
+    @Override
+    public void handlerRemoved0(ChannelHandlerContext ctx) {
+        if (this.compressor != null) {
+            this.compressor.close();
+        }
+    }
+    // Paper end - Use Velocity cipher
 
     private void setupInflaterInput(ByteBuf buffer) {
         ByteBuffer byteBuffer;
@@ -81,7 +117,13 @@ public class CompressionDecoder extends ByteToMessageDecoder {
         }
     }
 
-    public void setThreshold(int threshold, boolean validateDecompressed) {
+    // Paper start - Use Velocity cipher
+    public void setThreshold(com.velocitypowered.natives.compression.VelocityCompressor compressor, int threshold, boolean validateDecompressed) {
+        if (this.compressor == null && compressor != null) { // Only re-configure once. Re-reconfiguring would require closing the native compressor.
+            this.compressor = compressor;
+            this.inflater = null;
+        }
+        // Paper end - Use Velocity cipher
         this.threshold = threshold;
         this.validateDecompressed = validateDecompressed;
     }

@@ -7,14 +7,30 @@ import java.util.List;
 import javax.crypto.Cipher;
 
 public class CipherDecoder extends MessageToMessageDecoder<ByteBuf> {
-    private final CipherBase cipher;
+    private final com.velocitypowered.natives.encryption.VelocityCipher cipher; // Paper - Use Velocity cipher
 
-    public CipherDecoder(Cipher cipher) {
-        this.cipher = new CipherBase(cipher);
+    public CipherDecoder(com.velocitypowered.natives.encryption.VelocityCipher cipher) { // Paper - Use Velocity cipher
+        this.cipher = cipher; // Paper - Use Velocity cipher
     }
 
     @Override
     protected void decode(ChannelHandlerContext context, ByteBuf in, List<Object> out) throws Exception {
-        out.add(this.cipher.decipher(context, in));
+        // Paper start - Use Velocity cipher
+        ByteBuf compatible = com.velocitypowered.natives.util.MoreByteBufUtils.ensureCompatible(context.alloc(), this.cipher, in);
+        try {
+            this.cipher.process(compatible);
+            out.add(compatible);
+        } catch (Exception e) {
+            compatible.release(); // compatible will never be used if we throw an exception
+            throw e;
+        }
+        // Paper end - Use Velocity cipher
     }
+
+    // Paper start - Use Velocity cipher
+    @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) {
+        this.cipher.close();
+    }
+    // Paper end - Use Velocity cipher
 }
