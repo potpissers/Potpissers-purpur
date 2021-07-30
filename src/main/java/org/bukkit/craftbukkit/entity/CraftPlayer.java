@@ -3568,4 +3568,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         this.getHandle().connection.send(new net.minecraft.network.protocol.game.ClientboundEntityEventPacket(((CraftEntity) target).getHandle(), effect.getData()));
     }
     // Paper end - entity effect API
+
+    // Purpur start
+    @Override
+    public boolean usesPurpurClient() {
+        return getHandle().purpurClient;
+    }
+    // Purpur end
 }

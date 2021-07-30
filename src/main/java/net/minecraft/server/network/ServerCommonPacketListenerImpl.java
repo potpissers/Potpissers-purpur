@@ -84,6 +84,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
     public final java.util.Map<java.util.UUID, net.kyori.adventure.resource.ResourcePackCallback> packCallbacks = new java.util.concurrent.ConcurrentHashMap<>(); // Paper - adventure resource pack callbacks
     private static final long KEEPALIVE_LIMIT = Long.getLong("paper.playerconnection.keepalive", 30) * 1000; // Paper - provide property to set keepalive limit
     protected static final ResourceLocation MINECRAFT_BRAND = ResourceLocation.withDefaultNamespace("brand"); // Paper - Brand support
+    protected static final ResourceLocation PURPUR_CLIENT = ResourceLocation.fromNamespaceAndPath("purpur", "client"); // Purpur
 
     public ServerCommonPacketListenerImpl(MinecraftServer minecraftserver, Connection networkmanager, CommonListenerCookie commonlistenercookie, ServerPlayer player) { // CraftBukkit
         this.server = minecraftserver;
@@ -172,6 +173,13 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
                 ServerGamePacketListenerImpl.LOGGER.error("Couldn\'t register custom payload", ex);
                 this.disconnect(Component.literal("Invalid payload REGISTER!"), PlayerKickEvent.Cause.INVALID_PAYLOAD); // Paper - kick event cause
             }
+        // Purpur start
+        } else if (identifier.equals(PURPUR_CLIENT)) {
+            try {
+                player.purpurClient = true;
+            } catch (Exception ignore) {
+            }
+        // Purpur end
         } else if (identifier.equals(ServerCommonPacketListenerImpl.CUSTOM_UNREGISTER)) {
             try {
                 String channels = payload.toString(com.google.common.base.Charsets.UTF_8);
