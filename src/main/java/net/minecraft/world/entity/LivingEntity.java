@@ -3064,6 +3064,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
 
                     if (f3 > 0.0F) {
                         this.playSound(this.getFallDamageSound((int) f3), 1.0F, 1.0F);
+                        if (level().purpurConfig.elytraKineticDamage) // Purpur
                         this.hurt(this.damageSources().flyIntoWall(), f3);
                     }
                 }
