@@ -225,7 +225,7 @@ public class ZombieVillager extends Zombie implements VillagerDataHolder {
             if (this.hasEffect(MobEffects.WEAKNESS)) {
                 itemstack.consume(1, player);
                 if (!this.level().isClientSide) {
-                    this.startConverting(player.getUUID(), this.random.nextInt(2401) + 3600);
+                    this.startConverting(player.getUUID(), this.random.nextInt(level().purpurConfig.zombieVillagerCuringTimeMax - level().purpurConfig.zombieVillagerCuringTimeMin + 1) + level().purpurConfig.zombieVillagerCuringTimeMin); // Purpur
                 }
 
                 return InteractionResult.SUCCESS;
