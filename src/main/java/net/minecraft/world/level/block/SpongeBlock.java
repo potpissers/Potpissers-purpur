@@ -77,7 +77,7 @@ public class SpongeBlock extends Block {
                 FluidState fluid = blockList.getFluidState(blockposition1);
                 // CraftBukkit end
 
-                if (!fluid.is(FluidTags.WATER)) {
+                if (!fluid.is(FluidTags.WATER) && (!world.purpurConfig.spongeAbsorbsLava || !fluid.is(FluidTags.LAVA)) && (!world.purpurConfig.spongeAbsorbsWaterFromMud || !iblockdata.is(Blocks.MUD))) { // Purpur
                     return false;
                 } else {
                     Block block = iblockdata.getBlock();
@@ -92,6 +92,10 @@ public class SpongeBlock extends Block {
 
                     if (iblockdata.getBlock() instanceof LiquidBlock) {
                         blockList.setBlock(blockposition1, Blocks.AIR.defaultBlockState(), 3); // CraftBukkit
+                    // Purpur start
+                    } else if (iblockdata.is(Blocks.MUD)) {
+                        blockList.setBlock(blockposition1, Blocks.CLAY.defaultBlockState(), 3);
+                    // Purpur end
                     } else {
                         if (!iblockdata.is(Blocks.KELP) && !iblockdata.is(Blocks.KELP_PLANT) && !iblockdata.is(Blocks.SEAGRASS) && !iblockdata.is(Blocks.TALL_SEAGRASS)) {
                             return false;
