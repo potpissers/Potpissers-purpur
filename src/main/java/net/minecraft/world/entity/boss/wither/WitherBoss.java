@@ -434,7 +434,7 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
                 }
                 // CraftBukkit end
 
-                if (!this.isSilent()) {
+                if (!this.isSilent() && level().purpurConfig.witherPlaySpawnSound) {
                     // CraftBukkit start - Use relative location for far away sounds
                     // this.level().globalLevelEvent(1023, new BlockPosition(this), 0);
                     int viewDistance = ((ServerLevel) this.level()).getCraftServer().getViewDistance() * 16;
