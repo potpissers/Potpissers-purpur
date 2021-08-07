@@ -114,7 +114,7 @@ public class CactusBlock extends Block {
 
             enumdirection = (Direction) iterator.next();
             iblockdata1 = world.getBlockState(pos.relative(enumdirection));
-        } while (!iblockdata1.isSolid() && !world.getFluidState(pos.relative(enumdirection)).is(FluidTags.LAVA));
+        } while ((!world.getWorldBorder().world.purpurConfig.cactusBreaksFromSolidNeighbors || !iblockdata1.isSolid()) && !world.getFluidState(pos.relative(enumdirection)).is(FluidTags.LAVA)); // Purpur
 
         return false;
     }
