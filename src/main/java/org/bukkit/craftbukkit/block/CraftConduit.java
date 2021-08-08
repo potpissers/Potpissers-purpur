@@ -73,7 +73,7 @@ public class CraftConduit extends CraftBlockEntityState<ConduitBlockEntity> impl
     public int getRange() {
         this.ensureNoWorldGeneration();
         ConduitBlockEntity conduit = (ConduitBlockEntity) this.getTileEntityFromWorld();
-        return (conduit != null) ? ConduitBlockEntity.getRange(conduit.effectBlocks) : 0;
+        return (conduit != null) ? ConduitBlockEntity.getRange(conduit.effectBlocks, this.world.getHandle()) : 0; // Purpur
     }
 
     @Override
