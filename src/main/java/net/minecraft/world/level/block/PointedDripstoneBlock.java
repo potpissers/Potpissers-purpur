@@ -190,7 +190,7 @@ public class PointedDripstoneBlock extends Block implements Fallable, SimpleWate
 
     @VisibleForTesting
     public static void maybeTransferFluid(BlockState state, ServerLevel world, BlockPos pos, float dripChance) {
-        if (dripChance <= 0.17578125F || dripChance <= 0.05859375F) {
+        if (dripChance <= world.purpurConfig.cauldronDripstoneWaterFillChance || dripChance <= world.purpurConfig.cauldronDripstoneLavaFillChance) { // Purpur
             if (PointedDripstoneBlock.isStalactiteStartPos(state, world, pos)) {
                 Optional<PointedDripstoneBlock.FluidInfo> optional = PointedDripstoneBlock.getFluidAboveStalactite(world, pos, state);
 
@@ -199,13 +199,13 @@ public class PointedDripstoneBlock extends Block implements Fallable, SimpleWate
                     float f1;
 
                     if (fluidtype == Fluids.WATER) {
-                        f1 = 0.17578125F;
+                        f1 = world.purpurConfig.cauldronDripstoneWaterFillChance; // Purpur
                     } else {
                         if (fluidtype != Fluids.LAVA) {
                             return;
                         }
 
-                        f1 = 0.05859375F;
+                        f1 = world.purpurConfig.cauldronDripstoneLavaFillChance; // Purpur
                     }
 
                     if (dripChance < f1) {
