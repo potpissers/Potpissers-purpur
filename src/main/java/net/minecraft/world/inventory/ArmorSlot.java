@@ -45,7 +45,7 @@ class ArmorSlot extends Slot {
     @Override
     public boolean mayPickup(Player playerEntity) {
         ItemStack itemStack = this.getItem();
-        return (itemStack.isEmpty() || playerEntity.isCreative() || !EnchantmentHelper.has(itemStack, EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE))
+        return (itemStack.isEmpty() || playerEntity.isCreative() || (!EnchantmentHelper.has(itemStack, EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE) || playerEntity.level().purpurConfig.playerRemoveBindingWithWeakness && playerEntity.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS)))
             && super.mayPickup(playerEntity);
     }
 
