@@ -147,7 +147,13 @@ public abstract class AbstractFurnaceMenu extends RecipeBookMenu<SingleRecipeInp
             } else if (slot != 1 && slot != 0) {
                 if (this.canSmelt(itemstack1)) {
                     if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
-                        return ItemStack.EMPTY;
+                        // Purpur start - fix #625
+                        if (this.isFuel(itemstack1)) {
+                            if (!this.moveItemStackTo(itemstack1, 1, 2, false)) {
+                                return ItemStack.EMPTY;
+                            }
+                        }
+                        // Purpur end
                     }
                 } else if (this.isFuel(itemstack1)) {
                     if (!this.moveItemStackTo(itemstack1, 1, 2, false)) {

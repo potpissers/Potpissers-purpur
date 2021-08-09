@@ -1611,6 +1611,19 @@ public final class CraftServer implements Server {
         return true;
     }
 
+    // Purpur Start
+    @Override
+    public void addFuel(org.bukkit.Material material, int burnTime) {
+        Preconditions.checkArgument(burnTime > 0, "BurnTime must be greater than 0");
+        net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity.addFuel(net.minecraft.world.item.ItemStack.fromBukkitCopy(new ItemStack(material)), burnTime);
+    }
+
+    @Override
+    public void removeFuel(org.bukkit.Material material) {
+        net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity.removeFuel(net.minecraft.world.item.ItemStack.fromBukkitCopy(new ItemStack(material)));
+    }
+    // Purpur End
+
     @Override
     public List<Recipe> getRecipesFor(ItemStack result) {
         Preconditions.checkArgument(result != null, "ItemStack cannot be null");

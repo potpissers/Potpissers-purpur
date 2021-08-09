@@ -213,6 +213,22 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
         }
     }
 
+    // Purpur start
+    public static void addFuel(ItemStack itemStack, Integer burnTime) {
+        Map<Item, Integer> map = Maps.newLinkedHashMap();
+        map.putAll(getFuel());
+        map.put(itemStack.getItem(), burnTime);
+        AbstractFurnaceBlockEntity.fuelCache = com.google.common.collect.ImmutableMap.copyOf(map);
+    }
+
+    public static void removeFuel(ItemStack itemStack) {
+        Map<Item, Integer> map = Maps.newLinkedHashMap();
+        map.putAll(getFuel());
+        map.remove(itemStack.getItem());
+        AbstractFurnaceBlockEntity.fuelCache = com.google.common.collect.ImmutableMap.copyOf(map);
+    }
+    // Purpur End
+
     // CraftBukkit start - add fields and methods
     private int maxStack = MAX_STACK;
     public List<HumanEntity> transaction = new java.util.ArrayList<HumanEntity>();
