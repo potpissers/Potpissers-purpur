@@ -240,7 +240,7 @@ public class WalkNodeEvaluator extends NodeEvaluator {
                 if ((node == null || node.costMalus < 0.0F)
                     && maxYStep > 0
                     && (pathType != PathType.FENCE || this.canWalkOverFences())
-                    && pathType != PathType.UNPASSABLE_RAIL
+                    && (this.mob.level().purpurConfig.mobsIgnoreRails || pathType != PathType.UNPASSABLE_RAIL) // Purpur
                     && pathType != PathType.TRAPDOOR
                     && pathType != PathType.POWDER_SNOW) {
                     node = this.tryJumpOn(x, y, z, maxYStep, prevFeetY, direction, nodeType, mutableBlockPos);

@@ -139,6 +139,7 @@ public class PurpurWorldConfig {
     public double tridentLoyaltyVoidReturnHeight = 0.0D;
     public int raidCooldownSeconds = 0;
     public int animalBreedingCooldownSeconds = 0;
+    public boolean mobsIgnoreRails = false;
     private void miscGameplayMechanicsSettings() {
         useBetterMending = getBoolean("gameplay-mechanics.use-better-mending", useBetterMending);
         alwaysTameInCreative = getBoolean("gameplay-mechanics.always-tame-in-creative", alwaysTameInCreative);
@@ -160,6 +161,7 @@ public class PurpurWorldConfig {
         tridentLoyaltyVoidReturnHeight = getDouble("gameplay-mechanics.trident-loyalty-void-return-height", tridentLoyaltyVoidReturnHeight);
         raidCooldownSeconds = getInt("gameplay-mechanics.raid-cooldown-seconds", raidCooldownSeconds);
         animalBreedingCooldownSeconds = getInt("gameplay-mechanics.animal-breeding-cooldown-seconds", animalBreedingCooldownSeconds);
+        mobsIgnoreRails = getBoolean("gameplay-mechanics.mobs-ignore-rails", mobsIgnoreRails);
     }
 
     public int daytimeTicks = 12000;
