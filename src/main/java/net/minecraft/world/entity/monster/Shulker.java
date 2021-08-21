@@ -126,6 +126,19 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
     }
 
     @Override
+    protected net.minecraft.world.InteractionResult mobInteract(Player player, net.minecraft.world.InteractionHand hand) {
+        net.minecraft.world.item.ItemStack itemstack = player.getItemInHand(hand);
+        if (player.level().purpurConfig.shulkerChangeColorWithDye && itemstack.getItem() instanceof net.minecraft.world.item.DyeItem dye && dye.getDyeColor() != this.getColor()) {
+            this.setVariant(Optional.of(dye.getDyeColor()));
+            if (!player.getAbilities().instabuild) {
+                itemstack.shrink(1);
+            }
+            return net.minecraft.world.InteractionResult.SUCCESS;
+        }
+        return super.mobInteract(player, hand);
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F, 0.02F, true));
