@@ -1490,6 +1490,13 @@ public abstract class PlayerList {
     }
 
     public void reloadResources() {
+        // Paper start - API for updating recipes on clients
+        this.reloadAdvancementData();
+        this.reloadTagData();
+        this.reloadRecipeData();
+    }
+    public void reloadAdvancementData() {
+        // Paper end - API for updating recipes on clients
         // CraftBukkit start
         /*Iterator iterator = this.advancements.values().iterator();
 
@@ -1505,7 +1512,15 @@ public abstract class PlayerList {
         }
         // CraftBukkit end
 
+        // Paper start - API for updating recipes on clients
+    }
+    public void reloadTagData() {
+        // Paper end - API for updating recipes on clients
         this.broadcastAll(new ClientboundUpdateTagsPacket(TagNetworkSerialization.serializeTagsToNetwork(this.registries)));
+        // Paper start - API for updating recipes on clients
+    }
+    public void reloadRecipeData() {
+        // Paper end - API for updating recipes on clients
         ClientboundUpdateRecipesPacket packetplayoutrecipeupdate = new ClientboundUpdateRecipesPacket(this.server.getRecipeManager().getOrderedRecipes());
         Iterator iterator1 = this.players.iterator();
 
