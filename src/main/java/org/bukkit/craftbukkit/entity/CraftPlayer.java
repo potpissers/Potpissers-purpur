@@ -2763,6 +2763,28 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         return this.getHandle().getAbilities().walkingSpeed * 2f;
     }
 
+    // Purpur start - OfflinePlayer API
+    @Override
+    public boolean teleportOffline(@NotNull Location destination) {
+        return this.teleport(destination);
+    }
+
+    @Override
+    public boolean teleportOffline(Location destination, PlayerTeleportEvent.TeleportCause cause) {
+        return this.teleport(destination, cause);
+    }
+
+    @Override
+    public java.util.concurrent.CompletableFuture<Boolean> teleportOfflineAsync(@NotNull Location destination) {
+        return this.teleportAsync(destination);
+    }
+
+    @Override
+    public java.util.concurrent.CompletableFuture<Boolean> teleportOfflineAsync(@NotNull Location destination, PlayerTeleportEvent.TeleportCause cause) {
+        return this.teleportAsync(destination, cause);
+    }
+    // Purpur end - OfflinePlayer API
+
     private void validateSpeed(float value) {
         Preconditions.checkArgument(value <= 1f && value >= -1f, "Speed value (%s) need to be between -1f and 1f", value);
     }
