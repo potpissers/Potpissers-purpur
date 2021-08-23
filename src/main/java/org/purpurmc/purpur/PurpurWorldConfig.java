@@ -140,6 +140,8 @@ public class PurpurWorldConfig {
     public int raidCooldownSeconds = 0;
     public int animalBreedingCooldownSeconds = 0;
     public boolean mobsIgnoreRails = false;
+    public boolean rainStopsAfterSleep = true;
+    public boolean thunderStopsAfterSleep = true;
     private void miscGameplayMechanicsSettings() {
         useBetterMending = getBoolean("gameplay-mechanics.use-better-mending", useBetterMending);
         alwaysTameInCreative = getBoolean("gameplay-mechanics.always-tame-in-creative", alwaysTameInCreative);
@@ -162,6 +164,8 @@ public class PurpurWorldConfig {
         raidCooldownSeconds = getInt("gameplay-mechanics.raid-cooldown-seconds", raidCooldownSeconds);
         animalBreedingCooldownSeconds = getInt("gameplay-mechanics.animal-breeding-cooldown-seconds", animalBreedingCooldownSeconds);
         mobsIgnoreRails = getBoolean("gameplay-mechanics.mobs-ignore-rails", mobsIgnoreRails);
+        rainStopsAfterSleep = getBoolean("gameplay-mechanics.rain-stops-after-sleep", rainStopsAfterSleep);
+        thunderStopsAfterSleep = getBoolean("gameplay-mechanics.thunder-stops-after-sleep", thunderStopsAfterSleep);
     }
 
     public int daytimeTicks = 12000;

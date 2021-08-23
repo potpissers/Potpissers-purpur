@@ -1230,6 +1230,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
     @VisibleForTesting
     public void resetWeatherCycle() {
         // CraftBukkit start
+        if (this.purpurConfig.rainStopsAfterSleep) // Purpur
         this.serverLevelData.setRaining(false, org.bukkit.event.weather.WeatherChangeEvent.Cause.SLEEP); // Paper - Add cause to Weather/ThunderChangeEvents
         // If we stop due to everyone sleeping we should reset the weather duration to some other random value.
         // Not that everyone ever manages to get the whole server to sleep at the same time....
@@ -1237,6 +1238,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
             this.serverLevelData.setRainTime(0);
         }
         // CraftBukkit end
+        if (this.purpurConfig.thunderStopsAfterSleep) // Purpur
         this.serverLevelData.setThundering(false, org.bukkit.event.weather.ThunderChangeEvent.Cause.SLEEP); // Paper - Add cause to Weather/ThunderChangeEvents
         // CraftBukkit start
         // If we stop due to everyone sleeping we should reset the weather duration to some other random value.
