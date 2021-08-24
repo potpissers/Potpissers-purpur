@@ -7361,6 +7361,7 @@ public class Blocks {
             BlockBehaviour.Properties.of()
                 .mapColor(MapColor.PLANT)
                 .forceSolidOff()
+                .randomTicks() // Purpur
                 .instabreak()
                 .sound(SoundType.AZALEA)
                 .noOcclusion()
@@ -7373,6 +7374,7 @@ public class Blocks {
             BlockBehaviour.Properties.of()
                 .mapColor(MapColor.PLANT)
                 .forceSolidOff()
+                .randomTicks() // Purpur
                 .instabreak()
                 .sound(SoundType.FLOWERING_AZALEA)
                 .noOcclusion()

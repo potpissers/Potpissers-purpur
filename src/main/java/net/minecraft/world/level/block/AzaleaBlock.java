@@ -49,6 +49,20 @@ public class AzaleaBlock extends BushBlock implements BonemealableBlock {
 
     @Override
     public void performBonemeal(ServerLevel world, RandomSource random, BlockPos pos, BlockState state) {
+        // Purpur start
+        growTree(world, random, pos, state);
+    }
+
+    @Override
+    public void randomTick(net.minecraft.world.level.block.state.BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+        double chance = state.getBlock() == Blocks.FLOWERING_AZALEA ? world.purpurConfig.floweringAzaleaGrowthChance : world.purpurConfig.azaleaGrowthChance;
+        if (chance > 0.0D && world.getMaxLocalRawBrightness(pos.above()) > 9 && random.nextDouble() < chance) {
+            growTree(world, random, pos, state);
+        }
+    }
+
+    private void growTree(ServerLevel world, RandomSource random, BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {
+        // Purpur end
         TreeGrower.AZALEA.growTree(world, world.getChunkSource().getGenerator(), pos, state, random);
     }
 
