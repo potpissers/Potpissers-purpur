@@ -2075,6 +2075,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
 
             boolean cancelled;
             if (movingobjectposition == null || movingobjectposition.getType() != HitResult.Type.BLOCK) {
+                if (this.player.gameMode.shiftClickMended(itemstack)) return; // Purpur
                 org.bukkit.event.player.PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(this.player, Action.RIGHT_CLICK_AIR, itemstack, enumhand);
                 cancelled = event.useItemInHand() == Event.Result.DENY;
             } else {

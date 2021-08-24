@@ -518,6 +518,7 @@ public class ServerPlayerGameMode {
     public InteractionHand interactHand;
     public ItemStack interactItemStack;
     public InteractionResult useItemOn(ServerPlayer player, Level world, ItemStack stack, InteractionHand hand, BlockHitResult hitResult) {
+        if (shiftClickMended(stack)) return InteractionResult.SUCCESS; // Purpur
         BlockPos blockposition = hitResult.getBlockPos();
         BlockState iblockdata = world.getBlockState(blockposition);
         boolean cancelledBlock = false;
@@ -626,4 +627,18 @@ public class ServerPlayerGameMode {
     public void setLevel(ServerLevel world) {
         this.level = world;
     }
+
+    // Purpur start
+    public boolean shiftClickMended(ItemStack itemstack) {
+        if (this.player.level().purpurConfig.shiftRightClickRepairsMendingPoints > 0 && this.player.isShiftKeyDown() && this.player.getBukkitEntity().hasPermission("purpur.mending_shift_click")) {
+            int points = Math.min(this.player.totalExperience, this.player.level().purpurConfig.shiftRightClickRepairsMendingPoints);
+            if (points > 0 && itemstack.isDamaged() && net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.MENDING, itemstack) > 0) {
+                this.player.giveExperiencePoints(-points);
+                this.player.level().addFreshEntity(new net.minecraft.world.entity.ExperienceOrb(this.player.level(), this.player.getX(), this.player.getY(), this.player.getZ(), points, org.bukkit.entity.ExperienceOrb.SpawnReason.UNKNOWN, this.player, this.player));
+                return true;
+            }
+        }
+        return false;
+    }
+    // Purpur end
 }
