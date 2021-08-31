@@ -81,6 +81,7 @@ public class Dolphin extends WaterAnimal {
     public static final Predicate<ItemEntity> ALLOWED_ITEMS = (entityitem) -> {
         return !entityitem.hasPickUpDelay() && entityitem.isAlive() && entityitem.isInWater();
     };
+    private boolean isNaturallyAggressiveToPlayers; // Purpur
     private int spitCooldown; // Purpur
 
     public Dolphin(EntityType<? extends Dolphin> type, Level world) {
@@ -173,6 +174,7 @@ public class Dolphin extends WaterAnimal {
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor world, DifficultyInstance difficulty, MobSpawnType spawnReason, @Nullable SpawnGroupData entityData) {
         this.setAirSupply(this.getMaxAirSupply());
         this.setXRot(0.0F);
+        this.isNaturallyAggressiveToPlayers = world.getLevel().purpurConfig.dolphinNaturallyAggressiveToPlayersChance > 0.0D && random.nextDouble() <= world.getLevel().purpurConfig.dolphinNaturallyAggressiveToPlayersChance; // Purpur
         return super.finalizeSpawn(world, difficulty, spawnReason, entityData);
     }
 
@@ -237,6 +239,7 @@ public class Dolphin extends WaterAnimal {
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new BreathAirGoal(this));
         this.goalSelector.addGoal(0, new TryFindWaterGoal(this));
+        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.2000000476837158D, true)); // Purpur
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new Dolphin.DolphinSwimToTreasureGoal(this));
         this.goalSelector.addGoal(2, new Dolphin.DolphinSwimWithPlayerGoal(this, 4.0D));
@@ -244,12 +247,13 @@ public class Dolphin extends WaterAnimal {
         this.goalSelector.addGoal(4, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(5, new DolphinJumpGoal(this, 10));
-        this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.2000000476837158D, true));
+        //this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.2000000476837158D, true)); // Purpur - moved up
         this.goalSelector.addGoal(8, new Dolphin.PlayWithItemsGoal());
         this.goalSelector.addGoal(8, new FollowBoatGoal(this));
         this.goalSelector.addGoal(9, new AvoidEntityGoal<>(this, Guardian.class, 8.0F, 1.0D, 1.0D));
         this.targetSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this, new Class[]{Guardian.class})).setAlertOthers());
+        this.targetSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, target -> isNaturallyAggressiveToPlayers)); // Purpur
     }
 
     public static AttributeSupplier.Builder createAttributes() {
