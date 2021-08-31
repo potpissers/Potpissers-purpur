@@ -1107,6 +1107,12 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
 
     @Override
     public void startSleeping(BlockPos pos) {
+        // Purpur start
+        if (level().purpurConfig.bedExplodeOnVillagerSleep && this.level().getBlockState(pos).getBlock() instanceof net.minecraft.world.level.block.BedBlock) {
+            this.level().explode(null, (double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, (float) this.level().purpurConfig.bedExplosionPower, this.level().purpurConfig.bedExplosionFire, this.level().purpurConfig.bedExplosionEffect);
+            return;
+        }
+        // Purpur end
         super.startSleeping(pos);
         this.brain.setMemory(MemoryModuleType.LAST_SLEPT, this.level().getGameTime()); // CraftBukkit - decompile error
         this.brain.eraseMemory(MemoryModuleType.WALK_TARGET);
