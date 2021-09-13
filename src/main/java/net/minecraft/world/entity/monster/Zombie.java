@@ -582,11 +582,7 @@ public class Zombie extends Monster {
         }
 
         if (this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
-            LocalDate localdate = LocalDate.now();
-            int i = localdate.get(ChronoField.DAY_OF_MONTH);
-            int j = localdate.get(ChronoField.MONTH_OF_YEAR);
-
-            if (j == 10 && i == 31 && randomsource.nextFloat() < 0.25F) {
+            if (net.minecraft.world.entity.ambient.Bat.isHalloweenSeason(world.getMinecraftWorld()) && this.random.nextFloat() < this.level().purpurConfig.chanceHeadHalloweenOnEntity) { // Purpur
                 this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(randomsource.nextFloat() < 0.1F ? Blocks.JACK_O_LANTERN : Blocks.CARVED_PUMPKIN));
                 this.armorDropChances[EquipmentSlot.HEAD.getIndex()] = 0.0F;
             }

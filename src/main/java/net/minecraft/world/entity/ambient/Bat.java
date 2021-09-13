@@ -302,7 +302,7 @@ public class Bat extends AmbientCreature {
             int i = world.getMaxLocalRawBrightness(pos);
             byte b0 = 4;
 
-            if (Bat.isHalloween()) {
+            if (Bat.isHalloweenSeason(world.getMinecraftWorld())) { // Purpur
                 b0 = 7;
             } else if (random.nextBoolean()) {
                 return false;
@@ -316,6 +316,7 @@ public class Bat extends AmbientCreature {
     private static boolean isSpookySeason = false;
     private static final int ONE_HOUR = 20 * 60 * 60;
     private static int lastSpookyCheck = -ONE_HOUR;
+    public static boolean isHalloweenSeason(Level level) { return level.purpurConfig.forceHalloweenSeason || isHalloween(); } // Purpur
     private static boolean isHalloween() {
         if (net.minecraft.server.MinecraftServer.currentTick - lastSpookyCheck > ONE_HOUR) {
         LocalDate localdate = LocalDate.now();
