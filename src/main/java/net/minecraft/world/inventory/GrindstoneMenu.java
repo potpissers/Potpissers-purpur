@@ -135,7 +135,7 @@ public class GrindstoneMenu extends AbstractContainerMenu {
                     Holder<Enchantment> holder = (Holder) entry.getKey();
                     int k = entry.getIntValue();
 
-                    if (!holder.is(EnchantmentTags.CURSE)) {
+                    if (!org.purpurmc.purpur.PurpurConfig.grindstoneIgnoredEnchants.contains(holder.value())) { // Purpur
                         j += ((Enchantment) holder.value()).getMinCost(k);
                     }
                 }
@@ -234,7 +234,7 @@ public class GrindstoneMenu extends AbstractContainerMenu {
                 Entry<Holder<Enchantment>> entry = (Entry) iterator.next();
                 Holder<Enchantment> holder = (Holder) entry.getKey();
 
-                if (!holder.is(EnchantmentTags.CURSE) || itemenchantments_a.getLevel(holder) == 0) {
+                if (!org.purpurmc.purpur.PurpurConfig.grindstoneIgnoredEnchants.contains(holder.value()) || itemenchantments_a.getLevel(holder) == 0) { // Purpur
                     itemenchantments_a.upgrade(holder, entry.getIntValue());
                 }
             }
@@ -242,10 +242,70 @@ public class GrindstoneMenu extends AbstractContainerMenu {
         });
     }
 
+    // Purpur start
+    private java.util.List<net.minecraft.core.component.DataComponentType<?>> GRINDSTONE_REMOVE_ATTRIBUTES_REMOVAL_LIST = java.util.List.of(
+        // DataComponents.MAX_STACK_SIZE,
+        // DataComponents.DAMAGE,
+        // DataComponents.BLOCK_STATE,
+        DataComponents.CUSTOM_DATA,
+        // DataComponents.MAX_DAMAGE,
+        // DataComponents.UNBREAKABLE,
+        // DataComponents.CUSTOM_NAME,
+        // DataComponents.ITEM_NAME,
+        // DataComponents.LORE,
+        // DataComponents.RARITY,
+        // DataComponents.ENCHANTMENTS,
+        // DataComponents.CAN_PLACE_ON,
+        // DataComponents.CAN_BREAK,
+        DataComponents.ATTRIBUTE_MODIFIERS,
+        DataComponents.CUSTOM_MODEL_DATA,
+        // DataComponents.HIDE_ADDITIONAL_TOOLTIP,
+        // DataComponents.HIDE_TOOLTIP,
+        // DataComponents.REPAIR_COST,
+        // DataComponents.CREATIVE_SLOT_LOCK,
+        // DataComponents.ENCHANTMENT_GLINT_OVERRIDE,
+        // DataComponents.INTANGIBLE_PROJECTILE,
+        // DataComponents.FOOD,
+        // DataComponents.FIRE_RESISTANT,
+        // DataComponents.TOOL,
+        // DataComponents.STORED_ENCHANTMENTS,
+        DataComponents.DYED_COLOR,
+        // DataComponents.MAP_COLOR,
+        // DataComponents.MAP_ID,
+        // DataComponents.MAP_DECORATIONS,
+        // DataComponents.MAP_POST_PROCESSING,
+        // DataComponents.CHARGED_PROJECTILES,
+        // DataComponents.BUNDLE_CONTENTS,
+        // DataComponents.POTION_CONTENTS,
+        DataComponents.SUSPICIOUS_STEW_EFFECTS
+        // DataComponents.WRITABLE_BOOK_CONTENT,
+        // DataComponents.WRITTEN_BOOK_CONTENT,
+        // DataComponents.TRIM,
+        // DataComponents.DEBUG_STICK_STATE,
+        // DataComponents.ENTITY_DATA,
+        // DataComponents.BUCKET_ENTITY_DATA,
+        // DataComponents.BLOCK_ENTITY_DATA,
+        // DataComponents.INSTRUMENT,
+        // DataComponents.OMINOUS_BOTTLE_AMPLIFIER,
+        // DataComponents.RECIPES,
+        // DataComponents.LODESTONE_TRACKER,
+        // DataComponents.FIREWORK_EXPLOSION,
+        // DataComponents.FIREWORKS,
+        // DataComponents.PROFILE,
+        // DataComponents.NOTE_BLOCK_SOUND,
+        // DataComponents.BANNER_PATTERNS,
+        // DataComponents.BASE_COLOR,
+        // DataComponents.POT_DECORATIONS,
+        // DataComponents.CONTAINER,
+        // DataComponents.BEES,
+        // DataComponents.LOCK,
+        // DataComponents.CONTAINER_LOOT,
+    );
+    // Purpur end
     private ItemStack removeNonCursesFrom(ItemStack item) {
         ItemEnchantments itemenchantments = EnchantmentHelper.updateEnchantments(item, (itemenchantments_a) -> {
             itemenchantments_a.removeIf((holder) -> {
-                return !holder.is(EnchantmentTags.CURSE);
+                return !org.purpurmc.purpur.PurpurConfig.grindstoneIgnoredEnchants.contains(holder.value()); // Purpur
             });
         });
 
@@ -260,6 +320,23 @@ public class GrindstoneMenu extends AbstractContainerMenu {
         }
 
         item.set(DataComponents.REPAIR_COST, i);
+
+        // Purpur start
+        net.minecraft.core.component.DataComponentPatch.Builder builder = net.minecraft.core.component.DataComponentPatch.builder();
+        if (org.purpurmc.purpur.PurpurConfig.grindstoneRemoveAttributes) {
+            item.getComponents().forEach(typedDataComponent -> {
+                if (GRINDSTONE_REMOVE_ATTRIBUTES_REMOVAL_LIST.contains(typedDataComponent.type())) {
+                    builder.remove(typedDataComponent.type());
+                }
+            });
+        }
+        if (org.purpurmc.purpur.PurpurConfig.grindstoneRemoveDisplay) {
+            builder.remove(DataComponents.CUSTOM_NAME);
+            builder.remove(DataComponents.LORE);
+        }
+        item.applyComponents(builder.build());
+        // Purpur end
+
         return item;
     }
 
