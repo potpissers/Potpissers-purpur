@@ -132,7 +132,7 @@ public class CampfireBlock extends BaseEntityBlock implements SimpleWaterloggedB
         BlockPos blockposition = ctx.getClickedPos();
         boolean flag = world.getFluidState(blockposition).getType() == Fluids.WATER;
 
-        return (BlockState) ((BlockState) ((BlockState) ((BlockState) this.defaultBlockState().setValue(CampfireBlock.WATERLOGGED, flag)).setValue(CampfireBlock.SIGNAL_FIRE, this.isSmokeSource(world.getBlockState(blockposition.below())))).setValue(CampfireBlock.LIT, !flag)).setValue(CampfireBlock.FACING, ctx.getHorizontalDirection());
+        return (BlockState) ((BlockState) ((BlockState) ((BlockState) this.defaultBlockState().setValue(CampfireBlock.WATERLOGGED, flag)).setValue(CampfireBlock.SIGNAL_FIRE, this.isSmokeSource(world.getBlockState(blockposition.below())))).setValue(CampfireBlock.LIT, world.purpurConfig.campFireLitWhenPlaced ? !flag : world.purpurConfig.campFireLitWhenPlaced)).setValue(CampfireBlock.FACING, ctx.getHorizontalDirection()); // Purpur
     }
 
     @Override
