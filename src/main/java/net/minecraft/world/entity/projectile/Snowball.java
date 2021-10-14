@@ -63,6 +63,36 @@ public class Snowball extends ThrowableItemProjectile {
         entity.hurt(this.damageSources().thrown(this, this.getOwner()), (float) i);
     }
 
+    // Purpur start - borrowed and modified code from ThrownPotion#onHitBlock and ThrownPotion#dowseFire
+    @Override
+    protected void onHitBlock(net.minecraft.world.phys.BlockHitResult blockHitResult) {
+        super.onHitBlock(blockHitResult);
+
+        if (!this.level().isClientSide) {
+            net.minecraft.core.BlockPos blockposition = blockHitResult.getBlockPos();
+            net.minecraft.core.BlockPos blockposition1 = blockposition.relative(blockHitResult.getDirection());
+
+            net.minecraft.world.level.block.state.BlockState iblockdata = this.level().getBlockState(blockposition);
+
+            if (this.level().purpurConfig.snowballExtinguishesFire && this.level().getBlockState(blockposition1).is(net.minecraft.world.level.block.Blocks.FIRE)) {
+                if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(this, blockposition1, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState())) {
+                    this.level().removeBlock(blockposition1, false);
+                }
+            } else if (this.level().purpurConfig.snowballExtinguishesCandles && net.minecraft.world.level.block.AbstractCandleBlock.isLit(iblockdata)) {
+                if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(this, blockposition, iblockdata.setValue(net.minecraft.world.level.block.AbstractCandleBlock.LIT, false))) {
+                    net.minecraft.world.level.block.AbstractCandleBlock.extinguish(null, iblockdata, this.level(), blockposition);
+                }
+            } else if (this.level().purpurConfig.snowballExtinguishesCampfires && net.minecraft.world.level.block.CampfireBlock.isLitCampfire(iblockdata)) {
+                if (org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(this, blockposition, iblockdata.setValue(net.minecraft.world.level.block.CampfireBlock.LIT, false))) {
+                    this.level().levelEvent(null, 1009, blockposition, 0);
+                    net.minecraft.world.level.block.CampfireBlock.dowse(this.getOwner(), this.level(), blockposition, iblockdata);
+                    this.level().setBlockAndUpdate(blockposition, iblockdata.setValue(net.minecraft.world.level.block.CampfireBlock.LIT, false));
+                }
+            }
+        }
+    }
+    // Purpur end
+
     @Override
     protected void onHit(HitResult hitResult) {
         super.onHit(hitResult);
