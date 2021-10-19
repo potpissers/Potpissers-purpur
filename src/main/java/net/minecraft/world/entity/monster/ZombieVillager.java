@@ -222,7 +222,7 @@ public class ZombieVillager extends Zombie implements VillagerDataHolder {
         ItemStack itemstack = player.getItemInHand(hand);
 
         if (itemstack.is(Items.GOLDEN_APPLE)) {
-            if (this.hasEffect(MobEffects.WEAKNESS)) {
+            if (this.hasEffect(MobEffects.WEAKNESS) && level().purpurConfig.zombieVillagerCureEnabled) { // Purpur
                 itemstack.consume(1, player);
                 if (!this.level().isClientSide) {
                     this.startConverting(player.getUUID(), this.random.nextInt(level().purpurConfig.zombieVillagerCuringTimeMax - level().purpurConfig.zombieVillagerCuringTimeMin + 1) + level().purpurConfig.zombieVillagerCuringTimeMin); // Purpur
