@@ -299,6 +299,7 @@ public class ServerPlayerGameMode {
                 org.bukkit.craftbukkit.event.CraftEventFactory.callBlockDamageAbortEvent(this.player, pos, this.player.getInventory().getSelected()); // CraftBukkit
             }
         }
+        this.level.chunkPacketBlockController.onPlayerLeftClickBlock(this, pos, action, face, maxBuildHeight, sequence); // Paper - Anti-Xray
     }
 
     public void destroyAndAck(BlockPos pos, int sequence, String message) {

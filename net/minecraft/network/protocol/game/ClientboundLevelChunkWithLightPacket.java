@@ -18,18 +18,31 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
     private final int z;
     private final ClientboundLevelChunkPacketData chunkData;
     private final ClientboundLightUpdatePacketData lightData;
-    // Paper start - Anti-Xray
-    public void setReady(final boolean ready) {
-        // Empty hook, updated by feature patch
-    }
-    // Paper end - Anti-Xray
+    // Paper start - Async-Anti-Xray - Ready flag for the connection, add chunk packet info
+    private volatile boolean ready;
 
+    @Override
+    public boolean isReady() {
+        return this.ready;
+    }
+
+    public void setReady(final boolean ready) {
+        this.ready = ready;
+    }
+
+    @Deprecated @io.papermc.paper.annotation.DoNotUse
     public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightEngine, @Nullable BitSet skyLight, @Nullable BitSet blockLight) {
+        this(chunk, lightEngine, skyLight, blockLight, true);
+    }
+    public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightEngine, @Nullable BitSet skyLight, @Nullable BitSet blockLight, boolean modifyBlocks) {
+        // Paper end - Anti-Xray
         ChunkPos pos = chunk.getPos();
         this.x = pos.x;
         this.z = pos.z;
-        this.chunkData = new ClientboundLevelChunkPacketData(chunk);
+        io.papermc.paper.antixray.ChunkPacketInfo<net.minecraft.world.level.block.state.BlockState> chunkPacketInfo = modifyBlocks ? chunk.getLevel().chunkPacketBlockController.getChunkPacketInfo(this, chunk) : null; // Paper - Ant-Xray
+        this.chunkData = new ClientboundLevelChunkPacketData(chunk, chunkPacketInfo); // Paper - Anti-Xray
         this.lightData = new ClientboundLightUpdatePacketData(pos, lightEngine, skyLight, blockLight);
+        chunk.getLevel().chunkPacketBlockController.modifyBlocks(this, chunkPacketInfo); // Paper - Anti-Xray - Modify blocks
     }
 
     private ClientboundLevelChunkWithLightPacket(RegistryFriendlyByteBuf buffer) {

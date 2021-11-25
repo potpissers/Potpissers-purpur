@@ -94,7 +94,7 @@ public record SerializableChunkData(
     , @Nullable net.minecraft.nbt.Tag persistentDataContainer // CraftBukkit - persistentDataContainer
 ) {
     public static final Codec<PalettedContainer<BlockState>> BLOCK_STATE_CODEC = PalettedContainer.codecRW(
-        Block.BLOCK_STATE_REGISTRY, BlockState.CODEC, PalettedContainer.Strategy.SECTION_STATES, Blocks.AIR.defaultBlockState()
+        Block.BLOCK_STATE_REGISTRY, BlockState.CODEC, PalettedContainer.Strategy.SECTION_STATES, Blocks.AIR.defaultBlockState(), null // Paper - Anti-Xray
     );
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String TAG_UPGRADE_DATA = "UpgradeData";
@@ -128,6 +128,7 @@ public record SerializableChunkData(
 
     @Nullable
     public static SerializableChunkData parse(LevelHeightAccessor levelHeightAccessor, RegistryAccess registries, CompoundTag tag) {
+        net.minecraft.server.level.ServerLevel serverLevel = (net.minecraft.server.level.ServerLevel) levelHeightAccessor; // Paper - Anti-Xray This is is seemingly only called from ChunkMap, where, we have a server level. We'll fight this later if needed.
         if (!tag.contains("Status", 8)) {
             return null;
         } else {
@@ -212,18 +213,21 @@ public record SerializableChunkData(
             Codec<PalettedContainer<Holder<Biome>>> codec = makeBiomeCodecRW(registry); // CraftBukkit - read/write
 
             for (int i2 = 0; i2 < list7.size(); i2++) {
-                CompoundTag compound2 = list7.getCompound(i2);
+                CompoundTag compound2 = list7.getCompound(i2); final CompoundTag sectionData = compound2; // Paper - Anti-Xray - OBFHELPER
                 int _byte = compound2.getByte("Y");
                 LevelChunkSection levelChunkSection;
                 if (_byte >= levelHeightAccessor.getMinSectionY() && _byte <= levelHeightAccessor.getMaxSectionY()) {
+                    // Paper start - Anti-Xray - Add preset block states
+                    BlockState[] presetBlockStates = serverLevel.chunkPacketBlockController.getPresetBlockStates(serverLevel, chunkPos, _byte);
                     PalettedContainer<BlockState> palettedContainer;
                     if (compound2.contains("block_states", 10)) {
-                        palettedContainer = BLOCK_STATE_CODEC.parse(NbtOps.INSTANCE, compound2.getCompound("block_states"))
+                        Codec<PalettedContainer<BlockState>> blockStateCodec = presetBlockStates == null ? BLOCK_STATE_CODEC : PalettedContainer.codecRW(Block.BLOCK_STATE_REGISTRY, BlockState.CODEC, PalettedContainer.Strategy.SECTION_STATES, Blocks.AIR.defaultBlockState(), presetBlockStates); // Paper - Anti-Xray
+                        palettedContainer = blockStateCodec.parse(NbtOps.INSTANCE, sectionData.getCompound("block_states")) // Paper - Anti-Xray
                             .promotePartial(string -> logErrors(chunkPos, _byte, string))
                             .getOrThrow(SerializableChunkData.ChunkReadException::new);
                     } else {
                         palettedContainer = new PalettedContainer<>(
-                            Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES
+                            Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, presetBlockStates // Paper - Anti-Xray
                         );
                     }
 
@@ -234,7 +238,7 @@ public record SerializableChunkData(
                             .getOrThrow(SerializableChunkData.ChunkReadException::new);
                     } else {
                         palettedContainerRo = new PalettedContainer<>(
-                            registry.asHolderIdMap(), registry.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES
+                            registry.asHolderIdMap(), registry.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null // Paper - Anti-Xray - Add preset biomes
                         );
                     }
 
@@ -414,7 +418,7 @@ public record SerializableChunkData(
 
     // CraftBukkit start - read/write
     private static Codec<PalettedContainer<Holder<Biome>>> makeBiomeCodecRW(Registry<Biome> biomeRegistry) {
-        return PalettedContainer.codecRW(biomeRegistry.asHolderIdMap(), biomeRegistry.holderByNameCodec(), PalettedContainer.Strategy.SECTION_BIOMES, biomeRegistry.getOrThrow(Biomes.PLAINS));
+        return PalettedContainer.codecRW(biomeRegistry.asHolderIdMap(), biomeRegistry.holderByNameCodec(), PalettedContainer.Strategy.SECTION_BIOMES, biomeRegistry.getOrThrow(Biomes.PLAINS), null); // Paper - Anti-Xray - Add preset biomes
     }
     // CraftBukkit end
 

@@ -168,6 +168,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
     }
     // Paper end - add paper world config
 
+    public final io.papermc.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
     public static BlockPos lastPhysicsProblem; // Spigot
     private org.spigotmc.TickLimiter entityLimiter;
     private org.spigotmc.TickLimiter tileLimiter;
@@ -214,7 +215,8 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
         org.bukkit.generator.BiomeProvider biomeProvider, // CraftBukkit
         org.bukkit.World.Environment env, // CraftBukkit
         java.util.function.Function<org.spigotmc.SpigotWorldConfig, // Spigot - create per world config
-        io.papermc.paper.configuration.WorldConfiguration> paperWorldConfigCreator // Paper - create paper world config
+        io.papermc.paper.configuration.WorldConfiguration> paperWorldConfigCreator, // Paper - create paper world config
+        java.util.concurrent.Executor executor // Paper - Anti-Xray
     ) {
         this.spigotConfig = new org.spigotmc.SpigotWorldConfig(((net.minecraft.world.level.storage.PrimaryLevelData) levelData).getLevelName()); // Spigot
         this.paperConfig = paperWorldConfigCreator.apply(this.spigotConfig); // Paper - create paper world config
@@ -295,6 +297,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
         // CraftBukkit end
         this.entityLimiter = new org.spigotmc.TickLimiter(this.spigotConfig.entityMaxTickTime);
         this.tileLimiter = new org.spigotmc.TickLimiter(this.spigotConfig.tileMaxTickTime);
+        this.chunkPacketBlockController = this.paperConfig().anticheat.antiXray.enabled ? new io.papermc.paper.antixray.ChunkPacketBlockControllerAntiXray(this, executor) : io.papermc.paper.antixray.ChunkPacketBlockController.NO_OPERATION_INSTANCE; // Paper - Anti-Xray
     }
 
     // Paper start - Cancel hit for vanished players
@@ -495,6 +498,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
             // CraftBukkit end
 
             BlockState blockState = chunkAt.setBlockState(pos, state, (flags & 64) != 0, (flags & 1024) == 0); // CraftBukkit custom NO_PLACE flag
+            this.chunkPacketBlockController.onBlockChange(this, pos, state, blockState, flags, recursionLeft); // Paper - Anti-Xray
 
             if (blockState == null) {
                 // CraftBukkit start - remove blockstate if failed (or the same)

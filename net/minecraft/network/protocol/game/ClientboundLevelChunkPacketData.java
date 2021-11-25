@@ -28,7 +28,13 @@ public class ClientboundLevelChunkPacketData {
     private final byte[] buffer;
     private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
 
+    // Paper start - Anti-Xray - Add chunk packet info
+    @Deprecated @io.papermc.paper.annotation.DoNotUse
     public ClientboundLevelChunkPacketData(LevelChunk levelChunk) {
+        this(levelChunk, null);
+    }
+    public ClientboundLevelChunkPacketData(LevelChunk levelChunk, io.papermc.paper.antixray.ChunkPacketInfo<net.minecraft.world.level.block.state.BlockState> chunkPacketInfo) {
+        // Paper end
         this.heightmaps = new CompoundTag();
 
         for (Entry<Heightmap.Types, Heightmap> entry : levelChunk.getHeightmaps()) {
@@ -38,7 +44,11 @@ public class ClientboundLevelChunkPacketData {
         }
 
         this.buffer = new byte[calculateChunkSize(levelChunk)];
-        extractChunkData(new FriendlyByteBuf(this.getWriteBuffer()), levelChunk);
+        // Paper start - Anti-Xray - Add chunk packet info
+        if (chunkPacketInfo != null) {
+            chunkPacketInfo.setBuffer(this.buffer);
+        }
+        extractChunkData(new FriendlyByteBuf(this.getWriteBuffer()), levelChunk, chunkPacketInfo);
         this.blockEntitiesData = Lists.newArrayList();
 
         for (Entry<BlockPos, BlockEntity> entryx : levelChunk.getBlockEntities().entrySet()) {
@@ -85,9 +95,17 @@ public class ClientboundLevelChunkPacketData {
         return byteBuf;
     }
 
+    // Paper start - Anti-Xray - Add chunk packet info
+    @Deprecated @io.papermc.paper.annotation.DoNotUse
     public static void extractChunkData(FriendlyByteBuf buffer, LevelChunk chunk) {
+        ClientboundLevelChunkPacketData.extractChunkData(buffer, chunk, null);
+    }
+    public static void extractChunkData(FriendlyByteBuf buffer, LevelChunk chunk, io.papermc.paper.antixray.ChunkPacketInfo<net.minecraft.world.level.block.state.BlockState> chunkPacketInfo) {
+        int chunkSectionIndex = 0;
         for (LevelChunkSection levelChunkSection : chunk.getSections()) {
-            levelChunkSection.write(buffer);
+            levelChunkSection.write(buffer, chunkPacketInfo, chunkSectionIndex);
+            chunkSectionIndex++;
+            // Paper end  - Anti-Xray - Add chunk packet info
         }
     }
 

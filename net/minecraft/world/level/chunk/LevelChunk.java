@@ -109,7 +109,7 @@ public class LevelChunk extends ChunkAccess {
         @Nullable LevelChunk.PostLoadProcessor postLoad,
         @Nullable BlendingData blendingData
     ) {
-        super(pos, data, level, level.registryAccess().lookupOrThrow(Registries.BIOME), inhabitedTime, sections, blendingData);
+        super(pos, data, level, net.minecraft.server.MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.BIOME), inhabitedTime, sections, blendingData); // Paper - Anti-Xray - The world isn't ready yet, use server singleton for registry
         this.level = (ServerLevel) level; // CraftBukkit - type
         this.gameEventListenerRegistrySections = new Int2ObjectOpenHashMap<>();
 

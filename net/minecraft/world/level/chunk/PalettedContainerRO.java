@@ -14,7 +14,10 @@ public interface PalettedContainerRO<T> {
 
     void getAll(Consumer<T> consumer);
 
-    void write(FriendlyByteBuf buffer);
+    // Paper start - Anti-Xray - Add chunk packet info
+    @Deprecated @io.papermc.paper.annotation.DoNotUse void write(FriendlyByteBuf buffer);
+    void write(FriendlyByteBuf buffer, @javax.annotation.Nullable io.papermc.paper.antixray.ChunkPacketInfo<T> chunkPacketInfo, int chunkSectionIndex);
+    // Paper end
 
     int getSerializedSize();
 

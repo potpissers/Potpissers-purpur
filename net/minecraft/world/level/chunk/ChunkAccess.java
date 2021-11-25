@@ -114,14 +114,14 @@ public abstract class ChunkAccess implements BiomeManager.NoiseBiomeSource, Ligh
             }
         }
 
-        replaceMissingSections(biomeRegistry, this.sections);
+        this.replaceMissingSections(biomeRegistry, this.sections); // Paper - Anti-Xray - make it a non-static method
         this.biomeRegistry = biomeRegistry; // CraftBukkit
     }
 
-    private static void replaceMissingSections(Registry<Biome> biomeRegistry, LevelChunkSection[] sections) {
+    private void replaceMissingSections(Registry<Biome> biomeRegistry, LevelChunkSection[] sections) { // Paper - Anti-Xray - make it a non-static method
         for (int i = 0; i < sections.length; i++) {
             if (sections[i] == null) {
-                sections[i] = new LevelChunkSection(biomeRegistry);
+                sections[i] = new LevelChunkSection(biomeRegistry, this.levelHeightAccessor instanceof net.minecraft.world.level.Level ? (net.minecraft.world.level.Level) this.levelHeightAccessor : null, this.chunkPos, this.levelHeightAccessor.getSectionYFromSectionIndex(i)); // Paper - Anti-Xray - Add parameters
             }
         }
     }

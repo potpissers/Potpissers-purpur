@@ -37,20 +37,25 @@ public final class FeatureHooks {
     }
 
     public static LevelChunkSection createSection(final Registry<Biome> biomeRegistry, final Level level, final ChunkPos chunkPos, final int chunkSection) {
-        return new LevelChunkSection(biomeRegistry);
+        return new LevelChunkSection(biomeRegistry, level, chunkPos, chunkSection); // Paper - Anti-Xray - Add parameters
     }
 
     public static void sendChunkRefreshPackets(final List<ServerPlayer> playersInRange, final LevelChunk chunk) {
-        final ClientboundLevelChunkWithLightPacket refreshPacket = new ClientboundLevelChunkWithLightPacket(chunk, chunk.level.getLightEngine(), null, null);
+        // Paper start - Anti-Xray
+        final Map<Object, ClientboundLevelChunkWithLightPacket> refreshPackets = new HashMap<>();
         for (final ServerPlayer player : playersInRange) {
             if (player.connection == null) continue;
 
-            player.connection.send(refreshPacket);
+            final Boolean shouldModify = chunk.getLevel().chunkPacketBlockController.shouldModify(player, chunk);
+            player.connection.send(refreshPackets.computeIfAbsent(shouldModify, s -> { // Use connection to prevent creating firing event
+                return new ClientboundLevelChunkWithLightPacket(chunk, chunk.level.getLightEngine(), null, null, (Boolean) s);
+            }));
         }
+        // Paper end - Anti-Xray
     }
 
     public static PalettedContainer<BlockState> emptyPalettedBlockContainer() {
-        return new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES);
+        return new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null); // Paper - Anti-Xray - Add preset block states
     }
 
     public static Set<Long> getSentChunkKeys(final ServerPlayer player) {
