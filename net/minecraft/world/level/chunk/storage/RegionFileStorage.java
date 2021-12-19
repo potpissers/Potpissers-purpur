@@ -15,6 +15,7 @@ import net.minecraft.util.ExceptionCollector;
 import net.minecraft.world.level.ChunkPos;
 
 public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise.patches.chunk_system.io.ChunkSystemRegionFileStorage { // Paper - rewrite chunk system
+    private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger(); // Paper
     public static final String ANVIL_EXTENSION = ".mca";
     private static final int MAX_CACHE_SIZE = 256;
     public final Long2ObjectLinkedOpenHashMap<RegionFile> regionCache = new Long2ObjectLinkedOpenHashMap<>();
@@ -119,11 +120,24 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
         // (and, the regionfile parameter is unused for writing until the write call)
         final ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO.RegionDataController.WriteData writeData = ((ca.spottedleaf.moonrise.patches.chunk_system.storage.ChunkSystemRegionFile)regionFile).moonrise$startWrite(compound, pos);
 
+        try { // Paper - implement RegionFileSizeException
         try {
             NbtIo.write(compound, writeData.output());
         } finally {
             writeData.output().close();
         }
+        // Paper start - implement RegionFileSizeException
+        } catch (final RegionFileSizeException ex) {
+            // note: it's OK if close() is called, as close() here will not issue a write to the RegionFile
+            // see startWrite
+            final int maxSize = RegionFile.MAX_CHUNK_SIZE / (1024 * 1024);
+            LOGGER.error("Chunk at (" + chunkX + "," + chunkZ + ") in regionfile '" + regionFile.getPath().toString() + "' exceeds max size of " + maxSize + "MiB, it has been deleted from disk.");
+            return new ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO.RegionDataController.WriteData(
+                compound, ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO.RegionDataController.WriteData.WriteResult.DELETE,
+                null, null
+            );
+        }
+        // Paper end - implement RegionFileSizeException
 
         return writeData;
     }
@@ -326,9 +340,17 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
         if (chunkData == null) {
             regionFile.clear(chunkPos);
         } else {
-            try (DataOutputStream chunkDataOutputStream = regionFile.getChunkDataOutputStream(chunkPos)) {
+            DataOutputStream chunkDataOutputStream = regionFile.getChunkDataOutputStream(chunkPos); // Paper - Only write if successful
+            try { // Paper - Only write if successful
                 NbtIo.write(chunkData, chunkDataOutputStream);
                 regionFile.setOversized(chunkPos.x, chunkPos.z, false); // Paper - We don't do this anymore, mojang stores differently, but clear old meta flag if it exists to get rid of our own meta file once last oversized is gone
+                // Paper start - don't write garbage data to disk if writing serialization fails
+                chunkDataOutputStream.close();
+            } catch (final RegionFileSizeException ex) {
+                regionFile.clear(chunkPos);
+                final int maxSize = RegionFile.MAX_CHUNK_SIZE / (1024 * 1024);
+                LOGGER.error("Chunk at (" + chunkPos.x + "," + chunkPos.z + ") in regionfile '" + regionFile.getPath().toString() + "' exceeds max size of " + maxSize + "MiB, it has been deleted from disk.");
+                // Paper end - don't write garbage data to disk if writing serialization fails
             }
         }
     }
@@ -370,4 +392,13 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
     public RegionStorageInfo info() {
         return this.info;
     }
+
+    // Paper start - don't write garbage data to disk if writing serialization fails
+    public static final class RegionFileSizeException extends RuntimeException {
+
+        public RegionFileSizeException(final String message) {
+            super(message);
+        }
+    }
+    // Paper end - don't write garbage data to disk if writing serialization fails
 }

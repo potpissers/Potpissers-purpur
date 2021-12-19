@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 
 public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patches.chunk_system.storage.ChunkSystemRegionFile { // Paper - rewrite chunk system
     private static final Logger LOGGER = LogUtils.getLogger();
+    public static final int MAX_CHUNK_SIZE = 500 * 1024 * 1024; // Paper - don't write garbage data to disk if writing serialization fails
     private static final int SECTOR_BYTES = 4096;
     @VisibleForTesting
     protected static final int SECTOR_INTS = 1024;
@@ -454,6 +455,24 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
             super.write(RegionFile.this.version.getId());
             this.pos = pos;
         }
+
+        // Paper start - don't write garbage data to disk if writing serialization fails
+        @Override
+        public void write(final int b) {
+            if (this.count > MAX_CHUNK_SIZE) {
+                throw new RegionFileStorage.RegionFileSizeException("Region file too large: " + this.count);
+            }
+            super.write(b);
+        }
+
+        @Override
+        public void write(final byte[] b, final int off, final int len) {
+            if (this.count + len > MAX_CHUNK_SIZE) {
+                throw new RegionFileStorage.RegionFileSizeException("Region file too large: " + (this.count + len));
+            }
+            super.write(b, off, len);
+        }
+        // Paper end - don't write garbage data to disk if writing serialization fails
 
         @Override
         public void close() throws IOException {
