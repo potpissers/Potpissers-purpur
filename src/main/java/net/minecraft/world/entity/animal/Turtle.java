@@ -120,6 +120,11 @@ public class Turtle extends Animal {
         return this.level().purpurConfig.turtleTakeDamageFromWater;
     }
 
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.turtleAlwaysDropExp;
+    }
+
     public void setHomePos(BlockPos pos) {
         this.entityData.set(Turtle.HOME_POS, pos);
     }

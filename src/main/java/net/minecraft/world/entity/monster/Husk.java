@@ -70,6 +70,11 @@ public class Husk extends Zombie {
         return this.level().purpurConfig.huskTakeDamageFromWater;
     }
 
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.huskAlwaysDropExp;
+    }
+
     public static boolean checkHuskSpawnRules(EntityType<Husk> type, ServerLevelAccessor world, MobSpawnType spawnReason, BlockPos pos, RandomSource random) {
         return checkMonsterSpawnRules(type, world, spawnReason, pos, random) && (MobSpawnType.isSpawner(spawnReason) || world.canSeeSky(pos));
     }

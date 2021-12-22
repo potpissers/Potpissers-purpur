@@ -138,6 +138,11 @@ public class WitherBoss extends Monster implements PowerableMob, RangedAttackMob
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.witherAlwaysDropExp;
+    }
+
+    @Override
     protected PathNavigation createNavigation(Level world) {
         FlyingPathNavigation navigationflying = new FlyingPathNavigation(this, world);
 

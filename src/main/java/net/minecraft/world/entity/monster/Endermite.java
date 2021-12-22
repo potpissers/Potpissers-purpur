@@ -76,6 +76,11 @@ public class Endermite extends Monster {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.endermiteAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(1, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur

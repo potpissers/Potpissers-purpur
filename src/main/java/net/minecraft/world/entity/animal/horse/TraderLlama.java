@@ -78,6 +78,11 @@ public class TraderLlama extends Llama {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.traderLlamaAlwaysDropExp;
+    }
+
+    @Override
     public boolean isTraderLlama() {
         return true;
     }

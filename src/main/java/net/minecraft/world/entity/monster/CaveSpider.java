@@ -55,6 +55,11 @@ public class CaveSpider extends Spider {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.caveSpiderAlwaysDropExp;
+    }
+
+    @Override
     public boolean doHurtTarget(Entity target) {
         if (super.doHurtTarget(target)) {
             if (target instanceof LivingEntity) {

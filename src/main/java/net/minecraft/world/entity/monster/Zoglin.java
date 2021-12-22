@@ -108,6 +108,11 @@ public class Zoglin extends Monster implements Enemy, HoglinBase {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.zoglinAlwaysDropExp;
+    }
+
+    @Override
     protected Brain.Provider<Zoglin> brainProvider() {
         return Brain.provider(MEMORY_TYPES, SENSOR_TYPES);
     }

@@ -131,6 +131,11 @@ public class ZombieVillager extends Zombie implements VillagerDataHolder {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.zombieVillagerAlwaysDropExp;
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(ZombieVillager.DATA_CONVERTING_ID, false);

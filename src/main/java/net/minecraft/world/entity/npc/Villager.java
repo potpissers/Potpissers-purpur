@@ -198,6 +198,11 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.villagerAlwaysDropExp;
+    }
+
+    @Override
     public Brain<Villager> getBrain() {
         return (Brain<Villager>) super.getBrain(); // CraftBukkit - decompile error
     }

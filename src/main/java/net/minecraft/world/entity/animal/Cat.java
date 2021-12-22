@@ -144,6 +144,11 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
     public boolean isSensitiveToWater() {
         return this.level().purpurConfig.catTakeDamageFromWater;
     }
+
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.catAlwaysDropExp;
+    }
     // Purpur end
 
     public ResourceLocation getTextureId() {

@@ -102,6 +102,11 @@ public class Guardian extends Monster {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.guardianAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         MoveTowardsRestrictionGoal pathfindergoalmovetowardsrestriction = new MoveTowardsRestrictionGoal(this, 1.0D);
 

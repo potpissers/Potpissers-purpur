@@ -71,6 +71,11 @@ public class MagmaCube extends Slime {
         return this.level().purpurConfig.magmaCubeTakeDamageFromWater;
     }
 
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.magmaCubeAlwaysDropExp;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MOVEMENT_SPEED, 0.2F);
     }

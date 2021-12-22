@@ -57,6 +57,11 @@ public class Skeleton extends AbstractSkeleton {
     // Purpur end
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.skeletonAlwaysDropExp;
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(Skeleton.DATA_STRAY_CONVERSION_ID, false);

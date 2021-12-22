@@ -107,6 +107,11 @@ public class ZombifiedPiglin extends Zombie implements NeutralMob {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.zombifiedPiglinAlwaysDropExp;
+    }
+
+    @Override
     public void setPersistentAngerTarget(@Nullable UUID angryAt) {
         this.persistentAngerTarget = angryAt;
     }

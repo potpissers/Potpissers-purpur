@@ -495,6 +495,11 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.beeAlwaysDropExp;
+    }
+
+    @Override
     public int getRemainingPersistentAngerTime() {
         return (Integer) this.entityData.get(Bee.DATA_REMAINING_ANGER_TIME);
     }

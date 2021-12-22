@@ -169,6 +169,11 @@ public class Dolphin extends WaterAnimal {
         return this.level().purpurConfig.dolphinTakeDamageFromWater;
     }
 
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.dolphinAlwaysDropExp;
+    }
+
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor world, DifficultyInstance difficulty, MobSpawnType spawnReason, @Nullable SpawnGroupData entityData) {

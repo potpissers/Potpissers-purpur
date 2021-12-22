@@ -113,6 +113,11 @@ public class Vex extends Monster implements TraceableEntity {
     public boolean isSensitiveToWater() {
         return this.level().purpurConfig.vexTakeDamageFromWater;
     }
+
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.vexAlwaysDropExp;
+    }
     // Purpur end
 
     @Override

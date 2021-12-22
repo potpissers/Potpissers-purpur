@@ -36,6 +36,11 @@ public class Salmon extends AbstractSchoolingFish {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.salmonAlwaysDropExp;
+    }
+
+    @Override
     public int getMaxSchoolSize() {
         return 5;
     }

@@ -122,6 +122,11 @@ public class Piglin extends AbstractPiglin implements CrossbowAttackMob, Invento
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.piglinAlwaysDropExp;
+    }
+
+    @Override
     public void addAdditionalSaveData(CompoundTag nbt) {
         super.addAdditionalSaveData(nbt);
         if (this.isBaby()) {

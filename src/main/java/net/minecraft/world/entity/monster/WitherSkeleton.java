@@ -62,6 +62,11 @@ public class WitherSkeleton extends AbstractSkeleton {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.witherSkeletonAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractPiglin.class, true));
         super.registerGoals();

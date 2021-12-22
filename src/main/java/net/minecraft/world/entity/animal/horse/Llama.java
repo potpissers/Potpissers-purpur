@@ -151,6 +151,11 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
         return this.level().purpurConfig.llamaTakeDamageFromWater;
     }
 
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.llamaAlwaysDropExp;
+    }
+
     public boolean isTraderLlama() {
         return false;
     }

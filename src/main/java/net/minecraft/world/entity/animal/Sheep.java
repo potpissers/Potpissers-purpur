@@ -149,6 +149,11 @@ public class Sheep extends Animal implements Shearable {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.sheepAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         this.eatBlockGoal = new EatBlockGoal(this);
         this.goalSelector.addGoal(0, new FloatGoal(this));

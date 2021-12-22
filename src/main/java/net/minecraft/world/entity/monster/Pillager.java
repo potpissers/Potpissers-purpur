@@ -91,6 +91,11 @@ public class Pillager extends AbstractIllager implements CrossbowAttackMob, Inve
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.pillagerAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));

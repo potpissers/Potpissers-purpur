@@ -99,6 +99,11 @@ public class Ocelot extends Animal {
         return this.level().purpurConfig.ocelotTakeDamageFromWater;
     }
 
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.ocelotAlwaysDropExp;
+    }
+
     public boolean isTrusting() {
         return (Boolean) this.entityData.get(Ocelot.DATA_TRUSTING);
     }

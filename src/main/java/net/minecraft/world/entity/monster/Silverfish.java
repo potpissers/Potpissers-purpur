@@ -74,6 +74,11 @@ public class Silverfish extends Monster {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.silverfishAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         this.friendsGoal = new Silverfish.SilverfishWakeUpFriendsGoal(this);
         this.goalSelector.addGoal(1, new FloatGoal(this));

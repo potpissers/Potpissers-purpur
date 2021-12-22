@@ -56,6 +56,11 @@ public class ElderGuardian extends Guardian {
         return this.level().purpurConfig.elderGuardianTakeDamageFromWater;
     }
 
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.elderGuardianAlwaysDropExp;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return Guardian.createAttributes().add(Attributes.MOVEMENT_SPEED, 0.30000001192092896D).add(Attributes.ATTACK_DAMAGE, 8.0D).add(Attributes.MAX_HEALTH, 80.0D);
     }

@@ -143,6 +143,11 @@ public class Phantom extends FlyingMob implements Enemy {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.phantomAlwaysDropExp;
+    }
+
+    @Override
     public boolean isFlapping() {
         return (this.getUniqueFlapTickOffset() + this.tickCount) % Phantom.TICKS_PER_FLAP == 0;
     }

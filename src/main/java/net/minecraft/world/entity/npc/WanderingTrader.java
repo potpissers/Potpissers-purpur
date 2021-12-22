@@ -104,6 +104,11 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.wanderingTraderAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(0, new UseItemGoal<>(this, PotionContents.createItemStack(Items.POTION, Potions.INVISIBILITY), SoundEvents.WANDERING_TRADER_DISAPPEARED, (entityvillagertrader) -> {

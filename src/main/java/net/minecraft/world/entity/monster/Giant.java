@@ -55,6 +55,11 @@ public class Giant extends Monster {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.giantAlwaysDropExp;
+    }
+
+    @Override
     protected void initAttributes() {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.level().purpurConfig.giantMaxHealth);
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.giantScale);

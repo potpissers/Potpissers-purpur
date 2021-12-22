@@ -74,6 +74,11 @@ public class Pufferfish extends AbstractFish {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.pufferfishAlwaysDropExp;
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(Pufferfish.PUFF_STATE, 0);

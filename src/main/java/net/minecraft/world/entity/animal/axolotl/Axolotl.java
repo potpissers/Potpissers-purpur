@@ -131,6 +131,11 @@ public class Axolotl extends Animal implements LerpingModel, VariantHolder<Axolo
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.axolotlAlwaysDropExp;
+    }
+
+    @Override
     public Map<String, Vector3f> getModelRotationValues() {
         return this.modelRotationValues;
     }

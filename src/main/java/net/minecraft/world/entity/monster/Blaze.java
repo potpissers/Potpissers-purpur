@@ -81,6 +81,11 @@ public class Blaze extends Monster {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.blazeAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(4, new Blaze.BlazeAttackGoal(this));

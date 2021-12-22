@@ -165,6 +165,11 @@ public class Panda extends Animal {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.pandaAlwaysDropExp;
+    }
+
+    @Override
     public boolean canTakeItem(ItemStack stack) {
         EquipmentSlot enumitemslot = this.getEquipmentSlotForItem(stack);
 

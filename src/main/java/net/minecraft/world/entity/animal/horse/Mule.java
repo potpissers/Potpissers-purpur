@@ -47,6 +47,11 @@ public class Mule extends AbstractChestedHorse {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.muleAlwaysDropExp;
+    }
+
+    @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.MULE_AMBIENT;
     }

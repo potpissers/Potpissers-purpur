@@ -139,6 +139,11 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.shulkerAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F, 0.02F, true));

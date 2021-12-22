@@ -125,6 +125,11 @@ public class Strider extends Animal implements ItemSteerable, Saddleable {
         return this.level().purpurConfig.striderBreedingTicks;
     }
 
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.striderAlwaysDropExp;
+    }
+
     public static boolean checkStriderSpawnRules(EntityType<Strider> type, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, RandomSource random) {
         BlockPos.MutableBlockPos blockposition_mutableblockposition = pos.mutable();
 

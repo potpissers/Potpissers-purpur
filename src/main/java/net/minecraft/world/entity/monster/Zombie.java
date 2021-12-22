@@ -150,6 +150,11 @@ public class Zombie extends Monster {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.zombieAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         if (this.level().paperConfig().entities.behavior.zombiesTargetTurtleEggs) this.goalSelector.addGoal(4, new Zombie.ZombieAttackTurtleEggGoal(this, 1.0D, 3)); // Paper - Add zombie targets turtle egg config

@@ -74,6 +74,11 @@ public class SkeletonHorse extends AbstractHorse {
         return this.level().purpurConfig.skeletonHorseTakeDamageFromWater;
     }
 
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.skeletonHorseAlwaysDropExp;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return createBaseHorseAttributes().add(Attributes.MAX_HEALTH, 15.0D).add(Attributes.MOVEMENT_SPEED, 0.20000000298023224D);
     }

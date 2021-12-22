@@ -202,6 +202,11 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
         return this.level().purpurConfig.parrotTakeDamageFromWater;
     }
 
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.parrotAlwaysDropExp;
+    }
+
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor world, DifficultyInstance difficulty, MobSpawnType spawnReason, @Nullable SpawnGroupData entityData) {

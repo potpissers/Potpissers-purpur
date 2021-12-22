@@ -49,6 +49,11 @@ public class Stray extends AbstractSkeleton {
         return this.level().purpurConfig.strayTakeDamageFromWater;
     }
 
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.strayAlwaysDropExp;
+    }
+
     public static boolean checkStraySpawnRules(EntityType<Stray> type, ServerLevelAccessor world, MobSpawnType spawnReason, BlockPos pos, RandomSource random) {
         BlockPos blockPos = pos;
 

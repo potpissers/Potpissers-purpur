@@ -156,6 +156,11 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
     public boolean isSensitiveToWater() {
         return this.level().purpurConfig.rabbitTakeDamageFromWater;
     }
+
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.rabbitAlwaysDropExp;
+    }
     // Purpur end
 
     @Override

@@ -86,6 +86,11 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.snowGolemAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
         this.goalSelector.addGoal(1, new RangedAttackGoal(this, level().purpurConfig.snowGolemAttackDistance, level().purpurConfig.snowGolemSnowBallMin, level().purpurConfig.snowGolemSnowBallMax, level().purpurConfig.snowGolemSnowBallModifier)); // Purpur

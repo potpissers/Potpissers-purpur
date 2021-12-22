@@ -48,6 +48,11 @@ public class Donkey extends AbstractChestedHorse {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.donkeyAlwaysDropExp;
+    }
+
+    @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.DONKEY_AMBIENT;
     }

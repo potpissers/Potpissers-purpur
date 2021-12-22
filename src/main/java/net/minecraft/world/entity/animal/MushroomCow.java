@@ -97,6 +97,11 @@ public class MushroomCow extends Cow implements Shearable, VariantHolder<Mushroo
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.mooshroomAlwaysDropExp;
+    }
+
+    @Override
     public float getWalkTargetValue(BlockPos pos, LevelReader world) {
         return world.getBlockState(pos.below()).is(Blocks.MYCELIUM) ? 10.0F : world.getPathfindingCostFromLightLevels(pos);
     }

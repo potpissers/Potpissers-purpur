@@ -83,6 +83,11 @@ public class Slime extends Mob implements Enemy {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.slimeAlwaysDropExp;
+    }
+
+    @Override
     public boolean dismountsUnderwater() {
         return level().purpurConfig.useDismountsUnderwaterTag ? super.dismountsUnderwater() : !level().purpurConfig.slimeRidableInWater;
     }

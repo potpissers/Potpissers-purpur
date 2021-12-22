@@ -120,6 +120,11 @@ public class Drowned extends Zombie implements RangedAttackMob {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.drownedAlwaysDropExp;
+    }
+
+    @Override
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new Drowned.DrownedGoToWaterGoal(this, 1.0D));
         this.goalSelector.addGoal(2, new Drowned.DrownedTridentAttackGoal(this, 1.0D, 40, 10.0F));

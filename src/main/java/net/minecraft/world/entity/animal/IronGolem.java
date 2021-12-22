@@ -101,6 +101,11 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.ironGolemAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         if (level().purpurConfig.ironGolemCanSwim) this.goalSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.FloatGoal(this)); // Purpur
         if (this.level().purpurConfig.ironGolemPoppyCalm) this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.ReceiveFlower(this)); // Purpur

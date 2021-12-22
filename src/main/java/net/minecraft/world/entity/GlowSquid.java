@@ -52,6 +52,11 @@ public class GlowSquid extends Squid {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.glowSquidAlwaysDropExp;
+    }
+
+    @Override
     protected ParticleOptions getInkParticle() {
         return ParticleTypes.GLOW_SQUID_INK;
     }

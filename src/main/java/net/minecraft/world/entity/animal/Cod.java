@@ -36,6 +36,11 @@ public class Cod extends AbstractSchoolingFish {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.codAlwaysDropExp;
+    }
+
+    @Override
     public ItemStack getBucketItemStack() {
         return new ItemStack(Items.COD_BUCKET);
     }

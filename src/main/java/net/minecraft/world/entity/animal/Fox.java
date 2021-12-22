@@ -200,6 +200,11 @@ public class Fox extends Animal implements VariantHolder<Fox.Type> {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.foxAlwaysDropExp;
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(Fox.DATA_TRUSTED_ID_0, Optional.empty());

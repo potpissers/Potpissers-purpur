@@ -143,6 +143,11 @@ public class Ghast extends FlyingMob implements Enemy {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.ghastAlwaysDropExp;
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(Ghast.DATA_IS_CHARGING, false);

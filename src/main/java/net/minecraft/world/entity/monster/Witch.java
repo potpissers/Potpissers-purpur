@@ -85,6 +85,11 @@ public class Witch extends Raider implements RangedAttackMob {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.witchAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         super.registerGoals();
         this.healRaidersGoal = new NearestHealableRaiderTargetGoal<>(this, Raider.class, true, (entityliving) -> {

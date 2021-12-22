@@ -124,6 +124,11 @@ public class Hoglin extends Animal implements Enemy, HoglinBase {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.hoglinAlwaysDropExp;
+    }
+
+    @Override
     public boolean canBeLeashed() {
         return true;
     }

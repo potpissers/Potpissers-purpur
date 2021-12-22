@@ -104,6 +104,11 @@ public class Ravager extends Raider {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.ravagerAlwaysDropExp;
+    }
+
+    @Override
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));

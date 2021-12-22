@@ -284,6 +284,11 @@ public class Bat extends AmbientCreature {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.batAlwaysDropExp;
+    }
+
+    @Override
     public void readAdditionalSaveData(CompoundTag nbt) {
         super.readAdditionalSaveData(nbt);
         this.entityData.set(Bat.DATA_ID_FLAGS, nbt.getByte("BatFlags"));

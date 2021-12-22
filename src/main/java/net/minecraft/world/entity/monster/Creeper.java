@@ -283,6 +283,11 @@ public class Creeper extends Monster implements PowerableMob {
     // Purpur end - Config to make Creepers explode on death
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.creeperAlwaysDropExp;
+    }
+
+    @Override
     protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.CREEPER_HURT;
     }

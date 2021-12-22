@@ -119,6 +119,11 @@ public class Goat extends Animal {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.goatAlwaysDropExp;
+    }
+
+    @Override
     protected Brain.Provider<Goat> brainProvider() {
         return Brain.provider(Goat.MEMORY_TYPES, Goat.SENSOR_TYPES);
     }

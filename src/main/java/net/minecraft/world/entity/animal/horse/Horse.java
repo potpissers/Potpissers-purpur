@@ -78,6 +78,11 @@ public class Horse extends AbstractHorse implements VariantHolder<Variant> {
     }
 
     @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.horseAlwaysDropExp;
+    }
+
+    @Override
     protected void randomizeAttributes(RandomSource random) {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue((double)generateMaxHealth(random::nextInt));
         this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(generateSpeed(random::nextDouble));

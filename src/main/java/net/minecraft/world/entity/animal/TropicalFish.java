@@ -89,6 +89,11 @@ public class TropicalFish extends AbstractSchoolingFish implements VariantHolder
         return this.level().purpurConfig.tropicalFishTakeDamageFromWater;
     }
 
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.tropicalFishAlwaysDropExp;
+    }
+
     public static String getPredefinedName(int variant) {
         return "entity.minecraft.tropical_fish.predefined." + variant;
     }
