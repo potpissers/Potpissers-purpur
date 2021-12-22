@@ -39,6 +39,13 @@ public class Cod extends AbstractSchoolingFish {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.codAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public ItemStack getBucketItemStack() {
         return new ItemStack(Items.COD_BUCKET);

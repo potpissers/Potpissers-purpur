@@ -142,6 +142,13 @@ public class Goat extends Animal {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.goatAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     protected Brain.Provider<Goat> brainProvider() {
         return Brain.provider(MEMORY_TYPES, SENSOR_TYPES);

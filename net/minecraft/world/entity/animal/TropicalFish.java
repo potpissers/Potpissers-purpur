@@ -93,6 +93,13 @@ public class TropicalFish extends AbstractSchoolingFish implements VariantHolder
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.tropicalFishAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     public static String getPredefinedName(int variantId) {
         return "entity.minecraft.tropical_fish.predefined." + variantId;
     }

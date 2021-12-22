@@ -82,6 +82,13 @@ public class TraderLlama extends Llama {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.traderLlamaAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public boolean isTraderLlama() {
         return true;

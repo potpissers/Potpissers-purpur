@@ -274,6 +274,13 @@ public class Creeper extends Monster {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.creeperAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSource) {
         return SoundEvents.CREEPER_HURT;

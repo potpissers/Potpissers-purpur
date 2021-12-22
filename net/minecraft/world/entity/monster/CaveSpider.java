@@ -58,6 +58,13 @@ public class CaveSpider extends Spider {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.caveSpiderAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public boolean doHurtTarget(ServerLevel level, Entity source) {
         if (super.doHurtTarget(level, source)) {

@@ -138,6 +138,13 @@ public class PolarBear extends Animal implements NeutralMob {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.polarBearAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob otherParent) {

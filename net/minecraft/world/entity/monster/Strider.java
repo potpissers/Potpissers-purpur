@@ -126,6 +126,13 @@ public class Strider extends Animal implements ItemSteerable, Saddleable {
     }
     // Purpur end - Make entity breeding times configurable
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.striderAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     public static boolean checkStriderSpawnRules(
         EntityType<Strider> entityType, LevelAccessor level, EntitySpawnReason spawnReason, BlockPos pos, RandomSource random
     ) {

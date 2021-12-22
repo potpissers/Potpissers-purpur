@@ -157,6 +157,13 @@ public class Phantom extends FlyingMob implements Enemy {
     public void setShouldBurnInDay(boolean shouldBurnInDay) { this.shouldBurnInDay = shouldBurnInDay; }
     // Purpur end - API for any mob to burn daylight
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.phantomAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public boolean isFlapping() {
         return (this.getUniqueFlapTickOffset() + this.tickCount) % TICKS_PER_FLAP == 0;

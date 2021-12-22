@@ -81,6 +81,13 @@ public class Horse extends AbstractHorse implements VariantHolder<Variant> {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.horseAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     protected void randomizeAttributes(RandomSource random) {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(generateMaxHealth(random::nextInt));

@@ -95,6 +95,13 @@ public class Chicken extends Animal {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.chickenAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));

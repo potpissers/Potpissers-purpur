@@ -154,6 +154,13 @@ public class Panda extends Animal {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.pandaAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     protected boolean canDispenserEquipIntoSlot(EquipmentSlot slot) {
         return slot == EquipmentSlot.MAINHAND && this.canPickUpLoot();

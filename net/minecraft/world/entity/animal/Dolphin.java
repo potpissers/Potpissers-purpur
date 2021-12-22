@@ -163,6 +163,13 @@ public class Dolphin extends AgeableWaterCreature {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.dolphinAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(

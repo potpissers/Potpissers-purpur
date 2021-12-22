@@ -105,6 +105,13 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.ironGolemAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     protected void registerGoals() {
         if (this.level().purpurConfig.ironGolemPoppyCalm) this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.ReceiveFlower(this)); // Purpur - Iron golem calm anger options

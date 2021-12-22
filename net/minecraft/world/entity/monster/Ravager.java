@@ -104,6 +104,13 @@ public class Ravager extends Raider {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.ravagerAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     protected void registerGoals() {
         super.registerGoals();

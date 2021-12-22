@@ -285,6 +285,13 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.villagerAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public Brain<Villager> getBrain() {
         return (Brain<Villager>)super.getBrain();

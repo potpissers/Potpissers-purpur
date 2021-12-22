@@ -53,6 +53,13 @@ public class Mule extends AbstractChestedHorse {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.muleAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.MULE_AMBIENT;

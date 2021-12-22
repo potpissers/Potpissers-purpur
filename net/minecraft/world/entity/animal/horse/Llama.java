@@ -155,6 +155,13 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.llamaAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     public boolean isTraderLlama() {
         return false;
     }

@@ -116,6 +116,13 @@ public class Bat extends AmbientCreature {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.batAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public boolean isFlapping() {
         return !this.isResting() && this.tickCount % 10.0F == 0.0F;

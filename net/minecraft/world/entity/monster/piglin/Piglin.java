@@ -183,6 +183,13 @@ public class Piglin extends AbstractPiglin implements CrossbowAttackMob, Invento
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.piglinAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);

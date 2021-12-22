@@ -208,6 +208,13 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.parrotAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(

@@ -494,6 +494,13 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.beeAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public int getRemainingPersistentAngerTime() {
         return this.entityData.get(DATA_REMAINING_ANGER_TIME);

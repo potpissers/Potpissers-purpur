@@ -71,6 +71,13 @@ public class Pufferfish extends AbstractFish {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.pufferfishAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);

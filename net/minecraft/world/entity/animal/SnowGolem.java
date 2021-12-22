@@ -86,6 +86,13 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
     }
     // Purpur end - Configurable entity base attributes
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.snowGolemAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur - Ridables

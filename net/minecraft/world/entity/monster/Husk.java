@@ -75,6 +75,13 @@ public class Husk extends Zombie {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.huskAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     public static boolean checkHuskSpawnRules(
         EntityType<Husk> entityType, ServerLevelAccessor level, EntitySpawnReason spawnReason, BlockPos pos, RandomSource random
     ) {

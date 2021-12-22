@@ -53,6 +53,13 @@ public class Stray extends AbstractSkeleton {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.strayAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     public static boolean checkStraySpawnRules(
         EntityType<Stray> entityType, ServerLevelAccessor level, EntitySpawnReason spawnReason, BlockPos pos, RandomSource random
     ) {

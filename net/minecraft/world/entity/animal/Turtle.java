@@ -123,6 +123,13 @@ public class Turtle extends Animal {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.turtleAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     public void setHomePos(BlockPos homePos) {
         this.entityData.set(HOME_POS, homePos);
     }

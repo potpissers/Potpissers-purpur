@@ -112,6 +112,13 @@ public class ZombifiedPiglin extends Zombie implements NeutralMob {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.zombifiedPiglinAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public void setPersistentAngerTarget(@Nullable UUID target) {
         this.persistentAngerTarget = target;

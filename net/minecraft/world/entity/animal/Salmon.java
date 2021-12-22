@@ -61,6 +61,13 @@ public class Salmon extends AbstractSchoolingFish implements VariantHolder<Salmo
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.salmonAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public int getMaxSchoolSize() {
         return 5;

@@ -159,6 +159,13 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.rabbitAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));

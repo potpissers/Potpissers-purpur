@@ -97,6 +97,13 @@ public class PiglinBrute extends AbstractPiglin {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.piglinBruteAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
             .add(Attributes.MAX_HEALTH, 50.0)

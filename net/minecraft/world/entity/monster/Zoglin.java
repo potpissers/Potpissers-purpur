@@ -117,6 +117,13 @@ public class Zoglin extends Monster implements HoglinBase {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.zoglinAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     protected Brain.Provider<Zoglin> brainProvider() {
         return Brain.provider(MEMORY_TYPES, SENSOR_TYPES);

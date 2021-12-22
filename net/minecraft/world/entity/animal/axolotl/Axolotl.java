@@ -154,6 +154,13 @@ public class Axolotl extends Animal implements VariantHolder<Axolotl.Variant>, B
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.axolotlAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public float getWalkTargetValue(BlockPos pos, LevelReader level) {
         return 0.0F;

@@ -117,6 +117,13 @@ public class Vex extends Monster implements TraceableEntity {
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.vexAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public boolean isFlapping() {
         return this.tickCount % TICKS_PER_FLAP == 0;

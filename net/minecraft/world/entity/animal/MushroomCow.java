@@ -93,6 +93,13 @@ public class MushroomCow extends Cow implements Shearable, VariantHolder<Mushroo
     }
     // Purpur end - Toggle for water sensitive mob damage
 
+    // Purpur start - Mobs always drop experience
+    @Override
+    protected boolean isAlwaysExperienceDropper() {
+        return this.level().purpurConfig.mooshroomAlwaysDropExp;
+    }
+    // Purpur end - Mobs always drop experience
+
     @Override
     public float getWalkTargetValue(BlockPos pos, LevelReader level) {
         return level.getBlockState(pos.below()).is(Blocks.MYCELIUM) ? 10.0F : level.getPathfindingCostFromLightLevels(pos);
