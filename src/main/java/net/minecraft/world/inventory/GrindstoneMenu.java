@@ -96,12 +96,14 @@ public class GrindstoneMenu extends AbstractContainerMenu {
 
             @Override
             public void onTake(net.minecraft.world.entity.player.Player player, ItemStack stack) {
+                ItemStack itemstack = activeQuickItem == null ? stack : activeQuickItem; // Purpur
                 context.execute((world, blockposition) -> {
                     if (world instanceof ServerLevel) {
                         // Paper start - Fire BlockExpEvent on grindstone use
                         org.bukkit.event.block.BlockExpEvent event = new org.bukkit.event.block.BlockExpEvent(org.bukkit.craftbukkit.block.CraftBlock.at(world, blockposition), this.getExperienceAmount(world));
                         event.callEvent();
-                        ExperienceOrb.award((ServerLevel) world, Vec3.atCenterOf(blockposition), event.getExpToDrop(), org.bukkit.entity.ExperienceOrb.SpawnReason.GRINDSTONE, player);
+                        org.purpurmc.purpur.event.inventory.GrindstoneTakeResultEvent grindstoneTakeResultEvent = new org.purpurmc.purpur.event.inventory.GrindstoneTakeResultEvent(player.getBukkitEntity(), getBukkitView(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemstack), event.getExpToDrop()); grindstoneTakeResultEvent.callEvent(); // Purpur
+                        ExperienceOrb.award((ServerLevel) world, Vec3.atCenterOf(blockposition), grindstoneTakeResultEvent.getExperienceAmount(), org.bukkit.entity.ExperienceOrb.SpawnReason.GRINDSTONE, player); // Purpur
                         // Paper end - Fire BlockExpEvent on grindstone use
                     }
 
@@ -398,7 +400,9 @@ public class GrindstoneMenu extends AbstractContainerMenu {
                 return ItemStack.EMPTY;
             }
 
+            this.activeQuickItem = itemstack; // Purpur
             slot1.onTake(player, itemstack1);
+            this.activeQuickItem = null; // Purpur
         }
 
         return itemstack;
