@@ -68,4 +68,15 @@ public class NetherWartBlock extends BushBlock {
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(NetherWartBlock.AGE);
     }
+
+    // Purpur start
+    @Override
+    public void playerDestroy(net.minecraft.world.level.Level world, net.minecraft.world.entity.player.Player player, BlockPos pos, BlockState state, @javax.annotation.Nullable net.minecraft.world.level.block.entity.BlockEntity blockEntity, ItemStack itemInHand, boolean includeDrops, boolean dropExp) {
+        if (world.purpurConfig.hoeReplantsNetherWarts && itemInHand.getItem() instanceof net.minecraft.world.item.HoeItem) {
+            super.playerDestroyAndReplant(world, player, pos, state, blockEntity, itemInHand, Items.NETHER_WART);
+        } else {
+            super.playerDestroy(world, player, pos, state, blockEntity, itemInHand, includeDrops, dropExp);
+        }
+    }
+    // Purpur end
 }
