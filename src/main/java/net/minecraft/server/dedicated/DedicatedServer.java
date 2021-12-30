@@ -396,6 +396,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
 
             if (gg.pufferfish.pufferfish.PufferfishConfig.enableAsyncMobSpawning) mobSpawnExecutor.start(); // Pufferfish
             org.purpurmc.purpur.task.BossBarTask.startAll(); // Purpur
+            if (org.purpurmc.purpur.PurpurConfig.beeCountPayload) org.purpurmc.purpur.task.BeehiveTask.instance().register(); // Purpur
             return true;
         }
     }
