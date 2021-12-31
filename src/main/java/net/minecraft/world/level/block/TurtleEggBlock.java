@@ -170,7 +170,7 @@ public class TurtleEggBlock extends Block {
     private boolean shouldUpdateHatchLevel(Level world) {
         float f = world.getTimeOfDay(1.0F);
 
-        return (double) f < 0.69D && (double) f > 0.65D ? true : world.random.nextInt(500) == 0;
+        return (double) f < 0.69D && (double) f > 0.65D ? true : world.random.nextInt(world.purpurConfig.turtleEggsRandomTickCrackChance) == 0;
     }
 
     @Override
