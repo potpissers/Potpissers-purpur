@@ -1046,9 +1046,20 @@ public abstract class LivingEntity extends Entity implements Attackable {
             ItemStack itemstack = this.getItemBySlot(EquipmentSlot.HEAD);
             EntityType<?> entitytypes = entity.getType();
 
-            if (entitytypes == EntityType.SKELETON && itemstack.is(Items.SKELETON_SKULL) || entitytypes == EntityType.ZOMBIE && itemstack.is(Items.ZOMBIE_HEAD) || entitytypes == EntityType.PIGLIN && itemstack.is(Items.PIGLIN_HEAD) || entitytypes == EntityType.PIGLIN_BRUTE && itemstack.is(Items.PIGLIN_HEAD) || entitytypes == EntityType.CREEPER && itemstack.is(Items.CREEPER_HEAD)) {
-                d0 *= 0.5D;
+            // Purpur start
+            if (entitytypes == EntityType.SKELETON && itemstack.is(Items.SKELETON_SKULL)) {
+                d0 *= entity.level().purpurConfig.skeletonHeadVisibilityPercent;
             }
+            else if (entitytypes == EntityType.ZOMBIE && itemstack.is(Items.ZOMBIE_HEAD)) {
+                d0 *= entity.level().purpurConfig.zombieHeadVisibilityPercent;
+            }
+            else if (entitytypes == EntityType.CREEPER && itemstack.is(Items.CREEPER_HEAD)) {
+                d0 *= entity.level().purpurConfig.creeperHeadVisibilityPercent;
+            }
+            else if ((entitytypes == EntityType.PIGLIN || entitytypes == EntityType.PIGLIN_BRUTE) && itemstack.is(Items.PIGLIN_HEAD)) {
+                d0 *= entity.level().purpurConfig.piglinHeadVisibilityPercent;
+            }
+            // Purpur end
 
             // Purpur start
             if (entity instanceof LivingEntity entityliving) {
