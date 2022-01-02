@@ -454,4 +454,11 @@ public class PurpurConfig {
     private static void networkSettings() {
         useUPnP = getBoolean("settings.network.upnp-port-forwarding", useUPnP);
     }
+
+    public static java.util.regex.Pattern usernameValidCharactersPattern;
+    private static void usernameValidationSettings() {
+        String defaultPattern = "^[a-zA-Z0-9_.]*$";
+        String setPattern = getString("settings.username-valid-characters", defaultPattern);
+        usernameValidCharactersPattern = java.util.regex.Pattern.compile(setPattern == null || setPattern.isBlank() ? defaultPattern : setPattern);
+    }
 }
