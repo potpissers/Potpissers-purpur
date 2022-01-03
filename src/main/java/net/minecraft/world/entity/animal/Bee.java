@@ -446,6 +446,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
             this.hurt(this.damageSources().drown(), 1.0F);
         }
 
+        if (flag && !this.level().purpurConfig.beeDiesAfterSting) setHasStung(false); else // Purpur
         if (flag) {
             ++this.timeSinceSting;
             if (this.timeSinceSting % 5 == 0 && this.random.nextInt(Mth.clamp(1200 - this.timeSinceSting, 1, 1200)) == 0) {

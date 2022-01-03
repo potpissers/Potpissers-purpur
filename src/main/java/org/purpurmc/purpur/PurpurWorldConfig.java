@@ -1153,6 +1153,7 @@ public class PurpurWorldConfig {
     public boolean beeCanWorkAtNight = false;
     public boolean beeCanWorkInRain = false;
     public boolean beeAlwaysDropExp = false;
+    public boolean beeDiesAfterSting = true;
     private void beeSettings() {
         beeRidable = getBoolean("mobs.bee.ridable", beeRidable);
         beeRidableInWater = getBoolean("mobs.bee.ridable-in-water", beeRidableInWater);
@@ -1170,6 +1171,7 @@ public class PurpurWorldConfig {
         beeCanWorkAtNight = getBoolean("mobs.bee.can-work-at-night", beeCanWorkAtNight);
         beeCanWorkInRain = getBoolean("mobs.bee.can-work-in-rain", beeCanWorkInRain);
         beeAlwaysDropExp = getBoolean("mobs.bee.always-drop-exp", beeAlwaysDropExp);
+        beeDiesAfterSting = getBoolean("mobs.bee.dies-after-sting", beeDiesAfterSting);
     }
 
     public boolean blazeRidable = false;
