@@ -104,7 +104,7 @@ public class ShearsDispenseItemBehavior extends OptionalDispenseItemBehavior {
                 if (ishearable.readyForShearing()) {
                     // CraftBukkit start
                     // Paper start - Add drops to shear events
-                    org.bukkit.event.block.BlockShearEntityEvent event = CraftEventFactory.callBlockShearEntityEvent(entityliving, bukkitBlock, craftItem, ishearable.generateDefaultDrops());
+                    org.bukkit.event.block.BlockShearEntityEvent event = CraftEventFactory.callBlockShearEntityEvent(entityliving, bukkitBlock, craftItem, ishearable.generateDefaultDrops(net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.LOOTING, CraftItemStack.asNMSCopy(craftItem)))); // Purpur
                     if (event.isCancelled()) {
                         // Paper end - Add drops to shear events
                         continue;

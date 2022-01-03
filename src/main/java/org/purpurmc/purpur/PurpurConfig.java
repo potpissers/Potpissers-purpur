@@ -393,6 +393,7 @@ public class PurpurConfig {
         }
     }
 
+    public static boolean allowShearsLooting = false;
     public static boolean allowInapplicableEnchants = false;
     public static boolean allowIncompatibleEnchants = false;
     public static boolean allowHigherEnchantsLevels = false;
@@ -416,6 +417,7 @@ public class PurpurConfig {
             }
             set("settings.enchantment.anvil.allow-unsafe-enchants", null);
         }
+        allowShearsLooting = getBoolean("settings.enchantment.allow-looting-on-shears", allowShearsLooting);
         allowInapplicableEnchants = getBoolean("settings.enchantment.anvil.allow-inapplicable-enchants", allowInapplicableEnchants);
         allowIncompatibleEnchants = getBoolean("settings.enchantment.anvil.allow-incompatible-enchants", allowIncompatibleEnchants);
         allowHigherEnchantsLevels = getBoolean("settings.enchantment.anvil.allow-higher-enchants-levels", allowHigherEnchantsLevels);

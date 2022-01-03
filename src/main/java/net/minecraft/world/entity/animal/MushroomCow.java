@@ -161,7 +161,7 @@ public class MushroomCow extends Cow implements Shearable, VariantHolder<Mushroo
         } else if (itemstack.is(Items.SHEARS) && this.readyForShearing()) {
             // CraftBukkit start
             // Paper start - custom shear drops
-            java.util.List<ItemStack> drops = this.generateDefaultDrops();
+            java.util.List<ItemStack> drops = this.generateDefaultDrops(net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.LOOTING, itemstack)); // Purpur
             org.bukkit.event.player.PlayerShearEntityEvent event = CraftEventFactory.handlePlayerShearEntityEvent(player, this, itemstack, hand, drops);
             if (event != null) {
                 if (event.isCancelled()) {
@@ -209,13 +209,13 @@ public class MushroomCow extends Cow implements Shearable, VariantHolder<Mushroo
     @Override
     public void shear(SoundSource shearedSoundCategory) {
         // Paper start - custom shear drops
-        this.shear(shearedSoundCategory, this.generateDefaultDrops());
+        this.shear(shearedSoundCategory, this.generateDefaultDrops(0)); // Purpur
     }
 
     @Override
-    public java.util.List<ItemStack> generateDefaultDrops() {
+    public java.util.List<ItemStack> generateDefaultDrops(int looting) { // Purpur
         java.util.List<ItemStack> dropEntities = new java.util.ArrayList<>(5);
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 5 + (org.purpurmc.purpur.PurpurConfig.allowShearsLooting ? looting : 0); ++i) { // Purpur
             dropEntities.add(new ItemStack(this.getVariant().getBlockState().getBlock()));
         }
         return dropEntities;

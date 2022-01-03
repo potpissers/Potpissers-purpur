@@ -8,7 +8,7 @@ public interface Shearable {
 
     boolean readyForShearing();
     // Paper start - custom shear drops; ensure all implementing entities override this
-    default java.util.List<net.minecraft.world.item.ItemStack> generateDefaultDrops() {
+    default java.util.List<net.minecraft.world.item.ItemStack> generateDefaultDrops(int looting) { // Purpur
         return java.util.Collections.emptyList();
     }
     // Paper end - custom shear drops

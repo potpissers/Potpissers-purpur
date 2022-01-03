@@ -296,7 +296,7 @@ public class Sheep extends Animal implements Shearable {
             if (!this.level().isClientSide && this.readyForShearing()) {
                 // CraftBukkit start
                 // Paper start - custom shear drops
-                java.util.List<ItemStack> drops = this.generateDefaultDrops();
+                java.util.List<ItemStack> drops = this.generateDefaultDrops(net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.LOOTING, itemstack)); // Purpur
                 org.bukkit.event.player.PlayerShearEntityEvent event = CraftEventFactory.handlePlayerShearEntityEvent(player, this, itemstack, hand, drops);
                 if (event != null) {
                     if (event.isCancelled()) {
@@ -321,12 +321,13 @@ public class Sheep extends Animal implements Shearable {
     @Override
     public void shear(SoundSource shearedSoundCategory) {
         // Paper start - custom shear drops
-        this.shear(shearedSoundCategory, this.generateDefaultDrops());
+        this.shear(shearedSoundCategory, this.generateDefaultDrops(0)); // Purpur
     }
 
     @Override
-    public java.util.List<ItemStack> generateDefaultDrops() {
+    public java.util.List<ItemStack> generateDefaultDrops(int looting) { // Purpur
         int count = 1 + this.random.nextInt(3);
+        if (org.purpurmc.purpur.PurpurConfig.allowShearsLooting) count += looting; // Purpur
         java.util.List<ItemStack> dropEntities = new java.util.ArrayList<>(count);
         for (int j = 0; j < count; ++j) {
             dropEntities.add(new ItemStack(Sheep.ITEM_BY_DYE.get(this.getColor())));
