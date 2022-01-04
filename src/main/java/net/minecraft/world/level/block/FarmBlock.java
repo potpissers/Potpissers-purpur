@@ -111,7 +111,7 @@ public class FarmBlock extends Block {
     @Override
     public void fallOn(Level world, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
         super.fallOn(world, state, pos, entity, fallDistance); // CraftBukkit - moved here as game rules / events shouldn't affect fall damage.
-        if (!world.isClientSide && world.random.nextFloat() < fallDistance - 0.5F && entity instanceof LivingEntity && (entity instanceof Player || world.purpurConfig.farmlandBypassMobGriefing || world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) && entity.getBbWidth() * entity.getBbWidth() * entity.getBbHeight() > 0.512F) { // Purpur
+        if (!world.isClientSide && (world.purpurConfig.farmlandTrampleHeight >= 0D ? fallDistance >= world.purpurConfig.farmlandTrampleHeight : world.random.nextFloat() < fallDistance - 0.5F) && entity instanceof LivingEntity && (entity instanceof Player || world.purpurConfig.farmlandBypassMobGriefing || world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) && entity.getBbWidth() * entity.getBbWidth() * entity.getBbHeight() > 0.512F) { // Purpur
             // CraftBukkit start - Interact soil
             org.bukkit.event.Cancellable cancellable;
             if (entity instanceof Player) {
