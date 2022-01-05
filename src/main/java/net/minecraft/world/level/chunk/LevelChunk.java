@@ -130,7 +130,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
         this.defaultBlockState = empty ? VOID_AIR_BLOCKSTATE : AIR_BLOCKSTATE;
         // Paper end - get block chunk optimisation
 
-        this.lightningTick = new java.util.Random().nextInt(100000) << 1; // Pufferfish - initialize lightning tick
+        this.lightningTick = java.util.concurrent.ThreadLocalRandom.current().nextInt(100000) << 1; // Pufferfish - initialize lightning tick // Purpur - any random will do
     }
 
     // CraftBukkit start

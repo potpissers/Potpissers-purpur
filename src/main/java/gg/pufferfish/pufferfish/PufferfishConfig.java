@@ -232,7 +232,7 @@ public class PufferfishConfig {
     public static int activationDistanceMod;
 
     private static void dynamicActivationOfBrains() throws IOException {
-        dearEnabled = getBoolean("dab.enabled", "activation-range.enabled", true);
+        dearEnabled = getBoolean("dab.enabled", "activation-range.enabled", false); // Purpur
         startDistance = getInt("dab.start-distance", "activation-range.start-distance", 12,
                 "This value determines how far away an entity has to be",
                 "from the player to start being effected by DEAR.");
@@ -276,7 +276,7 @@ public class PufferfishConfig {
     
     public static boolean throttleInactiveGoalSelectorTick;
 	private static void inactiveGoalSelectorThrottle() {
-		throttleInactiveGoalSelectorTick = getBoolean("inactive-goal-selector-throttle", "inactive-goal-selector-disable", true,
+		throttleInactiveGoalSelectorTick = getBoolean("inactive-goal-selector-throttle", "inactive-goal-selector-disable", false, // Purpur
 				"Throttles the AI goal selector in entity inactive ticks.",
 				"This can improve performance by a few percent, but has minor gameplay implications.");
 	}

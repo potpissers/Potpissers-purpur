@@ -49,7 +49,7 @@ dependencies {
 
     // Pufferfish start
     implementation("org.yaml:snakeyaml:1.32")
-    implementation ("me.carleslc.Simple-YAML:Simple-Yaml:1.8.4") {
+    implementation ("com.github.carleslc.Simple-YAML:Simple-Yaml:1.8.4") { // Purpur
         exclude(group="org.yaml", module="snakeyaml")
     }
     // Pufferfish end

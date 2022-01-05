@@ -850,7 +850,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     public void tick() {
         // Pufferfish start - entity TTL
         if (type != EntityType.PLAYER && type.ttl >= 0 && this.tickCount >= type.ttl) {
-            discard();
+            discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DISCARD); // Purpur
             return;
         }
         // Pufferfish end - entity TTL

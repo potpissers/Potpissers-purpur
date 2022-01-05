@@ -71,7 +71,7 @@ public abstract class Projectile extends Entity implements TraceableEntity {
             if (!isLoaded) {
                 if (Projectile.loadedThisTick > gg.pufferfish.pufferfish.PufferfishConfig.maxProjectileLoadsPerTick) {
                     if (++this.loadedLifetime > gg.pufferfish.pufferfish.PufferfishConfig.maxProjectileLoadsPerProjectile) {
-                        this.discard();
+                        this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DISCARD); // Purpur
                     }
                     return;
                 }
