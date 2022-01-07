@@ -551,7 +551,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
         while (iterator.hasNext()) {
             MerchantOffer merchantrecipe = (MerchantOffer) iterator.next();
 
-            merchantrecipe.updateDemand();
+            merchantrecipe.updateDemand(this.level().purpurConfig.villagerMinimumDemand); // Purpur
         }
 
     }

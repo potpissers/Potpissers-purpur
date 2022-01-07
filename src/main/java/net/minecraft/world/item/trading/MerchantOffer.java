@@ -131,7 +131,12 @@ public class MerchantOffer {
     }
 
     public void updateDemand() {
-        this.demand = Math.max(0, this.demand + this.uses - (this.maxUses - this.uses)); // Paper - Fix MC-163962
+        // Purpur start
+        this.updateDemand(0);
+    }
+    public void updateDemand(int minimumDemand) {
+        this.demand = Math.max(minimumDemand, this.demand + this.uses - (this.maxUses - this.uses)); // Paper - Fix MC-163962
+        // Purpur end
     }
 
     public ItemStack assemble() {
