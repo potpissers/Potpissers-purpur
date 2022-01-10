@@ -637,7 +637,7 @@ public abstract class Player extends LivingEntity {
             while (iterator.hasNext()) {
                 Entity entity = (Entity) iterator.next();
 
-                if (entity.getType() == EntityType.EXPERIENCE_ORB) {
+                if (entity.getType() == EntityType.EXPERIENCE_ORB && entity.level().purpurConfig.playerExpPickupDelay >= 0) { // Purpur
                     list1.add(entity);
                 } else if (!entity.isRemoved()) {
                     this.touch(entity);
