@@ -2681,7 +2681,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
             // Spigot Start
             if (entity.getBukkitEntity() instanceof org.bukkit.inventory.InventoryHolder && (!(entity instanceof ServerPlayer) || entity.getRemovalReason() != Entity.RemovalReason.KILLED)) { // SPIGOT-6876: closeInventory clears death message
                 // Paper start - Fix merchant inventory not closing on entity removal
-                if (entity.getBukkitEntity() instanceof org.bukkit.inventory.Merchant merchant && merchant.getTrader() != null) {
+                if (!entity.level().purpurConfig.playerVoidTrading && entity.getBukkitEntity() instanceof org.bukkit.inventory.Merchant merchant && merchant.getTrader() != null) { // Purpur
                     merchant.getTrader().closeInventory(org.bukkit.event.inventory.InventoryCloseEvent.Reason.UNLOADED);
                 }
                 // Paper end - Fix merchant inventory not closing on entity removal
