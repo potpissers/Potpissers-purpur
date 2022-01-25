@@ -46,6 +46,7 @@ public class ShowTradesToPlayer extends Behavior<Villager> {
 
     @Override
     public boolean canStillUse(ServerLevel world, Villager entity, long time) {
+        if (!entity.level().purpurConfig.villagerDisplayTradeItem) return false; // Purpur
         return this.checkExtraStartConditions(world, entity)
             && this.lookTime > 0
             && entity.getBrain().getMemory(MemoryModuleType.INTERACTION_TARGET).isPresent();
