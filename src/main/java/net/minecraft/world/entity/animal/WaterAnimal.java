@@ -71,6 +71,6 @@ public abstract class WaterAnimal extends PathfinderMob {
         i = world.getMinecraftWorld().paperConfig().entities.spawning.wateranimalSpawnHeight.maximum.or(i);
         j = world.getMinecraftWorld().paperConfig().entities.spawning.wateranimalSpawnHeight.minimum.or(j);
         // Paper end - Make water animal spawn height configurable
-        return pos.getY() >= j && pos.getY() <= i && world.getFluidState(pos.below()).is(FluidTags.WATER) && world.getBlockState(pos.above()).is(Blocks.WATER);
+        return ((reason == MobSpawnType.SPAWNER && world.getMinecraftWorld().purpurConfig.spawnerFixMC238526) || (pos.getY() >= j && pos.getY() <= i)) && world.getFluidState(pos.below()).is(FluidTags.WATER) && world.getBlockState(pos.above()).is(Blocks.WATER); // Purpur
     }
 }
