@@ -174,8 +174,13 @@ public class CraftItem extends CraftEntity implements Item {
     }
 
     @Override
+    public void setImmuneToFire(@org.jetbrains.annotations.Nullable Boolean immuneToFire) {
+        this.getHandle().immuneToFire = (immuneToFire != null && immuneToFire);
+    }
+
+    @Override
     public void setImmuneToFire(boolean immuneToFire) {
-        item.immuneToFire = immuneToFire;
+        this.setImmuneToFire((Boolean) immuneToFire);
     }
 
     @Override

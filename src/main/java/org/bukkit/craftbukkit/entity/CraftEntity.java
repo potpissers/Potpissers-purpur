@@ -88,6 +88,16 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
 
     // Purpur start - API for any mob to burn daylight
     @Override
+    public boolean isImmuneToFire() {
+        return getHandle().fireImmune();
+    }
+
+    @Override
+    public void setImmuneToFire(Boolean fireImmune) {
+        getHandle().immuneToFire = fireImmune;
+    }
+
+    @Override
     public boolean isInDaylight() {
         return getHandle().isSunBurnTick();
     }

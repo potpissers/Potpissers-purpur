@@ -433,6 +433,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     public boolean activatedPriorityReset = false; // Pufferfish - DAB
     public int activatedPriority = gg.pufferfish.pufferfish.PufferfishConfig.maximumActivationPrio; // Pufferfish - DAB (golf score)
     public final BlockPos.MutableBlockPos cachedBlockPos = new BlockPos.MutableBlockPos(); // Pufferfish - reduce entity allocations
+    public @Nullable Boolean immuneToFire = null; // Purpur - Fire immune API
 
     public void setOrigin(@javax.annotation.Nonnull Location location) {
         this.origin = location.toVector();
@@ -1880,7 +1881,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
 
     public boolean fireImmune() {
-        return this.getType().fireImmune();
+        return this.immuneToFire != null ? immuneToFire : this.getType().fireImmune(); // Purpur - add fire immune API
     }
 
     public boolean causeFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
@@ -2589,6 +2590,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                 nbttagcompound.putBoolean("Paper.FreezeLock", true);
             }
             // Paper end
+            // Purpur start
+            if (immuneToFire != null) {
+                nbttagcompound.putBoolean("Purpur.FireImmune", immuneToFire);
+            }
+            // Purpur end
             return nbttagcompound;
         } catch (Throwable throwable) {
             CrashReport crashreport = CrashReport.forThrowable(throwable, "Saving entity NBT");
@@ -2736,6 +2742,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                 freezeLocked = nbt.getBoolean("Paper.FreezeLock");
             }
             // Paper end
+            // Purpur start
+            if (nbt.contains("Purpur.FireImmune")) {
+                immuneToFire = nbt.getBoolean("Purpur.FireImmune");
+            }
+            // Purpur end
 
         } catch (Throwable throwable) {
             CrashReport crashreport = CrashReport.forThrowable(throwable, "Loading entity NBT");
