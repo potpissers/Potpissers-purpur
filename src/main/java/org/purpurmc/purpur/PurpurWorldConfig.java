@@ -144,6 +144,7 @@ public class PurpurWorldConfig {
     public boolean mobsIgnoreRails = false;
     public boolean rainStopsAfterSleep = true;
     public boolean thunderStopsAfterSleep = true;
+    public int mobLastHurtByPlayerTime = 100;
     private void miscGameplayMechanicsSettings() {
         useBetterMending = getBoolean("gameplay-mechanics.use-better-mending", useBetterMending);
         alwaysTameInCreative = getBoolean("gameplay-mechanics.always-tame-in-creative", alwaysTameInCreative);
@@ -176,6 +177,7 @@ public class PurpurWorldConfig {
         mobsIgnoreRails = getBoolean("gameplay-mechanics.mobs-ignore-rails", mobsIgnoreRails);
         rainStopsAfterSleep = getBoolean("gameplay-mechanics.rain-stops-after-sleep", rainStopsAfterSleep);
         thunderStopsAfterSleep = getBoolean("gameplay-mechanics.thunder-stops-after-sleep", thunderStopsAfterSleep);
+        mobLastHurtByPlayerTime = getInt("gameplay-mechanics.mob-last-hurt-by-player-time", mobLastHurtByPlayerTime);
     }
 
     public int daytimeTicks = 12000;

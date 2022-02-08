@@ -1579,13 +1579,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
                 if (entity1 instanceof net.minecraft.world.entity.player.Player) {
                     net.minecraft.world.entity.player.Player entityhuman = (net.minecraft.world.entity.player.Player) entity1;
 
-                    this.lastHurtByPlayerTime = 100;
+                    this.lastHurtByPlayerTime = this.level().purpurConfig.mobLastHurtByPlayerTime; // Purpur
                     this.lastHurtByPlayer = entityhuman;
                 } else if (entity1 instanceof Wolf) {
                     Wolf entitywolf = (Wolf) entity1;
 
                     if (entitywolf.isTame()) {
-                        this.lastHurtByPlayerTime = 100;
+                        this.lastHurtByPlayerTime = this.level().purpurConfig.mobLastHurtByPlayerTime; // Purpur
                         LivingEntity entityliving2 = entitywolf.getOwner();
 
                         if (entityliving2 instanceof net.minecraft.world.entity.player.Player) {

@@ -513,7 +513,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
         net.minecraft.server.level.ServerPlayer entityPlayer = killer == null ? null : ((CraftPlayer) killer).getHandle();
         getHandle().lastHurtByPlayer = entityPlayer;
         getHandle().lastHurtByMob = entityPlayer;
-        getHandle().lastHurtByPlayerTime = entityPlayer == null ? 0 : 100; // 100 value taken from EntityLiving#damageEntity
+        getHandle().lastHurtByPlayerTime = entityPlayer == null ? 0 : getHandle().level().purpurConfig.mobLastHurtByPlayerTime; // 100 value taken from EntityLiving#damageEntity // Purpur
     }
     // Paper end
 
