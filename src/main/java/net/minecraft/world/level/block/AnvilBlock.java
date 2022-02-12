@@ -59,6 +59,53 @@ public class AnvilBlock extends FallingBlock {
         return this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getClockWise());
     }
 
+    // Purpur start - repairable/damageable anvils
+    @Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(final net.minecraft.world.item.ItemStack stack, final BlockState state, final Level world, final BlockPos pos, final Player player, final net.minecraft.world.InteractionHand hand, final BlockHitResult hit) {
+        if (world.purpurConfig.anvilRepairIngotsAmount > 0 && stack.is(net.minecraft.world.item.Items.IRON_INGOT)) {
+            if (stack.getCount() < world.purpurConfig.anvilRepairIngotsAmount) {
+                // not enough iron ingots, play "error" sound and consume
+                world.playSound(null, pos, net.minecraft.sounds.SoundEvents.ANVIL_HIT, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                return net.minecraft.world.ItemInteractionResult.CONSUME;
+            }
+            if (state.is(Blocks.DAMAGED_ANVIL)) {
+                world.setBlock(pos, Blocks.CHIPPED_ANVIL.defaultBlockState().setValue(FACING, state.getValue(FACING)), 3);
+            } else if (state.is(Blocks.CHIPPED_ANVIL)) {
+                world.setBlock(pos, Blocks.ANVIL.defaultBlockState().setValue(FACING, state.getValue(FACING)), 3);
+            } else if (state.is(Blocks.ANVIL)) {
+                // anvil is already fully repaired, play "error" sound and consume
+                world.playSound(null, pos, net.minecraft.sounds.SoundEvents.ANVIL_HIT, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                return net.minecraft.world.ItemInteractionResult.CONSUME;
+            }
+            if (!player.getAbilities().instabuild) {
+                stack.shrink(world.purpurConfig.anvilRepairIngotsAmount);
+            }
+            world.playSound(null, pos, net.minecraft.sounds.SoundEvents.ANVIL_PLACE, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+            return net.minecraft.world.ItemInteractionResult.CONSUME;
+        }
+        if (world.purpurConfig.anvilDamageObsidianAmount > 0 && stack.is(net.minecraft.world.item.Items.OBSIDIAN)) {
+            if (stack.getCount() < world.purpurConfig.anvilDamageObsidianAmount) {
+                // not enough obsidian, play "error" sound and consume
+                world.playSound(null, pos, net.minecraft.sounds.SoundEvents.ANVIL_HIT, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                return net.minecraft.world.ItemInteractionResult.CONSUME;
+            }
+            if (state.is(Blocks.DAMAGED_ANVIL)) {
+                world.destroyBlock(pos, false);
+            } else if (state.is(Blocks.CHIPPED_ANVIL)) {
+                world.setBlock(pos, Blocks.DAMAGED_ANVIL.defaultBlockState().setValue(FACING, state.getValue(FACING)), 3);
+            } else if (state.is(Blocks.ANVIL)) {
+                world.setBlock(pos, Blocks.CHIPPED_ANVIL.defaultBlockState().setValue(FACING, state.getValue(FACING)), 3);
+            }
+            if (!player.getAbilities().instabuild) {
+                stack.shrink(world.purpurConfig.anvilDamageObsidianAmount);
+            }
+            world.playSound(null, pos, net.minecraft.sounds.SoundEvents.ANVIL_LAND, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+            return net.minecraft.world.ItemInteractionResult.CONSUME;
+        }
+        return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+    }
+    // Purpur end
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         if (world.isClientSide) {
