@@ -35,7 +35,7 @@ public class ItemEnchantments implements TooltipProvider {
     private static final java.util.Comparator<Holder<Enchantment>> ENCHANTMENT_ORDER = java.util.Comparator.comparing(Holder::getRegisteredName);
     public static final ItemEnchantments EMPTY = new ItemEnchantments(new Object2IntAVLTreeMap<>(ENCHANTMENT_ORDER), true);
     // Paper end
-    private static final Codec<Integer> LEVEL_CODEC = Codec.intRange(0, 255);
+    private static final Codec<Integer> LEVEL_CODEC = Codec.intRange(0, (org.purpurmc.purpur.PurpurConfig.clampEnchantLevels ? 255 : 32767)); // Purpur
     private static final Codec<Object2IntAVLTreeMap<Holder<Enchantment>>> LEVELS_CODEC = Codec.unboundedMap(
             Enchantment.CODEC, LEVEL_CODEC
         )// Paper start - sort enchantments
@@ -69,7 +69,7 @@ public class ItemEnchantments implements TooltipProvider {
 
         for (Entry<Holder<Enchantment>> entry : enchantments.object2IntEntrySet()) {
             int i = entry.getIntValue();
-            if (i < 0 || i > 255) {
+            if (i < 0 || i > (org.purpurmc.purpur.PurpurConfig.clampEnchantLevels ? 255 : 32767)) { // Purpur
                 throw new IllegalArgumentException("Enchantment " + entry.getKey() + " has invalid level " + i);
             }
         }
@@ -166,13 +166,13 @@ public class ItemEnchantments implements TooltipProvider {
             if (level <= 0) {
                 this.enchantments.removeInt(enchantment);
             } else {
-                this.enchantments.put(enchantment, Math.min(level, 255));
+                this.enchantments.put(enchantment, Math.min(level, (org.purpurmc.purpur.PurpurConfig.clampEnchantLevels ? 255 : 32767))); // Purpur
             }
         }
 
         public void upgrade(Holder<Enchantment> enchantment, int level) {
             if (level > 0) {
-                this.enchantments.merge(enchantment, Math.min(level, 255), Integer::max);
+                this.enchantments.merge(enchantment, Math.min(level, (org.purpurmc.purpur.PurpurConfig.clampEnchantLevels ? 255 : 32767)), Integer::max); // Purpur
             }
         }
 

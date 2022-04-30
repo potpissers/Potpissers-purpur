@@ -120,6 +120,11 @@ public class Main {
                 JvmProfiler.INSTANCE.start(Environment.SERVER);
             }
 
+            // Purpur start - load config files early
+            org.bukkit.configuration.file.YamlConfiguration purpurConfiguration = io.papermc.paper.configuration.PaperConfigurations.loadLegacyConfigFile((File) optionset.valueOf("purpur-settings"));
+            org.purpurmc.purpur.PurpurConfig.clampEnchantLevels = purpurConfiguration.getBoolean("settings.enchantment.clamp-levels");
+            // Purpur end - load config files early
+
             io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
             Bootstrap.bootStrap();
             Bootstrap.validate();
