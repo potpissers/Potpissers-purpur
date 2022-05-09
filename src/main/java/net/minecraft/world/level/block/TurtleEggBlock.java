@@ -219,7 +219,13 @@ public class TurtleEggBlock extends Block {
         if (!(entity instanceof LivingEntity)) {
             return false;
         }
-        if (entity instanceof Player) return true;
+        if (world.purpurConfig.turtleEggsTramplingFeatherFalling) {
+            java.util.Iterator<ItemStack> armor = ((LivingEntity) entity).getArmorSlots().iterator();
+            return !armor.hasNext() || net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.FEATHER_FALLING, armor.next()) < (int) entity.fallDistance;
+        }
+        if (entity instanceof Player) {
+            return true;
+        }
 
         return world.purpurConfig.turtleEggsBypassMobGriefing || world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
         // Purpur end
