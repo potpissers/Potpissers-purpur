@@ -1101,6 +1101,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     }
 
     public void spawnGolemIfNeeded(ServerLevel world, long time, int requiredCount) {
+        if (world.purpurConfig.villagerSpawnIronGolemRadius > 0 && world.getEntitiesOfClass(net.minecraft.world.entity.animal.IronGolem.class, getBoundingBox().inflate(world.purpurConfig.villagerSpawnIronGolemRadius)).size() > world.purpurConfig.villagerSpawnIronGolemLimit) return; // Purpur
         if (this.wantsToSpawnGolem(time)) {
             AABB axisalignedbb = this.getBoundingBox().inflate(10.0D, 10.0D, 10.0D);
             List<Villager> list = world.getEntitiesOfClass(Villager.class, axisalignedbb);
