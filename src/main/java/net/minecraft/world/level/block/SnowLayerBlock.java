@@ -88,6 +88,12 @@ public class SnowLayerBlock extends Block {
     protected boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
         BlockState iblockdata1 = world.getBlockState(pos.below());
 
+        // Purpur start
+        if (iblockdata1.is(Blocks.BLUE_ICE) && !world.getWorldBorder().world.purpurConfig.snowOnBlueIce) {
+            return false;
+        }
+        // Purpur end
+
         return iblockdata1.is(BlockTags.SNOW_LAYER_CANNOT_SURVIVE_ON) ? false : (iblockdata1.is(BlockTags.SNOW_LAYER_CAN_SURVIVE_ON) ? true : Block.isFaceFull(iblockdata1.getCollisionShape(world, pos.below()), Direction.UP) || iblockdata1.is((Block) this) && (Integer) iblockdata1.getValue(SnowLayerBlock.LAYERS) == 8);
     }
 
