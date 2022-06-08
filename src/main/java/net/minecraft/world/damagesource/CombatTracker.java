@@ -101,6 +101,8 @@ public class CombatTracker {
                 // Purpur start
                 if (damageSource.isScissors()) {
                     return damageSource.getLocalizedDeathMessage(org.purpurmc.purpur.PurpurConfig.deathMsgRunWithScissors, this.mob);
+                } else if (damageSource.isStonecutter()) {
+                    return damageSource.getLocalizedDeathMessage(org.purpurmc.purpur.PurpurConfig.deathMsgStonecutter, this.mob);
                 }
                 // Purpur end
                 return damageSource.getLocalizedDeathMessage(this.mob);

@@ -30,6 +30,7 @@ public class DamageSource {
     private boolean melting = false;
     private boolean poison = false;
     private boolean scissors = false; // Purpur
+    private boolean stonecutter = false; // Purpur
     @Nullable
     private Entity customEventDamager = null; // This field is a helper for when causing entity damage is not set by vanilla // Paper - fix DamageSource API
 
@@ -68,6 +69,15 @@ public class DamageSource {
 
     public boolean isScissors() {
         return this.scissors;
+    }
+
+    public DamageSource stonecutter() {
+        this.stonecutter = true;
+        return this;
+    }
+
+    public boolean isStonecutter() {
+        return this.stonecutter;
     }
     // Purpur end
 
@@ -130,6 +140,7 @@ public class DamageSource {
         damageSource.poison = this.isPoison();
         damageSource.melting = this.isMelting();
         damageSource.scissors = this.isScissors(); // Purpur
+        damageSource.stonecutter = this.isStonecutter(); // Purpur
         return damageSource;
     }
     // CraftBukkit end

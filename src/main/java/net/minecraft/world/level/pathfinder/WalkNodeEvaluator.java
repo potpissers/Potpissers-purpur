@@ -491,7 +491,7 @@ public class WalkNodeEvaluator extends NodeEvaluator {
             return PathType.TRAPDOOR;
         } else if (blockState.is(Blocks.POWDER_SNOW)) {
             return PathType.POWDER_SNOW;
-        } else if (blockState.is(Blocks.CACTUS) || blockState.is(Blocks.SWEET_BERRY_BUSH)) {
+        } else if (blockState.is(Blocks.CACTUS) || blockState.is(Blocks.SWEET_BERRY_BUSH) || blockState.is(Blocks.STONECUTTER)) { // Purpur
             return PathType.DAMAGE_OTHER;
         } else if (blockState.is(Blocks.HONEY_BLOCK)) {
             return PathType.STICKY_HONEY;

@@ -1142,7 +1142,7 @@ public class CraftEventFactory {
             return CraftEventFactory.callEntityDamageEvent(source.getDirectBlock(), source.getDirectBlockState(), entity, DamageCause.LAVA, bukkitDamageSource, modifiers, modifierFunctions, cancelled);
         } else if (source.getDirectBlock() != null) {
             DamageCause cause;
-            if (source.is(DamageTypes.CACTUS) || source.is(DamageTypes.SWEET_BERRY_BUSH) || source.is(DamageTypes.STALAGMITE) || source.is(DamageTypes.FALLING_STALACTITE) || source.is(DamageTypes.FALLING_ANVIL)) {
+            if (source.is(DamageTypes.CACTUS) || source.is(DamageTypes.SWEET_BERRY_BUSH) || source.is(DamageTypes.STALAGMITE) || source.is(DamageTypes.FALLING_STALACTITE) || source.is(DamageTypes.FALLING_ANVIL) || source.isStonecutter()) { // Purpur
                 cause = DamageCause.CONTACT;
             } else if (source.is(DamageTypes.HOT_FLOOR)) {
                 cause = DamageCause.HOT_FLOOR;

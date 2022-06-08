@@ -1044,6 +1044,11 @@ public class PurpurWorldConfig {
         spongeAbsorbsWaterFromMud = getBoolean("blocks.sponge.absorbs-water-from-mud", spongeAbsorbsWaterFromMud);
     }
 
+    public float stonecutterDamage = 0.0F;
+    private void stonecutterSettings() {
+        stonecutterDamage = (float) getDouble("blocks.stonecutter.damage", stonecutterDamage);
+    }
+
     public boolean turtleEggsBreakFromExpOrbs = false;
     public boolean turtleEggsBreakFromItems = false;
     public boolean turtleEggsBreakFromMinecarts = false;
