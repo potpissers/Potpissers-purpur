@@ -17,6 +17,11 @@ public class ExperimentalRedstoneUtils {
             if (front != null) {
                 orientation = orientation.withFront(front);
             }
+            // Paper start - Optimize redstone (Alternate Current) - use default front instead of random
+            else if (level.paperConfig().misc.redstoneImplementation == io.papermc.paper.configuration.WorldConfiguration.Misc.RedstoneImplementation.ALTERNATE_CURRENT) {
+                orientation = orientation.withFront(Direction.WEST);
+            }
+            // Paper end - Optimize redstone (Alternate Current)
 
             return orientation;
         } else {

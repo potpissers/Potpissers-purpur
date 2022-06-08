@@ -2099,6 +2099,17 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
 
     public abstract FuelValues fuelValues();
 
+    // Paper start - optimize redstone (Alternate Current)
+    public alternate.current.wire.WireHandler getWireHandler() {
+        // This method is overridden in ServerLevel.
+        // Since Paper is a server platform there is no risk
+        // of this implementation being called. It is here
+        // only so this method can be called without casting
+        // an instance of Level to ServerLevel.
+        return null;
+    }
+    // Paper end - optimize redstone (Alternate Current)
+
     public static enum ExplosionInteraction implements StringRepresentable {
         NONE("none"),
         BLOCK("block"),
