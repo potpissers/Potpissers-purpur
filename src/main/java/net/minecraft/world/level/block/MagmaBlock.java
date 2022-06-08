@@ -28,7 +28,7 @@ public class MagmaBlock extends Block {
 
     @Override
     public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
-        if (!entity.isSteppingCarefully() && entity instanceof LivingEntity) {
+        if ((!entity.isSteppingCarefully() || world.purpurConfig.magmaBlockDamageWhenSneaking) && entity instanceof LivingEntity) { // Purpur
             entity.hurt(world.damageSources().hotFloor().directBlock(world, pos), 1.0F); // CraftBukkit
         }
 
