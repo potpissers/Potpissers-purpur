@@ -248,6 +248,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
         this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
         com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
+        gg.pufferfish.pufferfish.PufferfishConfig.pufferfishFile = (java.io.File) options.valueOf("pufferfish-settings"); // Purpur
         gg.pufferfish.pufferfish.PufferfishConfig.load(); // Pufferfish
         gg.pufferfish.pufferfish.PufferfishCommand.init(); // Pufferfish
 

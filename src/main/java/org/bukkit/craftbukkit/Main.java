@@ -182,6 +182,12 @@ public class Main {
                     .ofType(File.class)
                     .defaultsTo(new File("purpur.yml"))
                     .describedAs("Yml file");
+
+                acceptsAll(asList("pufferfish", "pufferfish-settings"), "File for pufferfish settings")
+                        .withRequiredArg()
+                        .ofType(File.class)
+                        .defaultsTo(new File("pufferfish.yml"))
+                        .describedAs("Yml file");
                 // Purpur end
 
                 // Paper start

@@ -28,6 +28,7 @@ public class PufferfishConfig {
 	
 	private static final YamlFile config = new YamlFile();
 	private static int updates = 0;
+	public static File pufferfishFile; // Purpur
 	
 	private static ConfigurationSection convertToBukkit(org.simpleyaml.configuration.ConfigurationSection section) {
 		ConfigurationSection newSection = new MemoryConfiguration();
@@ -50,7 +51,7 @@ public class PufferfishConfig {
 	}
 	
 	public static void load() throws IOException {
-		File configFile = new File("pufferfish.yml");
+		File configFile = pufferfishFile; // Purpur
 		
 		if (configFile.exists()) {
 			try {
