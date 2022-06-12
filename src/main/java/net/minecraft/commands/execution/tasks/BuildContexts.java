@@ -52,7 +52,7 @@ public class BuildContexts<T extends ExecutionCommandSource<T>> {
                     }
 
                     RedirectModifier<T> redirectModifier = commandContext.getRedirectModifier();
-                    if (redirectModifier instanceof CustomModifierExecutor<T> customModifierExecutor) {
+                    if (redirectModifier instanceof CustomModifierExecutor customModifierExecutor) { // Purpur - decompile error
                         customModifierExecutor.apply(baseSource, list, contextChain, chainModifiers, ExecutionControl.create(context, frame));
                         return;
                     }
@@ -92,11 +92,11 @@ public class BuildContexts<T extends ExecutionCommandSource<T>> {
 
         if (list.isEmpty()) {
             if (chainModifiers.isReturn()) {
-                context.queueNext(new CommandQueueEntry<>(frame, FallthroughTask.instance()));
+                context.queueNext(new CommandQueueEntry<>(frame, (EntryAction<T>) FallthroughTask.instance())); // Purpur - decompile error
             }
         } else {
             CommandContext<T> commandContext2 = contextChain.getTopContext();
-            if (commandContext2.getCommand() instanceof CustomCommandExecutor<T> customCommandExecutor) {
+            if (commandContext2.getCommand() instanceof CustomCommandExecutor customCommandExecutor) { // Purpur - decompile error
                 ExecutionControl<T> executionControl = ExecutionControl.create(context, frame);
 
                 for (T executionCommandSource2 : list) {

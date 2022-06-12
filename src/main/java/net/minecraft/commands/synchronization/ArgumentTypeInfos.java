@@ -119,10 +119,10 @@ public class ArgumentTypeInfos {
         register(registry, "dimension", DimensionArgument.class, SingletonArgumentInfo.contextFree(DimensionArgument::dimension));
         register(registry, "gamemode", GameModeArgument.class, SingletonArgumentInfo.contextFree(GameModeArgument::gameMode));
         register(registry, "time", TimeArgument.class, new TimeArgument.Info());
-        register(registry, "resource_or_tag", fixClassType(ResourceOrTagArgument.class), new ResourceOrTagArgument.Info());
-        register(registry, "resource_or_tag_key", fixClassType(ResourceOrTagKeyArgument.class), new ResourceOrTagKeyArgument.Info());
-        register(registry, "resource", fixClassType(ResourceArgument.class), new ResourceArgument.Info());
-        register(registry, "resource_key", fixClassType(ResourceKeyArgument.class), new ResourceKeyArgument.Info());
+        register(registry, "resource_or_tag", fixClassType(ResourceOrTagArgument.class), new ResourceOrTagArgument.Info<>()); // Purpur - decompile error
+        register(registry, "resource_or_tag_key", fixClassType(ResourceOrTagKeyArgument.class), new ResourceOrTagKeyArgument.Info<>()); // Purpur - decompile error
+        register(registry, "resource", fixClassType(ResourceArgument.class), new ResourceArgument.Info<>()); // Purpur - decompile error
+        register(registry, "resource_key", fixClassType(ResourceKeyArgument.class), new ResourceKeyArgument.Info<>()); // Purpur - decompile error
         register(registry, "template_mirror", TemplateMirrorArgument.class, SingletonArgumentInfo.contextFree(TemplateMirrorArgument::templateMirror));
         register(registry, "template_rotation", TemplateRotationArgument.class, SingletonArgumentInfo.contextFree(TemplateRotationArgument::templateRotation));
         register(registry, "heightmap", HeightmapTypeArgument.class, SingletonArgumentInfo.contextFree(HeightmapTypeArgument::heightmap));
