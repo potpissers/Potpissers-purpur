@@ -28,6 +28,7 @@ public class EnchantingTableBlockEntity extends BlockEntity implements Nameable 
     private static final RandomSource RANDOM = RandomSource.create();
     @Nullable
     private Component name;
+    private int lapis = 0; // Purpur
 
     public EnchantingTableBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntityType.ENCHANTING_TABLE, pos, state);
@@ -39,6 +40,7 @@ public class EnchantingTableBlockEntity extends BlockEntity implements Nameable 
         if (this.hasCustomName()) {
             nbt.putString("CustomName", Component.Serializer.toJson(this.name, registryLookup));
         }
+        nbt.putInt("Purpur.Lapis", this.lapis); // Purpur
     }
 
     @Override
@@ -47,6 +49,7 @@ public class EnchantingTableBlockEntity extends BlockEntity implements Nameable 
         if (nbt.contains("CustomName", 8)) {
             this.name = parseCustomNameSafe(nbt.getString("CustomName"), registryLookup);
         }
+        this.lapis = nbt.getInt("Purpur.Lapis"); // Purpur
     }
 
     public static void bookAnimationTick(Level world, BlockPos pos, BlockState state, EnchantingTableBlockEntity blockEntity) {
@@ -138,4 +141,14 @@ public class EnchantingTableBlockEntity extends BlockEntity implements Nameable 
     public void removeComponentsFromTag(CompoundTag nbt) {
         nbt.remove("CustomName");
     }
+
+    // Purpur start
+    public int getLapis() {
+        return this.lapis;
+    }
+
+    public void setLapis(int lapis) {
+        this.lapis = lapis;
+    }
+    // Purpur
 }
