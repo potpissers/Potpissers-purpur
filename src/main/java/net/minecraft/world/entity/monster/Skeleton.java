@@ -15,6 +15,16 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 
+// Purpur start
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
+import org.bukkit.craftbukkit.event.CraftEventFactory;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.particles.ParticleTypes;
+// Purpur end
+
 public class Skeleton extends AbstractSkeleton {
 
     private static final int TOTAL_CONVERSION_TIME = 300;
@@ -175,4 +185,63 @@ public class Skeleton extends AbstractSkeleton {
         }
 
     }
+
+    // Purpur start
+    private int witherRosesFed = 0;
+
+    @Override
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+
+        if (level().purpurConfig.skeletonFeedWitherRoses > 0 && this.getType() != EntityType.WITHER_SKELETON && stack.getItem() == Blocks.WITHER_ROSE.asItem()) {
+            return this.feedWitherRose(player, stack);
+        }
+
+        return super.mobInteract(player, hand);
+    }
+
+    private InteractionResult feedWitherRose(Player player, ItemStack stack) {
+        if (++witherRosesFed < level().purpurConfig.skeletonFeedWitherRoses) {
+            if (!player.getAbilities().instabuild) {
+                stack.shrink(1);
+            }
+            return InteractionResult.CONSUME;
+        }
+
+        WitherSkeleton skeleton = EntityType.WITHER_SKELETON.create(level());
+        if (skeleton == null) {
+            return InteractionResult.PASS;
+        }
+
+        skeleton.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
+        skeleton.setHealth(this.getHealth());
+        skeleton.setAggressive(this.isAggressive());
+        skeleton.copyPosition(this);
+        skeleton.setYBodyRot(this.yBodyRot);
+        skeleton.setYHeadRot(this.getYHeadRot());
+        skeleton.yRotO = this.yRotO;
+        skeleton.xRotO = this.xRotO;
+
+        if (this.hasCustomName()) {
+            skeleton.setCustomName(this.getCustomName());
+        }
+
+        if (CraftEventFactory.callEntityTransformEvent(this, skeleton, org.bukkit.event.entity.EntityTransformEvent.TransformReason.INFECTION).isCancelled()) {
+            return InteractionResult.PASS;
+        }
+
+        this.level().addFreshEntity(skeleton);
+        this.remove(RemovalReason.DISCARDED, org.bukkit.event.entity.EntityRemoveEvent.Cause.DISCARD);
+        if (!player.getAbilities().instabuild) {
+            stack.shrink(1);
+        }
+
+        for (int i = 0; i < 15; ++i) {
+            ((ServerLevel) level()).sendParticles(((ServerLevel) level()).players(), null, ParticleTypes.HAPPY_VILLAGER,
+                    getX() + random.nextFloat(), getY() + (random.nextFloat() * 2), getZ() + random.nextFloat(), 1,
+                    random.nextGaussian() * 0.05D, random.nextGaussian() * 0.05D, random.nextGaussian() * 0.05D, 0, true);
+        }
+        return InteractionResult.SUCCESS;
+    }
+    // Purpur end
 }
