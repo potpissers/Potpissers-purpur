@@ -680,7 +680,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
             ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.level).moonrise$getChunkTaskScheduler().chunkHolderManager.getChunkHolder(this.locX, this.locZ).getEntityChunk().callEntitiesLoadEvent(); // Paper - rewrite chunk system
 
             if (this.needsDecoration) {
-                try (co.aikar.timings.Timing ignored = this.level.timings.chunkLoadPopulate.startTiming()) { // Paper
+                //try (co.aikar.timings.Timing ignored = this.level.timings.chunkLoadPopulate.startTiming()) { // Paper // Purpur
                 this.needsDecoration = false;
                 java.util.Random random = new java.util.Random();
                 random.setSeed(this.level.getSeed());
@@ -700,7 +700,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
                     }
                 }
                 server.getPluginManager().callEvent(new org.bukkit.event.world.ChunkPopulateEvent(bukkitChunk));
-                } // Paper
+                //} // Paper // Purpur
             }
         }
     }
@@ -1040,7 +1040,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
                         ProfilerFiller gameprofilerfiller = LevelChunk.this.level.getProfiler();
 
                         gameprofilerfiller.push(this::getType);
-                        this.blockEntity.tickTimer.startTiming(); // Spigot
+                        //this.blockEntity.tickTimer.startTiming(); // Spigot // Purpur
                         BlockState iblockdata = LevelChunk.this.getBlockState(blockposition);
 
                         if (this.blockEntity.getType().isValid(iblockdata)) {
@@ -1067,7 +1067,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
                         // Paper end - Prevent block entity and entity crashes
                         // Spigot start
                     } finally {
-                        this.blockEntity.tickTimer.stopTiming();
+                        //this.blockEntity.tickTimer.stopTiming(); // Purpur
                         // Spigot end
                     }
                 }

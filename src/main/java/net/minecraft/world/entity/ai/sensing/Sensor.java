@@ -53,10 +53,10 @@ public abstract class Sensor<E extends LivingEntity> {
         if (--this.timeToTick <= 0L) {
             // Paper start - configurable sensor tick rate and timings
             this.timeToTick = java.util.Objects.requireNonNullElse(world.paperConfig().tickRates.sensor.get(entity.getType(), this.configKey), this.scanRate);
-            this.timing.startTiming();
+            //this.timing.startTiming(); // Purpur
             // Paper end
             this.doTick(world, entity);
-            this.timing.stopTiming(); // Paper - sensor timings
+            //this.timing.stopTiming(); // Paper - sensor timings // Purpur
         }
     }
 

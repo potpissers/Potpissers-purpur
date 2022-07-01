@@ -1238,7 +1238,7 @@ public abstract class PlayerList {
 
     public void saveAll(int interval) {
         io.papermc.paper.util.MCUtil.ensureMain("Save Players" , () -> { // Paper - Ensure main
-        MinecraftTimings.savePlayers.startTiming(); // Paper
+        //MinecraftTimings.savePlayers.startTiming(); // Paper // Purpur
         int numSaved = 0;
         long now = MinecraftServer.currentTick;
         for (int i = 0; i < this.players.size(); ++i) {
@@ -1249,7 +1249,7 @@ public abstract class PlayerList {
             }
             // Paper end - Incremental chunk and player saving
         }
-        MinecraftTimings.savePlayers.stopTiming(); // Paper
+        //MinecraftTimings.savePlayers.stopTiming(); // Paper // Purpur
         return null; }); // Paper - ensure main
     }
 

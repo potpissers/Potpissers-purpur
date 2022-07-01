@@ -59,9 +59,9 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
             this.status = Behavior.Status.RUNNING;
             int i = this.minDuration + world.getRandom().nextInt(this.maxDuration + 1 - this.minDuration);
             this.endTimestamp = time + (long)i;
-            this.timing.startTiming(); // Paper - behavior timings
+            //this.timing.startTiming(); // Paper - behavior timings // Purpur
             this.start(world, entity, time);
-            this.timing.stopTiming(); // Paper - behavior timings
+            //this.timing.stopTiming(); // Paper - behavior timings // Purpur
             return true;
         } else {
             return false;
@@ -73,13 +73,13 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
 
     @Override
     public final void tickOrStop(ServerLevel world, E entity, long time) {
-        this.timing.startTiming(); // Paper - behavior timings
+        //this.timing.startTiming(); // Paper - behavior timings // Purpur
         if (!this.timedOut(time) && this.canStillUse(world, entity, time)) {
             this.tick(world, entity, time);
         } else {
             this.doStop(world, entity, time);
         }
-        this.timing.stopTiming(); // Paper - behavior timings
+        //this.timing.stopTiming(); // Paper - behavior timings // Purpur
     }
 
     protected void tick(ServerLevel world, E entity, long time) {

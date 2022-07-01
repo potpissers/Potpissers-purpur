@@ -359,9 +359,9 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
 
     public void save(boolean flush) {
         // Paper - rewrite chunk system
-        try (co.aikar.timings.Timing timed = level.timings.chunkSaveData.startTiming()) { // Paper - Timings
+        //try (co.aikar.timings.Timing timed = level.timings.chunkSaveData.startTiming()) { // Paper - Timings // Purpur
         this.chunkMap.saveAllChunks(flush);
-        } // Paper - Timings
+        //} // Paper - Timings // Purpur
     }
 
     @Override
@@ -397,26 +397,25 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
     @Override
     public void tick(BooleanSupplier shouldKeepTicking, boolean tickChunks) {
         this.level.getProfiler().push("purge");
-        this.level.timings.doChunkMap.startTiming(); // Spigot
+        //this.level.timings.doChunkMap.startTiming(); // Spigot // Purpur
         if (this.level.tickRateManager().runsNormally() || !tickChunks || this.level.spigotConfig.unloadFrozenChunks) { // Spigot
             this.distanceManager.purgeStaleTickets();
         }
-
         this.runDistanceManagerUpdates();
-        this.level.timings.doChunkMap.stopTiming(); // Spigot
+        //this.level.timings.doChunkMap.stopTiming(); // Spigot // Purpur
         this.level.getProfiler().popPush("chunks");
         if (tickChunks) {
-            this.level.timings.chunks.startTiming(); // Paper - timings
+            //this.level.timings.chunks.startTiming(); // Paper - timings // Purpur
             ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.level).moonrise$getPlayerChunkLoader().tick(); // Paper - rewrite chunk system
             this.tickChunks();
-            this.level.timings.chunks.stopTiming(); // Paper - timings
+            //this.level.timings.chunks.stopTiming(); // Paper - timings // Purpur
             this.chunkMap.tick();
         }
 
-        this.level.timings.doChunkUnload.startTiming(); // Spigot
+        //this.level.timings.doChunkUnload.startTiming(); // Spigot // Purpur
         this.level.getProfiler().popPush("unload");
         this.chunkMap.tick(shouldKeepTicking);
-        this.level.timings.doChunkUnload.stopTiming(); // Spigot
+        //this.level.timings.doChunkUnload.stopTiming(); // Spigot // Purpur
         this.level.getProfiler().pop();
         this.clearCache();
     }
@@ -452,13 +451,13 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
             }
             // Paper end - chunk tick iteration optimisations
             Iterator iterator = null; // Paper - chunk tick iteration optimisations
-            if (this.level.getServer().tickRateManager().runsNormally()) this.level.timings.chunkTicks.startTiming(); // Paper
+            //if (this.level.getServer().tickRateManager().runsNormally()) this.level.timings.chunkTicks.startTiming(); // Paper // Purpur
 
             // Paper - chunk tick iteration optimisations
 
             if (this.level.tickRateManager().runsNormally()) {
                 gameprofilerfiller.popPush("naturalSpawnCount");
-                this.level.timings.countNaturalMobs.startTiming(); // Paper - timings
+                //this.level.timings.countNaturalMobs.startTiming(); // Paper - timings // Purpur
                 int k = this.distanceManager.getNaturalSpawnChunkCount();
                 // Paper start - Optional per player mob spawns
                 int naturalSpawnChunkCount = k;
@@ -488,7 +487,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
                     // Pufferfish end
                 }
                 // Paper end - Optional per player mob spawns
-                this.level.timings.countNaturalMobs.stopTiming(); // Paper - timings
+                // this.level.timings.countNaturalMobs.stopTiming(); // Paper - timings // Purpur
 
                 // this.lastSpawnState = spawnercreature_d; // Pufferfish - this is managed asynchronously
                 gameprofilerfiller.popPush("spawnAndTick");
@@ -529,19 +528,19 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
                         }
                     }
                 }
-                this.level.timings.chunkTicks.stopTiming(); // Paper
+                //this.level.timings.chunkTicks.stopTiming(); // Paper // Purpur
 
                 gameprofilerfiller.popPush("customSpawners");
                 if (flag) {
-                    try (co.aikar.timings.Timing ignored = this.level.timings.miscMobSpawning.startTiming()) { // Paper - timings
+                    //try (co.aikar.timings.Timing ignored = this.level.timings.miscMobSpawning.startTiming()) { // Paper - timings // Purpur
                     this.level.tickCustomSpawners(this.spawnEnemies, this.spawnFriendlies);
-                    } // Paper - timings
+                    //} // Paper - timings // Purpur
                 }
             }
 
             gameprofilerfiller.popPush("broadcast");
             // Paper start - chunk tick iteration optimisations
-            this.level.timings.broadcastChunkUpdates.startTiming(); // Paper - timing
+            //this.level.timings.broadcastChunkUpdates.startTiming(); // Paper - timing // Purpur
             {
                 final it.unimi.dsi.fastutil.objects.ObjectArrayList<net.minecraft.server.level.ServerChunkCache.ChunkAndHolder> chunks = (it.unimi.dsi.fastutil.objects.ObjectArrayList<net.minecraft.server.level.ServerChunkCache.ChunkAndHolder>)list;
                 final ServerChunkCache.ChunkAndHolder[] raw = chunks.elements();
@@ -555,7 +554,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
                     holder.holder().broadcastChanges(holder.chunk());
                 }
             }
-            this.level.timings.broadcastChunkUpdates.stopTiming(); // Paper - timing
+            //this.level.timings.broadcastChunkUpdates.stopTiming(); // Paper - timing // Purpur
             // Paper end - chunk tick iteration optimisations
             gameprofilerfiller.pop();
             gameprofilerfiller.pop();

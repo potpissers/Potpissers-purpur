@@ -1415,15 +1415,15 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
         ProfilerFiller gameprofilerfiller = this.getProfiler();
 
         gameprofilerfiller.push("blockEntities");
-        this.timings.tileEntityPending.startTiming(); // Spigot
+        //this.timings.tileEntityPending.startTiming(); // Spigot // Purpur
         this.tickingBlockEntities = true;
         if (!this.pendingBlockEntityTickers.isEmpty()) {
             this.blockEntityTickers.addAll(this.pendingBlockEntityTickers);
             this.pendingBlockEntityTickers.clear();
         }
-        this.timings.tileEntityPending.stopTiming(); // Spigot
+        //this.timings.tileEntityPending.stopTiming(); // Spigot // Purpur
 
-        this.timings.tileEntityTick.startTiming(); // Spigot
+        //this.timings.tileEntityTick.startTiming(); // Spigot // Purpur
         // Spigot start
         // Iterator<TickingBlockEntity> iterator = this.blockEntityTickers.iterator();
         boolean flag = this.tickRateManager().runsNormally();
@@ -1454,7 +1454,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
         }
         this.blockEntityTickers.removeAll(toRemove); // Paper - Fix MC-117075
 
-        this.timings.tileEntityTick.stopTiming(); // Spigot
+        //this.timings.tileEntityTick.stopTiming(); // Spigot // Purpur
         this.tickingBlockEntities = false;
         co.aikar.timings.TimingHistory.tileEntityTicks += this.blockEntityTickers.size(); // Paper
         gameprofilerfiller.pop();

@@ -80,16 +80,16 @@ public class BukkitCommandNode extends LiteralCommandNode<CommandSourceStack> {
 
             // Plugins do weird things to workaround normal registration
             if (this.command.timings == null) {
-                this.command.timings = co.aikar.timings.TimingsManager.getCommandTiming(null, this.command);
+                //this.command.timings = co.aikar.timings.TimingsManager.getCommandTiming(null, this.command); // Purpur
             }
 
             String content = context.getRange().get(context.getInput());
             String[] args = org.apache.commons.lang3.StringUtils.split(content, ' '); // fix adjacent spaces (from console/plugins) causing empty array elements
 
-            try (Timing ignored = this.command.timings.startTiming()) {
+            //try (Timing ignored = this.command.timings.startTiming()) { // Purpur
                 // Note: we don't return the result of target.execute as thats success / failure, we return handled (true) or not handled (false)
                 this.command.execute(sender, this.literal, Arrays.copyOfRange(args, 1, args.length));
-            }
+            //} // Purpur
 
             // return true as command was handled
             return 1;

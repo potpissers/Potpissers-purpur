@@ -171,7 +171,7 @@ public class ActivationRange
      */
     public static void activateEntities(Level world)
     {
-        MinecraftTimings.entityActivationCheckTimer.startTiming();
+        //MinecraftTimings.entityActivationCheckTimer.startTiming(); // Purpur
         final int miscActivationRange = world.spigotConfig.miscActivationRange;
         final int raiderActivationRange = world.spigotConfig.raiderActivationRange;
         final int animalActivationRange = world.spigotConfig.animalActivationRange;
@@ -251,7 +251,7 @@ public class ActivationRange
             }
             // Paper end
         }
-        MinecraftTimings.entityActivationCheckTimer.stopTiming();
+        //MinecraftTimings.entityActivationCheckTimer.stopTiming(); // Purpur
     }
 
     /**

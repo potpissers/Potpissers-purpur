@@ -548,7 +548,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
     }
 
     public void handleConsoleInputs() {
-        MinecraftTimings.serverCommandTimer.startTiming(); // Spigot
+        //MinecraftTimings.serverCommandTimer.startTiming(); // Spigot // Purpur
         // Paper start - Perf: use proper queue
         ConsoleInput servercommand;
         while ((servercommand = this.serverCommandQueue.poll()) != null) {
@@ -565,7 +565,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
             // CraftBukkit end
         }
 
-        MinecraftTimings.serverCommandTimer.stopTiming(); // Spigot
+        //MinecraftTimings.serverCommandTimer.stopTiming(); // Spigot // Purpur
     }
 
     @Override

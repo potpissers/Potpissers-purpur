@@ -504,10 +504,10 @@ public class CraftScheduler implements BukkitScheduler {
                 this.runners.remove(task.getTaskId());
             }
         }
-        MinecraftTimings.bukkitSchedulerFinishTimer.startTiming(); // Paper
+        //MinecraftTimings.bukkitSchedulerFinishTimer.startTiming(); // Paper // Purpur
         this.pending.addAll(temp);
         temp.clear();
-        MinecraftTimings.bukkitSchedulerFinishTimer.stopTiming(); // Paper
+        //MinecraftTimings.bukkitSchedulerFinishTimer.stopTiming(); // Paper // Purpur
         //this.debugHead = this.debugHead.getNextHead(currentTick); // Paper
     }
 
@@ -550,7 +550,7 @@ public class CraftScheduler implements BukkitScheduler {
     }
 
     void parsePending() { // Paper
-        if (!this.isAsyncScheduler) MinecraftTimings.bukkitSchedulerPendingTimer.startTiming(); // Paper
+        //if (!this.isAsyncScheduler) MinecraftTimings.bukkitSchedulerPendingTimer.startTiming(); // Paper // Purpur
         CraftTask head = this.head;
         CraftTask task = head.getNext();
         CraftTask lastTask = head;
@@ -569,7 +569,7 @@ public class CraftScheduler implements BukkitScheduler {
             task.setNext(null);
         }
         this.head = lastTask;
-        if (!this.isAsyncScheduler) MinecraftTimings.bukkitSchedulerPendingTimer.stopTiming(); // Paper
+        //if (!this.isAsyncScheduler) MinecraftTimings.bukkitSchedulerPendingTimer.stopTiming(); // Paper // Purpur
     }
 
     private boolean isReady(final int currentTick) {

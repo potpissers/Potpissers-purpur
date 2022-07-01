@@ -115,7 +115,7 @@ public final class CraftScoreboardManager implements ScoreboardManager {
     public void forAllObjectives(ObjectiveCriteria criteria, ScoreHolder holder, Consumer<ScoreAccess> consumer) {
         // Paper start - add timings for scoreboard search
         // plugins leaking scoreboards will make this very expensive, let server owners debug it easily
-        co.aikar.timings.MinecraftTimings.scoreboardScoreSearch.startTimingIfSync();
+        //co.aikar.timings.MinecraftTimings.scoreboardScoreSearch.startTimingIfSync(); // Purpur
         try {
         // Paper end - add timings for scoreboard search
         for (CraftScoreboard scoreboard : this.scoreboards) {
@@ -123,7 +123,7 @@ public final class CraftScoreboardManager implements ScoreboardManager {
             board.forAllObjectives(criteria, holder, (score) -> consumer.accept(score));
         }
         } finally { // Paper start - add timings for scoreboard search
-            co.aikar.timings.MinecraftTimings.scoreboardScoreSearch.stopTimingIfSync();
+            //co.aikar.timings.MinecraftTimings.scoreboardScoreSearch.stopTimingIfSync(); // Purpur
         }
         // Paper end - add timings for scoreboard search
     }

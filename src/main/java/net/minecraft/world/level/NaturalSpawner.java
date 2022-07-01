@@ -128,7 +128,7 @@ public final class NaturalSpawner {
 
     public static void spawnForChunk(ServerLevel world, LevelChunk chunk, NaturalSpawner.SpawnState info, boolean spawnAnimals, boolean spawnMonsters, boolean rareSpawn) {
         world.getProfiler().push("spawner");
-        world.timings.mobSpawn.startTiming(); // Spigot
+        //world.timings.mobSpawn.startTiming(); // Spigot // Purpur
         MobCategory[] aenumcreaturetype = NaturalSpawner.SPAWNING_CATEGORIES;
         int i = aenumcreaturetype.length;
 
@@ -181,7 +181,7 @@ public final class NaturalSpawner {
             }
         }
 
-        world.timings.mobSpawn.stopTiming(); // Spigot
+        //world.timings.mobSpawn.stopTiming(); // Spigot // Purpur
         world.getProfiler().pop();
     }
 

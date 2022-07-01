@@ -52,7 +52,7 @@ public class PacketUtils {
                 if (listener instanceof ServerCommonPacketListenerImpl serverCommonPacketListener && serverCommonPacketListener.processedDisconnect) return; // CraftBukkit - Don't handle sync packets for kicked players
                 if (listener.shouldHandleMessage(packet)) {
                     co.aikar.timings.Timing timing = co.aikar.timings.MinecraftTimings.getPacketTiming(packet); // Paper - timings
-                    try (co.aikar.timings.Timing ignored = timing.startTiming()) { // Paper - timings
+                    try { // Paper - timings // Purpur
                         packet.handle(listener);
                     } catch (Exception exception) {
                         if (exception instanceof ReportedException) {
