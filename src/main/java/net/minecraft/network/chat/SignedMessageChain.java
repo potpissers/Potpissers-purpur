@@ -45,7 +45,7 @@ public class SignedMessageChain {
                     SignedMessageLink signedMessageLink = SignedMessageChain.this.nextLink;
                     if (signedMessageLink == null) {
                         throw new SignedMessageChain.DecodeException(SignedMessageChain.DecodeException.CHAIN_BROKEN);
-                    } else if (body.timeStamp().isBefore(SignedMessageChain.this.lastTimeStamp)) {
+                    } else if (org.purpurmc.purpur.PurpurConfig.kickForOutOfOrderChat && body.timeStamp().isBefore(SignedMessageChain.this.lastTimeStamp)) {
                         this.setChainBroken();
                         throw new SignedMessageChain.DecodeException(SignedMessageChain.DecodeException.OUT_OF_ORDER_CHAT, org.bukkit.event.player.PlayerKickEvent.Cause.OUT_OF_ORDER_CHAT); // Paper - kick event causes
                     } else {
