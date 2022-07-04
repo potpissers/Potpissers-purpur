@@ -59,6 +59,7 @@ public class CoralBlock extends Block {
     }
 
     protected boolean scanForWater(BlockGetter world, BlockPos pos) {
+        if (!((net.minecraft.world.level.LevelAccessor) world).getMinecraftWorld().purpurConfig.coralDieOutsideWater) return true; // Purpur
         Direction[] aenumdirection = Direction.values();
         int i = aenumdirection.length;
 

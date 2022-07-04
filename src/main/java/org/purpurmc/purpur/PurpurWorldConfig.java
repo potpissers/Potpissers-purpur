@@ -872,6 +872,11 @@ public class PurpurWorldConfig {
         composterBulkProcess = getBoolean("blocks.composter.sneak-to-bulk-process", composterBulkProcess);
     }
 
+    public boolean coralDieOutsideWater = true;
+    private void coralSettings() {
+        coralDieOutsideWater = getBoolean("blocks.coral.die-outside-water", coralDieOutsideWater);
+    }
+
     public boolean dispenserApplyCursedArmor = true;
     public boolean dispenserPlaceAnvils = false;
     private void dispenserSettings() {
