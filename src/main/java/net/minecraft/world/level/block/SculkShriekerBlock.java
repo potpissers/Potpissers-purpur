@@ -134,7 +134,7 @@ public class SculkShriekerBlock extends BaseEntityBlock implements SimpleWaterlo
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        return (BlockState) this.defaultBlockState().setValue(SculkShriekerBlock.WATERLOGGED, ctx.getLevel().getFluidState(ctx.getClickedPos()).getType() == Fluids.WATER);
+        return (BlockState) this.defaultBlockState().setValue(SculkShriekerBlock.WATERLOGGED, ctx.getLevel().getFluidState(ctx.getClickedPos()).getType() == Fluids.WATER).setValue(SculkShriekerBlock.CAN_SUMMON, ctx.getLevel().purpurConfig.sculkShriekerCanSummonDefault); // Purpur
     }
 
     @Override
