@@ -2386,6 +2386,12 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         return (this.getHandle().getDragonFight() == null) ? null : new CraftDragonBattle(this.getHandle().getDragonFight());
     }
 
+    // Purpur start
+    public float getLocalDifficultyAt(Location location) {
+        return getHandle().getCurrentDifficultyAt(io.papermc.paper.util.MCUtil.toBlockPosition(location)).getEffectiveDifficulty();
+    }
+    // Purpur end
+
     @Override
     public Collection<GeneratedStructure> getStructures(int x, int z) {
         return this.getStructures(x, z, struct -> true);
