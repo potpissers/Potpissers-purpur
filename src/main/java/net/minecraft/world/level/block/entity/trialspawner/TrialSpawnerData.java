@@ -100,13 +100,13 @@ public class TrialSpawnerData {
         this.ejectingLootTable = rewardLootTable;
     }
 
-    public void reset() {
+    public void reset(TrialSpawner logic) { // Paper - Fix TrialSpawner forgets assigned mob; MC-273635
         this.detectedPlayers.clear();
         this.totalMobsSpawned = 0;
         this.nextMobSpawnsAt = 0L;
         this.cooldownEndsAt = 0L;
         this.currentMobs.clear();
-        this.nextSpawnData = Optional.empty();
+        if (!logic.getConfig().spawnPotentialsDefinition().isEmpty()) this.nextSpawnData = Optional.empty(); // Paper - Fix TrialSpawner forgets assigned mob; MC-273635
     }
 
     public boolean hasMobToSpawn(TrialSpawner logic, RandomSource random) {

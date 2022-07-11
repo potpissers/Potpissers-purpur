@@ -68,7 +68,7 @@ public enum TrialSpawnerState implements StringRepresentable {
             case INACTIVE -> trialSpawnerData.getOrCreateDisplayEntity(logic, world, WAITING_FOR_PLAYERS) == null ? this : WAITING_FOR_PLAYERS;
             case WAITING_FOR_PLAYERS -> {
                 if (!logic.canSpawnInLevel(world)) {
-                    trialSpawnerData.reset();
+                    trialSpawnerData.reset(logic); // Paper - Fix TrialSpawner forgets assigned mob; MC-273635
                     yield this;
                 } else if (!trialSpawnerData.hasMobToSpawn(logic, world.random)) {
                     yield INACTIVE;
@@ -79,7 +79,7 @@ public enum TrialSpawnerState implements StringRepresentable {
             }
             case ACTIVE -> {
                 if (!logic.canSpawnInLevel(world)) {
-                    trialSpawnerData.reset();
+                    trialSpawnerData.reset(logic); // Paper - Fix TrialSpawner forgets assigned mob; MC-273635
                     yield WAITING_FOR_PLAYERS;
                 } else if (!trialSpawnerData.hasMobToSpawn(logic, world.random)) {
                     yield INACTIVE;
@@ -145,7 +145,7 @@ public enum TrialSpawnerState implements StringRepresentable {
                     yield ACTIVE;
                 } else if (trialSpawnerData.isCooldownFinished(world)) {
                     logic.removeOminous(world, pos);
-                    trialSpawnerData.reset();
+                    trialSpawnerData.reset(logic); // Paper - Fix TrialSpawner forgets assigned mob; MC-273635
                     yield WAITING_FOR_PLAYERS;
                 } else {
                     yield this;
