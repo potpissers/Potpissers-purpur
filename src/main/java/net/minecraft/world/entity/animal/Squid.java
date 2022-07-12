@@ -41,7 +41,7 @@ public class Squid extends WaterAnimal {
 
     public Squid(EntityType<? extends Squid> type, Level world) {
         super(type, world);
-        //this.random.setSeed((long)this.getId()); // Paper - Share random for entities to make them more random
+        if (!world.purpurConfig.entitySharedRandom) this.random.setSeed((long)this.getId()); // Paper - Share random for entities to make them more random // Purpur
         this.tentacleSpeed = 1.0F / (this.random.nextFloat() + 1.0F) * 0.2F;
     }
 

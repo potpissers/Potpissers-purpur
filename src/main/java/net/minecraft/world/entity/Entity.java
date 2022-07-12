@@ -582,7 +582,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         this.bb = Entity.INITIAL_AABB;
         this.stuckSpeedMultiplier = Vec3.ZERO;
         this.nextStep = 1.0F;
-        this.random = SHARED_RANDOM; // Paper - Share random for entities to make them more random
+        this.random = world == null || world.purpurConfig.entitySharedRandom ? SHARED_RANDOM : RandomSource.create(); // Paper - Share random for entities to make them more random // Purpur
         this.remainingFireTicks = -this.getFireImmuneTicks();
         this.fluidHeight = new Object2DoubleArrayMap(2);
         this.fluidOnEyes = new HashSet();
