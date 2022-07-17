@@ -139,10 +139,10 @@ public class PiglinBrute extends AbstractPiglin {
 
     @Override
     protected void customServerAiStep() {
-        this.level().getProfiler().push("piglinBruteBrain");
+        //this.level().getProfiler().push("piglinBruteBrain"); // Purpur
         if (getRider() == null || this.isControllable()) // Purpur - only use brain if no rider
         this.getBrain().tick((ServerLevel)this.level(), this);
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
         PiglinBruteAi.updateActivity(this);
         PiglinBruteAi.maybePlayActivitySound(this);
         super.customServerAiStep();

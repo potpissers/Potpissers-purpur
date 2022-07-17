@@ -163,12 +163,12 @@ public class Armadillo extends Animal {
 
     @Override
     protected void customServerAiStep() {
-        this.level().getProfiler().push("armadilloBrain");
+        //this.level().getProfiler().push("armadilloBrain"); // Purpur
         ((Brain<Armadillo>) this.brain).tick((ServerLevel) this.level(), this); // CraftBukkit - decompile error
-        this.level().getProfiler().pop();
-        this.level().getProfiler().push("armadilloActivityUpdate");
+        //this.level().getProfiler().pop(); // Purpur
+        //this.level().getProfiler().push("armadilloActivityUpdate"); // Purpur
         ArmadilloAi.updateActivity(this);
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
         if (this.isAlive() && !this.isBaby() && --this.scuteTime <= 0) {
             this.playSound(SoundEvents.ARMADILLO_SCUTE_DROP, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
             this.forceDrops = true; // CraftBukkit

@@ -645,16 +645,16 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
     }
 
     public void tick(BooleanSupplier shouldKeepTicking) {
-        ProfilerFiller gameprofilerfiller = this.getProfiler();
+        //ProfilerFiller gameprofilerfiller = this.getProfiler(); // Purpur
 
         this.handlingTick = true;
         TickRateManager tickratemanager = this.tickRateManager();
         boolean flag = tickratemanager.runsNormally();
 
         if (flag) {
-            gameprofilerfiller.push("world border");
+            //gameprofilerfiller.push("world border"); // Purpur
             this.getWorldBorder().tick();
-            gameprofilerfiller.popPush("weather");
+            //gameprofilerfiller.popPush("weather"); // Purpur
             this.advanceWeatherCycle();
         }
 
@@ -686,30 +686,30 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
             this.tickTime();
         }
 
-        gameprofilerfiller.popPush("tickPending");
+        //gameprofilerfiller.popPush("tickPending"); // Purpur
         //this.timings.scheduledBlocks.startTiming(); // Paper // Purpur
         if (!this.isDebug() && flag) {
             j = this.getGameTime();
-            gameprofilerfiller.push("blockTicks");
+            //gameprofilerfiller.push("blockTicks"); // Purpur
             this.blockTicks.tick(j, paperConfig().environment.maxBlockTicks, this::tickBlock); // Paper - configurable max block ticks
-            gameprofilerfiller.popPush("fluidTicks");
+            //gameprofilerfiller.popPush("fluidTicks"); // Purpur
             this.fluidTicks.tick(j, paperConfig().environment.maxFluidTicks, this::tickFluid); // Paper - configurable max fluid ticks
-            gameprofilerfiller.pop();
+            //gameprofilerfiller.pop(); // Purpur
         }
         //this.timings.scheduledBlocks.stopTiming(); // Paper // Purpur
 
-        gameprofilerfiller.popPush("raid");
+        //gameprofilerfiller.popPush("raid"); // Purpur
         if (flag) {
             // this.timings.raids.startTiming(); // Paper - timings // Purpur
             this.raids.tick();
             // this.timings.raids.stopTiming(); // Paper - timings // Purpur
         }
 
-        gameprofilerfiller.popPush("chunkSource");
+        //gameprofilerfiller.popPush("chunkSource"); // Purpur
         //this.timings.chunkProviderTick.startTiming(); // Paper - timings // Purpur
         this.getChunkSource().tick(shouldKeepTicking, true);
         //this.timings.chunkProviderTick.stopTiming(); // Paper - timings // Purpur
-        gameprofilerfiller.popPush("blockEvents");
+        //gameprofilerfiller.popPush("blockEvents"); // Purpur
         if (flag) {
             // this.timings.doSounds.startTiming(); // Spigot // Purpur
             this.runBlockEvents();
@@ -717,7 +717,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
         }
 
         this.handlingTick = false;
-        gameprofilerfiller.pop();
+        //gameprofilerfiller.pop(); // Purpur
         boolean flag1 = !paperConfig().unsupportedSettings.disableWorldTickingWhenEmpty || !this.players.isEmpty() || !this.getForcedChunks().isEmpty(); // CraftBukkit - this prevents entity cleanup, other issues on servers with no players // Paper - restore this
 
         if (flag1) {
@@ -725,12 +725,12 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
         }
 
         if (flag1 || this.emptyTime++ < 300) {
-            gameprofilerfiller.push("entities");
+            //gameprofilerfiller.push("entities"); // Purpur
             //this.timings.tickEntities.startTiming(); // Spigot // Purpur
             if (this.dragonFight != null && flag) {
-                gameprofilerfiller.push("dragonFight");
+                //gameprofilerfiller.push("dragonFight"); // Purpur
                 this.dragonFight.tick();
-                gameprofilerfiller.pop();
+                //gameprofilerfiller.pop(); // Purpur
             }
 
             org.spigotmc.ActivationRange.activateEntities(this); // Spigot
@@ -741,9 +741,9 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
                     if (false && this.shouldDiscardEntity(entity)) { // CraftBukkit - We prevent spawning in general, so this butchering is not needed
                         entity.discard();
                     } else if (!tickratemanager.isEntityFrozen(entity)) {
-                        gameprofilerfiller.push("checkDespawn");
+                        //gameprofilerfiller.push("checkDespawn"); // Purpur
                         entity.checkDespawn();
-                        gameprofilerfiller.pop();
+                        //gameprofilerfiller.pop(); // Purpur
                         if (true || this.chunkSource.chunkMap.getDistanceManager().inEntityTickingRange(entity.chunkPosition().toLong())) { // Paper - rewrite chunk system
                             Entity entity1 = entity.getVehicle();
 
@@ -755,7 +755,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
                                 entity.stopRiding();
                             }
 
-                            gameprofilerfiller.push("tick");
+                            //gameprofilerfiller.push("tick"); // Purpur
                         // Pufferfish start - copied from this.guardEntityTick
                         try {
                             this.tickNonPassenger(entity); // Pufferfish - changed
@@ -770,20 +770,20 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
                         }
                         this.moonrise$midTickTasks(); // Paper - rewrite chunk system
                         // Pufferfish end
-                            gameprofilerfiller.pop();
+                            //gameprofilerfiller.pop(); // Purpur
                         }
                     }
                 }
             });
             //this.timings.entityTick.stopTiming(); // Spigot // Purpur
             //this.timings.tickEntities.stopTiming(); // Spigot // Purpur
-            gameprofilerfiller.pop();
+            //gameprofilerfiller.pop(); // Purpur
             this.tickBlockEntities();
         }
 
-        gameprofilerfiller.push("entityManagement");
+        //gameprofilerfiller.push("entityManagement"); // Purpur
         // Paper - rewrite chunk system
-        gameprofilerfiller.pop();
+        //gameprofilerfiller.pop(); // Purpur
     }
 
     @Override
@@ -916,8 +916,8 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
         boolean flag = this.isRaining();
         int j = chunkcoordintpair.getMinBlockX();
         int k = chunkcoordintpair.getMinBlockZ();
-        ProfilerFiller gameprofilerfiller = this.getProfiler();
-        gameprofilerfiller.push("thunder");
+        //ProfilerFiller gameprofilerfiller = this.getProfiler(); // Purpur
+        //gameprofilerfiller.push("thunder"); // Purpur
 
         if (!this.paperConfig().environment.disableThunder && flag && this.isThundering() && this.spigotConfig.thunderChance > 0 && /*this.random.nextInt(this.spigotConfig.thunderChance) == 0 &&*/ chunk.shouldDoLightning(this.random)) { // Spigot // Paper - Option to disable thunder // Pufferfish - replace random with shouldDoLightning
             BlockPos blockposition = this.findLightningTargetAround(this.getBlockRandomPos(j, 0, k, 15));
@@ -955,7 +955,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
             }
         }
 
-        gameprofilerfiller.popPush("iceandsnow");
+        //gameprofilerfiller.popPush("iceandsnow"); // Purpur
 
         if (!this.paperConfig().environment.disableIceAndSnow) { // Paper - Option to disable ice and snow
         for (int l = 0; l < randomTickSpeed; ++l) {
@@ -965,14 +965,14 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
         }
         } // Paper - Option to disable ice and snow
 
-        gameprofilerfiller.popPush("tickBlocks");
+        //gameprofilerfiller.popPush("tickBlocks"); // Purpur
         //timings.chunkTicksBlocks.startTiming(); // Paper // Purpur
         if (randomTickSpeed > 0) {
             this.optimiseRandomTick(chunk, randomTickSpeed); // Paper - optimise random ticking
         }
 
         //timings.chunkTicksBlocks.stopTiming(); // Paper // Purpur
-        gameprofilerfiller.pop();
+        //gameprofilerfiller.pop(); // Purpur
     }
 
     @VisibleForTesting
@@ -1318,19 +1318,19 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
         //try { // Purpur
         // Paper end - timings
         entity.setOldPosAndRot();
-        ProfilerFiller gameprofilerfiller = this.getProfiler();
+        //ProfilerFiller gameprofilerfiller = this.getProfiler(); // Purpur
 
         ++entity.tickCount;
-        this.getProfiler().push(() -> {
+        /*this.getProfiler().push(() -> { // Purpur
             return BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString();
-        });
-        gameprofilerfiller.incrementCounter("tickNonPassenger");
+        });*/ // Purpur
+        //gameprofilerfiller.incrementCounter("tickNonPassenger"); // Purpur
         if (isActive) { // Paper - EAR 2
             TimingHistory.activatedEntityTicks++;
         entity.tick();
         entity.postTick(); // CraftBukkit
         } else { entity.inactiveTick(); } // Paper - EAR 2
-        this.getProfiler().pop();
+        //this.getProfiler().pop(); // Purpur
         //} finally { timer.stopTiming(); } // Paper - timings // Purpur
         Iterator iterator = entity.getPassengers().iterator();
 
@@ -1359,12 +1359,12 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
                 // Paper end
                 passenger.setOldPosAndRot();
                 ++passenger.tickCount;
-                ProfilerFiller gameprofilerfiller = this.getProfiler();
+                //ProfilerFiller gameprofilerfiller = this.getProfiler(); // Purpur
 
-                gameprofilerfiller.push(() -> {
+                /*gameprofilerfiller.push(() -> { // Purpur
                     return BuiltInRegistries.ENTITY_TYPE.getKey(passenger.getType()).toString();
-                });
-                gameprofilerfiller.incrementCounter("tickPassenger");
+                });*/ // Purpur
+                //gameprofilerfiller.incrementCounter("tickPassenger"); // Purpur
                 // Paper start - EAR 2
                 if (isActive) {
                 passenger.rideTick();
@@ -1376,7 +1376,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
                     vehicle.positionRider(passenger);
                 }
                 // Paper end - EAR 2
-                gameprofilerfiller.pop();
+                //gameprofilerfiller.pop(); // Purpur
                 Iterator iterator = passenger.getPassengers().iterator();
 
                 while (iterator.hasNext()) {

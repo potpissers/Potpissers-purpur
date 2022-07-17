@@ -53,10 +53,10 @@ public class ServerFunctionManager {
     }
 
     private void executeTagFunctions(Collection<CommandFunction<CommandSourceStack>> functions, ResourceLocation label) {
-        ProfilerFiller gameprofilerfiller = this.server.getProfiler();
+        //ProfilerFiller gameprofilerfiller = this.server.getProfiler(); // Purpur
 
         Objects.requireNonNull(label);
-        gameprofilerfiller.push(label::toString);
+        //gameprofilerfiller.push(label::toString); // Purpur
         Iterator iterator = functions.iterator();
 
         while (iterator.hasNext()) {
@@ -65,15 +65,15 @@ public class ServerFunctionManager {
             this.execute(commandfunction, this.getGameLoopSender());
         }
 
-        this.server.getProfiler().pop();
+        //this.server.getProfiler().pop(); // Purpur
     }
 
     public void execute(CommandFunction<CommandSourceStack> function, CommandSourceStack source) {
-        ProfilerFiller gameprofilerfiller = this.server.getProfiler();
+        //ProfilerFiller gameprofilerfiller = this.server.getProfiler(); // Purpur
 
-        gameprofilerfiller.push(() -> {
+        /*gameprofilerfiller.push(() -> { // Purpur
             return "function " + String.valueOf(function.id());
-        });
+        });*/ // Purpur
 
         try {
             InstantiatedFunction<CommandSourceStack> instantiatedfunction = function.instantiate((CompoundTag) null, this.getDispatcher());
@@ -86,7 +86,7 @@ public class ServerFunctionManager {
         } catch (Exception exception) {
             ServerFunctionManager.LOGGER.warn("Failed to execute function {}", function.id(), exception);
         } finally {
-            gameprofilerfiller.pop();
+            //gameprofilerfiller.pop(); // Purpur
         }
 
     }

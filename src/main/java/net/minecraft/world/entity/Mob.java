@@ -370,13 +370,13 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
     @Override
     public void baseTick() {
         super.baseTick();
-        this.level().getProfiler().push("mobBaseTick");
+        //this.level().getProfiler().push("mobBaseTick"); // Purpur
         if (this.isAlive() && this.random.nextInt(1000) < this.ambientSoundTime++) {
             this.resetAmbientSoundTime();
             this.playAmbientSound();
         }
 
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
         incrementTicksSinceLastInteraction(); // Purpur
     }
 
@@ -706,7 +706,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
     @Override
     public void aiStep() {
         super.aiStep();
-        this.level().getProfiler().push("looting");
+        //this.level().getProfiler().push("looting"); // Purpur
         if (!this.level().isClientSide && this.canPickUpLoot() && this.isAlive() && !this.dead && (this.level().purpurConfig.entitiesPickUpLootBypassMobGriefing || this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))) {
             Vec3i baseblockposition = this.getPickupReach();
             List<ItemEntity> list = this.level().getEntitiesOfClass(ItemEntity.class, this.getBoundingBox().inflate((double) baseblockposition.getX(), (double) baseblockposition.getY(), (double) baseblockposition.getZ()));
@@ -726,7 +726,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
             }
         }
 
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
     }
 
     protected Vec3i getPickupReach() {
@@ -950,48 +950,48 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
             return;
         }
         // Paper end - Allow nerfed mobs to jump and float
-        ProfilerFiller gameprofilerfiller = this.level().getProfiler();
+        //ProfilerFiller gameprofilerfiller = this.level().getProfiler(); // Purpur
 
-        gameprofilerfiller.push("sensing");
+        //gameprofilerfiller.push("sensing"); // Purpur
         this.sensing.tick();
-        gameprofilerfiller.pop();
+        //gameprofilerfiller.pop(); // Purpur
         int i = this.tickCount + this.getId();
 
         if (i % 2 != 0 && this.tickCount > 1) {
-            gameprofilerfiller.push("targetSelector");
+            //gameprofilerfiller.push("targetSelector"); // Purpur
             if (this.targetSelector.inactiveTick(this.activatedPriority, false)) // Pufferfish - use this to alternate ticking
             this.targetSelector.tickRunningGoals(false);
-            gameprofilerfiller.pop();
-            gameprofilerfiller.push("goalSelector");
+            //gameprofilerfiller.pop(); // Purpur
+            //gameprofilerfiller.push("goalSelector"); // Purpur
             if (this.goalSelector.inactiveTick(this.activatedPriority, false)) // Pufferfish - use this to alternate ticking
             this.goalSelector.tickRunningGoals(false);
-            gameprofilerfiller.pop();
+            //gameprofilerfiller.pop(); // Purpur
         } else {
-            gameprofilerfiller.push("targetSelector");
+            //gameprofilerfiller.push("targetSelector"); // Purpur
             if (this.targetSelector.inactiveTick(this.activatedPriority, false)) // Pufferfish - use this to alternate ticking
             this.targetSelector.tick();
-            gameprofilerfiller.pop();
-            gameprofilerfiller.push("goalSelector");
+            //gameprofilerfiller.pop(); // Purpur
+            //gameprofilerfiller.push("goalSelector"); // Purpur
             if (this.goalSelector.inactiveTick(this.activatedPriority, false)) // Pufferfish - use this to alternate ticking
             this.goalSelector.tick();
-            gameprofilerfiller.pop();
+            //gameprofilerfiller.pop(); // Purpur
         }
 
-        gameprofilerfiller.push("navigation");
+        //gameprofilerfiller.push("navigation"); // Purpur
         this.navigation.tick();
-        gameprofilerfiller.pop();
-        gameprofilerfiller.push("mob tick");
+        //gameprofilerfiller.pop(); // Purpur
+        //gameprofilerfiller.push("mob tick"); // Purpur
         this.customServerAiStep();
-        gameprofilerfiller.pop();
-        gameprofilerfiller.push("controls");
-        gameprofilerfiller.push("move");
+        //gameprofilerfiller.pop(); // Purpur
+        //gameprofilerfiller.push("controls"); // Purpur
+        //gameprofilerfiller.push("move"); // Purpur
         this.moveControl.tick();
-        gameprofilerfiller.popPush("look");
+        //gameprofilerfiller.popPush("look"); // Purpur
         this.lookControl.tick();
-        gameprofilerfiller.popPush("jump");
+        //gameprofilerfiller.popPush("jump"); // Purpur
         this.jumpControl.tick();
-        gameprofilerfiller.pop();
-        gameprofilerfiller.pop();
+        //gameprofilerfiller.pop(); // Purpur
+        //gameprofilerfiller.pop(); // Purpur
         this.sendDebugPackets();
     }
 

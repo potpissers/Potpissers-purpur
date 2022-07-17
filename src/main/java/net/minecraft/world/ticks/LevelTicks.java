@@ -81,20 +81,20 @@ public class LevelTicks<T> implements LevelTickAccess<T> {
     }
 
     public void tick(long time, int maxTicks, BiConsumer<BlockPos, T> ticker) {
-        ProfilerFiller profilerFiller = this.profiler.get();
-        profilerFiller.push("collect");
-        this.collectTicks(time, maxTicks, profilerFiller);
-        profilerFiller.popPush("run");
-        profilerFiller.incrementCounter("ticksToRun", this.toRunThisTick.size());
+        //ProfilerFiller profilerFiller = this.profiler.get(); // Purpur
+        //profilerFiller.push("collect"); // Purpur
+        this.collectTicks(time, maxTicks, null); // Purpur
+        //profilerFiller.popPush("run"); // Purpur
+        //profilerFiller.incrementCounter("ticksToRun", this.toRunThisTick.size()); // Purpur
         this.runCollectedTicks(ticker);
-        profilerFiller.popPush("cleanup");
+        //profilerFiller.popPush("cleanup"); // Purpur
         this.cleanupAfterTick();
-        profilerFiller.pop();
+        //profilerFiller.pop(); // Purpur
     }
 
     private void collectTicks(long time, int maxTicks, ProfilerFiller profiler) {
         this.sortContainersToTick(time);
-        profiler.incrementCounter("containersToTick", this.containersToTick.size());
+        //profiler.incrementCounter("containersToTick", this.containersToTick.size()); // Purpur
         this.drainContainers(time, maxTicks);
         this.rescheduleLeftoverContainers();
     }

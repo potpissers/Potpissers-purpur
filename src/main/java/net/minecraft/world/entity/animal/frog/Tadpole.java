@@ -123,13 +123,13 @@ public class Tadpole extends AbstractFish {
     private int behaviorTick = 0; // Pufferfish
     @Override
     protected void customServerAiStep() {
-        this.level().getProfiler().push("tadpoleBrain");
+        //this.level().getProfiler().push("tadpoleBrain"); // Purpur
         if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick((ServerLevel) this.level(), this);
-        this.level().getProfiler().pop();
-        this.level().getProfiler().push("tadpoleActivityUpdate");
+        //this.level().getProfiler().pop(); // Purpur
+        //this.level().getProfiler().push("tadpoleActivityUpdate"); // Purpur
         TadpoleAi.updateActivity(this);
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
         super.customServerAiStep();
     }
 

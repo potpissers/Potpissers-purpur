@@ -1398,7 +1398,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
                 this.unsetRemoved();
                 */
                 // CraftBukkit end
-                worldserver1.getProfiler().push("moving");
+                //worldserver1.getProfiler().push("moving"); // Purpur
                 if (worldserver != null && resourcekey == LevelStem.OVERWORLD && worldserver.getTypeKey() == LevelStem.NETHER) { // CraftBukkit - empty to fall through to null to event
                     this.enteredNetherPosition = this.position();
                 }
@@ -1414,8 +1414,8 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
                 worldserver = ((CraftWorld) exit.getWorld()).getHandle();
                 // CraftBukkit end
 
-                worldserver1.getProfiler().pop();
-                worldserver1.getProfiler().push("placing");
+                //worldserver1.getProfiler().pop(); // Purpur
+                //worldserver1.getProfiler().push("placing"); // Purpur
                 // CraftBukkit start
                 this.isChangingDimension = true; // CraftBukkit - Set teleport invulnerability only if player changing worlds
                 LevelData worlddata = worldserver.getLevelData();
@@ -1433,7 +1433,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
                 this.connection.teleport(exit); // CraftBukkit - use internal teleport without event
                 this.connection.resetPosition();
                 worldserver.addDuringTeleport(this);
-                worldserver1.getProfiler().pop();
+                //worldserver1.getProfiler().pop(); // Purpur
                 this.triggerDimensionChangeTriggers(worldserver1);
                 this.connection.send(new ClientboundPlayerAbilitiesPacket(this.getAbilities()));
                 playerlist.sendLevelInfo(this, worldserver);

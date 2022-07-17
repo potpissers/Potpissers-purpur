@@ -269,7 +269,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
 
     @Override
     public final <T extends Entity> List<T> getEntitiesOfClass(final Class<T> entityClass, final AABB boundingBox, final Predicate<? super T> predicate) {
-        this.getProfiler().incrementCounter("getEntities");
+        //this.getProfiler().incrementCounter("getEntities"); // Purpur
         final List<T> ret = new java.util.ArrayList<>();
 
         ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemLevel)this).moonrise$getEntityLookup().getEntities(entityClass, null, boundingBox, ret, predicate);
@@ -279,7 +279,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
 
     @Override
     public final List<Entity> moonrise$getHardCollidingEntities(final Entity entity, final AABB box, final Predicate<? super Entity> predicate) {
-        this.getProfiler().incrementCounter("getEntities");
+        //this.getProfiler().incrementCounter("getEntities"); // Purpur
         final List<Entity> ret = new java.util.ArrayList<>();
 
         ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemLevel)this).moonrise$getEntityLookup().getHardCollidingEntities(entity, box, ret, predicate);
@@ -1412,9 +1412,9 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
     }
 
     protected void tickBlockEntities() {
-        ProfilerFiller gameprofilerfiller = this.getProfiler();
+        //ProfilerFiller gameprofilerfiller = this.getProfiler(); // Purpur
 
-        gameprofilerfiller.push("blockEntities");
+        //gameprofilerfiller.push("blockEntities"); // Purpur
         //this.timings.tileEntityPending.startTiming(); // Spigot // Purpur
         this.tickingBlockEntities = true;
         if (!this.pendingBlockEntityTickers.isEmpty()) {
@@ -1457,7 +1457,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
         //this.timings.tileEntityTick.stopTiming(); // Spigot // Purpur
         this.tickingBlockEntities = false;
         co.aikar.timings.TimingHistory.tileEntityTicks += this.blockEntityTickers.size(); // Paper
-        gameprofilerfiller.pop();
+        //gameprofilerfiller.pop(); // Purpur
         this.spigotConfig.currentPrimedTnt = 0; // Spigot
     }
 
@@ -1686,7 +1686,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
 
     @Override
     public List<Entity> getEntities(@Nullable Entity except, AABB box, Predicate<? super Entity> predicate) {
-        this.getProfiler().incrementCounter("getEntities");
+        //this.getProfiler().incrementCounter("getEntities"); // Purpur
         // Paper start - rewrite chunk system
         final List<Entity> ret = new java.util.ArrayList<>();
 
@@ -1712,7 +1712,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
     public <T extends Entity> void getEntities(final EntityTypeTest<Entity, T> entityTypeTest,
                                                final AABB boundingBox, final Predicate<? super T> predicate,
                                                final List<? super T> into, final int maxCount) {
-        this.getProfiler().incrementCounter("getEntities");
+        //this.getProfiler().incrementCounter("getEntities"); // Purpur
 
         if (entityTypeTest instanceof net.minecraft.world.entity.EntityType<T> byType) {
             if (maxCount != Integer.MAX_VALUE) {
@@ -2007,7 +2007,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
     }
 
     public ProfilerFiller getProfiler() {
-        if (gg.pufferfish.pufferfish.PufferfishConfig.disableMethodProfiler) return net.minecraft.util.profiling.InactiveProfiler.INSTANCE; // Pufferfish
+        if (true || gg.pufferfish.pufferfish.PufferfishConfig.disableMethodProfiler) return net.minecraft.util.profiling.InactiveProfiler.INSTANCE; // Pufferfish // Purpur
         return (ProfilerFiller) this.profiler.get();
     }
 

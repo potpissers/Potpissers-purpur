@@ -505,11 +505,11 @@ public class Sniffer extends Animal {
 
     @Override
     protected void customServerAiStep() {
-        this.level().getProfiler().push("snifferBrain");
+        //this.level().getProfiler().push("snifferBrain"); // Purpur
         this.getBrain().tick((ServerLevel) this.level(), this);
-        this.level().getProfiler().popPush("snifferActivityUpdate");
+        //this.level().getProfiler().popPush("snifferActivityUpdate"); // Purpur
         SnifferAi.updateActivity(this);
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
         super.customServerAiStep();
     }
 

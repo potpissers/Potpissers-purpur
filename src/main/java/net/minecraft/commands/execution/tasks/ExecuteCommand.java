@@ -23,7 +23,7 @@ public class ExecuteCommand<T extends ExecutionCommandSource<T>> implements Unbo
 
     @Override
     public void execute(T executionCommandSource, ExecutionContext<T> executionContext, Frame frame) {
-        executionContext.profiler().push(() -> "execute " + this.commandInput);
+        //executionContext.profiler().push(() -> "execute " + this.commandInput); // Purpur
 
         try {
             executionContext.incrementCost();
@@ -37,7 +37,7 @@ public class ExecuteCommand<T extends ExecutionCommandSource<T>> implements Unbo
         } catch (CommandSyntaxException var9) {
             executionCommandSource.handleError(var9, this.modifiers.isForked(), executionContext.tracer());
         } finally {
-            executionContext.profiler().pop();
+            //executionContext.profiler().pop(); // Purpur
         }
     }
 }

@@ -647,7 +647,7 @@ public class Explosion {
         }
 
         if (flag1) {
-            this.level.getProfiler().push("explosion_blocks");
+            //this.level.getProfiler().push("explosion_blocks"); // Purpur
             List<Pair<ItemStack, BlockPos>> list = new ArrayList();
 
             Util.shuffle(this.toBlow, this.level.random);
@@ -722,7 +722,7 @@ public class Explosion {
                 Block.popResource(this.level, (BlockPos) pair.getSecond(), (ItemStack) pair.getFirst());
             }
 
-            this.level.getProfiler().pop();
+            //this.level.getProfiler().pop(); // Purpur
         }
 
         if (this.fire) {

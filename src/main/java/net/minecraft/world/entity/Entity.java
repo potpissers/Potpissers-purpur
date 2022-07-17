@@ -889,7 +889,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     // CraftBukkit end
 
     public void baseTick() {
-        this.level().getProfiler().push("entityBaseTick");
+        //this.level().getProfiler().push("entityBaseTick"); // Purpur
         if (firstTick && this instanceof net.minecraft.world.entity.NeutralMob neutralMob) neutralMob.tickInitialPersistentAnger(level); // Paper - Prevent entity loading causing async lookups
         this.inBlockState = null;
         if (this.isPassenger() && this.getVehicle().isRemoved()) {
@@ -954,7 +954,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
             Leashable.tickLeash((Entity & Leashable) this); // CraftBukkit - decompile error
         }
 
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
     }
 
     public void setSharedFlagOnFire(boolean onFire) {
@@ -1169,7 +1169,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                 }
             }
 
-            this.level().getProfiler().push("move");
+            //this.level().getProfiler().push("move"); // Purpur
             if (this.stuckSpeedMultiplier.lengthSqr() > 1.0E-7D) {
                 movement = movement.multiply(this.stuckSpeedMultiplier);
                 this.stuckSpeedMultiplier = Vec3.ZERO;
@@ -1178,7 +1178,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
             // Paper start - ignore movement changes while inactive.
             if (isTemporarilyActive && !(this instanceof ItemEntity) && movement == getDeltaMovement() && movementType == MoverType.SELF) {
                 setDeltaMovement(Vec3.ZERO);
-                this.level.getProfiler().pop();
+                //this.level.getProfiler().pop(); // Purpur
                 return;
             }
             // Paper end
@@ -1199,8 +1199,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                 this.setPos(this.getX() + vec3d1.x, this.getY() + vec3d1.y, this.getZ() + vec3d1.z);
             }
 
-            this.level().getProfiler().pop();
-            this.level().getProfiler().push("rest");
+            //this.level().getProfiler().pop(); // Purpur
+            //this.level().getProfiler().push("rest"); // Purpur
             boolean flag = !Mth.equal(movement.x, vec3d1.x);
             boolean flag1 = !Mth.equal(movement.z, vec3d1.z);
 
@@ -1219,7 +1219,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
 
             this.checkFallDamage(vec3d1.y, this.onGround(), iblockdata, blockposition);
             if (this.isRemoved()) {
-                this.level().getProfiler().pop();
+                //this.level().getProfiler().pop(); // Purpur
             } else {
                 if (this.horizontalCollision) {
                     Vec3 vec3d2 = this.getDeltaMovement();
@@ -1322,7 +1322,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                     this.setRemainingFireTicks(-this.getFireImmuneTicks());
                 }
 
-                this.level().getProfiler().pop();
+                //this.level().getProfiler().pop(); // Purpur
             }
         }
         // Paper start - detailed watchdog information
@@ -3314,7 +3314,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
             this.processPortalCooldown();
             if (this.portalProcess != null) {
                 if (this.portalProcess.processPortalTeleportation(worldserver, this, this.canUsePortal(false))) {
-                    worldserver.getProfiler().push("portal");
+                    //worldserver.getProfiler().push("portal"); // Purpur
                     this.setPortalCooldown();
                     DimensionTransition dimensiontransition = this.portalProcess.getPortalDestination(worldserver, this);
 
@@ -3326,7 +3326,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                         }
                     }
 
-                    worldserver.getProfiler().pop();
+                    //worldserver.getProfiler().pop(); // Purpur
                 } else if (this.portalProcess.hasExpired()) {
                     this.portalProcess = null;
                 }
@@ -3829,7 +3829,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                     }
                 }
 
-                worldserver.getProfiler().push("changeDimension");
+                //worldserver.getProfiler().push("changeDimension"); // Purpur
                 Entity entity2 = worldserver1.dimension() == worldserver.dimension() ? this : this.getType().create(worldserver1);
 
                 if (entity2 != null) {
@@ -3865,7 +3865,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                     teleportTarget.postDimensionTransition().onTransition(entity2);
                 }
 
-                worldserver.getProfiler().pop();
+                //worldserver.getProfiler().pop(); // Purpur
                 return entity2;
             }
         }

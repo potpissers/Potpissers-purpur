@@ -55,7 +55,7 @@ public class ActiveProfiler implements ProfileCollector {
             this.started = true;
             this.path = "";
             this.paths.clear();
-            this.push("root");
+            //this.push("root"); // Purpur
         }
     }
 
@@ -64,7 +64,7 @@ public class ActiveProfiler implements ProfileCollector {
         if (!this.started) {
             LOGGER.error("Profiler tick already ended - missing startTick()?");
         } else {
-            this.pop();
+            //this.pop(); // Purpur
             this.started = false;
             if (!this.path.isEmpty()) {
                 LOGGER.error(
@@ -93,7 +93,7 @@ public class ActiveProfiler implements ProfileCollector {
 
     @Override
     public void push(Supplier<String> locationGetter) {
-        this.push(locationGetter.get());
+        //this.push(locationGetter.get()); // Purpur
     }
 
     @Override
@@ -132,14 +132,14 @@ public class ActiveProfiler implements ProfileCollector {
 
     @Override
     public void popPush(String location) {
-        this.pop();
-        this.push(location);
+        //this.pop(); // Purpur
+        //this.push(location); // Purpur
     }
 
     @Override
     public void popPush(Supplier<String> locationGetter) {
-        this.pop();
-        this.push(locationGetter);
+        //this.pop(); // Purpur
+        //this.push(locationGetter); // Purpur
     }
 
     private ActiveProfiler.PathEntry getCurrentEntry() {

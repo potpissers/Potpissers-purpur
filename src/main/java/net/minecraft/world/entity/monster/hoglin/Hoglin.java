@@ -194,10 +194,10 @@ public class Hoglin extends Animal implements Enemy, HoglinBase {
     private int behaviorTick; // Pufferfish
     @Override
     protected void customServerAiStep() {
-        this.level().getProfiler().push("hoglinBrain");
+        //this.level().getProfiler().push("hoglinBrain"); // Purpur
         if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick((ServerLevel)this.level(), this);
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
         HoglinAi.updateActivity(this);
         if (this.isConverting()) {
             this.timeInOverworld++;

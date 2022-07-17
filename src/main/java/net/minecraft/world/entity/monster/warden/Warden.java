@@ -301,10 +301,11 @@ public class Warden extends Monster implements VibrationSystem {
     protected void customServerAiStep() {
         ServerLevel worldserver = (ServerLevel) this.level();
 
-        worldserver.getProfiler().push("wardenBrain");
+        //worldserver.getProfiler().push("wardenBrain"); // Purpur
+        //if (this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - TODO: Move to Ridables patch
         if (this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish
         this.getBrain().tick(worldserver, this);
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
         super.customServerAiStep();
         if ((this.tickCount + this.getId()) % 120 == 0) {
             Warden.applyDarknessAround(worldserver, this.position(), this, 20);

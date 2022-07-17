@@ -238,13 +238,13 @@ public class Frog extends Animal implements VariantHolder<Holder<FrogVariant>> {
     private int behaviorTick = 0; // Pufferfish
     @Override
     protected void customServerAiStep() {
-        this.level().getProfiler().push("frogBrain");
+        //this.level().getProfiler().push("frogBrain"); // Purpur
         if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick((ServerLevel)this.level(), this);
-        this.level().getProfiler().pop();
-        this.level().getProfiler().push("frogActivityUpdate");
+        //this.level().getProfiler().pop(); // Purpur
+        //this.level().getProfiler().push("frogActivityUpdate"); // Purpur
         FrogAi.updateActivity(this);
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
         super.customServerAiStep();
     }
 

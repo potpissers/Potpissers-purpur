@@ -53,8 +53,8 @@ public class PathFinder {
     @Nullable
     // Paper start - Perf: remove streams and optimize collection
     private Path findPath(ProfilerFiller profiler, Node startNode, List<Map.Entry<Target, BlockPos>> positions, float followRange, int distance, float rangeMultiplier) {
-        profiler.push("find_path");
-        profiler.markForCharting(MetricCategory.PATH_FINDING);
+        //profiler.push("find_path"); // Purpur
+        //profiler.markForCharting(MetricCategory.PATH_FINDING); // Purpur
         // Set<Target> set = positions.keySet();
         startNode.g = 0.0F;
         startNode.h = this.getBestH(startNode, positions); // Paper - optimize collection
@@ -122,7 +122,7 @@ public class PathFinder {
             if (best == null || comparator.compare(path, best) < 0)
                 best = path;
         }
-        profiler.pop();
+        //profiler.pop(); // Purpur
         return best;
         // Paper end - Perf: remove streams and optimize collection
     }

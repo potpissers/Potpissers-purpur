@@ -16,11 +16,11 @@ public interface ResourceManagerReloadListener extends PreparableReloadListener 
         Executor applyExecutor
     ) {
         return synchronizer.wait(Unit.INSTANCE).thenRunAsync(() -> {
-            applyProfiler.startTick();
-            applyProfiler.push("listener");
+            //applyProfiler.startTick(); // Purpur
+            //applyProfiler.push("listener"); // Purpur
             this.onResourceManagerReload(manager);
-            applyProfiler.pop();
-            applyProfiler.endTick();
+            //applyProfiler.pop(); // Purpur
+            //applyProfiler.endTick(); // Purpur
         }, applyExecutor);
     }
 

@@ -310,13 +310,13 @@ public class Axolotl extends Animal implements LerpingModel, VariantHolder<Axolo
     private int behaviorTick = 0; // Pufferfish
     @Override
     protected void customServerAiStep() {
-        this.level().getProfiler().push("axolotlBrain");
+        //this.level().getProfiler().push("axolotlBrain"); // Purpur
         if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick((ServerLevel) this.level(), this);
-        this.level().getProfiler().pop();
-        this.level().getProfiler().push("axolotlActivityUpdate");
+        //this.level().getProfiler().pop(); // Purpur
+        //this.level().getProfiler().push("axolotlActivityUpdate"); // Purpur
         AxolotlAi.updateActivity(this);
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
         if (!this.isNoAi()) {
             Optional<Integer> optional = this.getBrain().getMemory(MemoryModuleType.PLAY_DEAD_TICKS);
 

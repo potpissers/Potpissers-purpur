@@ -228,11 +228,11 @@ public class Breeze extends Monster {
 
     @Override
     protected void customServerAiStep() {
-        this.level().getProfiler().push("breezeBrain");
+        //this.level().getProfiler().push("breezeBrain"); // Purpur
         this.getBrain().tick((ServerLevel)this.level(), this);
-        this.level().getProfiler().popPush("breezeActivityUpdate");
+        //this.level().getProfiler().popPush("breezeActivityUpdate"); // Purpur
         BreezeAi.updateActivity(this);
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
         super.customServerAiStep();
     }
 

@@ -165,7 +165,7 @@ public class Commands {
         DamageCommand.register(this.dispatcher, commandRegistryAccess);
         DataCommands.register(this.dispatcher);
         DataPackCommand.register(this.dispatcher);
-        DebugCommand.register(this.dispatcher);
+        //DebugCommand.register(this.dispatcher); // Purpur
         DefaultGameModeCommands.register(this.dispatcher);
         DifficultyCommand.register(this.dispatcher);
         EffectCommands.register(this.dispatcher, commandRegistryAccess);
@@ -346,9 +346,9 @@ public class Commands {
         // Paper end
         CommandSourceStack commandlistenerwrapper = (CommandSourceStack) parseresults.getContext().getSource();
 
-        commandlistenerwrapper.getServer().getProfiler().push(() -> {
+        /*commandlistenerwrapper.getServer().getProfiler().push(() -> { // Purpur
             return "/" + s;
-        });
+        });*/ // Purpur
         ContextChain contextchain = this.finishParsing(parseresults, s, commandlistenerwrapper, label); // CraftBukkit // Paper - Add UnknownCommandEvent
 
         try {
@@ -378,7 +378,7 @@ public class Commands {
                 Commands.LOGGER.error("'/{}' threw an exception", s, exception);
             }
         } finally {
-            commandlistenerwrapper.getServer().getProfiler().pop();
+            //commandlistenerwrapper.getServer().getProfiler().pop(); // Purpur
         }
 
     }

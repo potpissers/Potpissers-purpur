@@ -225,13 +225,13 @@ public class Goat extends Animal {
     private int behaviorTick = 0; // Pufferfish
     @Override
     protected void customServerAiStep() {
-        this.level().getProfiler().push("goatBrain");
+        //this.level().getProfiler().push("goatBrain"); // Purpur
         if ((getRider() == null || !this.isControllable()) && this.behaviorTick++ % this.activatedPriority == 0) // Pufferfish // Purpur - only use brain if no rider
         this.getBrain().tick((ServerLevel) this.level(), this);
-        this.level().getProfiler().pop();
-        this.level().getProfiler().push("goatActivityUpdate");
+        //this.level().getProfiler().pop(); // Purpur
+        //this.level().getProfiler().push("goatActivityUpdate"); // Purpur
         GoatAi.updateActivity(this);
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
         super.customServerAiStep();
     }
 

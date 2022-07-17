@@ -397,11 +397,11 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
                 if (LightEngine.hasDifferentLightProperties(this, blockposition, iblockdata1, iblockdata)) {
                     ProfilerFiller gameprofilerfiller = this.level.getProfiler();
 
-                    gameprofilerfiller.push("updateSkyLightSources");
+                    //gameprofilerfiller.push("updateSkyLightSources"); // Purpur
                     // Paper - rewrite chunk system
-                    gameprofilerfiller.popPush("queueCheckLight");
+                    //gameprofilerfiller.popPush("queueCheckLight"); // Purpur
                     this.level.getChunkSource().getLightEngine().checkBlock(blockposition);
-                    gameprofilerfiller.pop();
+                    //gameprofilerfiller.pop(); // Purpur
                 }
 
                 boolean flag3 = iblockdata1.hasBlockEntity();
@@ -1037,9 +1037,9 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
 
                 if (LevelChunk.this.isTicking(blockposition)) {
                     try {
-                        ProfilerFiller gameprofilerfiller = LevelChunk.this.level.getProfiler();
+                        //ProfilerFiller gameprofilerfiller = LevelChunk.this.level.getProfiler();
 
-                        gameprofilerfiller.push(this::getType);
+                        //gameprofilerfiller.push(this::getType);
                         //this.blockEntity.tickTimer.startTiming(); // Spigot // Purpur
                         BlockState iblockdata = LevelChunk.this.getBlockState(blockposition);
 
@@ -1056,7 +1056,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
                             // Paper end - Remove the Block Entity if it's invalid
                         }
 
-                        gameprofilerfiller.pop();
+                        //gameprofilerfiller.pop();
                     } catch (Throwable throwable) {
                         if (throwable instanceof ThreadDeath) throw throwable; // Paper
                         // Paper start - Prevent block entity and entity crashes

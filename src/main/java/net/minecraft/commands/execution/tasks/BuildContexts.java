@@ -42,7 +42,7 @@ public class BuildContexts<T extends ExecutionCommandSource<T>> {
         ChainModifiers chainModifiers = flags;
         List<T> list = sources;
         if (contextChain.getStage() != Stage.EXECUTE) {
-            context.profiler().push(() -> "prepare " + this.commandInput);
+            //context.profiler().push(() -> "prepare " + this.commandInput); // Purpur
 
             try {
                 for (int i = context.forkLimit(); contextChain.getStage() != Stage.EXECUTE; contextChain = contextChain.nextStage()) {
@@ -86,7 +86,7 @@ public class BuildContexts<T extends ExecutionCommandSource<T>> {
                     }
                 }
             } finally {
-                context.profiler().pop();
+                //context.profiler().pop(); // Purpur
             }
         }
 

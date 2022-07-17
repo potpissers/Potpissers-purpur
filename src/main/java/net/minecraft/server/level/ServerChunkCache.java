@@ -385,25 +385,26 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
     public void purgeUnload() {
         if (true) return; // Paper - rewrite chunk system
         this.level.getProfiler().push("purge");
+        //this.level.getProfiler().push("purge"); // Purpur
         this.distanceManager.purgeStaleTickets();
         this.runDistanceManagerUpdates();
-        this.level.getProfiler().popPush("unload");
+        //this.level.getProfiler().popPush("unload"); // Purpur
         this.chunkMap.tick(() -> true);
-        this.level.getProfiler().pop();
+        //this.level.getProfiler().pop(); // Purpur
         this.clearCache();
     }
     // CraftBukkit end
 
     @Override
     public void tick(BooleanSupplier shouldKeepTicking, boolean tickChunks) {
-        this.level.getProfiler().push("purge");
+        //this.level.getProfiler().push("purge"); // Purpur
         //this.level.timings.doChunkMap.startTiming(); // Spigot // Purpur
         if (this.level.tickRateManager().runsNormally() || !tickChunks || this.level.spigotConfig.unloadFrozenChunks) { // Spigot
             this.distanceManager.purgeStaleTickets();
         }
         this.runDistanceManagerUpdates();
         //this.level.timings.doChunkMap.stopTiming(); // Spigot // Purpur
-        this.level.getProfiler().popPush("chunks");
+        //this.level.getProfiler().popPush("chunks"); // Purpur
         if (tickChunks) {
             //this.level.timings.chunks.startTiming(); // Paper - timings // Purpur
             ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.level).moonrise$getPlayerChunkLoader().tick(); // Paper - rewrite chunk system
@@ -413,10 +414,10 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
         }
 
         //this.level.timings.doChunkUnload.startTiming(); // Spigot // Purpur
-        this.level.getProfiler().popPush("unload");
+        //this.level.getProfiler().popPush("unload"); // Purpur
         this.chunkMap.tick(shouldKeepTicking);
         //this.level.timings.doChunkUnload.stopTiming(); // Spigot // Purpur
-        this.level.getProfiler().pop();
+        //this.level.getProfiler().pop(); // Purpur
         this.clearCache();
     }
 
@@ -427,10 +428,10 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
 
         this.lastInhabitedUpdate = i;
         if (!this.level.isDebug()) {
-            ProfilerFiller gameprofilerfiller = this.level.getProfiler();
+            //ProfilerFiller gameprofilerfiller = this.level.getProfiler(); // Purpur
 
-            gameprofilerfiller.push("pollingChunks");
-            gameprofilerfiller.push("filteringLoadedChunks");
+            //gameprofilerfiller.push("pollingChunks"); // Purpur
+            //gameprofilerfiller.push("filteringLoadedChunks"); // Purpur
             // Paper start - chunk tick iteration optimisations
             List<ServerChunkCache.ChunkAndHolder> list;
             {
@@ -456,7 +457,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
             // Paper - chunk tick iteration optimisations
 
             if (this.level.tickRateManager().runsNormally()) {
-                gameprofilerfiller.popPush("naturalSpawnCount");
+                //gameprofilerfiller.popPush("naturalSpawnCount"); // Purpur
                 //this.level.timings.countNaturalMobs.startTiming(); // Paper - timings // Purpur
                 int k = this.distanceManager.getNaturalSpawnChunkCount();
                 // Paper start - Optional per player mob spawns
@@ -490,7 +491,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
                 // this.level.timings.countNaturalMobs.stopTiming(); // Paper - timings // Purpur
 
                 // this.lastSpawnState = spawnercreature_d; // Pufferfish - this is managed asynchronously
-                gameprofilerfiller.popPush("spawnAndTick");
+                //gameprofilerfiller.popPush("spawnAndTick"); // Purpur
                 boolean flag = this.level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING) && !this.level.players().isEmpty(); // CraftBukkit
 
                 if (!this.level.paperConfig().entities.spawning.perPlayerMobSpawns) Util.shuffle(list, this.level.random); // Paper - per player mob spawns - do not need this when per-player is enabled
@@ -530,7 +531,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
                 }
                 //this.level.timings.chunkTicks.stopTiming(); // Paper // Purpur
 
-                gameprofilerfiller.popPush("customSpawners");
+                //gameprofilerfiller.popPush("customSpawners"); // Purpur
                 if (flag) {
                     //try (co.aikar.timings.Timing ignored = this.level.timings.miscMobSpawning.startTiming()) { // Paper - timings // Purpur
                     this.level.tickCustomSpawners(this.spawnEnemies, this.spawnFriendlies);
@@ -538,7 +539,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
                 }
             }
 
-            gameprofilerfiller.popPush("broadcast");
+            //gameprofilerfiller.popPush("broadcast"); // Purpur
             // Paper start - chunk tick iteration optimisations
             //this.level.timings.broadcastChunkUpdates.startTiming(); // Paper - timing // Purpur
             {
@@ -556,8 +557,8 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
             }
             //this.level.timings.broadcastChunkUpdates.stopTiming(); // Paper - timing // Purpur
             // Paper end - chunk tick iteration optimisations
-            gameprofilerfiller.pop();
-            gameprofilerfiller.pop();
+            //gameprofilerfiller.pop(); // Purpur
+            //gameprofilerfiller.pop(); // Purpur
         }
     
         // Pufferfish start - optimize mob spawning
@@ -772,7 +773,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
 
         @Override
         protected void doRunTask(Runnable task) {
-            ServerChunkCache.this.level.getProfiler().incrementCounter("runTask");
+            //ServerChunkCache.this.level.getProfiler().incrementCounter("runTask"); // Purpur
             super.doRunTask(task);
         }
 

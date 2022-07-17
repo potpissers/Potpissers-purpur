@@ -396,16 +396,16 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
     }
 
     protected void tick(BooleanSupplier shouldKeepTicking) {
-        ProfilerFiller gameprofilerfiller = this.level.getProfiler();
+        //ProfilerFiller gameprofilerfiller = this.level.getProfiler(); // Purpur
 
-        gameprofilerfiller.push("poi");
+        //gameprofilerfiller.push("poi"); // Purpur
         this.poiManager.tick(shouldKeepTicking);
-        gameprofilerfiller.popPush("chunk_unload");
+        //gameprofilerfiller.popPush("chunk_unload"); // Purpur
         if (!this.level.noSave()) {
             this.processUnloads(shouldKeepTicking);
         }
 
-        gameprofilerfiller.pop();
+        //gameprofilerfiller.pop(); // Purpur
     }
 
     public boolean hasWork() {

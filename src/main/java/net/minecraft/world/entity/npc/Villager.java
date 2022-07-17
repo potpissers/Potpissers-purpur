@@ -345,7 +345,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     }
     protected void customServerAiStep(boolean inactive) { // Purpur - not final
         // Paper end
-        this.level().getProfiler().push("villagerBrain");
+        //this.level().getProfiler().push("villagerBrain"); // Purpur
         // Purpur start
         if (this.level().purpurConfig.villagerLobotomizeEnabled) {
             // treat as inactive if lobotomized
@@ -360,7 +360,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
         }
         else if (this.isLobotomized && shouldRestock()) restock(); // Purpur
         // Pufferfish end
-        this.level().getProfiler().pop();
+        //this.level().getProfiler().pop(); // Purpur
         if (this.assignProfessionWhenSpawned) {
             this.assignProfessionWhenSpawned = false;
         }

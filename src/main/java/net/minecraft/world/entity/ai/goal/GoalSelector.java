@@ -90,8 +90,8 @@ public class GoalSelector {
     }
 
     public void tick() {
-        ProfilerFiller profilerFiller = this.profiler.get();
-        profilerFiller.push("goalCleanup");
+        //ProfilerFiller profilerFiller = this.profiler.get(); // Purpur
+        //profilerFiller.push("goalCleanup"); // Purpur
 
         for (WrappedGoal wrappedGoal : this.availableGoals) {
             if (wrappedGoal.isRunning() && (goalContainsAnyFlags(wrappedGoal, this.goalTypes) || !wrappedGoal.canContinueToUse())) { // Paper - Perf: optimize goal types by removing streams
@@ -100,8 +100,8 @@ public class GoalSelector {
         }
 
         this.lockedFlags.entrySet().removeIf(entry -> !entry.getValue().isRunning());
-        profilerFiller.pop();
-        profilerFiller.push("goalUpdate");
+        //profilerFiller.pop(); // Purpur
+        //profilerFiller.push("goalUpdate"); // Purpur
 
         for (WrappedGoal wrappedGoal2 : this.availableGoals) {
             // Paper start
@@ -121,13 +121,13 @@ public class GoalSelector {
             }
         }
 
-        profilerFiller.pop();
+        //profilerFiller.pop(); // Purpur
         this.tickRunningGoals(true);
     }
 
     public void tickRunningGoals(boolean tickAll) {
-        ProfilerFiller profilerFiller = this.profiler.get();
-        profilerFiller.push("goalTick");
+        //ProfilerFiller profilerFiller = this.profiler.get(); // Purpur
+        //profilerFiller.push("goalTick"); // Purpur
 
         for (WrappedGoal wrappedGoal : this.availableGoals) {
             if (wrappedGoal.isRunning() && (tickAll || wrappedGoal.requiresUpdateEveryTick())) {
@@ -135,7 +135,7 @@ public class GoalSelector {
             }
         }
 
-        profilerFiller.pop();
+        //profilerFiller.pop(); // Purpur
     }
 
     public Set<WrappedGoal> getAvailableGoals() {

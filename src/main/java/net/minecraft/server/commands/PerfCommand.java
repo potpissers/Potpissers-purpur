@@ -42,6 +42,7 @@ public class PerfCommand {
     }
 
     private static int startProfilingDedicatedServer(CommandSourceStack source) throws CommandSyntaxException {
+        if (true) return removedMessage(source); // Purpur
         MinecraftServer minecraftServer = source.getServer();
         if (minecraftServer.isRecordingMetrics()) {
             throw ERROR_ALREADY_RUNNING.create();
@@ -55,6 +56,7 @@ public class PerfCommand {
     }
 
     private static int stopProfilingDedicatedServer(CommandSourceStack source) throws CommandSyntaxException {
+        if (true) return removedMessage(source); // Purpur
         MinecraftServer minecraftServer = source.getServer();
         if (!minecraftServer.isRecordingMetrics()) {
             throw ERROR_NOT_RUNNING.create();
@@ -63,6 +65,18 @@ public class PerfCommand {
             return 0;
         }
     }
+
+    // Purpur start
+    private static int removedMessage(CommandSourceStack source) {
+        if (true) {
+            net.kyori.adventure.text.minimessage.MiniMessage mm = net.kyori.adventure.text.minimessage.MiniMessage.miniMessage();
+            source.getSender().sendMessage(mm.deserialize("<gold>Purpur has removed Mojang's Profiler to save your performance. Please use <click:suggest_command:'/spark'><grey>/spark</grey></click> instead"));
+            source.getSender().sendMessage(mm.deserialize("<gold>For more information, view its documentation at"));
+            source.getSender().sendMessage(mm.deserialize("<gold><click:open_url:'https://spark.lucko.me/docs/Command-Usage'>https://spark.lucko.me/docs/Command-Usage</click>"));
+        }
+        return 0;
+    }
+    // Purpur end
 
     private static void saveResults(CommandSourceStack source, Path tempProfilingDirectory, MinecraftServer server) {
         String string = String.format(
