@@ -253,7 +253,7 @@ public final class NaturalSpawner {
                             blockposition_mutableblockposition.set(l, i, i1);
                             double d0 = (double) l + 0.5D;
                             double d1 = (double) i1 + 0.5D;
-                            Player entityhuman = world.getNearestPlayer(d0, (double) i, d1, -1.0D, false);
+                            Player entityhuman = world.getNearestPlayer(d0, (double) i, d1, -1.0D, world.purpurConfig.mobSpawningIgnoreCreativePlayers); // Purpur
 
                             if (entityhuman != null) {
                                 double d2 = entityhuman.distanceToSqr(d0, (double) i, d1);

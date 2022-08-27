@@ -378,6 +378,7 @@ public class PurpurWorldConfig {
     public boolean phantomSpawning;
     public boolean villagerTraderSpawning;
     public boolean villageSiegeSpawning;
+    public boolean mobSpawningIgnoreCreativePlayers = false;
     private void mobSpawnerSettings() {
         // values of "default" or null will default to true only if the world environment is normal (aka overworld)
         Predicate<Boolean> predicate = (bool) -> (bool != null && bool) || (bool == null && environment == World.Environment.NORMAL);
@@ -386,6 +387,7 @@ public class PurpurWorldConfig {
         phantomSpawning = getBoolean("gameplay-mechanics.mob-spawning.phantoms", predicate);
         villagerTraderSpawning = getBoolean("gameplay-mechanics.mob-spawning.wandering-traders", predicate);
         villageSiegeSpawning = getBoolean("gameplay-mechanics.mob-spawning.village-sieges", predicate);
+        mobSpawningIgnoreCreativePlayers = getBoolean("gameplay-mechanics.mob-spawning.ignore-creative-players", mobSpawningIgnoreCreativePlayers);
     }
 
     public boolean disableObserverClocks = false;
