@@ -185,7 +185,7 @@ public abstract class AbstractSkeleton extends Monster implements RangedAttackMo
         double d2 = target.getZ() - this.getZ();
         double d3 = Math.sqrt(d0 * d0 + d2 * d2);
 
-        entityarrow.shoot(d0, d1 + d3 * 0.20000000298023224D, d2, 1.6F, (float) (14 - this.level().getDifficulty().getId() * 4));
+        entityarrow.shoot(d0, d1 + d3 * 0.20000000298023224D, d2, 1.6F, this.level().purpurConfig.skeletonBowAccuracyMap.getOrDefault(this.level().getDifficulty().getId(), (float) (14 - this.level().getDifficulty().getId() * 4))); // Purpur
         // CraftBukkit start
         org.bukkit.event.entity.EntityShootBowEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callEntityShootBowEvent(this, this.getMainHandItem(), entityarrow.getPickupItem(), entityarrow, net.minecraft.world.InteractionHand.MAIN_HAND, 0.8F, true); // Paper
         if (event.isCancelled()) {
