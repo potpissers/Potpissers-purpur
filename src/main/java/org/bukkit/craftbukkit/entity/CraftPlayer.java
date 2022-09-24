@@ -3655,5 +3655,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         if (this.getHandle().connection == null) return;
         this.getHandle().connection.send(new net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket(new net.minecraft.network.protocol.common.custom.GameTestClearMarkersDebugPayload()));
     }
+
+    @Override
+    public void sendDeathScreen(net.kyori.adventure.text.Component message) {
+        if (this.getHandle().connection == null) return;
+        this.getHandle().connection.send(new net.minecraft.network.protocol.game.ClientboundPlayerCombatKillPacket(getEntityId(), io.papermc.paper.adventure.PaperAdventure.asVanilla(message)));
+    }
     // Purpur end
 }
