@@ -305,6 +305,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
     public boolean purpurClient = false; // Purpur
     private boolean tpsBar = false; // Purpur
     private boolean compassBar = false; // Purpur
+    private boolean ramBar = false; // Purpur
 
     // Paper start - rewrite chunk system
     private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
@@ -604,6 +605,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
 
         if (nbt.contains("Purpur.TPSBar")) { this.tpsBar = nbt.getBoolean("Purpur.TPSBar"); } // Purpur
         if (nbt.contains("Purpur.CompassBar")) { this.compassBar = nbt.getBoolean("Purpur.CompassBar"); } // Purpur
+        if (nbt.contains("Purpur.RamBar")) { this.ramBar = nbt.getBoolean("Purpur.RamBar"); } // Purpur
     }
 
     @Override
@@ -680,6 +682,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
             });
         }
 
+        nbt.putBoolean("Purpur.RamBar", this.ramBar); // Purpur
         nbt.putBoolean("Purpur.TPSBar", this.tpsBar); // Purpur
         nbt.putBoolean("Purpur.CompassBar", this.compassBar); // Purpur
     }
@@ -3103,6 +3106,14 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
 
     public void compassBar(boolean compassBar) {
         this.compassBar = compassBar;
+    }
+
+    public boolean ramBar() {
+        return this.ramBar;
+    }
+
+    public void ramBar(boolean ramBar) {
+        this.ramBar = ramBar;
     }
     // Purpur end
 }

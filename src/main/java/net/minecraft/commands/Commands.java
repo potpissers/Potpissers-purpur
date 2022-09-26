@@ -256,6 +256,8 @@ public class Commands {
             org.purpurmc.purpur.command.UptimeCommand.register(this.dispatcher); // Purpur
             org.purpurmc.purpur.command.TPSBarCommand.register(this.dispatcher); // Purpur
             org.purpurmc.purpur.command.CompassCommand.register(this.dispatcher); // Purpur
+            org.purpurmc.purpur.command.RamBarCommand.register(this.dispatcher); // Purpur
+            org.purpurmc.purpur.command.RamCommand.register(this.dispatcher); // Purpur
         }
 
         if (environment.includeIntegrated) {
