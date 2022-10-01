@@ -86,6 +86,8 @@ public class TridentItem extends Item implements ProjectileItem {
                                     entitythrowntrident.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                                 }
 
+                                entitythrowntrident.setActualEnchantments(stack.getEnchantments()); // Purpur - Add an option to fix MC-3304 projectile looting
+
                                 // CraftBukkit start
                                 // Paper start - PlayerLaunchProjectileEvent
                                 com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent event = new com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent((org.bukkit.entity.Player) entityhuman.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(stack), (org.bukkit.entity.Projectile) entitythrowntrident.getBukkitEntity());

@@ -80,6 +80,7 @@ public abstract class AbstractArrow extends Projectile {
     public ItemStack pickupItemStack;
     @Nullable
     public ItemStack firedFromWeapon;
+    public net.minecraft.world.item.enchantment.ItemEnchantments actualEnchantments = net.minecraft.world.item.enchantment.ItemEnchantments.EMPTY; // Purpur - Add an option to fix MC-3304 projectile looting
 
     // Spigot Start
     @Override
@@ -588,6 +589,12 @@ public abstract class AbstractArrow extends Projectile {
     public ItemStack getWeaponItem() {
         return this.firedFromWeapon;
     }
+
+    // Purpur start - Add an option to fix MC-3304 projectile looting
+    public void setActualEnchantments(net.minecraft.world.item.enchantment.ItemEnchantments actualEnchantments) {
+        this.actualEnchantments = actualEnchantments;
+    }
+    // Purpur end - Add an option to fix MC-3304 projectile looting
 
     protected SoundEvent getDefaultHitGroundSoundEvent() {
         return SoundEvents.ARROW_HIT;

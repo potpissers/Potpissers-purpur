@@ -503,6 +503,11 @@ public class PurpurConfig {
         usernameValidCharactersPattern = java.util.regex.Pattern.compile(setPattern == null || setPattern.isBlank() ? defaultPattern : setPattern);
     }
 
+    public static boolean fixProjectileLootingTransfer = false;
+    private static void fixProjectileLootingTransfer() {
+        fixProjectileLootingTransfer = getBoolean("settings.fix-projectile-looting-transfer", fixProjectileLootingTransfer);
+    }
+
     private static void blastResistanceSettings() {
         getMap("settings.blast-resistance-overrides", Collections.emptyMap()).forEach((blockId, value) -> {
             Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(blockId));

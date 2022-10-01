@@ -66,6 +66,11 @@ public class EnchantedCountIncreaseFunction extends LootItemConditionalFunction 
         Entity entity = context.getParamOrNull(LootContextParams.ATTACKING_ENTITY);
         if (entity instanceof LivingEntity livingEntity) {
             int i = EnchantmentHelper.getEnchantmentLevel(this.enchantment, livingEntity);
+            // Purpur start - Add an option to fix MC-3304 projectile looting
+            if (org.purpurmc.purpur.PurpurConfig.fixProjectileLootingTransfer && context.getParamOrNull(LootContextParams.DIRECT_ATTACKING_ENTITY) instanceof net.minecraft.world.entity.projectile.AbstractArrow arrow) {
+                i = arrow.actualEnchantments.getLevel(this.enchantment);
+            }
+            // Purpur end - Add an option to fix MC-3304 projectile looting
             if (i == 0) {
                 return stack;
             }
