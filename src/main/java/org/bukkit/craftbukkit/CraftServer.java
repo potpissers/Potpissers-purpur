@@ -411,6 +411,20 @@ public final class CraftServer implements Server {
         this.paperPluginManager = new io.papermc.paper.plugin.manager.PaperPluginManagerImpl(this, this.commandMap, pluginManager);
         this.pluginManager.paperPluginManager = this.paperPluginManager;
          // Paper end
+        // Purpur start
+        org.purpurmc.purpur.language.Language.setLanguage(new org.purpurmc.purpur.language.Language() {
+            private net.minecraft.locale.Language language = net.minecraft.locale.Language.getInstance();
+            @Override
+            public boolean has(@org.jetbrains.annotations.NotNull String key) {
+                return language.has(key);
+            }
+
+            @Override
+            public @org.jetbrains.annotations.NotNull String getOrDefault(@org.jetbrains.annotations.NotNull String key) {
+                return language.getOrDefault(key);
+            }
+        });
+        // Purpur end
 
         CraftRegistry.setMinecraftRegistry(console.registryAccess());
 
