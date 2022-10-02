@@ -181,7 +181,7 @@ public class BedBlock extends HorizontalDirectionalBlock implements EntityBlock 
 
     @Override
     public void fallOn(Level world, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
-        super.fallOn(world, state, pos, entity, fallDistance * 0.5F);
+        super.fallOn(world, state, pos, entity, fallDistance); // Purpur
     }
 
     @Override

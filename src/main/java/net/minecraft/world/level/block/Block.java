@@ -88,6 +88,10 @@ public class Block extends BlockBehaviour implements ItemLike {
     public static final int UPDATE_LIMIT = 512;
     protected final StateDefinition<Block, BlockState> stateDefinition;
     private BlockState defaultBlockState;
+    // Purpur start
+    public float fallDamageMultiplier = 1.0F;
+    public float fallDistanceMultiplier = 1.0F;
+    // Purpur end
     // Paper start
     public final boolean isDestroyable() {
         return io.papermc.paper.configuration.GlobalConfiguration.get().unsupportedSettings.allowPermanentBlockBreakExploits ||
@@ -485,7 +489,7 @@ public class Block extends BlockBehaviour implements ItemLike {
     }
 
     public void fallOn(Level world, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
-        entity.causeFallDamage(fallDistance, 1.0F, entity.damageSources().fall());
+        entity.causeFallDamage(fallDistance * fallDistanceMultiplier, fallDamageMultiplier, entity.damageSources().fall()); // Purpur
     }
 
     public void updateEntityAfterFallOn(BlockGetter world, Entity entity) {

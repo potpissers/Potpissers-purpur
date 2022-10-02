@@ -23,6 +23,6 @@ public class HayBlock extends RotatedPillarBlock {
 
     @Override
     public void fallOn(Level world, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
-        entity.causeFallDamage(fallDistance, 0.2F, world.damageSources().fall());
+        super.fallOn(world, state, pos, entity, fallDistance); // Purpur
     }
 }
