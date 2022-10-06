@@ -1129,6 +1129,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
             for (flag = false; iterator.hasNext(); flag = true) {
                 // CraftBukkit start
                 MobEffectInstance effect = (MobEffectInstance) iterator.next();
+                if (cause == EntityPotionEffectEvent.Cause.MILK && !this.level().purpurConfig.milkClearsBeneficialEffects && effect.getEffect().value().isBeneficial()) continue; // Purpur
                 EntityPotionEffectEvent event = CraftEventFactory.callEntityPotionEffectChangeEvent(this, effect, null, cause, EntityPotionEffectEvent.Action.CLEARED);
                 if (event.isCancelled()) {
                     continue;

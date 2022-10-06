@@ -131,6 +131,7 @@ public class PurpurWorldConfig {
     public boolean imposeTeleportRestrictionsOnNetherPortals = false;
     public boolean imposeTeleportRestrictionsOnEndPortals = false;
     public boolean milkCuresBadOmen = true;
+    public boolean milkClearsBeneficialEffects = true;
     public boolean noteBlockIgnoreAbove = false;
     public boolean persistentDroppableEntityDisplayNames = true;
     public boolean persistentTileEntityLore = false;
@@ -158,6 +159,7 @@ public class PurpurWorldConfig {
         imposeTeleportRestrictionsOnNetherPortals = getBoolean("gameplay-mechanics.impose-teleport-restrictions-on-nether-portals", imposeTeleportRestrictionsOnNetherPortals);
         imposeTeleportRestrictionsOnEndPortals = getBoolean("gameplay-mechanics.impose-teleport-restrictions-on-end-portals", imposeTeleportRestrictionsOnEndPortals);
         milkCuresBadOmen = getBoolean("gameplay-mechanics.milk-cures-bad-omen", milkCuresBadOmen);
+        milkClearsBeneficialEffects = getBoolean("gameplay-mechanics.milk-clears-beneficial-effects", milkClearsBeneficialEffects);
         noteBlockIgnoreAbove = getBoolean("gameplay-mechanics.note-block-ignore-above", noteBlockIgnoreAbove);
         if (PurpurConfig.version < 35) {
             boolean oldVal = getBoolean("gameplay-mechanics.persistent-tileentity-display-names-and-lore", persistentTileEntityLore);
