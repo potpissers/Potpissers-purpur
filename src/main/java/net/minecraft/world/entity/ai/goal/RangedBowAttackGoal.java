@@ -116,9 +116,9 @@ public class RangedBowAttackGoal<T extends Monster & RangedAttackMob> extends Go
                 }
 
                 this.mob.lookAt(livingEntity, 30.0F, 30.0F);
-            } else {
+            } //else { // Purpur - fix MC-121706
                 this.mob.getLookControl().setLookAt(livingEntity, 30.0F, 30.0F);
-            }
+            //} // Purpur
 
             if (this.mob.isUsingItem()) {
                 if (!bl && this.seeTime < -60) {
