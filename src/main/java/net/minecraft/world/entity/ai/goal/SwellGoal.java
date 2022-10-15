@@ -54,6 +54,14 @@ public class SwellGoal extends Goal {
             this.creeper.setSwellDir(-1);
         } else {
             this.creeper.setSwellDir(1);
+            // Purpur start
+            if (this.creeper.level().purpurConfig.creeperEncircleTarget) {
+                net.minecraft.world.phys.Vec3 relative = this.creeper.position().subtract(this.target.position());
+                relative = relative.yRot((float) Math.PI / 3).normalize().multiply(2, 2, 2);
+                net.minecraft.world.phys.Vec3 destination = this.target.position().add(relative);
+                this.creeper.getNavigation().moveTo(destination.x, destination.y, destination.z, 1);
+            }
+            // Purpur end
         }
     }
 }
