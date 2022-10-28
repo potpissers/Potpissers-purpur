@@ -429,6 +429,7 @@ public class Goat extends Animal {
 
     // Paper start - Goat ram API
     public void ram(net.minecraft.world.entity.LivingEntity entity) {
+        if(!new org.purpurmc.purpur.event.entity.GoatRamEntityEvent((org.bukkit.entity.Goat) getBukkitEntity(), (org.bukkit.entity.LivingEntity) entity.getBukkitLivingEntity()).callEvent()) return; // Purpur
         Brain<Goat> brain = this.getBrain();
         brain.setMemory(MemoryModuleType.RAM_TARGET, entity.position());
         brain.eraseMemory(MemoryModuleType.RAM_COOLDOWN_TICKS);
