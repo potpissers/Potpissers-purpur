@@ -29,6 +29,7 @@ public class RangedAttribute extends Attribute {
 
     @Override
     public double sanitizeValue(double value) {
+        if (!org.purpurmc.purpur.PurpurConfig.clampAttributes) return Double.isNaN(value) ? this.minValue : value; // Purpur
         return Double.isNaN(value) ? this.minValue : Mth.clamp(value, this.minValue, this.maxValue);
     }
 }
