@@ -970,6 +970,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
             && this.level.paperConfig().environment.netherCeilingVoidDamageHeight.test(v -> this.getY() >= v)
             && (!(this instanceof Player player) || !player.getAbilities().invulnerable))) {
             // Paper end - Configurable nether ceiling damage
+            if (this.level().purpurConfig.teleportOnNetherCeilingDamage && this.level.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER && this instanceof ServerPlayer player) player.teleport(io.papermc.paper.util.MCUtil.toLocation(this.level, this.level.getSharedSpawnPos())); else // Purpur
             this.onBelowWorld();
         }
 
