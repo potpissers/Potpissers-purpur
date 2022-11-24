@@ -627,6 +627,12 @@ public class EntityType<T extends Entity> implements FeatureElement, EntityTypeT
             entity.load(nbt);
         }, () -> {
             EntityType.LOGGER.warn("Skipping Entity with id {}", nbt.getString("id"));
+            // Purpur start - log skipped entity's position
+            try {
+                ListTag pos = nbt.getList("Pos", 6);
+                EntityType.LOGGER.warn("Location: {} {},{},{}", world.getWorld().getName(), pos.getDouble(0), pos.getDouble(1), pos.getDouble(2));
+            } catch (Throwable ignore) {}
+            // Purpur end
         });
     }
 
