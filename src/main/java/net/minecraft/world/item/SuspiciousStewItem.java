@@ -58,10 +58,14 @@ public class SuspiciousStewItem extends Item {
     public void cancelUsingItem(net.minecraft.server.level.ServerPlayer entityplayer, ItemStack itemstack) {
         SuspiciousStewEffects suspicioussteweffects = (SuspiciousStewEffects) itemstack.getOrDefault(DataComponents.SUSPICIOUS_STEW_EFFECTS, SuspiciousStewEffects.EMPTY);
 
+        final List<net.minecraft.network.protocol.Packet<? super net.minecraft.network.protocol.game.ClientGamePacketListener>> packets = new java.util.ArrayList<>(); // Paper - bundlize packets
         for (SuspiciousStewEffects.Entry suspicioussteweffects_a : suspicioussteweffects.effects()) {
-            entityplayer.connection.send(new net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket(entityplayer.getId(), suspicioussteweffects_a.effect()));
+            packets.add(new net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket(entityplayer.getId(), suspicioussteweffects_a.effect())); // Paper - bundlize packets
         }
-        entityplayer.server.getPlayerList().sendActivePlayerEffects(entityplayer);
+        // Paper start - bundlize packets
+        entityplayer.server.getPlayerList().sendActiveEffects(entityplayer, packets::add);
+        entityplayer.connection.send(new net.minecraft.network.protocol.game.ClientboundBundlePacket(packets));
+        // Paper end - bundlize packets
     }
     // CraftBukkit end
 }

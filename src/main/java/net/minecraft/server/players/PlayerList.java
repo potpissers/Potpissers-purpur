@@ -393,7 +393,7 @@ public abstract class PlayerList {
         ((ServerLevel)player.level()).getChunkSource().chunkMap.addEntity(player); // Paper - Fire PlayerJoinEvent when Player is actually ready; track entity now
         // CraftBukkit end
 
-        player.refreshEntityData(player); // CraftBukkit - BungeeCord#2321, send complete data to self on spawn
+        //player.refreshEntityData(player); // CraftBukkit - BungeeCord#2321, send complete data to self on spawn // Paper - THIS IS NOT NEEDED ANYMORE
 
         this.sendLevelInfo(player, worldserver1);
 
@@ -948,12 +948,17 @@ public abstract class PlayerList {
     }
 
     public void sendActiveEffects(LivingEntity entity, ServerGamePacketListenerImpl networkHandler) {
+        // Paper start - collect packets
+        this.sendActiveEffects(entity, networkHandler::send);
+    }
+    public void sendActiveEffects(LivingEntity entity, java.util.function.Consumer<Packet<? super net.minecraft.network.protocol.game.ClientGamePacketListener>> packetConsumer) {
+        // Paper end - collect packets
         Iterator iterator = entity.getActiveEffects().iterator();
 
         while (iterator.hasNext()) {
             MobEffectInstance mobeffect = (MobEffectInstance) iterator.next();
 
-            networkHandler.send(new ClientboundUpdateMobEffectPacket(entity.getId(), mobeffect, false));
+            packetConsumer.accept(new ClientboundUpdateMobEffectPacket(entity.getId(), mobeffect, false)); // Paper - collect packets
         }
 
     }
