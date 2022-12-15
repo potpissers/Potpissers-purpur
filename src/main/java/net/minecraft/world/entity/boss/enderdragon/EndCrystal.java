@@ -102,6 +102,7 @@ public class EndCrystal extends Entity {
                 }
             }
             // Paper end - Fix invulnerable end crystals
+            if (this.level().purpurConfig.endCrystalCramming > 0 && this.level().getEntitiesOfClass(EndCrystal.class, getBoundingBox()).size() > this.level().purpurConfig.endCrystalCramming) this.hurt(this.damageSources().cramming(), 6.0F); // Purpur
         }
 
     // Purpur start
