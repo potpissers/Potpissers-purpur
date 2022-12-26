@@ -408,6 +408,25 @@ public class Explosion {
             return;
         }
         // CraftBukkit end
+
+        // Purpur start - add PreExplodeEvents
+        if(this.source != null){
+            Location location = new Location(this.level.getWorld(), this.x, this.y, this.z);
+            if(!new org.purpurmc.purpur.event.entity.PreEntityExplodeEvent(this.source.getBukkitEntity(), location, this.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY ? 1.0F / this.radius : 1.0F, org.bukkit.craftbukkit.CraftExplosionResult.toBukkit(getBlockInteraction())).callEvent()) {
+                this.wasCanceled = true;
+                return;
+            }
+        }else {
+            Location location = new Location(this.level.getWorld(), this.x, this.y, this.z);
+            org.bukkit.block.Block block = location.getBlock();
+            org.bukkit.block.BlockState blockState = (this.damageSource.getDirectBlockState() != null) ? this.damageSource.getDirectBlockState() : block.getState();
+            if(!new org.purpurmc.purpur.event.PreBlockExplodeEvent(location.getBlock(), this.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY ? 1.0F / this.radius : 1.0F, blockState, org.bukkit.craftbukkit.CraftExplosionResult.toBukkit(getBlockInteraction())).callEvent()) {
+                this.wasCanceled = true;
+                return;
+            }
+        }
+        //Purpur end
+
         this.level.gameEvent(this.source, (Holder) GameEvent.EXPLODE, new Vec3(this.x, this.y, this.z));
 
         // Paper start - collision optimisations
