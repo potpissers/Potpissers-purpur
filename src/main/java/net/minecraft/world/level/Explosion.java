@@ -341,7 +341,7 @@ public class Explosion {
         this.hitPlayers = Maps.newHashMap();
         this.level = world;
         this.source = entity;
-        this.radius = (float) Math.max(power, 0.0); // CraftBukkit - clamp bad values
+        this.radius = (float) (world == null || world.purpurConfig.explosionClampRadius ? Math.max(power, 0.0) : power); // CraftBukkit - clamp bad values // Purpur
         this.x = x;
         this.y = y;
         this.z = z;
@@ -404,7 +404,7 @@ public class Explosion {
 
     public void explode() {
         // CraftBukkit start
-        if (this.radius < 0.1F) {
+        if ((this.level == null || this.level.purpurConfig.explosionClampRadius) && this.radius < 0.1F) { // Purpur
             return;
         }
         // CraftBukkit end
