@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class NetherWartBlock extends BushBlock {
+public class NetherWartBlock extends BushBlock implements BonemealableBlock { // Purpur
 
     public static final MapCodec<NetherWartBlock> CODEC = simpleCodec(NetherWartBlock::new);
     public static final int MAX_AGE = 3;
@@ -77,6 +77,23 @@ public class NetherWartBlock extends BushBlock {
         } else {
             super.playerDestroy(world, player, pos, state, blockEntity, itemInHand, includeDrops, dropExp);
         }
+    }
+
+    @Override
+    public boolean isValidBonemealTarget(final net.minecraft.world.level.LevelReader world, final BlockPos pos, final BlockState state) {
+        return ((net.minecraft.world.level.Level) world).purpurConfig.netherWartAffectedByBonemeal && state.getValue(NetherWartBlock.AGE) < 3;
+    }
+
+    @Override
+    public boolean isBonemealSuccess(net.minecraft.world.level.Level world, RandomSource random, BlockPos pos, BlockState state) {
+        return true;
+    }
+
+    @Override
+    public void performBonemeal(ServerLevel world, RandomSource random, BlockPos pos, BlockState state) {
+        int i = Math.min(3, state.getValue(NetherWartBlock.AGE) + 1);
+        state = state.setValue(NetherWartBlock.AGE, i);
+        org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(world, pos, state, 2); // CraftBukkit
     }
     // Purpur end
 }

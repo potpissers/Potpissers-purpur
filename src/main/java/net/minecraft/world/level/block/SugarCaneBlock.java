@@ -20,7 +20,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class SugarCaneBlock extends Block {
+public class SugarCaneBlock extends Block implements BonemealableBlock { // Purpur
 
     public static final MapCodec<SugarCaneBlock> CODEC = simpleCodec(SugarCaneBlock::new);
     public static final IntegerProperty AGE = BlockStateProperties.AGE_15;
@@ -113,4 +113,34 @@ public class SugarCaneBlock extends Block {
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(SugarCaneBlock.AGE);
     }
+
+    // Purpur start
+    @Override
+    public boolean isValidBonemealTarget(final LevelReader world, final BlockPos pos, final BlockState state) {
+        if (!((net.minecraft.world.level.Level) world).purpurConfig.sugarCanAffectedByBonemeal || !world.isEmptyBlock(pos.above())) return false;
+
+        int reedHeight = 0;
+        while (world.getBlockState(pos.below(reedHeight)).is(this)) {
+            reedHeight++;
+        }
+
+        return reedHeight < ((net.minecraft.world.level.Level) world).paperConfig().maxGrowthHeight.reeds;
+    }
+
+    @Override
+    public boolean isBonemealSuccess(net.minecraft.world.level.Level world, RandomSource random, BlockPos pos, BlockState state) {
+        return true;
+    }
+
+    @Override
+    public void performBonemeal(ServerLevel world, RandomSource random, BlockPos pos, BlockState state) {
+        int reedHeight = 0;
+        while (world.getBlockState(pos.below(reedHeight)).is(this)) {
+            reedHeight++;
+        }
+        for (int i = 0; i <= world.paperConfig().maxGrowthHeight.reeds - reedHeight; i++) {
+            world.setBlockAndUpdate(pos.above(i), state.setValue(SugarCaneBlock.AGE, 0));
+        }
+    }
+    // Purpur end
 }
