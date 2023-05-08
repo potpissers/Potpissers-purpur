@@ -237,24 +237,52 @@ public class ComposterBlock extends Block implements WorldlyContainerHolder {
         int i = (Integer) state.getValue(ComposterBlock.LEVEL);
 
         if (i < 8 && ComposterBlock.COMPOSTABLES.containsKey(stack.getItem())) {
-            if (i < 7 && !world.isClientSide) {
-                BlockState iblockdata1 = ComposterBlock.addItem(player, state, world, pos, stack);
-                // Paper start - handle cancelled events
-                if (iblockdata1 == null) {
-                    return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
-                }
-                // Paper end
-
-                world.levelEvent(1500, pos, state != iblockdata1 ? 1 : 0);
-                player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
-                stack.consume(1, player);
+            // Purpur start - sneak to bulk process composter
+            BlockState newState = process(i, player, state, world, pos, stack);
+            if (newState == null) {
+                return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
             }
+            if (world.purpurConfig.composterBulkProcess && player.isShiftKeyDown() && newState != state) {
+                BlockState oldState;
+                int oldCount, newCount, oldLevel, newLevel;
+                do {
+                    oldState = newState;
+                    oldCount = stack.getCount();
+                    oldLevel = oldState.getValue(ComposterBlock.LEVEL);
+                    newState = process(oldLevel, player, oldState, world, pos, stack);
+                    if (newState == null) {
+                        return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+                    }
+                    newCount = stack.getCount();
+                    newLevel = newState.getValue(ComposterBlock.LEVEL);
+                } while (newCount > 0 && (newCount != oldCount || newLevel != oldLevel || newState != oldState));
+            }
+            // Purpur end
 
             return ItemInteractionResult.sidedSuccess(world.isClientSide);
         } else {
             return super.useItemOn(stack, state, world, pos, player, hand, hit);
         }
     }
+
+    // Purpur start - sneak to bulk process composter
+    private static @Nullable BlockState process(int level, Player player, BlockState state, Level world, BlockPos pos, ItemStack stack) {
+        if (level < 7 && !world.isClientSide) {
+            BlockState iblockdata1 = ComposterBlock.addItem(player, state, world, pos, stack);
+            // Paper start - handle cancelled events
+            if (iblockdata1 == null) {
+                return null;
+            }
+            // Paper end
+
+            world.levelEvent(1500, pos, state != iblockdata1 ? 1 : 0);
+            player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
+            stack.consume(1, player);
+            return iblockdata1;
+        }
+        return state;
+    }
+    // Purpur end
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {

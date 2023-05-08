@@ -577,7 +577,7 @@ public class ServerPlayerGameMode {
             ItemStack itemstack1 = stack.copy();
             InteractionResult enuminteractionresult;
 
-            if (!flag1) {
+            if (!flag1 || (player.level().purpurConfig.composterBulkProcess && iblockdata.is(Blocks.COMPOSTER))) { // Purpur
                 ItemInteractionResult iteminteractionresult = iblockdata.useItemOn(player.getItemInHand(hand), world, player, hand, hitResult);
 
                 if (iteminteractionresult.consumesAction()) {
