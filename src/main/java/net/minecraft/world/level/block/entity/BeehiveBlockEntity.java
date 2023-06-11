@@ -146,10 +146,32 @@ public class BeehiveBlockEntity extends BlockEntity {
         return list;
     }
 
+    // Purpur start
+    public List<Entity> releaseBee(BlockState iblockdata, BeehiveBlockEntity.BeeData data, BeehiveBlockEntity.BeeReleaseStatus tileentitybeehive_releasestatus, boolean force) {
+        List<Entity> list = Lists.newArrayList();
+
+        BeehiveBlockEntity.releaseOccupant(this.level, this.worldPosition, iblockdata, data.occupant, list, tileentitybeehive_releasestatus, this.savedFlowerPos, force);
+
+        if (!list.isEmpty()) {
+            stored.remove(data);
+
+            super.setChanged();
+        }
+
+        return list;
+    }
+    // Purpur end
+
     @VisibleForDebug
     public int getOccupantCount() {
         return this.stored.size();
     }
+
+    // Purpur start
+    public List<BeeData> getStored() {
+        return stored;
+    }
+    // Purpur end
 
     // Paper start - Add EntityBlockStorage clearEntities
     public void clearBees() {
@@ -471,9 +493,9 @@ public class BeehiveBlockEntity extends BlockEntity {
         }
     }
 
-    private static class BeeData {
+    public static class BeeData { // Purpur - change from private to public
 
-        private final BeehiveBlockEntity.Occupant occupant;
+        public final BeehiveBlockEntity.Occupant occupant; // Purpur - make public
         private int exitTickCounter; // Paper - Fix bees aging inside hives; separate counter for checking if bee should exit to reduce exit attempts
         private int ticksInHive;
 
