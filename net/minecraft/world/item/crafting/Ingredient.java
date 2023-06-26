@@ -21,7 +21,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.ItemLike;
 
-public final class Ingredient implements StackedContents.IngredientInfo<Holder<Item>>, Predicate<ItemStack> {
+public final class Ingredient implements StackedContents.IngredientInfo<io.papermc.paper.inventory.recipe.ItemOrExact>, Predicate<ItemStack> { // Paper - Improve exact choice recipe ingredients
     public static final StreamCodec<RegistryFriendlyByteBuf, Ingredient> CONTENTS_STREAM_CODEC = ByteBufCodecs.holderSet(Registries.ITEM)
         .map(Ingredient::new, ingredient -> ingredient.values);
     public static final StreamCodec<RegistryFriendlyByteBuf, Optional<Ingredient>> OPTIONAL_CONTENTS_STREAM_CODEC = ByteBufCodecs.holderSet(Registries.ITEM)
@@ -35,20 +35,24 @@ public final class Ingredient implements StackedContents.IngredientInfo<Holder<I
     private final HolderSet<Item> values;
     // CraftBukkit start
     @javax.annotation.Nullable
-    private java.util.List<ItemStack> itemStacks;
+    private java.util.Set<ItemStack> itemStacks; // Paper - Improve exact choice recipe ingredients
 
     public boolean isExact() {
         return this.itemStacks != null;
     }
 
     @javax.annotation.Nullable
-    public java.util.List<ItemStack> itemStacks() {
+    public java.util.Set<ItemStack> itemStacks() { // Paper - Improve exact choice recipe ingredients
         return this.itemStacks;
     }
 
     public static Ingredient ofStacks(java.util.List<ItemStack> stacks) {
         Ingredient recipe = Ingredient.of(stacks.stream().map(ItemStack::getItem));
-        recipe.itemStacks = stacks;
+        // Paper start - Improve exact choice recipe ingredients
+        recipe.itemStacks = net.minecraft.world.item.ItemStackLinkedSet.createTypeAndComponentsSet();
+        recipe.itemStacks.addAll(stacks);
+        recipe.itemStacks = java.util.Collections.unmodifiableSet(recipe.itemStacks);
+        // Paper end - Improve exact choice recipe ingredients
         return recipe;
     }
     // CraftBukkit end
@@ -81,21 +85,22 @@ public final class Ingredient implements StackedContents.IngredientInfo<Holder<I
     public boolean test(ItemStack stack) {
         // CraftBukkit start
         if (this.isExact()) {
-            for (ItemStack itemstack1 : this.itemStacks()) {
-                if (itemstack1.getItem() == stack.getItem() && ItemStack.isSameItemSameComponents(stack, itemstack1)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return this.itemStacks.contains(stack); // Paper - Improve exact choice recipe ingredients (hashing FTW!)
         }
         // CraftBukkit end
         return stack.is(this.values);
     }
 
+    // Paper start - Improve exact choice recipe ingredients
     @Override
-    public boolean acceptsItem(Holder<Item> item) {
-        return this.values.contains(item);
+    public boolean acceptsItem(final io.papermc.paper.inventory.recipe.ItemOrExact itemOrExact) {
+        return switch (itemOrExact) {
+            case io.papermc.paper.inventory.recipe.ItemOrExact.Item(final Holder<Item> item) ->
+                !this.isExact() && this.values.contains(item);
+            case io.papermc.paper.inventory.recipe.ItemOrExact.Exact(final ItemStack exact) ->
+                this.isExact() && this.itemStacks.contains(exact);
+        };
+        // Paper end - Improve exact choice recipe ingredients
     }
 
     @Override
@@ -120,6 +125,11 @@ public final class Ingredient implements StackedContents.IngredientInfo<Holder<I
     }
 
     public SlotDisplay display() {
+        // Paper start - show exact ingredients in recipe book
+        if (this.isExact()) {
+            return new SlotDisplay.Composite(this.itemStacks().stream().<SlotDisplay>map(SlotDisplay.ItemStackSlotDisplay::new).toList());
+        }
+        // Paper end - show exact ingredients in recipe book
         return (SlotDisplay)this.values
             .unwrap()
             .map(SlotDisplay.TagSlotDisplay::new, list -> new SlotDisplay.Composite(list.stream().map(Ingredient::displayForSingleItem).toList()));

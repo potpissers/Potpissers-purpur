@@ -72,13 +72,18 @@ public class ShapelessRecipe implements CraftingRecipe {
 
     @Override
     public boolean matches(CraftingInput input, Level level) {
+        // Paper start - Improve exact choice recipe ingredients & unwrap ternary
         if (input.ingredientCount() != this.ingredients.size()) {
             return false;
-        } else {
-            return input.size() == 1 && this.ingredients.size() == 1
-                ? this.ingredients.getFirst().test(input.getItem(0))
-                : input.stackedContents().canCraft(this, null);
         }
+        if (input.size() == 1 && this.ingredients.size() == 1) {
+            return this.ingredients.getFirst().test(input.getItem(0));
+        }
+        input.stackedContents().initializeExtras(this, input);
+        boolean canCraft = input.stackedContents().canCraft(this, null);
+        input.stackedContents().resetExtras();
+        return canCraft;
+        // Paper end - Improve exact choice recipe ingredients & unwrap ternary
     }
 
     @Override

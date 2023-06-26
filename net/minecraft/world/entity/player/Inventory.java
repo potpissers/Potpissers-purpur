@@ -185,12 +185,12 @@ public class Inventory implements Container, Nameable {
         return !stack.isDamaged() && !stack.isEnchanted() && !stack.has(DataComponents.CUSTOM_NAME);
     }
 
-    public int findSlotMatchingCraftingIngredient(Holder<Item> item, ItemStack stack) {
+    public int findSlotMatchingCraftingIngredient(io.papermc.paper.inventory.recipe.ItemOrExact item, ItemStack stack) { // Paper - Improve exact choice recipe ingredients
         for (int i = 0; i < this.items.size(); i++) {
             ItemStack itemStack = this.items.get(i);
             if (!itemStack.isEmpty()
-                && itemStack.is(item)
-                && isUsableForCrafting(itemStack)
+                && item.matches(itemStack) // Paper - Improve exact choice recipe ingredients
+                && (!(item instanceof io.papermc.paper.inventory.recipe.ItemOrExact.Item) || Inventory.isUsableForCrafting(itemStack)) // Paper - Improve exact choice recipe ingredients
                 && (stack.isEmpty() || ItemStack.isSameItemSameComponents(stack, itemStack))) {
                 return i;
             }

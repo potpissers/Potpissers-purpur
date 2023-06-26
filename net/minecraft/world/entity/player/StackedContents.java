@@ -13,7 +13,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 public class StackedContents<T> {
-    public final Reference2IntOpenHashMap<T> amounts = new Reference2IntOpenHashMap<>();
+    public final it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap<T> amounts = new it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap<>(); // Paper - Improve exact choice recipe ingredients (don't use "reference" map)
 
     boolean hasAtLeast(T item, int amount) {
         return this.amounts.getInt(item) >= amount;
@@ -49,7 +49,7 @@ public class StackedContents<T> {
     List<T> getUniqueAvailableIngredientItems(Iterable<? extends StackedContents.IngredientInfo<T>> ingredients) {
         List<T> list = new ArrayList<>();
 
-        for (Entry<T> entry : Reference2IntMaps.fastIterable(this.amounts)) {
+        for (it.unimi.dsi.fastutil.objects.Object2IntMap.Entry<T> entry : it.unimi.dsi.fastutil.objects.Object2IntMaps.fastIterable(this.amounts)) { // Paper - Improve exact choice recipe ingredients (don't use "reference" map)
             if (entry.getIntValue() > 0 && anyIngredientMatches(ingredients, entry.getKey())) {
                 list.add(entry.getKey());
             }
@@ -71,13 +71,13 @@ public class StackedContents<T> {
     @VisibleForTesting
     public int getResultUpperBound(List<? extends StackedContents.IngredientInfo<T>> ingredients) {
         int i = Integer.MAX_VALUE;
-        ObjectIterable<Entry<T>> objectIterable = Reference2IntMaps.fastIterable(this.amounts);
+        ObjectIterable<it.unimi.dsi.fastutil.objects.Object2IntMap.Entry<T>> objectIterable = it.unimi.dsi.fastutil.objects.Object2IntMaps.fastIterable(this.amounts); // Paper - Improve exact choice recipe ingredients (don't use "reference" map)
 
         label31:
         for (StackedContents.IngredientInfo<T> ingredientInfo : ingredients) {
             int i1 = 0;
 
-            for (Entry<T> entry : objectIterable) {
+            for (it.unimi.dsi.fastutil.objects.Object2IntMap.Entry<T> entry : objectIterable) { // Paper - Improve exact choice recipe ingredients (don't use "reference" map)
                 int intValue = entry.getIntValue();
                 if (intValue > i1) {
                     if (ingredientInfo.acceptsItem(entry.getKey())) {
