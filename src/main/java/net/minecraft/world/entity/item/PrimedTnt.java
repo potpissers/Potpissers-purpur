@@ -230,4 +230,29 @@ public class PrimedTnt extends Entity implements TraceableEntity {
         return !level().paperConfig().fixes.preventTntFromMovingInWater && super.isPushedByFluid();
     }
     // Paper end - Option to prevent TNT from moving in water
+    // Purpur start - Shears can defuse TNT
+    @Override
+    public net.minecraft.world.InteractionResult interact(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+        if (!level().isClientSide && level().purpurConfig.shearsCanDefuseTnt) {
+            final net.minecraft.world.item.ItemStack inHand = player.getItemInHand(hand);
+
+            if (!inHand.is(net.minecraft.world.item.Items.SHEARS) || !player.getBukkitEntity().hasPermission("purpur.tnt.defuse") ||
+                    level().random.nextFloat() > level().purpurConfig.shearsCanDefuseTntChance) return net.minecraft.world.InteractionResult.PASS;
+
+            net.minecraft.world.entity.item.ItemEntity tntItem = new net.minecraft.world.entity.item.ItemEntity(level(), getX(), getY(), getZ(),
+                    new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.TNT));
+            tntItem.setPickUpDelay(10);
+
+            inHand.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+            level().addFreshEntity(tntItem, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM);
+
+            this.playSound(net.minecraft.sounds.SoundEvents.SHEEP_SHEAR);
+
+            this.kill();
+            return net.minecraft.world.InteractionResult.SUCCESS;
+        }
+
+        return super.interact(player, hand);
+    }
+    // Purpur end - Shears can defuse TNT
 }
