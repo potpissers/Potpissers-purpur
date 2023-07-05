@@ -195,6 +195,7 @@ public class MapItem extends ComplexItem {
     public static void renderBiomePreviewMap(ServerLevel world, ItemStack map) {
         MapItemSavedData mapItemSavedData = getSavedData(map, world);
         if (mapItemSavedData != null) {
+            mapItemSavedData.isExplorerMap = true; // Purpur
             if (world.dimension() == mapItemSavedData.dimension) {
                 int i = 1 << mapItemSavedData.scale;
                 int j = mapItemSavedData.centerX;

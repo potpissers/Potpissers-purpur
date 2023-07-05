@@ -80,6 +80,7 @@ public class MapItemSavedData extends SavedData {
     private final Map<String, MapFrame> frameMarkers = Maps.newHashMap();
     private int trackedDecorationCount;
     private org.bukkit.craftbukkit.map.RenderData vanillaRender = new org.bukkit.craftbukkit.map.RenderData(); // Paper
+    public boolean isExplorerMap; // Purpur
 
     // CraftBukkit start
     public final CraftMapView mapView;
