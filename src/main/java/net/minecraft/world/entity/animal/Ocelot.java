@@ -285,7 +285,7 @@ public class Ocelot extends Animal {
         if (world.isUnobstructed(this) && !world.containsAnyLiquid(this.getBoundingBox())) {
             BlockPos blockposition = this.blockPosition();
 
-            if (blockposition.getY() < world.getSeaLevel()) {
+            if (!level().purpurConfig.ocelotSpawnUnderSeaLevel && blockposition.getY() < world.getSeaLevel()) {
                 return false;
             }
 

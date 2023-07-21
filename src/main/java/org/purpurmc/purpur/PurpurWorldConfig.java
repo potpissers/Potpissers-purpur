@@ -2139,6 +2139,7 @@ public class PurpurWorldConfig {
     public int ocelotBreedingTicks = 6000;
     public boolean ocelotTakeDamageFromWater = false;
     public boolean ocelotAlwaysDropExp = false;
+    public boolean ocelotSpawnUnderSeaLevel = false;
     private void ocelotSettings() {
         ocelotRidable = getBoolean("mobs.ocelot.ridable", ocelotRidable);
         ocelotRidableInWater = getBoolean("mobs.ocelot.ridable-in-water", ocelotRidableInWater);
@@ -2153,6 +2154,7 @@ public class PurpurWorldConfig {
         ocelotBreedingTicks = getInt("mobs.ocelot.breeding-delay-ticks", ocelotBreedingTicks);
         ocelotTakeDamageFromWater = getBoolean("mobs.ocelot.takes-damage-from-water", ocelotTakeDamageFromWater);
         ocelotAlwaysDropExp = getBoolean("mobs.ocelot.always-drop-exp", ocelotAlwaysDropExp);
+        ocelotSpawnUnderSeaLevel = getBoolean("mobs.ocelot.spawn-below-sea-level", ocelotSpawnUnderSeaLevel);
     }
 
     public boolean pandaRidable = false;
