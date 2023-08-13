@@ -606,10 +606,17 @@ public class PiglinAi {
             ItemStack itemstack = (ItemStack) iterator.next();
 
             item = itemstack.getItem();
-        } while (!(item instanceof ArmorItem) || !((ArmorItem) item).getMaterial().is(ArmorMaterials.GOLD));
+        } while (!(item instanceof ArmorItem) || !((ArmorItem) item).getMaterial().is(ArmorMaterials.GOLD) && (!entity.level().purpurConfig.piglinIgnoresArmorWithGoldTrim || !isWearingGoldTrim(item))); // Purpur
 
         return true;
     }
+
+    // Purpur start
+    private static boolean isWearingGoldTrim(Item itemstack) {
+        net.minecraft.world.item.armortrim.ArmorTrim armorTrim = itemstack.components().get(net.minecraft.core.component.DataComponents.TRIM);
+        return armorTrim != null && armorTrim.material().is(net.minecraft.world.item.armortrim.TrimMaterials.GOLD);
+    }
+    // Purpur end
 
     private static void stopWalking(Piglin piglin) {
         piglin.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
