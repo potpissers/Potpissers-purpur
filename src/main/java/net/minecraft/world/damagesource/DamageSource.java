@@ -218,7 +218,7 @@ public class DamageSource {
 
             ItemStack itemstack1 = itemstack;
 
-            return !itemstack1.isEmpty() && itemstack1.has(DataComponents.CUSTOM_NAME) ? Component.translatable(s + ".item", killed.getDisplayName(), ichatbasecomponent, itemstack1.getDisplayName()) : Component.translatable(s, killed.getDisplayName(), ichatbasecomponent);
+            return !itemstack1.isEmpty() && (org.purpurmc.purpur.PurpurConfig.playerDeathsAlwaysShowItem || itemstack1.has(DataComponents.CUSTOM_NAME)) ? Component.translatable(s + ".item", killed.getDisplayName(), ichatbasecomponent, itemstack1.getDisplayName()) : Component.translatable(s, killed.getDisplayName(), ichatbasecomponent);
         }
     }
 

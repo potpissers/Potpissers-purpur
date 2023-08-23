@@ -54,7 +54,7 @@ public class CombatTracker {
 
     private Component getMessageForAssistedFall(Entity attacker, Component attackerDisplayName, String itemDeathTranslationKey, String deathTranslationKey) {
         ItemStack itemStack = attacker instanceof LivingEntity livingEntity ? livingEntity.getMainHandItem() : ItemStack.EMPTY;
-        return !itemStack.isEmpty() && itemStack.has(DataComponents.CUSTOM_NAME)
+        return !itemStack.isEmpty() && (org.purpurmc.purpur.PurpurConfig.playerDeathsAlwaysShowItem || itemStack.has(DataComponents.CUSTOM_NAME)) // Purpur
             ? Component.translatable(itemDeathTranslationKey, this.mob.getDisplayName(), attackerDisplayName, itemStack.getDisplayName())
             : Component.translatable(deathTranslationKey, this.mob.getDisplayName(), attackerDisplayName);
     }
