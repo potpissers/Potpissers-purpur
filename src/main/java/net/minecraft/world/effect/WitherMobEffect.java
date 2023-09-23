@@ -9,7 +9,7 @@ class WitherMobEffect extends MobEffect {
 
     @Override
     public boolean applyEffectTick(LivingEntity entity, int amplifier) {
-        entity.hurt(entity.damageSources().wither(), 1.0F);
+        entity.hurt(entity.damageSources().wither(), entity.level().purpurConfig.entityWitherDegenerationAmount); // Purpur
         return true;
     }
 

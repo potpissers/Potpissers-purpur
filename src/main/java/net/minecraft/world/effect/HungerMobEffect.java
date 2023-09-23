@@ -12,7 +12,7 @@ class HungerMobEffect extends MobEffect {
     @Override
     public boolean applyEffectTick(LivingEntity entity, int amplifier) {
         if (entity instanceof Player entityhuman) {
-            entityhuman.causeFoodExhaustion(0.005F * (float) (amplifier + 1), org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.HUNGER_EFFECT); // CraftBukkit - EntityExhaustionEvent
+            entityhuman.causeFoodExhaustion(entity.level().purpurConfig.humanHungerExhaustionAmount * (float) (amplifier + 1), org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.HUNGER_EFFECT); // CraftBukkit - EntityExhaustionEvent // Purpur
         }
 
         return true;
