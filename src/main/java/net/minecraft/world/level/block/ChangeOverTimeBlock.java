@@ -67,7 +67,7 @@ public interface ChangeOverTimeBlock<T extends Enum<T>> {
         }
 
         float f = (float) (k + 1) / (float) (k + j + 1);
-        float f1 = f * f * this.getChanceModifier();
+        float f1 = world.purpurConfig.disableOxidationProximityPenalty ? this.getChanceModifier() : f * f * this.getChanceModifier(); // Purpur
 
         return random.nextFloat() < f1 ? this.getNext(state) : Optional.empty();
     }
