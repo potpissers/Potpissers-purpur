@@ -129,7 +129,7 @@ public class NetherPortalBlock extends Block implements Portal {
     @Override
     public int getPortalTransitionTime(ServerLevel world, Entity entity) {
         if (entity instanceof Player entityhuman) {
-            return Math.max(1, world.getGameRules().getInt(entityhuman.getAbilities().invulnerable ? GameRules.RULE_PLAYERS_NETHER_PORTAL_CREATIVE_DELAY : GameRules.RULE_PLAYERS_NETHER_PORTAL_DEFAULT_DELAY));
+            return Math.max(1, entityhuman.canPortalInstant ? 1 : world.getGameRules().getInt(entityhuman.getAbilities().invulnerable ? GameRules.RULE_PLAYERS_NETHER_PORTAL_CREATIVE_DELAY : GameRules.RULE_PLAYERS_NETHER_PORTAL_DEFAULT_DELAY)); // Purpur
         } else {
             return 0;
         }

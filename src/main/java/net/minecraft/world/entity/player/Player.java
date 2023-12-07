@@ -199,6 +199,7 @@ public abstract class Player extends LivingEntity {
     public net.kyori.adventure.util.TriState flyingFallDamage = net.kyori.adventure.util.TriState.NOT_SET; // Paper - flying fall damage
     public int sixRowEnderchestSlotCount = -1; // Purpur
     public int burpDelay = 0; // Purpur
+    public boolean canPortalInstant = false; // Purpur
 
     // CraftBukkit start
     public boolean fauxSleeping;
