@@ -155,6 +155,7 @@ public class CraftRegistry<B extends Keyed, M> implements Registry<B> {
 
     private final Class<?> bukkitClass; // Paper - relax preload class
     private final Map<NamespacedKey, B> cache = new HashMap<>();
+    private final Map<B, NamespacedKey> byValue = new java.util.IdentityHashMap<>(); // Paper - improve Registry
     private final net.minecraft.core.Registry<M> minecraftRegistry;
     private final BiFunction<NamespacedKey, M, B> minecraftToBukkit;
     private final BiFunction<NamespacedKey, ApiVersion, NamespacedKey> serializationUpdater; // Paper - rename to make it *clear* what it is *only* for
@@ -203,6 +204,7 @@ public class CraftRegistry<B extends Keyed, M> implements Registry<B> {
         }
 
         this.cache.put(namespacedKey, bukkit);
+        this.byValue.put(bukkit, namespacedKey); // Paper - improve Registry
 
         return bukkit;
     }
@@ -225,4 +227,11 @@ public class CraftRegistry<B extends Keyed, M> implements Registry<B> {
 
         return this.minecraftToBukkit.apply(namespacedKey, minecraft);
     }
+
+    // Paper start - improve Registry
+    @Override
+    public NamespacedKey getKey(final B value) {
+        return this.byValue.get(value);
+    }
+    // Paper end - improve Registry
 }
