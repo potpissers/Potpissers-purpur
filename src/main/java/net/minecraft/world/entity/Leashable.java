@@ -54,7 +54,13 @@ public interface Leashable {
     @Nullable
     default Leashable.LeashData readLeashData(CompoundTag nbt) {
         if (nbt.contains("leash", 10)) {
-            return new Leashable.LeashData(Either.left(nbt.getCompound("leash").getUUID("UUID")));
+            // Paper start
+            final CompoundTag leashTag = nbt.getCompound("leash");
+            if (!leashTag.hasUUID("UUID")) {
+                return null;
+            }
+            return new Leashable.LeashData(Either.left(leashTag.getUUID("UUID")));
+            // Paper end
         } else {
             if (nbt.contains("leash", 11)) {
                 Either<UUID, BlockPos> either = (Either) NbtUtils.readBlockPos(nbt, "leash").map(Either::right).orElse(null); // CraftBukkit - decompile error
