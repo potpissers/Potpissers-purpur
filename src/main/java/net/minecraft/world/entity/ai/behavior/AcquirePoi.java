@@ -73,7 +73,7 @@ public class AcquirePoi {
                                     };
                                     // Paper start - optimise POI access
                                     java.util.List<Pair<Holder<PoiType>, BlockPos>> poiposes = new java.util.ArrayList<>();
-                                    io.papermc.paper.util.PoiAccess.findNearestPoiPositions(poiManager, poiPredicate, predicate2, entity.blockPosition(), 48, 48*48, PoiManager.Occupancy.HAS_SPACE, false, 5, poiposes);
+                                    io.papermc.paper.util.PoiAccess.findNearestPoiPositions(poiManager, poiPredicate, predicate2, entity.blockPosition(), world.purpurConfig.villagerAcquirePoiSearchRadius, world.purpurConfig.villagerAcquirePoiSearchRadius*world.purpurConfig.villagerAcquirePoiSearchRadius, PoiManager.Occupancy.HAS_SPACE, false, 5, poiposes); // Purpur
                                     Set<Pair<Holder<PoiType>, BlockPos>> set = new java.util.HashSet<>(poiposes);
                                     // Paper end - optimise POI access
                                     Path path = findPathToPois(entity, set);

@@ -56,7 +56,7 @@ public class NearestBedSensor extends Sensor<Mob> {
             // Paper start - optimise POI access
             java.util.List<Pair<Holder<PoiType>, BlockPos>> poiposes = new java.util.ArrayList<>();
             // don't ask me why it's unbounded. ask mojang.
-            io.papermc.paper.util.PoiAccess.findAnyPoiPositions(poiManager, type -> type.is(PoiTypes.HOME), predicate, entity.blockPosition(), 48, PoiManager.Occupancy.ANY, false, Integer.MAX_VALUE, poiposes);
+            io.papermc.paper.util.PoiAccess.findAnyPoiPositions(poiManager, type -> type.is(PoiTypes.HOME), predicate, entity.blockPosition(), world.purpurConfig.villagerNearestBedSensorSearchRadius, PoiManager.Occupancy.ANY, false, Integer.MAX_VALUE, poiposes); // Purpur
             Path path = AcquirePoi.findPathToPois(entity, new java.util.HashSet<>(poiposes));
             // Paper end - optimise POI access
             if (path != null && path.canReach()) {
