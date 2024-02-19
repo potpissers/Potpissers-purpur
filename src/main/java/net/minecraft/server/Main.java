@@ -123,6 +123,7 @@ public class Main {
             // Purpur start - load config files early
             org.bukkit.configuration.file.YamlConfiguration purpurConfiguration = io.papermc.paper.configuration.PaperConfigurations.loadLegacyConfigFile((File) optionset.valueOf("purpur-settings"));
             org.purpurmc.purpur.PurpurConfig.clampEnchantLevels = purpurConfiguration.getBoolean("settings.enchantment.clamp-levels");
+            org.purpurmc.purpur.PurpurConfig.registerMinecraftDebugCommands = purpurConfiguration.getBoolean("settings.register-minecraft-debug-commands");
             // Purpur end - load config files early
 
             io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper

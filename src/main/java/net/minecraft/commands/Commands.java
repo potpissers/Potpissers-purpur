@@ -221,8 +221,8 @@ public class Commands {
             JfrCommand.register(this.dispatcher);
         }
 
-        if (SharedConstants.IS_RUNNING_IN_IDE) {
-            TestCommand.register(this.dispatcher);
+        if (org.purpurmc.purpur.PurpurConfig.registerMinecraftDebugCommands || SharedConstants.IS_RUNNING_IN_IDE) { // Purpur
+            if (!org.purpurmc.purpur.PurpurConfig.registerMinecraftDebugCommands) TestCommand.register(this.dispatcher); // Purpur
             RaidCommand.register(this.dispatcher, commandRegistryAccess);
             DebugPathCommand.register(this.dispatcher);
             DebugMobSpawningCommand.register(this.dispatcher);
