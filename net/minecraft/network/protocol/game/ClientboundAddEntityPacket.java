@@ -42,9 +42,11 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
         this(
             entity.getId(),
             entity.getUUID(),
-            serverEntity.getPositionBase().x(),
-            serverEntity.getPositionBase().y(),
-            serverEntity.getPositionBase().z(),
+            // Paper start - fix entity tracker desync
+            entity.trackingPosition().x(),
+            entity.trackingPosition().y(),
+            entity.trackingPosition().z(),
+            // Paper end - fix entity tracker desync
             serverEntity.getLastSentXRot(),
             serverEntity.getLastSentYRot(),
             entity.getType(),

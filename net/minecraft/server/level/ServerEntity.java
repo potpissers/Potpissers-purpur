@@ -90,6 +90,13 @@ public class ServerEntity {
         this.trackedDataValues = entity.getEntityData().getNonDefaultValues();
     }
 
+    // Paper start - fix desync when a player is added to the tracker
+    private boolean forceStateResync;
+    public void onPlayerAdd() {
+        this.forceStateResync = true;
+    }
+    // Paper end - fix desync when a player is added to the tracker
+
     public void sendChanges() {
         // Paper start - optimise collisions
         if (((ca.spottedleaf.moonrise.patches.chunk_system.entity.ChunkSystemEntity)this.entity).moonrise$isHardColliding()) {
@@ -131,7 +138,7 @@ public class ServerEntity {
             this.sendDirtyEntityData();
         }
 
-        if (this.tickCount % this.updateInterval == 0 || this.entity.hasImpulse || this.entity.getEntityData().isDirty()) {
+        if (this.forceStateResync || this.tickCount % this.updateInterval == 0 || this.entity.hasImpulse || this.entity.getEntityData().isDirty()) { // Paper - fix desync when a player is added to the tracker
             byte b = Mth.packDegrees(this.entity.getYRot());
             byte b1 = Mth.packDegrees(this.entity.getXRot());
             boolean flag = Math.abs(b - this.lastSentYRot) >= 1 || Math.abs(b1 - this.lastSentXRot) >= 1;
@@ -166,7 +173,7 @@ public class ServerEntity {
                 long l1 = this.positionCodec.encodeY(vec3);
                 long l2 = this.positionCodec.encodeZ(vec3);
                 boolean flag5 = l < -32768L || l > 32767L || l1 < -32768L || l1 > 32767L || l2 < -32768L || l2 > 32767L;
-                if (flag5 || this.teleportDelay > 400 || this.wasRiding || this.wasOnGround != this.entity.onGround()) {
+                if (this.forceStateResync || flag5 || this.teleportDelay > 400 || this.wasRiding || this.wasOnGround != this.entity.onGround()) { // Paper - fix desync when a player is added to the tracker
                     this.wasOnGround = this.entity.onGround();
                     this.teleportDelay = 0;
                     packet = ClientboundEntityPositionSyncPacket.of(this.entity);
@@ -231,6 +238,7 @@ public class ServerEntity {
             }
 
             this.entity.hasImpulse = false;
+            this.forceStateResync = false; // Paper - fix desync when a player is added to the tracker
         }
 
         this.tickCount++;
