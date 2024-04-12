@@ -1060,6 +1060,8 @@ public class PurpurWorldConfig {
     public boolean polarBearControllable = true;
     public double polarBearMaxHealth = 30.0D;
     public double polarBearScale = 1.0D;
+    public String polarBearBreedableItemString = "";
+    public Item polarBearBreedableItem = null;
     private void polarBearSettings() {
         polarBearRidable = getBoolean("mobs.polar_bear.ridable", polarBearRidable);
         polarBearRidableInWater = getBoolean("mobs.polar_bear.ridable-in-water", polarBearRidableInWater);
@@ -1071,6 +1073,9 @@ public class PurpurWorldConfig {
         }
         polarBearMaxHealth = getDouble("mobs.polar_bear.attributes.max_health", polarBearMaxHealth);
         polarBearScale = Mth.clamp(getDouble("mobs.polar_bear.attributes.scale", polarBearScale), 0.0625D, 16.0D);
+        polarBearBreedableItemString = getString("mobs.polar_bear.breedable-item", polarBearBreedableItemString);
+        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(polarBearBreedableItemString));
+        if (item != Items.AIR) polarBearBreedableItem = item;
     }
 
     public boolean pufferfishRidable = false;

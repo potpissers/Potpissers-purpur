@@ -99,6 +99,27 @@ public class PolarBear extends Animal implements NeutralMob {
         this.getAttribute(Attributes.SCALE).setBaseValue(this.level().purpurConfig.polarBearScale);
     }
 
+    public boolean canMate(Animal other) {
+        if (other == this) {
+            return false;
+        } else if (this.isStanding()) {
+            return false;
+        } else if (this.getTarget() != null) {
+            return false;
+        } else if (!(other instanceof PolarBear)) {
+            return false;
+        } else {
+            PolarBear bear = (PolarBear) other;
+            if (bear.isStanding()) {
+                return false;
+            }
+            if (bear.getTarget() != null) {
+                return false;
+            }
+            return this.isInLove() && bear.isInLove();
+        }
+    }
+
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel world, AgeableMob entity) {
@@ -107,7 +128,7 @@ public class PolarBear extends Animal implements NeutralMob {
 
     @Override
     public boolean isFood(ItemStack stack) {
-        return false;
+        return level().purpurConfig.polarBearBreedableItem != null && stack.getItem() == level().purpurConfig.polarBearBreedableItem; // Purpur
     }
 
     @Override
@@ -118,6 +139,12 @@ public class PolarBear extends Animal implements NeutralMob {
         this.goalSelector.addGoal(1, new PolarBear.PolarBearMeleeAttackGoal());
         this.goalSelector
             .addGoal(1, new PanicGoal(this, 2.0, polarBear -> polarBear.isBaby() ? DamageTypeTags.PANIC_CAUSES : DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES));
+        // Purpur start
+        if (level().purpurConfig.polarBearBreedableItem != null) {
+            this.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.BreedGoal(this, 1.0D));
+            this.goalSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.TemptGoal(this, 1.0D, net.minecraft.world.item.crafting.Ingredient.of(level().purpurConfig.polarBearBreedableItem), false));
+        }
+        // Purpur end
         this.goalSelector.addGoal(4, new FollowParentGoal(this, 1.25));
         this.goalSelector.addGoal(5, new RandomStrollGoal(this, 1.0));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 6.0F));
