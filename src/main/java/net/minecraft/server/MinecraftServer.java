@@ -1272,6 +1272,17 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                 }
             }
             // Purpur end
+
+            // Purpur start
+            if (!Boolean.getBoolean("Purpur.IReallyDontWantStartupCommands") && !org.purpurmc.purpur.PurpurConfig.startupCommands.isEmpty()) {
+                LOGGER.info("Purpur: Running startup commands specified in purpur.yml.");
+                for (final String startupCommand : org.purpurmc.purpur.PurpurConfig.startupCommands) {
+                    LOGGER.info("Purpur: Running the following command: \"{}\"", startupCommand);
+                    ((DedicatedServer) this).handleConsoleInput(startupCommand, this.createCommandSourceStack());
+                }
+            }
+            // Purpur end
+
             while (this.running) {
                 long i;
 
