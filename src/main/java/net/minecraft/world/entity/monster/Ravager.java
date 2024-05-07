@@ -113,6 +113,7 @@ public class Ravager extends Raider {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(0, new org.purpurmc.purpur.entity.ai.HasRider(this)); // Purpur
+        if (level().purpurConfig.ravagerAvoidRabbits) this.goalSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.AvoidEntityGoal<>(this, net.minecraft.world.entity.animal.Rabbit.class, 6.0F, 1.0D, 1.2D)); // Purpur
         this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.4D));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 6.0F));
