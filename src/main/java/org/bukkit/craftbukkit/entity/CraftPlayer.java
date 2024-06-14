@@ -3496,7 +3496,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void setViewDistance(final int viewDistance) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        // Paper - rewrite chunk system - TODO do this better
+        ((ca.spottedleaf.moonrise.patches.chunk_system.player.ChunkSystemServerPlayer)this.getHandle())
+            .moonrise$getViewDistanceHolder().setLoadViewDistance(viewDistance + 1);
     }
 
     @Override
@@ -3506,7 +3508,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void setSimulationDistance(final int simulationDistance) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        // Paper - rewrite chunk system - TODO do this better
+        ((ca.spottedleaf.moonrise.patches.chunk_system.player.ChunkSystemServerPlayer)this.getHandle())
+            .moonrise$getViewDistanceHolder().setTickViewDistance(simulationDistance);
     }
 
     @Override
@@ -3516,6 +3520,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void setSendViewDistance(final int viewDistance) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        // Paper - rewrite chunk system - TODO do this better
+        ((ca.spottedleaf.moonrise.patches.chunk_system.player.ChunkSystemServerPlayer)this.getHandle())
+            .moonrise$getViewDistanceHolder().setSendViewDistance(viewDistance);
     }
 }
