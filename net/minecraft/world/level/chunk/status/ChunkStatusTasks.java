@@ -182,7 +182,7 @@ public class ChunkStatusTasks {
             if (protoChunk instanceof ImposterProtoChunk imposterProtoChunk) {
                 wrapped = imposterProtoChunk.getWrapped();
             } else {
-                wrapped = new LevelChunk(serverLevel, protoChunk, chunk1 -> postLoadProtoChunk(serverLevel, protoChunk.getEntities()));
+                wrapped = new LevelChunk(serverLevel, protoChunk, chunk1 -> postLoadProtoChunk(serverLevel, protoChunk.getEntities(), protoChunk.getPos())); // Paper - rewrite chunk system
                 generationChunkHolder.replaceProtoChunk(new ImposterProtoChunk(wrapped, false));
             }
 
@@ -196,7 +196,7 @@ public class ChunkStatusTasks {
         }, worldGenContext.mainThreadExecutor());
     }
 
-    public static void postLoadProtoChunk(ServerLevel level, List<CompoundTag> entityTags) { // Paper - public
+    public static void postLoadProtoChunk(ServerLevel level, List<CompoundTag> entityTags, ChunkPos pos) { // Paper - public // Paper - rewrite chunk system - add ChunkPos param
         if (!entityTags.isEmpty()) {
             // CraftBukkit start - these are spawned serialized (DefinedStructure) and we don't call an add event below at the moment due to ordering complexities
             level.addWorldGenChunkEntities(EntityType.loadEntitiesRecursive(entityTags, level, EntitySpawnReason.LOAD).filter((entity) -> {
@@ -208,7 +208,7 @@ public class ChunkStatusTasks {
                 }
                 checkDupeUUID(level, entity); // Paper - duplicate uuid resolving
                 return !needsRemoval;
-            }));
+            }), pos); // Paper - rewrite chunk system
             // CraftBukkit end
         }
     }

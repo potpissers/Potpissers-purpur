@@ -7,12 +7,19 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.VarInt;
 import org.apache.commons.lang3.Validate;
 
-public class LinearPalette<T> implements Palette<T> {
+public class LinearPalette<T> implements Palette<T>, ca.spottedleaf.moonrise.patches.fast_palette.FastPalette<T> { // Paper - optimise palette reads
     private final IdMap<T> registry;
     private final T[] values;
     private final PaletteResize<T> resizeHandler;
     private final int bits;
     private int size;
+
+    // Paper start - optimise palette reads
+    @Override
+    public final T[] moonrise$getRawPalette(final ca.spottedleaf.moonrise.patches.fast_palette.FastPaletteData<T> container) {
+        return this.values;
+    }
+    // Paper end - optimise palette reads
 
     private LinearPalette(IdMap<T> registry, int bits, PaletteResize<T> resizeHandler, List<T> values) {
         this.registry = registry;

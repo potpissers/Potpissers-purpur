@@ -8,11 +8,23 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.VarInt;
 import org.apache.commons.lang3.Validate;
 
-public class SingleValuePalette<T> implements Palette<T> {
+public class SingleValuePalette<T> implements Palette<T>, ca.spottedleaf.moonrise.patches.fast_palette.FastPalette<T> { // Paper - optimise palette reads
     private final IdMap<T> registry;
     @Nullable
     private T value;
     private final PaletteResize<T> resizeHandler;
+
+    // Paper start - optimise palette reads
+    private T[] rawPalette;
+
+    @Override
+    public final T[] moonrise$getRawPalette(final ca.spottedleaf.moonrise.patches.fast_palette.FastPaletteData<T> container) {
+        if (this.rawPalette != null) {
+            return this.rawPalette;
+        }
+        return this.rawPalette = (T[])new Object[] { this.value };
+    }
+    // Paper end - optimise palette reads
 
     public SingleValuePalette(IdMap<T> registry, PaletteResize<T> resizeHandler, List<T> value) {
         this.registry = registry;
@@ -33,6 +45,11 @@ public class SingleValuePalette<T> implements Palette<T> {
             return this.resizeHandler.onResize(1, state);
         } else {
             this.value = state;
+            // Paper start - optimise palette reads
+            if (this.rawPalette != null) {
+                this.rawPalette[0] = state;
+            }
+            // Paper end - optimise palette reads
             return 0;
         }
     }
@@ -58,6 +75,11 @@ public class SingleValuePalette<T> implements Palette<T> {
     @Override
     public void read(FriendlyByteBuf buffer) {
         this.value = this.registry.byIdOrThrow(buffer.readVarInt());
+        // Paper start - optimise palette reads
+        if (this.rawPalette != null) {
+            this.rawPalette[0] = this.value;
+        }
+        // Paper end - optimise palette reads
     }
 
     @Override

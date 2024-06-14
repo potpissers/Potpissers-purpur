@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.minecraft.world.level.block.state.StateHolder;
 
-public abstract class Property<T extends Comparable<T>> {
+public abstract class Property<T extends Comparable<T>> implements ca.spottedleaf.moonrise.patches.blockstate_propertyaccess.PropertyAccess<T> { // Paper - optimise blockstate property access
     private final Class<T> clazz;
     private final String name;
     @Nullable
@@ -24,9 +24,38 @@ public abstract class Property<T extends Comparable<T>> {
         );
     private final Codec<Property.Value<T>> valueCodec = this.codec.xmap(this::value, Property.Value::value);
 
+    // Paper start - optimise blockstate property access
+    private static final java.util.concurrent.atomic.AtomicInteger ID_GENERATOR = new java.util.concurrent.atomic.AtomicInteger();
+    private final int id;
+    private T[] byId;
+
+    @Override
+    public final int moonrise$getId() {
+        return this.id;
+    }
+
+    @Override
+    public final T moonrise$getById(final int id) {
+        final T[] byId = this.byId;
+        return id < 0 || id >= byId.length ? null : this.byId[id];
+    }
+
+    @Override
+    public final void moonrise$setById(final T[] byId) {
+        if (this.byId != null) {
+            throw new IllegalStateException();
+        }
+        this.byId = byId;
+    }
+
+    @Override
+    public abstract int moonrise$getIdFor(final T value);
+    // Paper end - optimise blockstate property access
+
     protected Property(String name, Class<T> clazz) {
         this.clazz = clazz;
         this.name = name;
+        this.id = ID_GENERATOR.getAndIncrement(); // Paper - optimise blockstate property access
     }
 
     public Property.Value<T> value(T value) {

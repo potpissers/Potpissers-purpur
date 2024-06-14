@@ -9,151 +9,111 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.chunk.DataLayer;
 import net.minecraft.world.level.chunk.LightChunkGetter;
 
-public class LevelLightEngine implements LightEventListener {
+public class LevelLightEngine implements LightEventListener, ca.spottedleaf.moonrise.patches.starlight.light.StarLightLightingProvider { // Paper - rewrite chunk system
     public static final int LIGHT_SECTION_PADDING = 1;
     public static final LevelLightEngine EMPTY = new LevelLightEngine();
     protected final LevelHeightAccessor levelHeightAccessor;
-    @Nullable
-    private final LightEngine<?, ?> blockEngine;
-    @Nullable
-    private final LightEngine<?, ?> skyEngine;
+    // Paper start - rewrite chunk system
+    protected final ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface lightEngine;
+
+    @Override
+    public final ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface starlight$getLightEngine() {
+        return this.lightEngine;
+    }
+
+    @Override
+    public void starlight$clientUpdateLight(final LightLayer lightType, final SectionPos pos,
+                                            final DataLayer nibble, final boolean trustEdges) {
+        throw new IllegalStateException("This hook is for the CLIENT ONLY"); // Paper - not implemented on server
+    }
+
+    @Override
+    public void starlight$clientRemoveLightData(final ChunkPos chunkPos) {
+        throw new IllegalStateException("This hook is for the CLIENT ONLY"); // Paper - not implemented on server
+    }
+
+    @Override
+    public void starlight$clientChunkLoad(final ChunkPos pos, final net.minecraft.world.level.chunk.LevelChunk chunk) {
+        throw new IllegalStateException("This hook is for the CLIENT ONLY"); // Paper - not implemented on server
+    }
+    // Paper end - rewrite chunk system
 
     public LevelLightEngine(LightChunkGetter lightChunkGetter, boolean blockLight, boolean skyLight) {
         this.levelHeightAccessor = lightChunkGetter.getLevel();
-        this.blockEngine = blockLight ? new BlockLightEngine(lightChunkGetter) : null;
-        this.skyEngine = skyLight ? new SkyLightEngine(lightChunkGetter) : null;
+        // Paper start - rewrite chunk system
+        if (lightChunkGetter.getLevel() instanceof net.minecraft.world.level.Level) {
+            this.lightEngine = new ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface(lightChunkGetter, skyLight, blockLight, (LevelLightEngine)(Object)this);
+        } else {
+            this.lightEngine = new ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface(null, skyLight, blockLight, (LevelLightEngine)(Object)this);
+        }
+        // Paper end - rewrite chunk system
     }
 
     private LevelLightEngine() {
         this.levelHeightAccessor = LevelHeightAccessor.create(0, 0);
-        this.blockEngine = null;
-        this.skyEngine = null;
+        // Paper start - rewrite chunk system
+        this.lightEngine = new ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface(null, false, false, (LevelLightEngine)(Object)this);
+        // Paper end - rewrite chunk system
     }
 
     @Override
     public void checkBlock(BlockPos pos) {
-        if (this.blockEngine != null) {
-            this.blockEngine.checkBlock(pos);
-        }
-
-        if (this.skyEngine != null) {
-            this.skyEngine.checkBlock(pos);
-        }
+        this.lightEngine.blockChange(pos.immutable()); // Paper - rewrite chunk system
     }
 
     @Override
     public boolean hasLightWork() {
-        return this.skyEngine != null && this.skyEngine.hasLightWork() || this.blockEngine != null && this.blockEngine.hasLightWork();
+        return this.lightEngine.hasUpdates(); // Paper - rewrite chunk system
     }
 
     @Override
     public int runLightUpdates() {
-        int i = 0;
-        if (this.blockEngine != null) {
-            i += this.blockEngine.runLightUpdates();
-        }
-
-        if (this.skyEngine != null) {
-            i += this.skyEngine.runLightUpdates();
-        }
-
-        return i;
+        final boolean hadUpdates = this.hasLightWork();
+        this.lightEngine.propagateChanges();
+        return hadUpdates ? 1 : 0; // Paper - rewrite chunk system
     }
 
     @Override
     public void updateSectionStatus(SectionPos pos, boolean isEmpty) {
-        if (this.blockEngine != null) {
-            this.blockEngine.updateSectionStatus(pos, isEmpty);
-        }
-
-        if (this.skyEngine != null) {
-            this.skyEngine.updateSectionStatus(pos, isEmpty);
-        }
+        this.lightEngine.sectionChange(pos, isEmpty); // Paper - rewrite chunk system
     }
 
     @Override
     public void setLightEnabled(ChunkPos chunkPos, boolean lightEnabled) {
-        if (this.blockEngine != null) {
-            this.blockEngine.setLightEnabled(chunkPos, lightEnabled);
-        }
-
-        if (this.skyEngine != null) {
-            this.skyEngine.setLightEnabled(chunkPos, lightEnabled);
-        }
+        // Paper - rewrite chunk system
     }
 
     @Override
     public void propagateLightSources(ChunkPos chunkPos) {
-        if (this.blockEngine != null) {
-            this.blockEngine.propagateLightSources(chunkPos);
-        }
-
-        if (this.skyEngine != null) {
-            this.skyEngine.propagateLightSources(chunkPos);
-        }
+        // Paper - rewrite chunk system
     }
 
     public LayerLightEventListener getLayerListener(LightLayer type) {
-        if (type == LightLayer.BLOCK) {
-            return (LayerLightEventListener)(this.blockEngine == null ? LayerLightEventListener.DummyLightLayerEventListener.INSTANCE : this.blockEngine);
-        } else {
-            return (LayerLightEventListener)(this.skyEngine == null ? LayerLightEventListener.DummyLightLayerEventListener.INSTANCE : this.skyEngine);
-        }
+        return type == LightLayer.BLOCK ? this.lightEngine.getBlockReader() : this.lightEngine.getSkyReader(); // Paper - rewrite chunk system
     }
 
     public String getDebugData(LightLayer lightLayer, SectionPos sectionPos) {
-        if (lightLayer == LightLayer.BLOCK) {
-            if (this.blockEngine != null) {
-                return this.blockEngine.getDebugData(sectionPos.asLong());
-            }
-        } else if (this.skyEngine != null) {
-            return this.skyEngine.getDebugData(sectionPos.asLong());
-        }
-
-        return "n/a";
+        return "n/a"; // Paper - rewrite chunk system
     }
 
     public LayerLightSectionStorage.SectionType getDebugSectionType(LightLayer lightLayer, SectionPos sectionPos) {
-        if (lightLayer == LightLayer.BLOCK) {
-            if (this.blockEngine != null) {
-                return this.blockEngine.getDebugSectionType(sectionPos.asLong());
-            }
-        } else if (this.skyEngine != null) {
-            return this.skyEngine.getDebugSectionType(sectionPos.asLong());
-        }
-
-        return LayerLightSectionStorage.SectionType.EMPTY;
+        throw new UnsupportedOperationException(); // Paper - rewrite chunk system
     }
 
     public void queueSectionData(LightLayer lightLayer, SectionPos sectionPos, @Nullable DataLayer dataLayer) {
-        if (lightLayer == LightLayer.BLOCK) {
-            if (this.blockEngine != null) {
-                this.blockEngine.queueSectionData(sectionPos.asLong(), dataLayer);
-            }
-        } else if (this.skyEngine != null) {
-            this.skyEngine.queueSectionData(sectionPos.asLong(), dataLayer);
-        }
+        // Paper - rewrite chunk system
     }
 
     public void retainData(ChunkPos pos, boolean retain) {
-        if (this.blockEngine != null) {
-            this.blockEngine.retainData(pos, retain);
-        }
-
-        if (this.skyEngine != null) {
-            this.skyEngine.retainData(pos, retain);
-        }
+        // Paper - rewrite chunk system
     }
 
     public int getRawBrightness(BlockPos blockPos, int amount) {
-        int i = this.skyEngine == null ? 0 : this.skyEngine.getLightValue(blockPos) - amount;
-        int i1 = this.blockEngine == null ? 0 : this.blockEngine.getLightValue(blockPos);
-        return Math.max(i1, i);
+        return this.lightEngine.getRawBrightness(blockPos, amount); // Paper - rewrite chunk system
     }
 
     public boolean lightOnInColumn(long columnPos) {
-        return this.blockEngine == null
-            || this.blockEngine.storage.lightOnInColumn(columnPos) && (this.skyEngine == null || this.skyEngine.storage.lightOnInColumn(columnPos));
+        throw new UnsupportedOperationException(); // Paper - rewrite chunk system // Paper - not implemented on server
     }
 
     public int getLightSectionCount() {

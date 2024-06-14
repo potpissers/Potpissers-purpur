@@ -17,13 +17,37 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.level.ChunkPos;
 
-public class LevelChunkTicks<T> implements SerializableTickContainer<T>, TickContainerAccess<T> {
+public class LevelChunkTicks<T> implements SerializableTickContainer<T>, TickContainerAccess<T>, ca.spottedleaf.moonrise.patches.chunk_system.ticks.ChunkSystemLevelChunkTicks { // Paper - rewrite chunk system
     private final Queue<ScheduledTick<T>> tickQueue = new PriorityQueue<>(ScheduledTick.DRAIN_ORDER);
     @Nullable
     private List<SavedTick<T>> pendingTicks;
     private final Set<ScheduledTick<?>> ticksPerPosition = new ObjectOpenCustomHashSet<>(ScheduledTick.UNIQUE_TICK_HASH);
     @Nullable
     private BiConsumer<LevelChunkTicks<T>, ScheduledTick<T>> onTickAdded;
+
+    // Paper start - rewrite chunk system
+    /*
+     * Since ticks are saved using relative delays, we need to consider the entire tick list dirty when there are scheduled ticks
+     * and the last saved tick is not equal to the current tick
+     */
+    /*
+     * In general, it would be nice to be able to "re-pack" ticks once the chunk becomes non-ticking again, but that is a
+     * bit out of scope for the chunk system
+     */
+
+    private boolean dirty;
+    private long lastSaved = Long.MIN_VALUE;
+
+    @Override
+    public final boolean moonrise$isDirty(final long tick) {
+        return this.dirty || (!this.tickQueue.isEmpty() && tick != this.lastSaved);
+    }
+
+    @Override
+    public final void moonrise$clearDirty() {
+        this.dirty = false;
+    }
+    // Paper end - rewrite chunk system
 
     public LevelChunkTicks() {
     }
@@ -49,7 +73,7 @@ public class LevelChunkTicks<T> implements SerializableTickContainer<T>, TickCon
     public ScheduledTick<T> poll() {
         ScheduledTick<T> scheduledTick = this.tickQueue.poll();
         if (scheduledTick != null) {
-            this.ticksPerPosition.remove(scheduledTick);
+            this.ticksPerPosition.remove(scheduledTick); this.dirty = true; // Paper - rewrite chunk system
         }
 
         return scheduledTick;
@@ -58,7 +82,7 @@ public class LevelChunkTicks<T> implements SerializableTickContainer<T>, TickCon
     @Override
     public void schedule(ScheduledTick<T> tick) {
         if (this.ticksPerPosition.add(tick)) {
-            this.scheduleUnchecked(tick);
+            this.scheduleUnchecked(tick); this.dirty = true; // Paper - rewrite chunk system
         }
     }
 
@@ -80,7 +104,7 @@ public class LevelChunkTicks<T> implements SerializableTickContainer<T>, TickCon
         while (iterator.hasNext()) {
             ScheduledTick<T> scheduledTick = iterator.next();
             if (predicate.test(scheduledTick)) {
-                iterator.remove();
+                iterator.remove(); this.dirty = true; // Paper - rewrite chunk system
                 this.ticksPerPosition.remove(scheduledTick);
             }
         }
@@ -110,6 +134,7 @@ public class LevelChunkTicks<T> implements SerializableTickContainer<T>, TickCon
     }
 
     public ListTag save(long gametime, Function<T, String> idGetter) {
+        this.lastSaved = gametime; // Paper - rewrite chunk system
         ListTag listTag = new ListTag();
 
         for (SavedTick<T> savedTick : this.pack(gametime)) {
@@ -121,6 +146,7 @@ public class LevelChunkTicks<T> implements SerializableTickContainer<T>, TickCon
 
     public void unpack(long gameTime) {
         if (this.pendingTicks != null) {
+            this.lastSaved = gameTime; // Paper - rewrite chunk system
             int i = -this.pendingTicks.size();
 
             for (SavedTick<T> savedTick : this.pendingTicks) {

@@ -135,7 +135,7 @@ import net.minecraft.world.scores.ScoreHolder;
 import net.minecraft.world.scores.Team;
 import org.slf4j.Logger;
 
-public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess, ScoreHolder {
+public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess, ScoreHolder, ca.spottedleaf.moonrise.patches.chunk_system.entity.ChunkSystemEntity, ca.spottedleaf.moonrise.patches.entity_tracker.EntityTrackerEntity {  // Paper - rewrite chunk system // Paper - optimise entity tracker
 
     // CraftBukkit start
     private static final int CURRENT_LEVEL = 2;
@@ -146,7 +146,17 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
 
     // Paper start - Share random for entities to make them more random
     public static RandomSource SHARED_RANDOM = new RandomRandomSource();
-    private static final class RandomRandomSource extends java.util.Random implements net.minecraft.world.level.levelgen.BitRandomSource {
+    // Paper start - replace random
+    private static final class RandomRandomSource extends ca.spottedleaf.moonrise.common.util.ThreadUnsafeRandom {
+        public RandomRandomSource() {
+            this(net.minecraft.world.level.levelgen.RandomSupport.generateUniqueSeed());
+        }
+
+        public RandomRandomSource(long seed) {
+            super(seed);
+        }
+
+        // Paper end - replace random
         private boolean locked = false;
 
         @Override
@@ -159,61 +169,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
             }
         }
 
-        @Override
-        public RandomSource fork() {
-            return new net.minecraft.world.level.levelgen.LegacyRandomSource(this.nextLong());
-        }
-
-        @Override
-        public net.minecraft.world.level.levelgen.PositionalRandomFactory forkPositional() {
-            return new net.minecraft.world.level.levelgen.LegacyRandomSource.LegacyPositionalRandomFactory(this.nextLong());
-        }
-
-        // these below are added to fix reobf issues that I don't wanna deal with right now
-        @Override
-        public int next(int bits) {
-            return super.next(bits);
-        }
-
-        @Override
-        public int nextInt(int origin, int bound) {
-            return net.minecraft.world.level.levelgen.BitRandomSource.super.nextInt(origin, bound);
-        }
-
-        @Override
-        public long nextLong() {
-            return net.minecraft.world.level.levelgen.BitRandomSource.super.nextLong();
-        }
-
-        @Override
-        public int nextInt() {
-            return net.minecraft.world.level.levelgen.BitRandomSource.super.nextInt();
-        }
-
-        @Override
-        public int nextInt(int bound) {
-            return net.minecraft.world.level.levelgen.BitRandomSource.super.nextInt(bound);
-        }
-
-        @Override
-        public boolean nextBoolean() {
-            return net.minecraft.world.level.levelgen.BitRandomSource.super.nextBoolean();
-        }
-
-        @Override
-        public float nextFloat() {
-            return net.minecraft.world.level.levelgen.BitRandomSource.super.nextFloat();
-        }
-
-        @Override
-        public double nextDouble() {
-            return net.minecraft.world.level.levelgen.BitRandomSource.super.nextDouble();
-        }
-
-        @Override
-        public double nextGaussian() {
-            return super.nextGaussian();
-        }
+        // Paper - replace random
     }
     // Paper end - Share random for entities to make them more random
     public org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason spawnReason; // Paper - Entity#getEntitySpawnReason
@@ -415,6 +371,156 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return this.dimensions.makeBoundingBox(x, y, z);
     }
     // Paper end
+    // Paper start - rewrite chunk system
+    private final boolean isHardColliding = this.moonrise$isHardCollidingUncached();
+    private net.minecraft.server.level.FullChunkStatus chunkStatus;
+    private ca.spottedleaf.moonrise.patches.chunk_system.level.chunk.ChunkData chunkData;
+    private int sectionX = Integer.MIN_VALUE;
+    private int sectionY = Integer.MIN_VALUE;
+    private int sectionZ = Integer.MIN_VALUE;
+    private boolean updatingSectionStatus;
+
+    @Override
+    public final boolean moonrise$isHardColliding() {
+        return this.isHardColliding;
+    }
+
+    @Override
+    public final net.minecraft.server.level.FullChunkStatus moonrise$getChunkStatus() {
+        return this.chunkStatus;
+    }
+
+    @Override
+    public final void moonrise$setChunkStatus(final net.minecraft.server.level.FullChunkStatus status) {
+        this.chunkStatus = status;
+    }
+
+    @Override
+    public final ca.spottedleaf.moonrise.patches.chunk_system.level.chunk.ChunkData moonrise$getChunkData() {
+        return this.chunkData;
+    }
+
+    @Override
+    public final void moonrise$setChunkData(final ca.spottedleaf.moonrise.patches.chunk_system.level.chunk.ChunkData chunkData) {
+        this.chunkData = chunkData;
+    }
+
+    @Override
+    public final int moonrise$getSectionX() {
+        return this.sectionX;
+    }
+
+    @Override
+    public final void moonrise$setSectionX(final int x) {
+        this.sectionX = x;
+    }
+
+    @Override
+    public final int moonrise$getSectionY() {
+        return this.sectionY;
+    }
+
+    @Override
+    public final void moonrise$setSectionY(final int y) {
+        this.sectionY = y;
+    }
+
+    @Override
+    public final int moonrise$getSectionZ() {
+        return this.sectionZ;
+    }
+
+    @Override
+    public final void moonrise$setSectionZ(final int z) {
+        this.sectionZ = z;
+    }
+
+    @Override
+    public final boolean moonrise$isUpdatingSectionStatus() {
+        return this.updatingSectionStatus;
+    }
+
+    @Override
+    public final void moonrise$setUpdatingSectionStatus(final boolean to) {
+        this.updatingSectionStatus = to;
+    }
+
+    @Override
+    public final boolean moonrise$hasAnyPlayerPassengers() {
+        if (this.passengers.isEmpty()) {
+            return false;
+        }
+        return this.getIndirectPassengersStream().anyMatch((entity) -> entity instanceof Player);
+    }
+    // Paper end - rewrite chunk system
+    // Paper start - optimise collisions
+    private static float[] calculateStepHeights(final AABB box, final List<VoxelShape> voxels, final List<AABB> aabbs, final float stepHeight,
+                                                final float collidedY) {
+        final FloatArraySet ret = new FloatArraySet();
+
+        for (int i = 0, len = voxels.size(); i < len; ++i) {
+            final VoxelShape shape = voxels.get(i);
+
+            final double[] yCoords = ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape).moonrise$rootCoordinatesY();
+            final double yOffset = ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape).moonrise$offsetY();
+
+            for (final double yUnoffset : yCoords) {
+                final double y = yUnoffset + yOffset;
+
+                final float step = (float)(y - box.minY);
+
+                if (step > stepHeight) {
+                    break;
+                }
+
+                if (step < 0.0f || !(step != collidedY)) {
+                    continue;
+                }
+
+                ret.add(step);
+            }
+        }
+
+        for (int i = 0, len = aabbs.size(); i < len; ++i) {
+            final AABB shape = aabbs.get(i);
+
+            final float step1 = (float)(shape.minY - box.minY);
+            final float step2 = (float)(shape.maxY - box.minY);
+
+            if (!(step1 < 0.0f) && step1 != collidedY && !(step1 > stepHeight)) {
+                ret.add(step1);
+            }
+
+            if (!(step2 < 0.0f) && step2 != collidedY && !(step2 > stepHeight)) {
+                ret.add(step2);
+            }
+        }
+
+        final float[] steps = ret.toFloatArray();
+        FloatArrays.unstableSort(steps);
+        return steps;
+    }
+    // Paper end - optimise collisions
+    // Paper start - optimise entity tracker
+    private net.minecraft.server.level.ChunkMap.TrackedEntity trackedEntity;
+
+    @Override
+    public final net.minecraft.server.level.ChunkMap.TrackedEntity moonrise$getTrackedEntity() {
+        return this.trackedEntity;
+    }
+
+    @Override
+    public final void moonrise$setTrackedEntity(final net.minecraft.server.level.ChunkMap.TrackedEntity trackedEntity) {
+        this.trackedEntity = trackedEntity;
+    }
+
+    private static void collectIndirectPassengers(final List<Entity> into, final List<Entity> from) {
+        for (final Entity passenger : from) {
+            into.add(passenger);
+            collectIndirectPassengers(into, ((Entity)(Object)passenger).passengers);
+        }
+    }
+    // Paper end - optimise entity tracker
 
     public Entity(EntityType<?> entityType, Level level) {
         this.type = entityType;
@@ -1323,35 +1429,77 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return distance;
     }
 
-    private Vec3 collide(Vec3 vec) {
-        AABB boundingBox = this.getBoundingBox();
-        List<VoxelShape> entityCollisions = this.level().getEntityCollisions(this, boundingBox.expandTowards(vec));
-        Vec3 vec3 = vec.lengthSqr() == 0.0 ? vec : collideBoundingBox(this, vec, boundingBox, this.level(), entityCollisions);
-        boolean flag = vec.x != vec3.x;
-        boolean flag1 = vec.y != vec3.y;
-        boolean flag2 = vec.z != vec3.z;
-        boolean flag3 = flag1 && vec.y < 0.0;
-        if (this.maxUpStep() > 0.0F && (flag3 || this.onGround()) && (flag || flag2)) {
-            AABB aabb = flag3 ? boundingBox.move(0.0, vec3.y, 0.0) : boundingBox;
-            AABB aabb1 = aabb.expandTowards(vec.x, this.maxUpStep(), vec.z);
-            if (!flag3) {
-                aabb1 = aabb1.expandTowards(0.0, -1.0E-5F, 0.0);
-            }
+    // Paper start - optimise collisions
+    private Vec3 collide(Vec3 movement) {
+        final boolean xZero = movement.x == 0.0;
+        final boolean yZero = movement.y == 0.0;
+        final boolean zZero = movement.z == 0.0;
+        if (xZero & yZero & zZero) {
+            return movement;
+        }
 
-            List<VoxelShape> list = collectColliders(this, this.level, entityCollisions, aabb1);
-            float f = (float)vec3.y;
-            float[] floats = collectCandidateStepUpHeights(aabb, list, this.maxUpStep(), f);
+        final AABB currentBox = this.getBoundingBox();
 
-            for (float f1 : floats) {
-                Vec3 vec31 = collideWithShapes(new Vec3(vec.x, f1, vec.z), aabb, list);
-                if (vec31.horizontalDistanceSqr() > vec3.horizontalDistanceSqr()) {
-                    double d = boundingBox.minY - aabb.minY;
-                    return vec31.add(0.0, -d, 0.0);
-                }
+        final List<VoxelShape> potentialCollisionsVoxel = new ArrayList<>();
+        final List<AABB> potentialCollisionsBB = new ArrayList<>();
+
+        final AABB initialCollisionBox;
+        if (xZero & zZero) {
+            // note: xZero & zZero -> collision on x/z == 0 -> no step height calculation
+            // this specifically optimises entities standing still
+            initialCollisionBox = movement.y < 0.0 ?
+                ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.cutDownwards(currentBox, movement.y) : ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.cutUpwards(currentBox, movement.y);
+        } else {
+            initialCollisionBox = currentBox.expandTowards(movement);
+        }
+
+        final List<AABB> entityAABBs = new ArrayList<>();
+        ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.getEntityHardCollisions(
+            this.level, (Entity)(Object)this, initialCollisionBox, entityAABBs, 0, null
+        );
+
+        ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.getCollisionsForBlocksOrWorldBorder(
+            this.level, (Entity)(Object)this, initialCollisionBox, potentialCollisionsVoxel, potentialCollisionsBB,
+            ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_FLAG_CHECK_BORDER, null
+        );
+        potentialCollisionsBB.addAll(entityAABBs);
+        final Vec3 collided = ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.performCollisions(movement, currentBox, potentialCollisionsVoxel, potentialCollisionsBB);
+
+        final boolean collidedX = collided.x != movement.x;
+        final boolean collidedY = collided.y != movement.y;
+        final boolean collidedZ = collided.z != movement.z;
+
+        final boolean collidedDownwards = collidedY && movement.y < 0.0;
+
+        final double stepHeight;
+
+        if ((!collidedDownwards && !this.onGround) || (!collidedX && !collidedZ) || (stepHeight = (double)this.maxUpStep()) <= 0.0) {
+            return collided;
+        }
+
+        final AABB collidedYBox = collidedDownwards ? currentBox.move(0.0, collided.y, 0.0) : currentBox;
+        AABB stepRetrievalBox = collidedYBox.expandTowards(movement.x, stepHeight, movement.z);
+        if (!collidedDownwards) {
+            stepRetrievalBox = stepRetrievalBox.expandTowards(0.0, (double)-1.0E-5F, 0.0);
+        }
+
+        final List<VoxelShape> stepVoxels = new ArrayList<>();
+        final List<AABB> stepAABBs = entityAABBs;
+
+        ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.getCollisionsForBlocksOrWorldBorder(
+            this.level, (Entity)(Object)this, stepRetrievalBox, stepVoxels, stepAABBs,
+            ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_FLAG_CHECK_BORDER, null
+        );
+
+        for (final float step : calculateStepHeights(collidedYBox, stepVoxels, stepAABBs, (float)stepHeight, (float)collided.y)) {
+            final Vec3 stepResult = ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.performCollisions(new Vec3(movement.x, (double)step, movement.z), collidedYBox, stepVoxels, stepAABBs);
+            if (stepResult.horizontalDistanceSqr() > collided.horizontalDistanceSqr()) {
+                return stepResult.add(0.0, collidedYBox.minY - currentBox.minY, 0.0);
             }
         }
 
-        return vec3;
+        return collided;
+        // Paper end - optimise collisions
     }
 
     private static float[] collectCandidateStepUpHeights(AABB box, List<VoxelShape> colliders, float deltaY, float maxUpStep) {
@@ -2658,23 +2806,110 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
 
     public boolean isInWall() {
+        // Paper start - optimise collisions
         if (this.noPhysics) {
             return false;
-        } else {
-            float f = this.dimensions.width() * 0.8F;
-            AABB aabb = AABB.ofSize(this.getEyePosition(), f, 1.0E-6, f);
-            return BlockPos.betweenClosedStream(aabb)
-                .anyMatch(
-                    pos -> {
-                        BlockState blockState = this.level().getBlockState(pos);
-                        return !blockState.isAir()
-                            && blockState.isSuffocating(this.level(), pos)
-                            && Shapes.joinIsNotEmpty(
-                                blockState.getCollisionShape(this.level(), pos).move(pos.getX(), pos.getY(), pos.getZ()), Shapes.create(aabb), BooleanOp.AND
-                            );
-                    }
-                );
         }
+
+        final double reducedWith = (double)(this.dimensions.width() * 0.8F);
+        final AABB boundingBox = AABB.ofSize(this.getEyePosition(), reducedWith, 1.0E-6D, reducedWith);
+        final Level world = this.level;
+
+        if (ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.isEmpty(boundingBox)) {
+            return false;
+        }
+
+        final int minBlockX = Mth.floor(boundingBox.minX);
+        final int minBlockY = Mth.floor(boundingBox.minY);
+        final int minBlockZ = Mth.floor(boundingBox.minZ);
+
+        final int maxBlockX = Mth.floor(boundingBox.maxX);
+        final int maxBlockY = Mth.floor(boundingBox.maxY);
+        final int maxBlockZ = Mth.floor(boundingBox.maxZ);
+
+        final int minChunkX = minBlockX >> 4;
+        final int minChunkY = minBlockY >> 4;
+        final int minChunkZ = minBlockZ >> 4;
+
+        final int maxChunkX = maxBlockX >> 4;
+        final int maxChunkY = maxBlockY >> 4;
+        final int maxChunkZ = maxBlockZ >> 4;
+
+        final int minSection = ca.spottedleaf.moonrise.common.util.WorldUtil.getMinSection(world);
+        final net.minecraft.world.level.chunk.ChunkSource chunkSource = world.getChunkSource();
+        final BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+
+        for (int currChunkZ = minChunkZ; currChunkZ <= maxChunkZ; ++currChunkZ) {
+            for (int currChunkX = minChunkX; currChunkX <= maxChunkX; ++currChunkX) {
+                final net.minecraft.world.level.chunk.LevelChunkSection[] sections = chunkSource.getChunk(currChunkX, currChunkZ, net.minecraft.world.level.chunk.status.ChunkStatus.FULL, true).getSections();
+
+                for (int currChunkY = minChunkY; currChunkY <= maxChunkY; ++currChunkY) {
+                    final int sectionIdx = currChunkY - minSection;
+                    if (sectionIdx < 0 || sectionIdx >= sections.length) {
+                        continue;
+                    }
+                    final net.minecraft.world.level.chunk.LevelChunkSection section = sections[sectionIdx];
+                    if (section.hasOnlyAir()) {
+                        // empty
+                        continue;
+                    }
+
+                    final net.minecraft.world.level.chunk.PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocks = section.states;
+
+                    final int minXIterate = currChunkX == minChunkX ? (minBlockX & 15) : 0;
+                    final int maxXIterate = currChunkX == maxChunkX ? (maxBlockX & 15) : 15;
+                    final int minZIterate = currChunkZ == minChunkZ ? (minBlockZ & 15) : 0;
+                    final int maxZIterate = currChunkZ == maxChunkZ ? (maxBlockZ & 15) : 15;
+                    final int minYIterate = currChunkY == minChunkY ? (minBlockY & 15) : 0;
+                    final int maxYIterate = currChunkY == maxChunkY ? (maxBlockY & 15) : 15;
+
+                    for (int currY = minYIterate; currY <= maxYIterate; ++currY) {
+                        final int blockY = currY | (currChunkY << 4);
+                        mutablePos.setY(blockY);
+                        for (int currZ = minZIterate; currZ <= maxZIterate; ++currZ) {
+                            final int blockZ = currZ | (currChunkZ << 4);
+                            mutablePos.setZ(blockZ);
+                            for (int currX = minXIterate; currX <= maxXIterate; ++currX) {
+                                final int blockX = currX | (currChunkX << 4);
+                                mutablePos.setX(blockX);
+
+                                final BlockState blockState = blocks.get((currX) | (currZ << 4) | ((currY) << 8));
+
+                                if (((ca.spottedleaf.moonrise.patches.collisions.block.CollisionBlockState)blockState).moonrise$emptyCollisionShape()
+                                    || !blockState.isSuffocating(world, mutablePos)) {
+                                    continue;
+                                }
+
+                                // Yes, it does not use the Entity context stuff.
+                                final VoxelShape collisionShape = blockState.getCollisionShape(world, mutablePos);
+
+                                if (collisionShape.isEmpty()) {
+                                    continue;
+                                }
+
+                                final AABB toCollide = boundingBox.move(-(double)blockX, -(double)blockY, -(double)blockZ);
+
+                                final AABB singleAABB = ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)collisionShape).moonrise$getSingleAABBRepresentation();
+                                if (singleAABB != null) {
+                                    if (ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.voxelShapeIntersect(singleAABB, toCollide)) {
+                                        return true;
+                                    }
+                                    continue;
+                                }
+
+                                if (ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.voxelShapeIntersectNoEmpty(collisionShape, toCollide)) {
+                                    return true;
+                                }
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+        // Paper end - optimise collisions
     }
 
     public InteractionResult interact(Player player, InteractionHand hand) {
@@ -4098,15 +4333,17 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
 
     public Iterable<Entity> getIndirectPassengers() {
-        // Paper start - Optimize indirect passenger iteration
-        if (this.passengers.isEmpty()) { return ImmutableList.of(); }
-        ImmutableList.Builder<Entity> indirectPassengers = ImmutableList.builder();
-        for (Entity passenger : this.passengers) {
-            indirectPassengers.add(passenger);
-            indirectPassengers.addAll(passenger.getIndirectPassengers());
+        // Paper start - optimise entity tracker
+        final List<Entity> ret = new ArrayList<>();
+
+        if (this.passengers.isEmpty()) {
+            return ret;
         }
-        return indirectPassengers.build();
-        // Paper end - Optimize indirect passenger iteration
+
+        collectIndirectPassengers(ret, this.passengers);
+
+        return ret;
+        // Paper end - optimise entity tracker
     }
 
     public int countPlayerPassengers() {
@@ -4244,77 +4481,136 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return Mth.lerp(partialTick, this.yRotO, this.yRot);
     }
 
-    public boolean updateFluidHeightAndDoFluidPushing(TagKey<Fluid> fluidTag, double motionScale) {
+    // Paper start - optimise collisions
+    public boolean updateFluidHeightAndDoFluidPushing(final TagKey<Fluid> fluid, final double flowScale) {
         if (this.touchingUnloadedChunk()) {
             return false;
-        } else {
-            AABB aabb = this.getBoundingBox().deflate(0.001);
-            int floor = Mth.floor(aabb.minX);
-            int ceil = Mth.ceil(aabb.maxX);
-            int floor1 = Mth.floor(aabb.minY);
-            int ceil1 = Mth.ceil(aabb.maxY);
-            int floor2 = Mth.floor(aabb.minZ);
-            int ceil2 = Mth.ceil(aabb.maxZ);
-            double d = 0.0;
-            boolean isPushedByFluid = this.isPushedByFluid();
-            boolean flag = false;
-            Vec3 vec3 = Vec3.ZERO;
-            int i = 0;
-            BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+        }
 
-            for (int i1 = floor; i1 < ceil; i1++) {
-                for (int i2 = floor1; i2 < ceil1; i2++) {
-                    for (int i3 = floor2; i3 < ceil2; i3++) {
-                        mutableBlockPos.set(i1, i2, i3);
-                        FluidState fluidState = this.level().getFluidState(mutableBlockPos);
-                        if (fluidState.is(fluidTag)) {
-                            double d1 = i2 + fluidState.getHeight(this.level(), mutableBlockPos);
-                            if (d1 >= aabb.minY) {
-                                flag = true;
-                                d = Math.max(d1 - aabb.minY, d);
-                                if (isPushedByFluid) {
-                                    Vec3 flow = fluidState.getFlow(this.level(), mutableBlockPos);
-                                    if (d < 0.4) {
-                                        flow = flow.scale(d);
-                                    }
+        final AABB boundingBox = this.getBoundingBox().deflate(1.0E-3);
 
-                                    vec3 = vec3.add(flow);
-                                    i++;
+        final Level world = this.level;
+        final int minSection = ca.spottedleaf.moonrise.common.util.WorldUtil.getMinSection(world);
+
+        final int minBlockX = Mth.floor(boundingBox.minX);
+        final int minBlockY = Math.max((minSection << 4), Mth.floor(boundingBox.minY));
+        final int minBlockZ = Mth.floor(boundingBox.minZ);
+
+        // note: bounds are exclusive in Vanilla, so we subtract 1 - our loop expects bounds to be inclusive
+        final int maxBlockX = Mth.ceil(boundingBox.maxX) - 1;
+        final int maxBlockY = Math.min((ca.spottedleaf.moonrise.common.util.WorldUtil.getMaxSection(world) << 4) | 15, Mth.ceil(boundingBox.maxY) - 1);
+        final int maxBlockZ = Mth.ceil(boundingBox.maxZ) - 1;
+
+        final boolean isPushable = this.isPushedByFluid();
+        final BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+
+        Vec3 pushVector = Vec3.ZERO;
+        double totalPushes = 0.0;
+        double maxHeightDiff = 0.0;
+        boolean inFluid = false;
+
+        final int minChunkX = minBlockX >> 4;
+        final int maxChunkX = maxBlockX >> 4;
+
+        final int minChunkY = minBlockY >> 4;
+        final int maxChunkY = maxBlockY >> 4;
+
+        final int minChunkZ = minBlockZ >> 4;
+        final int maxChunkZ = maxBlockZ >> 4;
+
+        final net.minecraft.world.level.chunk.ChunkSource chunkSource = world.getChunkSource();
+
+        for (int currChunkZ = minChunkZ; currChunkZ <= maxChunkZ; ++currChunkZ) {
+            for (int currChunkX = minChunkX; currChunkX <= maxChunkX; ++currChunkX) {
+                final net.minecraft.world.level.chunk.LevelChunkSection[] sections = chunkSource.getChunk(currChunkX, currChunkZ, net.minecraft.world.level.chunk.status.ChunkStatus.FULL, false).getSections();
+
+                // bound y
+                for (int currChunkY = minChunkY; currChunkY <= maxChunkY; ++currChunkY) {
+                    final int sectionIdx = currChunkY - minSection;
+                    if (sectionIdx < 0 || sectionIdx >= sections.length) {
+                        continue;
+                    }
+                    final net.minecraft.world.level.chunk.LevelChunkSection section = sections[sectionIdx];
+                    if (section.hasOnlyAir()) {
+                        // empty
+                        continue;
+                    }
+
+                    final net.minecraft.world.level.chunk.PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocks = section.states;
+
+                    final int minXIterate = currChunkX == minChunkX ? (minBlockX & 15) : 0;
+                    final int maxXIterate = currChunkX == maxChunkX ? (maxBlockX & 15) : 15;
+                    final int minZIterate = currChunkZ == minChunkZ ? (minBlockZ & 15) : 0;
+                    final int maxZIterate = currChunkZ == maxChunkZ ? (maxBlockZ & 15) : 15;
+                    final int minYIterate = currChunkY == minChunkY ? (minBlockY & 15) : 0;
+                    final int maxYIterate = currChunkY == maxChunkY ? (maxBlockY & 15) : 15;
+
+                    for (int currY = minYIterate; currY <= maxYIterate; ++currY) {
+                        for (int currZ = minZIterate; currZ <= maxZIterate; ++currZ) {
+                            for (int currX = minXIterate; currX <= maxXIterate; ++currX) {
+                                final FluidState fluidState = blocks.get((currX) | (currZ << 4) | ((currY) << 8)).getFluidState();
+
+                                if (fluidState.isEmpty() || !fluidState.is(fluid)) {
+                                    continue;
                                 }
-                                // CraftBukkit start - store last lava contact location
-                                if (fluidTag == FluidTags.LAVA) {
-                                    this.lastLavaContact = mutableBlockPos.immutable();
+
+                                mutablePos.set(currX | (currChunkX << 4), currY | (currChunkY << 4), currZ | (currChunkZ << 4));
+
+                                final double height = (double)((float)mutablePos.getY() + fluidState.getHeight(world, mutablePos));
+                                final double diff = height - boundingBox.minY;
+
+                                if (diff < 0.0) {
+                                    continue;
                                 }
-                                // CraftBukkit end
+
+                                inFluid = true;
+                                maxHeightDiff = Math.max(maxHeightDiff, diff);
+
+                                if (!isPushable) {
+                                    continue;
+                                }
+
+                                ++totalPushes;
+
+                                final Vec3 flow = fluidState.getFlow(world, mutablePos);
+
+                                if (diff < 0.4) {
+                                    pushVector = pushVector.add(flow.scale(diff));
+                                } else {
+                                    pushVector = pushVector.add(flow);
+                                }
                             }
                         }
                     }
                 }
             }
-
-            if (vec3.length() > 0.0) {
-                if (i > 0) {
-                    vec3 = vec3.scale(1.0 / i);
-                }
-
-                if (!(this instanceof Player)) {
-                    vec3 = vec3.normalize();
-                }
-
-                Vec3 deltaMovement = this.getDeltaMovement();
-                vec3 = vec3.scale(motionScale);
-                double d2 = 0.003;
-                if (Math.abs(deltaMovement.x) < 0.003 && Math.abs(deltaMovement.z) < 0.003 && vec3.length() < 0.0045000000000000005) {
-                    vec3 = vec3.normalize().scale(0.0045000000000000005);
-                }
-
-                this.setDeltaMovement(this.getDeltaMovement().add(vec3));
-            }
-
-            this.fluidHeight.put(fluidTag, d);
-            return flag;
         }
+
+        this.fluidHeight.put(fluid, maxHeightDiff);
+
+        if (pushVector.lengthSqr() == 0.0) {
+            return inFluid;
+        }
+
+        // note: totalPushes != 0 as pushVector != 0
+        pushVector = pushVector.scale(1.0 / totalPushes);
+        final Vec3 currMovement = this.getDeltaMovement();
+
+        if (!((Entity)(Object)this instanceof Player)) {
+            pushVector = pushVector.normalize();
+        }
+
+        pushVector = pushVector.scale(flowScale);
+        if (Math.abs(currMovement.x) < 0.003 && Math.abs(currMovement.z) < 0.003 && pushVector.length() < 0.0045000000000000005) {
+            pushVector = pushVector.normalize().scale(0.0045000000000000005);
+        }
+
+        this.setDeltaMovement(currMovement.add(pushVector));
+
+        // note: inFluid = true here as pushVector != 0
+        return true;
     }
+    // Paper end - optimise collisions
 
     public boolean touchingUnloadedChunk() {
         AABB aabb = this.getBoundingBox().inflate(1.0);
@@ -4467,6 +4763,15 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         this.setPosRaw(x, y, z, false);
     }
     public final void setPosRaw(double x, double y, double z, boolean forceBoundingBoxUpdate) {
+        // Paper start - rewrite chunk system
+        if (this.updatingSectionStatus) {
+            LOGGER.error(
+                "Refusing to update position for entity " + this + " to position " + new Vec3(x, y, z)
+                    + " since it is processing a section status update", new Throwable()
+            );
+            return;
+        }
+        // Paper end - rewrite chunk system
         if (!checkPosition(this, x, y, z)) {
             return;
         }
@@ -4597,6 +4902,12 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
 
     @Override
     public final void setRemoved(Entity.RemovalReason removalReason, org.bukkit.event.entity.EntityRemoveEvent.Cause cause) {
+        // Paper start - rewrite chunk system
+        if (!((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemLevel)this.level).moonrise$getEntityLookup().canRemoveEntity((Entity)(Object)this)) {
+            LOGGER.warn("Entity " + this + " is currently prevented from being removed from the world since it is processing section status updates", new Throwable());
+            return;
+        }
+        // Paper end - rewrite chunk system
         org.bukkit.craftbukkit.event.CraftEventFactory.callEntityRemoveEvent(this, cause);
         // CraftBukkit end
         final boolean alreadyRemoved = this.removalReason != null; // Paper - Folia schedulers
@@ -4608,7 +4919,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
             this.stopRiding();
         }
 
-        this.getPassengers().forEach(Entity::stopRiding);
+        if (this.removalReason != Entity.RemovalReason.UNLOADED_TO_CHUNK) { this.getPassengers().forEach(Entity::stopRiding); } // Paper - rewrite chunk system
         this.levelCallback.onRemove(removalReason);
         this.onRemoval(removalReason);
         // Paper start - Folia schedulers
@@ -4642,7 +4953,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     public boolean shouldBeSaved() {
         return (this.removalReason == null || this.removalReason.shouldSave())
             && !this.isPassenger()
-            && (!this.isVehicle() || !this.hasExactlyOnePlayerPassenger());
+            && (!this.isVehicle() || !((ca.spottedleaf.moonrise.patches.chunk_system.entity.ChunkSystemEntity)this).moonrise$hasAnyPlayerPassengers()); // Paper - rewrite chunk system
     }
 
     @Override

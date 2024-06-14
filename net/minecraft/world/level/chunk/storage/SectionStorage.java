@@ -40,10 +40,10 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import org.slf4j.Logger;
 
-public class SectionStorage<R, P> implements AutoCloseable {
+public class SectionStorage<R, P> implements AutoCloseable, ca.spottedleaf.moonrise.patches.chunk_system.level.storage.ChunkSystemSectionStorage { // Paper - rewrite chunk system
     static final Logger LOGGER = LogUtils.getLogger();
     private static final String SECTIONS_TAG = "Sections";
-    private final SimpleRegionStorage simpleRegionStorage;
+    // Paper - rewrite chunk system
     private final Long2ObjectMap<Optional<R>> storage = new Long2ObjectOpenHashMap<>();
     private final LongLinkedOpenHashSet dirtyChunks = new LongLinkedOpenHashSet();
     private final Codec<P> codec;
@@ -57,6 +57,18 @@ public class SectionStorage<R, P> implements AutoCloseable {
     private final Long2ObjectMap<CompletableFuture<Optional<SectionStorage.PackedChunk<P>>>> pendingLoads = new Long2ObjectOpenHashMap<>();
     private final Object loadLock = new Object();
 
+    // Paper start - rewrite chunk system
+    private final RegionFileStorage regionStorage;
+
+    @Override
+    public final RegionFileStorage moonrise$getRegionStorage() {
+        return this.regionStorage;
+    }
+
+    @Override
+    public void moonrise$close() throws IOException {}
+    // Paper end - rewrite chunk system
+
     public SectionStorage(
         SimpleRegionStorage simpleRegionStorage,
         Codec<P> codec,
@@ -67,7 +79,7 @@ public class SectionStorage<R, P> implements AutoCloseable {
         ChunkIOErrorReporter errorReporter,
         LevelHeightAccessor levelHeightAccessor
     ) {
-        this.simpleRegionStorage = simpleRegionStorage;
+        // Paper - rewrite chunk system
         this.codec = codec;
         this.packer = packer;
         this.unpacker = unpacker;
@@ -75,6 +87,7 @@ public class SectionStorage<R, P> implements AutoCloseable {
         this.registryAccess = registryAccess;
         this.errorReporter = errorReporter;
         this.levelHeightAccessor = levelHeightAccessor;
+        this.regionStorage = simpleRegionStorage.worker.storage; // Paper - rewrite chunk system
     }
 
     protected void tick(BooleanSupplier aheadOfTime) {
@@ -188,65 +201,15 @@ public class SectionStorage<R, P> implements AutoCloseable {
     }
 
     private CompletableFuture<Optional<SectionStorage.PackedChunk<P>>> tryRead(ChunkPos chunkPos) {
-        RegistryOps<Tag> registryOps = this.registryAccess.createSerializationContext(NbtOps.INSTANCE);
-        return this.simpleRegionStorage
-            .read(chunkPos)
-            .thenApplyAsync(
-                optional -> optional.map(
-                    compoundTag -> SectionStorage.PackedChunk.parse(this.codec, registryOps, compoundTag, this.simpleRegionStorage, this.levelHeightAccessor)
-                ),
-                Util.backgroundExecutor().forName("parseSection")
-            )
-            .exceptionally(cause -> {
-                if (cause instanceof CompletionException) {
-                    cause = cause.getCause();
-                }
-
-                if (cause instanceof IOException ioException) {
-                    LOGGER.error("Error reading chunk {} data from disk", chunkPos, ioException);
-                    this.errorReporter.reportChunkLoadFailure(ioException, this.simpleRegionStorage.storageInfo(), chunkPos);
-                    return Optional.empty();
-                } else {
-                    throw new CompletionException(cause);
-                }
-            });
+        throw new IllegalStateException("Only chunk system can write state, offending class:" + this.getClass().getName()); // Paper - rewrite chunk system
     }
 
     private void unpackChunk(ChunkPos pos, @Nullable SectionStorage.PackedChunk<P> packedChunk) {
-        if (packedChunk == null) {
-            for (int sectionY = this.levelHeightAccessor.getMinSectionY(); sectionY <= this.levelHeightAccessor.getMaxSectionY(); sectionY++) {
-                this.storage.put(getKey(pos, sectionY), Optional.empty());
-            }
-        } else {
-            boolean versionChanged = packedChunk.versionChanged();
-
-            for (int sectionY1 = this.levelHeightAccessor.getMinSectionY(); sectionY1 <= this.levelHeightAccessor.getMaxSectionY(); sectionY1++) {
-                long key = getKey(pos, sectionY1);
-                Optional<R> optional = Optional.ofNullable(packedChunk.sectionsByY.get(sectionY1))
-                    .map(object -> this.unpacker.apply((P)object, () -> this.setDirty(key)));
-                this.storage.put(key, optional);
-                optional.ifPresent(object -> {
-                    this.onSectionLoad(key);
-                    if (versionChanged) {
-                        this.setDirty(key);
-                    }
-                });
-            }
-        }
+        throw new IllegalStateException("Only chunk system can load in state, offending class:" + this.getClass().getName()); // Paper - rewrite chunk system
     }
 
     private void writeChunk(ChunkPos pos) {
-        RegistryOps<Tag> registryOps = this.registryAccess.createSerializationContext(NbtOps.INSTANCE);
-        Dynamic<Tag> dynamic = this.writeChunk(pos, registryOps);
-        Tag tag = dynamic.getValue();
-        if (tag instanceof CompoundTag) {
-            this.simpleRegionStorage.write(pos, (CompoundTag)tag).exceptionally(throwable -> {
-                this.errorReporter.reportChunkSaveFailure(throwable, this.simpleRegionStorage.storageInfo(), pos);
-                return null;
-            });
-        } else {
-            LOGGER.error("Expected compound tag, got {}", tag);
-        }
+        throw new IllegalStateException("Only chunk system can write state, offending class:" + this.getClass().getName()); // Paper - rewrite chunk system
     }
 
     private <T> Dynamic<T> writeChunk(ChunkPos pos, DynamicOps<T> ops) {
@@ -282,7 +245,7 @@ public class SectionStorage<R, P> implements AutoCloseable {
     protected void onSectionLoad(long sectionKey) {
     }
 
-    protected void setDirty(long sectionPos) {
+    public void setDirty(long sectionPos) { // Paper - public
         Optional<R> optional = this.storage.get(sectionPos);
         if (optional != null && !optional.isEmpty()) {
             this.dirtyChunks.add(ChunkPos.asLong(SectionPos.x(sectionPos), SectionPos.z(sectionPos)));
@@ -303,7 +266,7 @@ public class SectionStorage<R, P> implements AutoCloseable {
 
     @Override
     public void close() throws IOException {
-        this.simpleRegionStorage.close();
+        this.moonrise$close(); // Paper - rewrite chunk system
     }
 
     record PackedChunk<T>(Int2ObjectMap<T> sectionsByY, boolean versionChanged) {

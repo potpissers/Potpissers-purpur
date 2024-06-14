@@ -45,6 +45,48 @@ public abstract class FlowingFluid extends Fluid {
     });
     private final Map<FluidState, VoxelShape> shapes = Maps.newIdentityHashMap();
 
+    // Paper start - fluid method optimisations
+    private FluidState sourceFalling;
+    private FluidState sourceNotFalling;
+
+    private static final int TOTAL_FLOWING_STATES = FALLING.getPossibleValues().size() * LEVEL.getPossibleValues().size();
+    private static final int MIN_LEVEL = LEVEL.getPossibleValues().stream().sorted().findFirst().get().intValue();
+
+    // index = (falling ? 1 : 0) + level*2
+    private FluidState[] flowingLookUp;
+    private volatile boolean init;
+
+    private static final int COLLISION_OCCLUSION_CACHE_SIZE = 2048;
+    private static final ThreadLocal<ca.spottedleaf.moonrise.patches.collisions.util.FluidOcclusionCacheKey[]> COLLISION_OCCLUSION_CACHE = ThreadLocal.withInitial(() -> new ca.spottedleaf.moonrise.patches.collisions.util.FluidOcclusionCacheKey[COLLISION_OCCLUSION_CACHE_SIZE]);
+
+
+    /**
+     * Due to init order, we need to use callbacks to initialise our state
+     */
+    private void init() {
+        synchronized (this) {
+            if (this.init) {
+                return;
+            }
+            this.flowingLookUp = new FluidState[TOTAL_FLOWING_STATES];
+            final FluidState defaultFlowState = this.getFlowing().defaultFluidState();
+            for (int i = 0; i < TOTAL_FLOWING_STATES; ++i) {
+                final int falling = i & 1;
+                final int level = (i >>> 1) + MIN_LEVEL;
+
+                this.flowingLookUp[i] = defaultFlowState.setValue(FALLING, falling == 1 ? Boolean.TRUE : Boolean.FALSE)
+                    .setValue(LEVEL, Integer.valueOf(level));
+            }
+
+            final FluidState defaultFallState = this.getSource().defaultFluidState();
+            this.sourceFalling = defaultFallState.setValue(FALLING, Boolean.TRUE);
+            this.sourceNotFalling = defaultFallState.setValue(FALLING, Boolean.FALSE);
+
+            this.init = true;
+        }
+    }
+    // Paper end - fluid method optimisations
+
     @Override
     protected void createFluidStateDefinition(StateDefinition.Builder<Fluid, FluidState> builder) {
         builder.add(FALLING);
@@ -209,61 +251,71 @@ public abstract class FlowingFluid extends Fluid {
         }
     }
 
-    private static boolean canPassThroughWall(
-        Direction direction, BlockGetter level, BlockPos pos, BlockState state, BlockPos spreadPos, BlockState spreadState
-    ) {
-        VoxelShape collisionShape = spreadState.getCollisionShape(level, spreadPos);
-        if (collisionShape == Shapes.block()) {
+    // Paper start - fluid method optimisations
+    private static boolean canPassThroughWall(final Direction direction, final BlockGetter level,
+                                              final BlockPos fromPos, final BlockState fromState,
+                                              final BlockPos toPos, final BlockState toState) {
+        if (((ca.spottedleaf.moonrise.patches.collisions.block.CollisionBlockState)fromState).moonrise$emptyCollisionShape() & ((ca.spottedleaf.moonrise.patches.collisions.block.CollisionBlockState)toState).moonrise$emptyCollisionShape()) {
+            // don't even try to cache simple cases
+            return true;
+        }
+
+        if (((ca.spottedleaf.moonrise.patches.collisions.block.CollisionBlockState)fromState).moonrise$occludesFullBlock() | ((ca.spottedleaf.moonrise.patches.collisions.block.CollisionBlockState)toState).moonrise$occludesFullBlock()) {
+            // don't even try to cache simple cases
             return false;
-        } else {
-            VoxelShape collisionShape1 = state.getCollisionShape(level, pos);
-            if (collisionShape1 == Shapes.block()) {
-                return false;
-            } else if (collisionShape1 == Shapes.empty() && collisionShape == Shapes.empty()) {
-                return true;
-            } else {
-                Object2ByteLinkedOpenHashMap<FlowingFluid.BlockStatePairKey> map;
-                if (!state.getBlock().hasDynamicShape() && !spreadState.getBlock().hasDynamicShape()) {
-                    map = OCCLUSION_CACHE.get();
-                } else {
-                    map = null;
-                }
+        }
 
-                FlowingFluid.BlockStatePairKey blockStatePairKey;
-                if (map != null) {
-                    blockStatePairKey = new FlowingFluid.BlockStatePairKey(state, spreadState, direction);
-                    byte andMoveToFirst = map.getAndMoveToFirst(blockStatePairKey);
-                    if (andMoveToFirst != 127) {
-                        return andMoveToFirst != 0;
-                    }
-                } else {
-                    blockStatePairKey = null;
-                }
+        final ca.spottedleaf.moonrise.patches.collisions.util.FluidOcclusionCacheKey[] cache = ((ca.spottedleaf.moonrise.patches.collisions.block.CollisionBlockState)fromState).moonrise$hasCache() & ((ca.spottedleaf.moonrise.patches.collisions.block.CollisionBlockState)toState).moonrise$hasCache() ?
+            COLLISION_OCCLUSION_CACHE.get() : null;
 
-                boolean flag = !Shapes.mergedFaceOccludes(collisionShape1, collisionShape, direction);
-                if (map != null) {
-                    if (map.size() == 200) {
-                        map.removeLastByte();
-                    }
+        final int keyIndex
+            = (((ca.spottedleaf.moonrise.patches.collisions.block.CollisionBlockState)fromState).moonrise$uniqueId1() ^ ((ca.spottedleaf.moonrise.patches.collisions.block.CollisionBlockState)toState).moonrise$uniqueId2() ^ ((ca.spottedleaf.moonrise.patches.collisions.util.CollisionDirection)(Object)direction).moonrise$uniqueId())
+            & (COLLISION_OCCLUSION_CACHE_SIZE - 1);
 
-                    map.putAndMoveToFirst(blockStatePairKey, (byte)(flag ? 1 : 0));
-                }
-
-                return flag;
+        if (cache != null) {
+            final ca.spottedleaf.moonrise.patches.collisions.util.FluidOcclusionCacheKey cached = cache[keyIndex];
+            if (cached != null && cached.first() == fromState && cached.second() == toState && cached.direction() == direction) {
+                return cached.result();
             }
         }
+
+        final VoxelShape shape1 = fromState.getCollisionShape(level, fromPos);
+        final VoxelShape shape2 = toState.getCollisionShape(level, toPos);
+
+        final boolean result = !Shapes.mergedFaceOccludes(shape1, shape2, direction);
+
+        if (cache != null) {
+            // we can afford to replace in-use keys more often due to the excessive caching the collision patch does in mergedFaceOccludes
+            cache[keyIndex] = new ca.spottedleaf.moonrise.patches.collisions.util.FluidOcclusionCacheKey(fromState, toState, direction, result);
+        }
+
+        return result;
     }
+    // Paper end - fluid method optimisations
+
 
     public abstract Fluid getFlowing();
 
     public FluidState getFlowing(int level, boolean falling) {
-        return this.getFlowing().defaultFluidState().setValue(LEVEL, Integer.valueOf(level)).setValue(FALLING, Boolean.valueOf(falling));
+        // Paper start - fluid method optimisations
+        final int amount = level;
+        if (!this.init) {
+            this.init();
+        }
+        final int index = (falling ? 1 : 0) | ((amount - MIN_LEVEL) << 1);
+        return this.flowingLookUp[index];
+        // Paper end - fluid method optimisations
     }
 
     public abstract Fluid getSource();
 
     public FluidState getSource(boolean falling) {
-        return this.getSource().defaultFluidState().setValue(FALLING, Boolean.valueOf(falling));
+        // Paper start - fluid method optimisations
+        if (!this.init) {
+            this.init();
+        }
+        return falling ? this.sourceFalling : this.sourceNotFalling;
+        // Paper end - fluid method optimisations
     }
 
     protected abstract boolean canConvertToSource(ServerLevel level);

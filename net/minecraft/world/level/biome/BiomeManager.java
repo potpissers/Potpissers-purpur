@@ -98,8 +98,7 @@ public class BiomeManager {
     }
 
     private static double getFiddle(long seed) {
-        double d = Math.floorMod(seed >> 24, 1024) / 1024.0;
-        return (d - 0.5) * 0.9;
+        return (double)(((seed >> 24) & (1024 - 1)) - (1024/2)) * (0.9 / 1024.0); // Paper - avoid floorMod, fp division, and fp subtraction
     }
 
     public interface NoiseBiomeSource {

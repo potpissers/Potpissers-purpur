@@ -170,7 +170,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.LevelTicks;
 import org.slf4j.Logger;
 
-public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLevel {
+public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLevel, ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel, ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemLevelReader, ca.spottedleaf.moonrise.patches.chunk_tick_iteration.ChunkTickServerLevel { // Paper - rewrite chunk system // Paper - chunk tick iteration
     public static final BlockPos END_SPAWN_POINT = new BlockPos(100, 50, 0);
     public static final IntProvider RAIN_DELAY = UniformInt.of(12000, 180000);
     public static final IntProvider RAIN_DURATION = UniformInt.of(12000, 24000);
@@ -185,7 +185,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
     public final net.minecraft.world.level.storage.PrimaryLevelData serverLevelData; // CraftBukkit - type
     private int lastSpawnChunkRadius;
     final EntityTickList entityTickList = new EntityTickList();
-    public final PersistentEntitySectionManager<Entity> entityManager;
+    // Paper - rewrite chunk system
     private final GameEventDispatcher gameEventDispatcher;
     public boolean noSave;
     private final SleepStatus sleepStatus;
@@ -256,12 +256,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
 
     public final void loadChunksForMoveAsync(AABB axisalignedbb, ca.spottedleaf.concurrentutil.util.Priority priority,
                                              java.util.function.Consumer<List<net.minecraft.world.level.chunk.ChunkAccess>> onLoad) {
-        if (Thread.currentThread() != this.thread) {
-            this.getChunkSource().mainThreadProcessor.execute(() -> {
-                this.loadChunksForMoveAsync(axisalignedbb, priority, onLoad);
-            });
-            return;
-        }
+        // Paper - rewrite chunk system
         int minBlockX = Mth.floor(axisalignedbb.minX - 1.0E-7D) - 3;
         int minBlockZ = Mth.floor(axisalignedbb.minZ - 1.0E-7D) - 3;
 
@@ -280,32 +275,159 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
     public final void loadChunks(int minChunkX, int minChunkZ, int maxChunkX, int maxChunkZ,
                                  ca.spottedleaf.concurrentutil.util.Priority priority,
                                  java.util.function.Consumer<List<net.minecraft.world.level.chunk.ChunkAccess>> onLoad) {
-        List<net.minecraft.world.level.chunk.ChunkAccess> ret = new java.util.ArrayList<>();
-        it.unimi.dsi.fastutil.ints.IntArrayList ticketLevels = new it.unimi.dsi.fastutil.ints.IntArrayList();
-        ServerChunkCache chunkProvider = this.getChunkSource();
+        this.moonrise$loadChunksAsync(minChunkX, maxChunkX, minChunkZ, maxChunkZ, priority, onLoad); // Paper - rewrite chunk system
+    }
+    // Paper end
 
-        int requiredChunks = (maxChunkX - minChunkX + 1) * (maxChunkZ - minChunkZ + 1);
-        int[] loadedChunks = new int[1];
+    // Paper start - optimise getPlayerByUUID
+    @Nullable
+    @Override
+    public Player getPlayerByUUID(UUID uuid) {
+        final Player player = this.getServer().getPlayerList().getPlayer(uuid);
+        return player != null && player.level() == this ? player : null;
+    }
+    // Paper end - optimise getPlayerByUUID
+    // Paper start - rewrite chunk system
+    private final ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder viewDistanceHolder = new ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder();
+    private final ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader chunkLoader = new ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader((ServerLevel)(Object)this);
+    private final ca.spottedleaf.moonrise.patches.chunk_system.io.datacontroller.EntityDataController entityDataController;
+    private final ca.spottedleaf.moonrise.patches.chunk_system.io.datacontroller.PoiDataController poiDataController;
+    private final ca.spottedleaf.moonrise.patches.chunk_system.io.datacontroller.ChunkDataController chunkDataController;
+    private final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler chunkTaskScheduler;
+    private long lastMidTickFailure;
+    private long tickedBlocksOrFluids;
+    private final ca.spottedleaf.moonrise.common.misc.NearbyPlayers nearbyPlayers = new ca.spottedleaf.moonrise.common.misc.NearbyPlayers((ServerLevel)(Object)this);
+    private static final ServerChunkCache.ChunkAndHolder[] EMPTY_CHUNK_AND_HOLDERS = new ServerChunkCache.ChunkAndHolder[0];
+    private final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.server.level.ServerChunkCache.ChunkAndHolder> loadedChunks = new ca.spottedleaf.moonrise.common.list.ReferenceList<>(EMPTY_CHUNK_AND_HOLDERS);
+    private final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.server.level.ServerChunkCache.ChunkAndHolder> tickingChunks = new ca.spottedleaf.moonrise.common.list.ReferenceList<>(EMPTY_CHUNK_AND_HOLDERS);
+    private final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.server.level.ServerChunkCache.ChunkAndHolder> entityTickingChunks = new ca.spottedleaf.moonrise.common.list.ReferenceList<>(EMPTY_CHUNK_AND_HOLDERS);
 
-        Long holderIdentifier = Long.valueOf(chunkProvider.chunkFutureAwaitCounter++);
+    @Override
+    public final LevelChunk moonrise$getFullChunkIfLoaded(final int chunkX, final int chunkZ) {
+        return this.chunkSource.getChunkNow(chunkX, chunkZ);
+    }
 
-        java.util.function.Consumer<net.minecraft.world.level.chunk.ChunkAccess> consumer = (net.minecraft.world.level.chunk.ChunkAccess chunk) -> {
+    @Override
+    public final ChunkAccess moonrise$getAnyChunkIfLoaded(final int chunkX, final int chunkZ) {
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder newChunkHolder = this.moonrise$getChunkTaskScheduler().chunkHolderManager.getChunkHolder(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkKey(chunkX, chunkZ));
+        if (newChunkHolder == null) {
+            return null;
+        }
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder.ChunkCompletion lastCompletion = newChunkHolder.getLastChunkCompletion();
+        return lastCompletion == null ? null : lastCompletion.chunk();
+    }
+
+    @Override
+    public final ChunkAccess moonrise$getSpecificChunkIfLoaded(final int chunkX, final int chunkZ, final net.minecraft.world.level.chunk.status.ChunkStatus leastStatus) {
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder newChunkHolder = this.moonrise$getChunkTaskScheduler().chunkHolderManager.getChunkHolder(chunkX, chunkZ);
+        if (newChunkHolder == null) {
+            return null;
+        }
+        return newChunkHolder.getChunkIfPresentUnchecked(leastStatus);
+    }
+
+    @Override
+    public final void moonrise$midTickTasks() {
+        ((ca.spottedleaf.moonrise.patches.chunk_system.server.ChunkSystemMinecraftServer)this.server).moonrise$executeMidTickTasks();
+    }
+
+    @Override
+    public final ChunkAccess moonrise$syncLoadNonFull(final int chunkX, final int chunkZ, final net.minecraft.world.level.chunk.status.ChunkStatus status) {
+        return this.moonrise$getChunkTaskScheduler().syncLoadNonFull(chunkX, chunkZ, status);
+    }
+
+    @Override
+    public final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler moonrise$getChunkTaskScheduler() {
+        return this.chunkTaskScheduler;
+    }
+
+    @Override
+    public final ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO.RegionDataController  moonrise$getChunkDataController() {
+        return this.chunkDataController;
+    }
+
+    @Override
+    public final ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO.RegionDataController moonrise$getPoiChunkDataController() {
+        return this.poiDataController;
+    }
+
+    @Override
+    public final ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO.RegionDataController moonrise$getEntityChunkDataController() {
+        return this.entityDataController;
+    }
+
+    @Override
+    public final int moonrise$getRegionChunkShift() {
+        return io.papermc.paper.threadedregions.TickRegions.getRegionChunkShift();
+    }
+
+    @Override
+    public final ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader moonrise$getPlayerChunkLoader() {
+        return this.chunkLoader;
+    }
+
+    @Override
+    public final void moonrise$loadChunksAsync(final BlockPos pos, final int radiusBlocks,
+                                               final ca.spottedleaf.concurrentutil.util.Priority priority,
+                                               final java.util.function.Consumer<java.util.List<net.minecraft.world.level.chunk.ChunkAccess>> onLoad) {
+        this.moonrise$loadChunksAsync(
+            (pos.getX() - radiusBlocks) >> 4,
+            (pos.getX() + radiusBlocks) >> 4,
+            (pos.getZ() - radiusBlocks) >> 4,
+            (pos.getZ() + radiusBlocks) >> 4,
+            priority, onLoad
+        );
+    }
+
+    @Override
+    public final void moonrise$loadChunksAsync(final BlockPos pos, final int radiusBlocks,
+                                               final net.minecraft.world.level.chunk.status.ChunkStatus chunkStatus, final ca.spottedleaf.concurrentutil.util.Priority priority,
+                                               final java.util.function.Consumer<java.util.List<net.minecraft.world.level.chunk.ChunkAccess>> onLoad) {
+        this.moonrise$loadChunksAsync(
+            (pos.getX() - radiusBlocks) >> 4,
+            (pos.getX() + radiusBlocks) >> 4,
+            (pos.getZ() - radiusBlocks) >> 4,
+            (pos.getZ() + radiusBlocks) >> 4,
+            chunkStatus, priority, onLoad
+        );
+    }
+
+    @Override
+    public final void moonrise$loadChunksAsync(final int minChunkX, final int maxChunkX, final int minChunkZ, final int maxChunkZ,
+                                               final ca.spottedleaf.concurrentutil.util.Priority priority,
+                                               final java.util.function.Consumer<java.util.List<net.minecraft.world.level.chunk.ChunkAccess>> onLoad) {
+        this.moonrise$loadChunksAsync(minChunkX, maxChunkX, minChunkZ, maxChunkZ, net.minecraft.world.level.chunk.status.ChunkStatus.FULL, priority, onLoad);
+    }
+
+    @Override
+    public final void moonrise$loadChunksAsync(final int minChunkX, final int maxChunkX, final int minChunkZ, final int maxChunkZ,
+                                               final net.minecraft.world.level.chunk.status.ChunkStatus chunkStatus, final ca.spottedleaf.concurrentutil.util.Priority priority,
+                                               final java.util.function.Consumer<java.util.List<net.minecraft.world.level.chunk.ChunkAccess>> onLoad) {
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler chunkTaskScheduler = this.moonrise$getChunkTaskScheduler();
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManager chunkHolderManager = chunkTaskScheduler.chunkHolderManager;
+
+        final int requiredChunks = (maxChunkX - minChunkX + 1) * (maxChunkZ - minChunkZ + 1);
+        final java.util.concurrent.atomic.AtomicInteger loadedChunks = new java.util.concurrent.atomic.AtomicInteger();
+        final Long holderIdentifier = ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler.getNextChunkLoadId();
+        final int ticketLevel = ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler.getTicketLevel(chunkStatus);
+
+        final List<ChunkAccess> ret = new ArrayList<>(requiredChunks);
+
+        final java.util.function.Consumer<net.minecraft.world.level.chunk.ChunkAccess> consumer = (final ChunkAccess chunk) -> {
             if (chunk != null) {
-                int ticketLevel = Math.max(33, chunkProvider.chunkMap.getUpdatingChunkIfPresent(chunk.getPos().toLong()).getTicketLevel());
-                ret.add(chunk);
-                ticketLevels.add(ticketLevel);
-                chunkProvider.addTicketAtLevel(TicketType.FUTURE_AWAIT, chunk.getPos(), ticketLevel, holderIdentifier);
+                synchronized (ret) {
+                    ret.add(chunk);
+                }
+                chunkHolderManager.addTicketAtLevel(ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler.CHUNK_LOAD, chunk.getPos(), ticketLevel, holderIdentifier);
             }
-            if (++loadedChunks[0] == requiredChunks) {
+            if (loadedChunks.incrementAndGet() == requiredChunks) {
                 try {
                     onLoad.accept(java.util.Collections.unmodifiableList(ret));
                 } finally {
                     for (int i = 0, len = ret.size(); i < len; ++i) {
-                        ChunkPos chunkPos = ret.get(i).getPos();
-                        int ticketLevel = ticketLevels.getInt(i);
+                        final ChunkPos chunkPos = ret.get(i).getPos();
 
-                        chunkProvider.addTicketAtLevel(TicketType.UNKNOWN, chunkPos, ticketLevel, chunkPos);
-                        chunkProvider.removeTicketAtLevel(TicketType.FUTURE_AWAIT, chunkPos, ticketLevel, holderIdentifier);
+                        chunkHolderManager.removeTicketAtLevel(ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler.CHUNK_LOAD, chunkPos, ticketLevel, holderIdentifier);
                     }
                 }
             }
@@ -319,16 +441,133 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
             }
         }
     }
-    // Paper end
 
-    // Paper start - optimise getPlayerByUUID
-    @Nullable
     @Override
-    public Player getPlayerByUUID(UUID uuid) {
-        final Player player = this.getServer().getPlayerList().getPlayer(uuid);
-        return player != null && player.level() == this ? player : null;
+    public final ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder moonrise$getViewDistanceHolder() {
+        return this.viewDistanceHolder;
     }
-    // Paper end - optimise getPlayerByUUID
+
+    @Override
+    public final long moonrise$getLastMidTickFailure() {
+        return this.lastMidTickFailure;
+    }
+
+    @Override
+    public final void moonrise$setLastMidTickFailure(final long time) {
+        this.lastMidTickFailure = time;
+    }
+
+    @Override
+    public final ca.spottedleaf.moonrise.common.misc.NearbyPlayers moonrise$getNearbyPlayers() {
+        return this.nearbyPlayers;
+    }
+
+    @Override
+    public final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.server.level.ServerChunkCache.ChunkAndHolder> moonrise$getLoadedChunks() {
+        return this.loadedChunks;
+    }
+
+    @Override
+    public final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.server.level.ServerChunkCache.ChunkAndHolder> moonrise$getTickingChunks() {
+        return this.tickingChunks;
+    }
+
+    @Override
+    public final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.server.level.ServerChunkCache.ChunkAndHolder> moonrise$getEntityTickingChunks() {
+        return this.entityTickingChunks;
+    }
+
+    @Override
+    public final boolean moonrise$areChunksLoaded(final int fromX, final int fromZ, final int toX, final int toZ) {
+        final ServerChunkCache chunkSource = this.chunkSource;
+
+        for (int currZ = fromZ; currZ <= toZ; ++currZ) {
+            for (int currX = fromX; currX <= toX; ++currX) {
+                if (!chunkSource.hasChunk(currX, currZ)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+    // Paper end - rewrite chunk system
+    // Paper start - chunk tick iteration
+    private static final ServerChunkCache.ChunkAndHolder[] EMPTY_PLAYER_CHUNK_HOLDERS = new ServerChunkCache.ChunkAndHolder[0];
+    private final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.server.level.ServerChunkCache.ChunkAndHolder> playerTickingChunks = new ca.spottedleaf.moonrise.common.list.ReferenceList<>(EMPTY_PLAYER_CHUNK_HOLDERS);
+    private final it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap playerTickingRequests = new it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap();
+
+    @Override
+    public final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.server.level.ServerChunkCache.ChunkAndHolder> moonrise$getPlayerTickingChunks() {
+        return this.playerTickingChunks;
+    }
+
+    @Override
+    public final void moonrise$markChunkForPlayerTicking(final LevelChunk chunk) {
+        final ChunkPos pos = chunk.getPos();
+        if (!this.playerTickingRequests.containsKey(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkKey(pos))) {
+            return;
+        }
+
+        this.playerTickingChunks.add(((ca.spottedleaf.moonrise.patches.chunk_system.level.chunk.ChunkSystemLevelChunk)chunk).moonrise$getChunkAndHolder());
+    }
+
+    @Override
+    public final void moonrise$removeChunkForPlayerTicking(final LevelChunk chunk) {
+        this.playerTickingChunks.remove(((ca.spottedleaf.moonrise.patches.chunk_system.level.chunk.ChunkSystemLevelChunk)chunk).moonrise$getChunkAndHolder());
+    }
+
+    @Override
+    public final void moonrise$addPlayerTickingRequest(final int chunkX, final int chunkZ) {
+        ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread((ServerLevel)(Object)this, chunkX, chunkZ, "Cannot add ticking request async");
+
+        final long chunkKey = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkKey(chunkX, chunkZ);
+
+        if (this.playerTickingRequests.addTo(chunkKey, 1) != 0) {
+            // already added
+            return;
+        }
+
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder chunkHolder = ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)(ServerLevel)(Object)this).moonrise$getChunkTaskScheduler()
+            .chunkHolderManager.getChunkHolder(chunkKey);
+
+        if (chunkHolder == null || !chunkHolder.isTickingReady()) {
+            return;
+        }
+
+        this.playerTickingChunks.add(
+            ((ca.spottedleaf.moonrise.patches.chunk_system.level.chunk.ChunkSystemLevelChunk)(LevelChunk)chunkHolder.getCurrentChunk()).moonrise$getChunkAndHolder()
+        );
+    }
+
+    @Override
+    public final void moonrise$removePlayerTickingRequest(final int chunkX, final int chunkZ) {
+        ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread((ServerLevel)(Object)this, chunkX, chunkZ, "Cannot remove ticking request async");
+
+        final long chunkKey = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkKey(chunkX, chunkZ);
+        final int val = this.playerTickingRequests.addTo(chunkKey, -1);
+
+        if (val <= 0) {
+            throw new IllegalStateException("Negative counter");
+        }
+
+        if (val != 1) {
+            // still has at least one request
+            return;
+        }
+
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder chunkHolder = ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)(ServerLevel)(Object)this).moonrise$getChunkTaskScheduler()
+            .chunkHolderManager.getChunkHolder(chunkKey);
+
+        if (chunkHolder == null || !chunkHolder.isTickingReady()) {
+            return;
+        }
+
+        this.playerTickingChunks.remove(
+            ((ca.spottedleaf.moonrise.patches.chunk_system.level.chunk.ChunkSystemLevelChunk)(LevelChunk)chunkHolder.getCurrentChunk()).moonrise$getChunkAndHolder()
+        );
+    }
+    // Paper end - chunk tick iteration
 
     public ServerLevel(
         MinecraftServer server,
@@ -376,18 +615,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
         // CraftBukkit end
         boolean flag = server.forceSynchronousWrites();
         DataFixer fixerUpper = server.getFixerUpper();
-        EntityPersistentStorage<Entity> entityPersistentStorage = new EntityStorage(
-            new SimpleRegionStorage(
-                new RegionStorageInfo(levelStorageAccess.getLevelId(), dimension, "entities"),
-                levelStorageAccess.getDimensionPath(dimension).resolve("entities"),
-                fixerUpper,
-                flag,
-                DataFixTypes.ENTITY_CHUNK
-            ),
-            this,
-            server
-        );
-        this.entityManager = new PersistentEntitySectionManager<>(Entity.class, new ServerLevel.EntityCallbacks(), entityPersistentStorage);
+        // Paper - rewrite chunk system
         this.chunkSource = new ServerChunkCache(
             this,
             levelStorageAccess,
@@ -399,7 +627,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
             this.spigotConfig.simulationDistance, // Spigot
             flag,
             progressListener,
-            this.entityManager::updateChunkStatus,
+            null, // Paper - rewrite chunk system
             () -> server.overworld().getDataStorage()
         );
         this.chunkSource.getGeneratorState().ensureStructuresGenerated();
@@ -437,6 +665,20 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
         this.randomSequences = Objects.requireNonNullElseGet(
             randomSequences, () -> this.getDataStorage().computeIfAbsent(RandomSequences.factory(seed), "random_sequences")
         );
+        // Paper start - rewrite chunk system
+        this.moonrise$setEntityLookup(new ca.spottedleaf.moonrise.patches.chunk_system.level.entity.server.ServerEntityLookup((ServerLevel)(Object)this, ((ServerLevel)(Object)this).new EntityCallbacks()));
+        this.chunkTaskScheduler = new ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler((ServerLevel)(Object)this);
+        this.entityDataController = new ca.spottedleaf.moonrise.patches.chunk_system.io.datacontroller.EntityDataController(
+            new ca.spottedleaf.moonrise.patches.chunk_system.io.datacontroller.EntityDataController.EntityRegionFileStorage(
+                new RegionStorageInfo(levelStorageAccess.getLevelId(), dimension, "entities"),
+                levelStorageAccess.getDimensionPath(dimension).resolve("entities"),
+                server.forceSynchronousWrites()
+            ),
+            this.chunkTaskScheduler
+        );
+        this.poiDataController = new ca.spottedleaf.moonrise.patches.chunk_system.io.datacontroller.PoiDataController((ServerLevel)(Object)this, this.chunkTaskScheduler);
+        this.chunkDataController = new ca.spottedleaf.moonrise.patches.chunk_system.io.datacontroller.ChunkDataController((ServerLevel)(Object)this, this.chunkTaskScheduler);
+        // Paper end - rewrite chunk system
         this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
     }
 
@@ -560,8 +802,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
                                 profilerFiller.push("checkDespawn");
                                 entity.checkDespawn();
                                 profilerFiller.pop();
-                                if (entity instanceof ServerPlayer
-                                    || this.chunkSource.chunkMap.getDistanceManager().inEntityTickingRange(entity.chunkPosition().toLong())) {
+                                if (true) { // Paper - rewrite chunk system
                                     Entity vehicle = entity.getVehicle();
                                     if (vehicle != null) {
                                         if (!vehicle.isRemoved() && vehicle.hasPassenger(entity)) {
@@ -584,13 +825,16 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
         }
 
         profilerFiller.push("entityManagement");
-        this.entityManager.tick();
+        // Paper - rewrite chunk system
         profilerFiller.pop();
     }
 
     @Override
     public boolean shouldTickBlocksAt(long chunkPos) {
-        return this.chunkSource.chunkMap.getDistanceManager().inBlockTickingRange(chunkPos);
+        // Paper start - rewrite chunk system
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder holder = this.moonrise$getChunkTaskScheduler().chunkHolderManager.getChunkHolder(chunkPos);
+        return holder != null && holder.isTickingReady();
+        // Paper end - rewrite chunk system
     }
 
     protected void tickTime() {
@@ -621,14 +865,67 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
         this.players.stream().filter(LivingEntity::isSleeping).collect(Collectors.toList()).forEach(player -> player.stopSleepInBed(false, false));
     }
 
+    // Paper start - optimise random ticking
+    private final ca.spottedleaf.moonrise.common.util.SimpleThreadUnsafeRandom simpleRandom = new ca.spottedleaf.moonrise.common.util.SimpleThreadUnsafeRandom(net.minecraft.world.level.levelgen.RandomSupport.generateUniqueSeed());
+
+    private void optimiseRandomTick(final LevelChunk chunk, final int tickSpeed) {
+        final LevelChunkSection[] sections = chunk.getSections();
+        final int minSection = ca.spottedleaf.moonrise.common.util.WorldUtil.getMinSection((ServerLevel)(Object)this);
+        final ca.spottedleaf.moonrise.common.util.SimpleThreadUnsafeRandom simpleRandom = this.simpleRandom;
+        final boolean doubleTickFluids = !ca.spottedleaf.moonrise.common.PlatformHooks.get().configFixMC224294();
+
+        final ChunkPos cpos = chunk.getPos();
+        final int offsetX = cpos.x << 4;
+        final int offsetZ = cpos.z << 4;
+
+        for (int sectionIndex = 0, sectionsLen = sections.length; sectionIndex < sectionsLen; sectionIndex++) {
+            final int offsetY = (sectionIndex + minSection) << 4;
+            final LevelChunkSection section = sections[sectionIndex];
+            final net.minecraft.world.level.chunk.PalettedContainer<net.minecraft.world.level.block.state.BlockState> states = section.states;
+            if (!section.isRandomlyTickingBlocks()) {
+                continue;
+            }
+
+            final ca.spottedleaf.moonrise.common.list.ShortList tickList = ((ca.spottedleaf.moonrise.patches.block_counting.BlockCountingChunkSection)section).moonrise$getTickingBlockList();
+
+            for (int i = 0; i < tickSpeed; ++i) {
+                final int tickingBlocks = tickList.size();
+                final int index = simpleRandom.nextInt() & ((16 * 16 * 16) - 1);
+
+                if (index >= tickingBlocks) {
+                    // most of the time we fall here
+                    continue;
+                }
+
+                final int location = (int)tickList.getRaw(index) & 0xFFFF;
+                final BlockState state = states.get(location);
+
+                // do not use a mutable pos, as some random tick implementations store the input without calling immutable()!
+                final BlockPos pos = new BlockPos((location & 15) | offsetX, ((location >>> (4 + 4)) & 15) | offsetY, ((location >>> 4) & 15) | offsetZ);
+
+                state.randomTick((ServerLevel)(Object)this, pos, simpleRandom);
+                if (doubleTickFluids) {
+                    final FluidState fluidState = state.getFluidState();
+                    if (fluidState.isRandomlyTicking()) {
+                        fluidState.randomTick((ServerLevel)(Object)this, pos, simpleRandom);
+                    }
+                }
+            }
+        }
+
+        return;
+    }
+    // Paper end - optimise random ticking
+
     public void tickChunk(LevelChunk chunk, int randomTickSpeed) {
+        final ca.spottedleaf.moonrise.common.util.SimpleThreadUnsafeRandom simpleRandom = this.simpleRandom; // Paper - optimise random ticking
         ChunkPos pos = chunk.getPos();
         boolean isRaining = this.isRaining();
         int minBlockX = pos.getMinBlockX();
         int minBlockZ = pos.getMinBlockZ();
         ProfilerFiller profilerFiller = Profiler.get();
         profilerFiller.push("thunder");
-        if (!this.paperConfig().environment.disableThunder && isRaining && this.isThundering() && this.spigotConfig.thunderChance > 0 && this.random.nextInt(this.spigotConfig.thunderChance) == 0) { // Spigot // Paper - Option to disable thunder
+        if (!this.paperConfig().environment.disableThunder && isRaining && this.isThundering() && this.spigotConfig.thunderChance > 0 && simpleRandom.nextInt(this.spigotConfig.thunderChance) == 0) { // Spigot // Paper - Option to disable thunder // Paper - optimise random ticking
             BlockPos blockPos = this.findLightningTargetAround(this.getBlockRandomPos(minBlockX, 0, minBlockZ, 15));
             if (this.isRainingAt(blockPos)) {
                 DifficultyInstance currentDifficultyAt = this.getCurrentDifficultyAt(blockPos);
@@ -658,7 +955,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
 
         if (!this.paperConfig().environment.disableIceAndSnow) { // Paper - Option to disable ice and snow
         for (int i = 0; i < randomTickSpeed; i++) {
-            if (this.random.nextInt(48) == 0) {
+            if (simpleRandom.nextInt(48) == 0) {  // Paper - optimise random ticking
                 this.tickPrecipitation(this.getBlockRandomPos(minBlockX, 0, minBlockZ, 15));
             }
         }
@@ -666,33 +963,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
 
         profilerFiller.popPush("tickBlocks");
         if (randomTickSpeed > 0) {
-            LevelChunkSection[] sections = chunk.getSections();
-
-            for (int i1 = 0; i1 < sections.length; i1++) {
-                LevelChunkSection levelChunkSection = sections[i1];
-                if (levelChunkSection.isRandomlyTicking()) {
-                    int sectionYFromSectionIndex = chunk.getSectionYFromSectionIndex(i1);
-                    int blockPosCoord = SectionPos.sectionToBlockCoord(sectionYFromSectionIndex);
-
-                    for (int i2 = 0; i2 < randomTickSpeed; i2++) {
-                        BlockPos blockRandomPos = this.getBlockRandomPos(minBlockX, blockPosCoord, minBlockZ, 15);
-                        profilerFiller.push("randomTick");
-                        BlockState blockState = levelChunkSection.getBlockState(
-                            blockRandomPos.getX() - minBlockX, blockRandomPos.getY() - blockPosCoord, blockRandomPos.getZ() - minBlockZ
-                        );
-                        if (blockState.isRandomlyTicking()) {
-                            blockState.randomTick(this, blockRandomPos, this.random);
-                        }
-
-                        FluidState fluidState = blockState.getFluidState();
-                        if (fluidState.isRandomlyTicking()) {
-                            fluidState.randomTick(this, blockRandomPos, this.random);
-                        }
-
-                        profilerFiller.pop();
-                    }
-                }
-            }
+            this.optimiseRandomTick(chunk, randomTickSpeed); // Paper - optimise random ticking
         }
 
         profilerFiller.pop();
@@ -946,6 +1217,12 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
         if (fluidState.is(fluid)) {
             fluidState.tick(this, pos, blockState);
         }
+        // Paper start - rewrite chunk system
+        if ((++this.tickedBlocksOrFluids & 7L) != 0L) {
+            ((ca.spottedleaf.moonrise.patches.chunk_system.server.ChunkSystemMinecraftServer)this.server).moonrise$executeMidTickTasks();
+        }
+        // Paper end - rewrite chunk system
+
     }
 
     private void tickBlock(BlockPos pos, Block block) {
@@ -953,6 +1230,12 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
         if (blockState.is(block)) {
             blockState.tick(this, pos, this.random);
         }
+        // Paper start - rewrite chunk system
+        if ((++this.tickedBlocksOrFluids & 7L) != 0L) {
+            ((ca.spottedleaf.moonrise.patches.chunk_system.server.ChunkSystemMinecraftServer)this.server).moonrise$executeMidTickTasks();
+        }
+        // Paper end - rewrite chunk system
+
     }
 
     // Paper start - log detailed entity tick information
@@ -1033,6 +1316,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
     }
 
     public void save(@Nullable ProgressListener progress, boolean flush, boolean skipSave) {
+        // Paper start - add close param
+        this.save(progress, flush, skipSave, false);
+    }
+    public void save(@Nullable ProgressListener progress, boolean flush, boolean skipSave, boolean close) {
+        // Paper end - add close param
         ServerChunkCache chunkSource = this.getChunkSource();
         if (!skipSave) {
             org.bukkit.Bukkit.getPluginManager().callEvent(new org.bukkit.event.world.WorldSaveEvent(this.getWorld())); // CraftBukkit
@@ -1045,13 +1333,18 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
                 progress.progressStage(Component.translatable("menu.savingChunks"));
             }
 
-            chunkSource.save(flush);
-            if (flush) {
-                this.entityManager.saveAll();
-            } else {
-                this.entityManager.autoSave();
+            if (!close) { chunkSource.save(flush); } // Paper - add close param
+            // Paper - rewrite chunk system
+        }
+        // Paper start - add close param
+        if (close) {
+            try {
+                chunkSource.close(!skipSave);
+            } catch (IOException never) {
+                throw new RuntimeException(never);
             }
         }
+        // Paper end - add close param
 
         // CraftBukkit start - moved from MinecraftServer.saveChunks
         ServerLevel worldserver1 = this;
@@ -1182,7 +1475,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
             this.removePlayerImmediately((ServerPlayer)entity, Entity.RemovalReason.DISCARDED);
         }
 
-        this.entityManager.addNewEntity(player);
+        this.moonrise$getEntityLookup().addNewEntity(player); // Paper - rewrite chunk system
     }
 
     // CraftBukkit start
@@ -1213,7 +1506,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
             }
             // CraftBukkit end
 
-            return this.entityManager.addNewEntity(entity);
+            return this.moonrise$getEntityLookup().addNewEntity(entity); // Paper - rewrite chunk system
         }
     }
 
@@ -1224,7 +1517,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
 
     public boolean tryAddFreshEntityWithPassengers(Entity entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
         // CraftBukkit end
-        if (entity.getSelfAndPassengers().map(Entity::getUUID).anyMatch(this.entityManager::isLoaded)) {
+        if (entity.getSelfAndPassengers().map(Entity::getUUID).anyMatch(this.moonrise$getEntityLookup()::hasEntity)) { // Paper - rewrite chunk system
             return false;
         } else {
             this.addFreshEntityWithPassengers(entity, reason); // CraftBukkit
@@ -1959,7 +2252,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
                 }
             }
 
-            bufferedWriter.write(String.format(Locale.ROOT, "entities: %s\n", this.entityManager.gatherStats()));
+            bufferedWriter.write(String.format(Locale.ROOT, "entities: %s\n", this.moonrise$getEntityLookup().getDebugInfo()));  // Paper - rewrite chunk system
             bufferedWriter.write(String.format(Locale.ROOT, "block_entity_tickers: %d\n", this.blockEntityTickers.size()));
             bufferedWriter.write(String.format(Locale.ROOT, "block_ticks: %d\n", this.getBlockTicks().count()));
             bufferedWriter.write(String.format(Locale.ROOT, "fluid_ticks: %d\n", this.getFluidTicks().count()));
@@ -1977,13 +2270,13 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
         Path path1 = path.resolve("chunks.csv");
 
         try (Writer bufferedWriter2 = Files.newBufferedWriter(path1)) {
-            chunkMap.dumpChunks(bufferedWriter2);
+            //chunkMap.dumpChunks(bufferedWriter2); // Paper - rewrite chunk system
         }
 
         Path path2 = path.resolve("entity_chunks.csv");
 
         try (Writer bufferedWriter3 = Files.newBufferedWriter(path2)) {
-            this.entityManager.dumpSections(bufferedWriter3);
+            //this.entityManager.dumpSections(bufferedWriter3); // Paper - rewrite chunk system
         }
 
         Path path3 = path.resolve("entities.csv");
@@ -2092,8 +2385,8 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
             Locale.ROOT,
             "players: %s, entities: %s [%s], block_entities: %d [%s], block_ticks: %d, fluid_ticks: %d, chunk_source: %s",
             this.players.size(),
-            this.entityManager.gatherStats(),
-            getTypeCount(this.entityManager.getEntityGetter().getAll(), entity -> BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString()),
+            this.moonrise$getEntityLookup().getDebugInfo(), // Paper - rewrite chunk system
+            getTypeCount(this.moonrise$getEntityLookup().getAll(), entity -> BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString()), // Paper - rewrite chunk system
             this.blockEntityTickers.size(),
             getTypeCount(this.blockEntityTickers, TickingBlockEntity::getType),
             this.getBlockTicks().count(),
@@ -2125,15 +2418,25 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
     @Override
     public LevelEntityGetter<Entity> getEntities() {
         org.spigotmc.AsyncCatcher.catchOp("Chunk getEntities call"); // Spigot
-        return this.entityManager.getEntityGetter();
+        return this.moonrise$getEntityLookup(); // Paper - rewrite chunk system
     }
 
     public void addLegacyChunkEntities(Stream<Entity> entities) {
-        this.entityManager.addLegacyChunkEntities(entities);
+        // Paper start - add chunkpos param
+        this.addLegacyChunkEntities(entities, null);
+    }
+    public void addLegacyChunkEntities(Stream<Entity> entities, ChunkPos chunkPos) {
+        // Paper end - add chunkpos param
+        this.moonrise$getEntityLookup().addLegacyChunkEntities(entities.toList(), chunkPos); // Paper - rewrite chunk system
     }
 
     public void addWorldGenChunkEntities(Stream<Entity> entities) {
-        this.entityManager.addWorldGenChunkEntities(entities);
+        // Paper start - add chunkpos param
+        this.addWorldGenChunkEntities(entities, null);
+    }
+    public void addWorldGenChunkEntities(Stream<Entity> entities, ChunkPos chunkPos) {
+        // Paper end - add chunkpos param
+        this.moonrise$getEntityLookup().addWorldGenChunkEntities(entities.toList(), chunkPos); // Paper - rewrite chunk system
     }
 
     public void startTickingChunk(LevelChunk chunk) {
@@ -2151,32 +2454,45 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
     @Override
     public void close() throws IOException {
         super.close();
-        this.entityManager.close();
+        // Paper - rewrite chunk system
     }
 
     @Override
     public String gatherChunkSourceStats() {
-        return "Chunks[S] W: " + this.chunkSource.gatherStats() + " E: " + this.entityManager.gatherStats();
+        return "Chunks[S] W: " + this.chunkSource.gatherStats() + " E: " + this.moonrise$getEntityLookup().getDebugInfo(); // Paper - rewrite chunk system
     }
 
     public boolean areEntitiesLoaded(long chunkPos) {
-        return this.entityManager.areEntitiesLoaded(chunkPos);
+        return this.moonrise$getAnyChunkIfLoaded(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkX(chunkPos), ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkZ(chunkPos)) != null; // Paper - rewrite chunk system
     }
 
     private boolean isPositionTickingWithEntitiesLoaded(long chunkPos) {
-        return this.areEntitiesLoaded(chunkPos) && this.chunkSource.isPositionTicking(chunkPos);
+        // Paper start - rewrite chunk system
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder chunkHolder = this.moonrise$getChunkTaskScheduler().chunkHolderManager.getChunkHolder(chunkPos);
+        // isTicking implies the chunk is loaded, and the chunk is loaded now implies the entities are loaded
+        return chunkHolder != null && chunkHolder.isTickingReady();
+        // Paper end - rewrite chunk system
     }
 
     public boolean isPositionEntityTicking(BlockPos pos) {
-        return this.entityManager.canPositionTick(pos) && this.chunkSource.chunkMap.getDistanceManager().inEntityTickingRange(ChunkPos.asLong(pos));
+        // Paper start - rewrite chunk system
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder chunkHolder = this.moonrise$getChunkTaskScheduler().chunkHolderManager.getChunkHolder(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkKey(pos));
+        return chunkHolder != null && chunkHolder.isEntityTickingReady();
+        // Paper end - rewrite chunk system
     }
 
     public boolean isNaturalSpawningAllowed(BlockPos pos) {
-        return this.entityManager.canPositionTick(pos);
+        // Paper start - rewrite chunk system
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder chunkHolder = this.moonrise$getChunkTaskScheduler().chunkHolderManager.getChunkHolder(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkKey(pos));
+        return chunkHolder != null && chunkHolder.isEntityTickingReady();
+        // Paper end - rewrite chunk system
     }
 
     public boolean isNaturalSpawningAllowed(ChunkPos chunkPos) {
-        return this.entityManager.canPositionTick(chunkPos);
+        // Paper start - rewrite chunk system
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder chunkHolder = this.moonrise$getChunkTaskScheduler().chunkHolderManager.getChunkHolder(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkKey(chunkPos));
+        return chunkHolder != null && chunkHolder.isEntityTickingReady();
+        // Paper end - rewrite chunk system
     }
 
     @Override
@@ -2230,7 +2546,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
     @Override
     public CrashReportCategory fillReportDetails(CrashReport report) {
         CrashReportCategory crashReportCategory = super.fillReportDetails(report);
-        crashReportCategory.setDetail("Loaded entity count", () -> String.valueOf(this.entityManager.count()));
+        crashReportCategory.setDetail("Loaded entity count", () -> String.valueOf(this.moonrise$getEntityLookup().getEntityCount())); // Paper - rewrite chunk system
         return crashReportCategory;
     }
 

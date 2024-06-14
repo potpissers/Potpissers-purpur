@@ -268,7 +268,7 @@ public final class PaperHooks extends BaseChunkSystemHooks implements PlatformHo
 
     @Override
     public void postLoadProtoChunk(final ServerLevel world, final ProtoChunk chunk) {
-        net.minecraft.world.level.chunk.status.ChunkStatusTasks.postLoadProtoChunk(world, chunk.getEntities());
+        net.minecraft.world.level.chunk.status.ChunkStatusTasks.postLoadProtoChunk(world, chunk.getEntities(), chunk.getPos()); // Paper - rewrite chunk system - add ChunkPos param
     }
 
     @Override

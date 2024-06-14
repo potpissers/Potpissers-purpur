@@ -22,7 +22,7 @@ import net.minecraft.util.profiling.jfr.JvmProfiler;
 import net.minecraft.world.level.ChunkPos;
 import org.slf4j.Logger;
 
-public class RegionFile implements AutoCloseable {
+public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patches.chunk_system.storage.ChunkSystemRegionFile { // Paper - rewrite chunk system
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int SECTOR_BYTES = 4096;
     @VisibleForTesting
@@ -44,6 +44,21 @@ public class RegionFile implements AutoCloseable {
     private final IntBuffer timestamps;
     @VisibleForTesting
     protected final RegionBitmap usedSectors = new RegionBitmap();
+
+    // Paper start - rewrite chunk system
+    @Override
+    public final ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO.RegionDataController.WriteData moonrise$startWrite(final net.minecraft.nbt.CompoundTag data, final ChunkPos pos) throws IOException {
+        final RegionFile.ChunkBuffer buffer = ((RegionFile)(Object)this).new ChunkBuffer(pos);
+        ((ca.spottedleaf.moonrise.patches.chunk_system.storage.ChunkSystemChunkBuffer)buffer).moonrise$setWriteOnClose(false);
+
+        final DataOutputStream out = new DataOutputStream(this.version.wrap(buffer));
+
+        return new ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO.RegionDataController.WriteData(
+            data, ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO.RegionDataController.WriteData.WriteResult.WRITE,
+            out, ((ca.spottedleaf.moonrise.patches.chunk_system.storage.ChunkSystemChunkBuffer)buffer)::moonrise$write
+        );
+    }
+    // Paper end - rewrite chunk system
 
     public RegionFile(RegionStorageInfo info, Path path, Path externalFileDir, boolean sync) throws IOException {
         this(info, path, externalFileDir, RegionFileVersion.getCompressionFormat(), sync); // Paper - Configurable region compression format
@@ -204,6 +219,16 @@ public class RegionFile implements AutoCloseable {
 
     @Nullable
     private DataInputStream createExternalChunkInputStream(ChunkPos chunkPos, byte versionByte) throws IOException {
+        // Paper start - rewrite chunk system
+        final DataInputStream is = this.createExternalChunkInputStream0(chunkPos, versionByte);
+        if (is == null) {
+            return is;
+        }
+        return new ca.spottedleaf.moonrise.patches.chunk_system.util.stream.ExternalChunkStreamMarker(is);
+    }
+    @Nullable
+    private DataInputStream createExternalChunkInputStream0(ChunkPos chunkPos, byte versionByte) throws IOException {
+        // Paper end - rewrite chunk system
         Path externalChunkPath = this.getExternalChunkPath(chunkPos);
         if (!Files.isRegularFile(externalChunkPath)) {
             LOGGER.error("External chunk path {} is not file", externalChunkPath);
@@ -398,8 +423,27 @@ public class RegionFile implements AutoCloseable {
         }
     }
 
-    class ChunkBuffer extends ByteArrayOutputStream {
+    class ChunkBuffer extends ByteArrayOutputStream implements ca.spottedleaf.moonrise.patches.chunk_system.storage.ChunkSystemChunkBuffer { // Paper - rewrite chunk system
         private final ChunkPos pos;
+
+        // Paper start - rewrite chunk system
+        private boolean writeOnClose = true;
+
+        @Override
+        public final boolean moonrise$getWriteOnClose() {
+            return this.writeOnClose;
+        }
+
+        @Override
+        public final void moonrise$setWriteOnClose(final boolean value) {
+            this.writeOnClose = value;
+        }
+
+        @Override
+        public final void moonrise$write(final RegionFile regionFile) throws IOException {
+            regionFile.write(this.pos, ByteBuffer.wrap(this.buf, 0, this.count));
+        }
+        // Paper end - rewrite chunk system
 
         public ChunkBuffer(final ChunkPos pos) {
             super(8096);
@@ -417,7 +461,7 @@ public class RegionFile implements AutoCloseable {
             int i = this.count - 5 + 1;
             JvmProfiler.INSTANCE.onRegionFileWrite(RegionFile.this.info, this.pos, RegionFile.this.version, i);
             byteBuffer.putInt(0, i);
-            RegionFile.this.write(this.pos, byteBuffer);
+            if (this.writeOnClose) { RegionFile.this.write(this.pos, byteBuffer); } // Paper - rewrite chunk system
         }
     }
 

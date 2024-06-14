@@ -15,7 +15,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public interface EntityGetter {
+public interface EntityGetter extends ca.spottedleaf.moonrise.patches.chunk_system.world.ChunkSystemEntityGetter { // Paper - rewrite chunk system
     List<Entity> getEntities(@Nullable Entity entity, AABB area, Predicate<? super Entity> predicate);
 
     <T extends Entity> List<T> getEntities(EntityTypeTest<Entity, T> entityTypeTest, AABB bounds, Predicate<? super T> predicate);
@@ -30,21 +30,44 @@ public interface EntityGetter {
         return this.getEntities(entity, area, EntitySelector.NO_SPECTATORS);
     }
 
-    default boolean isUnobstructed(@Nullable Entity entity, VoxelShape shape) {
-        if (shape.isEmpty()) {
+    // Paper start - rewrite chunk system
+    @Override
+    default List<Entity> moonrise$getHardCollidingEntities(final Entity entity, final AABB box, final Predicate<? super Entity> predicate) {
+        return this.getEntities(entity, box, predicate);
+    }
+    // Paper end - rewrite chunk system
+
+    // Paper start - optimise collisions
+    default boolean isUnobstructed(@Nullable Entity entity, VoxelShape voxel) {
+        if (voxel.isEmpty()) {
             return true;
-        } else {
-            for (Entity entity1 : this.getEntities(entity, shape.bounds())) {
-                if (!entity1.isRemoved()
-                    && entity1.blocksBuilding
-                    && (entity == null || !entity1.isPassengerOfSameVehicle(entity))
-                    && Shapes.joinIsNotEmpty(shape, Shapes.create(entity1.getBoundingBox()), BooleanOp.AND)) {
-                    return false;
+        }
+
+        final AABB singleAABB = ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)voxel).moonrise$getSingleAABBRepresentation();
+        final List<Entity> entities = this.getEntities(
+            entity,
+            singleAABB == null ? voxel.bounds() : singleAABB.inflate(-ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_EPSILON, -ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_EPSILON, -ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_EPSILON)
+        );
+
+        for (int i = 0, len = entities.size(); i < len; ++i) {
+            final Entity otherEntity = entities.get(i);
+
+            if (otherEntity.isRemoved() || !otherEntity.blocksBuilding || (entity != null && otherEntity.isPassengerOfSameVehicle(entity))) {
+                continue;
+            }
+
+            if (singleAABB == null) {
+                final AABB entityBB = otherEntity.getBoundingBox();
+                if (ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.isEmpty(entityBB) || !ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.voxelShapeIntersectNoEmpty(voxel, entityBB)) {
+                    continue;
                 }
             }
 
-            return true;
+            return false;
         }
+
+        return true;
+        // Paper end - optimise collisions
     }
 
     default <T extends Entity> List<T> getEntitiesOfClass(Class<T> entityClass, AABB area) {
@@ -52,23 +75,41 @@ public interface EntityGetter {
     }
 
     default List<VoxelShape> getEntityCollisions(@Nullable Entity entity, AABB collisionBox) {
-        if (collisionBox.getSize() < 1.0E-7) {
-            return List.of();
+        // Paper start - optimise collisions
+        // first behavior change is to correctly check for empty AABB
+        if (ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.isEmpty(collisionBox)) {
+            // reduce indirection by always returning type with same class
+            return new java.util.ArrayList<>();
+        }
+
+        // to comply with vanilla intersection rules, expand by -epsilon so that we only get stuff we definitely collide with.
+        // Vanilla for hard collisions has this backwards, and they expand by +epsilon but this causes terrible problems
+        // specifically with boat collisions.
+        collisionBox = collisionBox.inflate(-ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_EPSILON, -ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_EPSILON, -ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_EPSILON);
+
+        final List<Entity> entities;
+        if (entity != null && ((ca.spottedleaf.moonrise.patches.chunk_system.entity.ChunkSystemEntity) entity).moonrise$isHardColliding()) {
+            entities = this.getEntities(entity, collisionBox, null);
         } else {
-            Predicate<Entity> predicate = entity == null ? EntitySelector.CAN_BE_COLLIDED_WITH : EntitySelector.NO_SPECTATORS.and(entity::canCollideWith);
-            List<Entity> entities = this.getEntities(entity, collisionBox.inflate(1.0E-7), predicate);
-            if (entities.isEmpty()) {
-                return List.of();
-            } else {
-                Builder<VoxelShape> builder = ImmutableList.builderWithExpectedSize(entities.size());
+            entities = ((ca.spottedleaf.moonrise.patches.chunk_system.world.ChunkSystemEntityGetter) this).moonrise$getHardCollidingEntities(entity, collisionBox, null);
+        }
 
-                for (Entity entity1 : entities) {
-                    builder.add(Shapes.create(entity1.getBoundingBox()));
-                }
+        final List<VoxelShape> ret = new java.util.ArrayList<>(Math.min(25, entities.size()));
 
-                return builder.build();
+        for (int i = 0, len = entities.size(); i < len; ++i) {
+            final Entity otherEntity = entities.get(i);
+
+            if (otherEntity.isSpectator()) {
+                continue;
+            }
+
+            if ((entity == null && otherEntity.canBeCollidedWith()) || (entity != null && entity.canCollideWith(otherEntity))) {
+                ret.add(Shapes.create(otherEntity.getBoundingBox()));
             }
         }
+
+        return ret;
+        // Paper end - optimise collisions
     }
 
     // Paper start - Affects Spawning API

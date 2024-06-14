@@ -23,12 +23,26 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.util.VisibleForDebug;
 import org.slf4j.Logger;
 
-public class PoiSection {
+public class PoiSection implements ca.spottedleaf.moonrise.patches.chunk_system.level.poi.ChunkSystemPoiSection { // Paper - rewrite chunk system
     private static final Logger LOGGER = LogUtils.getLogger();
     private final Short2ObjectMap<PoiRecord> records = new Short2ObjectOpenHashMap<>();
     private final Map<Holder<PoiType>, Set<PoiRecord>> byType = Maps.newHashMap();
     private final Runnable setDirty;
     private boolean isValid;
+
+    // Paper start - rewrite chunk system
+    private final Optional<PoiSection> noAllocOptional = Optional.of((PoiSection)(Object)this);
+
+    @Override
+    public final boolean moonrise$isEmpty() {
+        return this.isValid && this.records.isEmpty() && this.byType.isEmpty();
+    }
+
+    @Override
+    public final Optional<PoiSection> moonrise$asOptional() {
+        return this.noAllocOptional;
+    }
+    // Paper end - rewrite chunk system
 
     public PoiSection(Runnable setDirty) {
         this(setDirty, true, ImmutableList.of());

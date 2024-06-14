@@ -10,10 +10,38 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import net.minecraft.util.StringRepresentable;
 
-public final class EnumProperty<T extends Enum<T> & StringRepresentable> extends Property<T> {
+public final class EnumProperty<T extends Enum<T> & StringRepresentable> extends Property<T> implements ca.spottedleaf.moonrise.patches.blockstate_propertyaccess.PropertyAccess<T> { // Paper - optimise blockstate property access
     private final List<T> values;
     private final Map<String, T> names;
     private final int[] ordinalToIndex;
+
+    // Paper start - optimise blockstate property access
+    private int[] idLookupTable;
+
+    @Override
+    public final int moonrise$getIdFor(final T value) {
+        final Class<T> target = this.getValueClass();
+        return ((value.getClass() != target && value.getDeclaringClass() != target)) ? -1 : this.idLookupTable[value.ordinal()];
+    }
+
+    private void init() {
+        final java.util.Collection<T> values = this.getPossibleValues();
+        final Class<T> clazz = this.getValueClass();
+
+        int id = 0;
+        this.idLookupTable = new int[clazz.getEnumConstants().length];
+        Arrays.fill(this.idLookupTable, -1);
+        final T[] byId = (T[])java.lang.reflect.Array.newInstance(clazz, values.size());
+
+        for (final T value : values) {
+            final int valueId = id++;
+            this.idLookupTable[value.ordinal()] = valueId;
+            byId[valueId] = value;
+        }
+
+        this.moonrise$setById(byId);
+    }
+    // Paper end - optimise blockstate property access
 
     private EnumProperty(String name, Class<T> clazz, List<T> values) {
         super(name, clazz);
@@ -37,6 +65,7 @@ public final class EnumProperty<T extends Enum<T> & StringRepresentable> extends
 
             this.names = builder.buildOrThrow();
         }
+        this.init(); // Paper - optimise blockstate property access
     }
 
     @Override

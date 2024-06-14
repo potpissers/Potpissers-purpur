@@ -116,7 +116,7 @@ public abstract class ChunkGenerator {
         return CompletableFuture.supplyAsync(() -> {
             chunk.fillBiomesFromNoise(this.biomeSource, randomState.sampler());
             return chunk;
-        }, Util.backgroundExecutor().forName("init_biomes"));
+        }, Runnable::run);  // Paper - rewrite chunk system
     }
 
     public abstract void applyCarvers(
@@ -315,7 +315,7 @@ public abstract class ChunkGenerator {
                     return Pair.of(placement.getLocatePos(chunkPos), holder);
                 }
 
-                ChunkAccess chunk = level.getChunk(chunkPos.x, chunkPos.z, ChunkStatus.STRUCTURE_STARTS);
+                ChunkAccess chunk = ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemLevelReader)level).moonrise$syncLoadNonFull(chunkPos.x, chunkPos.z, ChunkStatus.STRUCTURE_STARTS); // Paper - rewrite chunk system
                 StructureStart startForStructure = structureManager.getStartForStructure(SectionPos.bottomOf(chunk), holder.value(), chunk);
                 if (startForStructure != null && startForStructure.isValid() && (!skipKnownStructures || tryAddReference(structureManager, startForStructure))) {
                     return Pair.of(placement.getLocatePos(startForStructure.getChunkPos()), holder);

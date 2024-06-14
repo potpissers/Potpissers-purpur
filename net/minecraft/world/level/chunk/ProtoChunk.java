@@ -151,7 +151,7 @@ public class ProtoChunk extends ChunkAccess {
                     }
 
                     if (LightEngine.hasDifferentLightProperties(blockState, state)) {
-                        this.skyLightSources.update(this, relativeBlockPosX, y, relativeBlockPosZ);
+                        // Paper - rewrite chunk system
                         this.lightEngine.checkBlock(pos);
                     }
                 }

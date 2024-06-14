@@ -47,8 +47,13 @@ public class StructureCheck {
     private final BiomeSource biomeSource;
     private final long seed;
     private final DataFixer fixerUpper;
-    private final Long2ObjectMap<Object2IntMap<Structure>> loadedChunks = new Long2ObjectOpenHashMap<>();
-    private final Map<Structure, Long2BooleanMap> featureChecks = new HashMap<>();
+    // Paper start - rewrite chunk system
+    // make sure to purge entries from the maps to prevent memory leaks
+    private static final int CHUNK_TOTAL_LIMIT = 50 * (2 * 100 + 1) * (2 * 100 + 1); // cache 50 structure lookups
+    private static final int PER_FEATURE_CHECK_LIMIT = 50 * (2 * 100 + 1) * (2 * 100 + 1); // cache 50 structure lookups
+    private final ca.spottedleaf.moonrise.common.map.SynchronisedLong2ObjectMap<it.unimi.dsi.fastutil.objects.Object2IntMap<Structure>> loadedChunksSafe = new ca.spottedleaf.moonrise.common.map.SynchronisedLong2ObjectMap<>(CHUNK_TOTAL_LIMIT);
+    private final java.util.concurrent.ConcurrentHashMap<Structure, ca.spottedleaf.moonrise.common.map.SynchronisedLong2BooleanMap> featureChecksSafe = new java.util.concurrent.ConcurrentHashMap<>();
+    // Paper end - rewrite chunk system
 
     public StructureCheck(
         ChunkScanAccess storageAccess,
@@ -90,7 +95,7 @@ public class StructureCheck {
 
     public StructureCheckResult checkStart(ChunkPos chunkPos, Structure structure, StructurePlacement placement, boolean skipKnownStructures) {
         long packedChunkPos = chunkPos.toLong();
-        Object2IntMap<Structure> map = this.loadedChunks.get(packedChunkPos);
+        Object2IntMap<Structure> map = this.loadedChunksSafe.get(packedChunkPos); // Paper - rewrite chunk system
         if (map != null) {
             return this.checkStructureInfo(map, structure, skipKnownStructures);
         } else {
@@ -100,9 +105,11 @@ public class StructureCheck {
             } else if (!placement.applyAdditionalChunkRestrictions(chunkPos.x, chunkPos.z, this.seed, this.getSaltOverride(structure))) { // Paper - add missing structure seed configs
                 return StructureCheckResult.START_NOT_PRESENT;
             } else {
-                boolean flag = this.featureChecks
-                    .computeIfAbsent(structure, structure1 -> new Long2BooleanOpenHashMap())
-                    .computeIfAbsent(packedChunkPos, l -> this.canCreateStructure(chunkPos, structure));
+                // Paper start - rewrite chunk system
+                boolean flag = this.featureChecksSafe
+                    .computeIfAbsent(structure, structure1 -> new ca.spottedleaf.moonrise.common.map.SynchronisedLong2BooleanMap(PER_FEATURE_CHECK_LIMIT))
+                    .getOrCompute(packedChunkPos, l -> this.canCreateStructure(chunkPos, structure));
+                // Paper end - rewrite chunk system
                 return !flag ? StructureCheckResult.START_NOT_PRESENT : StructureCheckResult.CHUNK_LOAD_NEEDED;
             }
         }
@@ -228,15 +235,25 @@ public class StructureCheck {
     }
 
     private void storeFullResults(long chunkPos, Object2IntMap<Structure> structureChunks) {
-        this.loadedChunks.put(chunkPos, deduplicateEmptyMap(structureChunks));
-        this.featureChecks.values().forEach(map -> map.remove(chunkPos));
+        // Paper start - rewrite chunk system
+        this.loadedChunksSafe.put(chunkPos, deduplicateEmptyMap(structureChunks));
+        // once we insert into loadedChunks, we don't really need to be very careful about removing everything
+        // from this map, as everything that checks this map uses loadedChunks first
+        // so, one way or another it's a race condition that doesn't matter
+        for (ca.spottedleaf.moonrise.common.map.SynchronisedLong2BooleanMap value : this.featureChecksSafe.values()) {
+            value.remove(chunkPos);
+        }
+        // Paper end - rewrite chunk system
     }
 
     public void incrementReference(ChunkPos pos, Structure structure) {
-        this.loadedChunks.compute(pos.toLong(), (_long, map) -> {
-            if (map == null || map.isEmpty()) {
+        this.loadedChunksSafe.compute(pos.toLong(), (_long, map) -> { // Paper start - rewrite chunk system
+            if (map == null) {
                 map = new Object2IntOpenHashMap<>();
+            } else {
+                map = map instanceof Object2IntOpenHashMap<Structure> fastClone ? fastClone.clone() : new Object2IntOpenHashMap<>(map);
             }
+            // Paper end - rewrite chunk system
 
             map.computeInt(structure, (structure1, integer) -> integer == null ? 1 : integer + 1);
             return map;

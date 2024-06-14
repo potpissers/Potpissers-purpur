@@ -7,7 +7,7 @@ import java.util.Iterator;
 import javax.annotation.Nullable;
 import net.minecraft.core.IdMap;
 
-public class CrudeIncrementalIntIdentityHashBiMap<K> implements IdMap<K> {
+public class CrudeIncrementalIntIdentityHashBiMap<K> implements IdMap<K>, ca.spottedleaf.moonrise.patches.fast_palette.FastPalette<K> { // Paper - optimise palette reads
     private static final int NOT_FOUND = -1;
     private static final Object EMPTY_SLOT = null;
     private static final float LOADFACTOR = 0.8F;
@@ -16,6 +16,16 @@ public class CrudeIncrementalIntIdentityHashBiMap<K> implements IdMap<K> {
     private K[] byId;
     private int nextId;
     private int size;
+
+    // Paper start - optimise palette reads
+    private ca.spottedleaf.moonrise.patches.fast_palette.FastPaletteData<K> reference;
+
+    @Override
+    public final K[] moonrise$getRawPalette(final ca.spottedleaf.moonrise.patches.fast_palette.FastPaletteData<K> src) {
+        this.reference = src;
+        return this.byId;
+    }
+    // Paper end - optimise palette reads
 
     private CrudeIncrementalIntIdentityHashBiMap(int size) {
         this.keys = (K[])(new Object[size]);
@@ -88,6 +98,12 @@ public class CrudeIncrementalIntIdentityHashBiMap<K> implements IdMap<K> {
         this.byId = crudeIncrementalIntIdentityHashBiMap.byId;
         this.nextId = crudeIncrementalIntIdentityHashBiMap.nextId;
         this.size = crudeIncrementalIntIdentityHashBiMap.size;
+        // Paper start - optimise palette reads
+        final ca.spottedleaf.moonrise.patches.fast_palette.FastPaletteData<K> ref = this.reference;
+        if (ref != null) {
+            ref.moonrise$setPalette(this.byId);
+        }
+        // Paper end - optimise palette reads
     }
 
     public void addMapping(K object, int intKey) {

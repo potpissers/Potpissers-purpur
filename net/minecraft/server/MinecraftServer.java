@@ -173,7 +173,7 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
-public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements ServerInfo, ChunkIOErrorReporter, CommandSource {
+public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements ServerInfo, ChunkIOErrorReporter, CommandSource, ca.spottedleaf.moonrise.patches.chunk_system.server.ChunkSystemMinecraftServer { // Paper - rewrite chunk system
     private static MinecraftServer SERVER; // Paper
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final net.kyori.adventure.text.logger.slf4j.ComponentLogger COMPONENT_LOGGER = net.kyori.adventure.text.logger.slf4j.ComponentLogger.logger(LOGGER.getName()); // Paper
@@ -319,6 +319,77 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
         thread.start();
         return minecraftServer;
     }
+
+    // Paper start - rewrite chunk system
+    private volatile Throwable chunkSystemCrash;
+
+    @Override
+    public final void moonrise$setChunkSystemCrash(final Throwable throwable) {
+        this.chunkSystemCrash = throwable;
+    }
+
+    private static final long CHUNK_TASK_QUEUE_BACKOFF_MIN_TIME = 25L * 1000L; // 25us
+    private static final long MAX_CHUNK_EXEC_TIME = 1000L; // 1us
+    private static final long TASK_EXECUTION_FAILURE_BACKOFF = 5L * 1000L; // 5us
+
+    private long lastMidTickExecute;
+    private long lastMidTickExecuteFailure;
+
+    private boolean tickMidTickTasks() {
+        // give all worlds a fair chance at by targeting them all.
+        // if we execute too many tasks, that's fine - we have logic to correctly handle overuse of allocated time.
+        boolean executed = false;
+        for (final ServerLevel world : this.getAllLevels()) {
+            long currTime = System.nanoTime();
+            if (currTime - ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)world).moonrise$getLastMidTickFailure() <= TASK_EXECUTION_FAILURE_BACKOFF) {
+                continue;
+            }
+            if (!world.getChunkSource().pollTask()) {
+                // we need to back off if this fails
+                ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)world).moonrise$setLastMidTickFailure(currTime);
+            } else {
+                executed = true;
+            }
+        }
+
+        return executed;
+    }
+
+    @Override
+    public final void moonrise$executeMidTickTasks() {
+        final long startTime = System.nanoTime();
+        if ((startTime - this.lastMidTickExecute) <= CHUNK_TASK_QUEUE_BACKOFF_MIN_TIME || (startTime - this.lastMidTickExecuteFailure) <= TASK_EXECUTION_FAILURE_BACKOFF) {
+            // it's shown to be bad to constantly hit the queue (chunk loads slow to a crawl), even if no tasks are executed.
+            // so, backoff to prevent this
+            return;
+        }
+
+        for (;;) {
+            final boolean moreTasks = this.tickMidTickTasks();
+            final long currTime = System.nanoTime();
+            final long diff = currTime - startTime;
+
+            if (!moreTasks || diff >= MAX_CHUNK_EXEC_TIME) {
+                if (!moreTasks) {
+                    this.lastMidTickExecuteFailure = currTime;
+                }
+
+                // note: negative values reduce the time
+                long overuse = diff - MAX_CHUNK_EXEC_TIME;
+                if (overuse >= (10L * 1000L * 1000L)) { // 10ms
+                    // make sure something like a GC or dumb plugin doesn't screw us over...
+                    overuse = 10L * 1000L * 1000L; // 10ms
+                }
+
+                final double overuseCount = (double)overuse/(double)MAX_CHUNK_EXEC_TIME;
+                final long extraSleep = (long)Math.round(overuseCount*CHUNK_TASK_QUEUE_BACKOFF_MIN_TIME);
+
+                this.lastMidTickExecute = currTime + extraSleep;
+                return;
+            }
+        }
+    }
+    // Paper end - rewrite chunk system
 
     public MinecraftServer(
         // CraftBukkit start
@@ -651,7 +722,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
         this.forceDifficulty();
         for (ServerLevel serverLevel : this.getAllLevels()) {
             this.prepareLevels(serverLevel.getChunkSource().chunkMap.progressListener, serverLevel);
-            serverLevel.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
+            // Paper - rewrite chunk system
             this.server.getPluginManager().callEvent(new org.bukkit.event.world.WorldLoadEvent(serverLevel.getWorld()));
         }
 
@@ -850,6 +921,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
     public abstract boolean shouldRconBroadcast();
 
     public boolean saveAllChunks(boolean suppressLog, boolean flush, boolean forced) {
+        // Paper start - add close param
+        return this.saveAllChunks(suppressLog, flush, forced, false);
+    }
+    public boolean saveAllChunks(boolean suppressLog, boolean flush, boolean forced, boolean close) {
+        // Paper end - add close param
         boolean flag = false;
 
         for (ServerLevel serverLevel : this.getAllLevels()) {
@@ -857,7 +933,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                 LOGGER.info("Saving chunks for level '{}'/{}", serverLevel, serverLevel.dimension().location());
             }
 
-            serverLevel.save(null, flush, serverLevel.noSave && !forced);
+            serverLevel.save(null, flush, serverLevel.noSave && !forced, close); // Paper - add close param
             flag = true;
         }
 
@@ -950,7 +1026,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
             }
         }
 
-        while (this.levels.values().stream().anyMatch(level -> level.getChunkSource().chunkMap.hasWork())) {
+        while (false && this.levels.values().stream().anyMatch(level -> level.getChunkSource().chunkMap.hasWork())) { // Paper - rewrite chunk system
             this.nextTickTimeNanos = Util.getNanos() + TimeUtil.NANOSECONDS_PER_MILLISECOND;
 
             for (ServerLevel serverLevelx : this.getAllLevels()) {
@@ -961,17 +1037,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
             this.waitUntilNextTick();
         }
 
-        this.saveAllChunks(false, true, false);
-
-        for (ServerLevel serverLevelx : this.getAllLevels()) {
-            if (serverLevelx != null) {
-                try {
-                    serverLevelx.close();
-                } catch (IOException var5) {
-                    LOGGER.error("Exception closing the level", (Throwable)var5);
-                }
-            }
-        }
+        this.saveAllChunks(false, true, false, true); // Paper - rewrite chunk system
 
         this.isSaving = false;
         this.resources.close();
@@ -991,6 +1057,14 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
             this.getProfileCache().save(false); // Paper - Perf: Async GameProfileCache saving
         }
         // Spigot end
+        // Paper start - rewrite chunk system
+        LOGGER.info("Waiting for I/O tasks to complete...");
+        ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO.flush((MinecraftServer)(Object)this);
+        LOGGER.info("All I/O tasks to complete");
+        if ((Object)this instanceof net.minecraft.server.dedicated.DedicatedServer) {
+            ca.spottedleaf.moonrise.common.util.MoonriseCommon.haltExecutors();
+        }
+        // Paper end - rewrite chunk system
         // Paper start - Improved watchdog support - move final shutdown items here
         Util.shutdownExecutors();
         try {
@@ -1175,6 +1249,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                     profilerFiller.push("tick");
                     this.tickFrame.start();
                     this.tickServer(flag ? () -> false : this::haveTime);
+                    // Paper start - rewrite chunk system
+                    final Throwable crash = this.chunkSystemCrash;
+                    if (crash != null) {
+                        this.chunkSystemCrash = null;
+                        throw new RuntimeException("Chunk system crash propagated to tick()", crash);
+                    }
+                    // Paper end - rewrite chunk system
                     this.tickFrame.end();
                     profilerFiller.popPush("nextTickWait");
                     this.mayHaveDelayedTasks = true;
@@ -1345,6 +1426,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
 
     private boolean pollTaskInternal() {
         if (super.pollTask()) {
+            this.moonrise$executeMidTickTasks(); // Paper - rewrite chunk system
             return true;
         } else {
             boolean ret = false; // Paper - force execution of all worlds, do not just bias the first
@@ -2473,6 +2555,12 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
         }
     }
 
+    // Paper start - rewrite chunk system
+    @Override
+    public boolean isSameThread() {
+        return ca.spottedleaf.moonrise.common.util.TickThread.isTickThread();
+    }
+    // Paper end - rewrite chunk system
 
     // CraftBukkit start
     public boolean isDebugging() {

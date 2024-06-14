@@ -12,6 +12,7 @@ public class SliceShape extends VoxelShape {
         super(makeSlice(delegate.shape, axis, index));
         this.delegate = delegate;
         this.axis = axis;
+        ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)this).moonrise$initCache(); // Paper - optimise collisions
     }
 
     private static DiscreteVoxelShape makeSlice(DiscreteVoxelShape shape, Direction.Axis axis, int index) {

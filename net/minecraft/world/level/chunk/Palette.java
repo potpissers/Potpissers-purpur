@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 import net.minecraft.core.IdMap;
 import net.minecraft.network.FriendlyByteBuf;
 
-public interface Palette<T> {
+public interface Palette<T> extends ca.spottedleaf.moonrise.patches.fast_palette.FastPalette<T> { // Paper - optimise palette reads
     int idFor(T state);
 
     boolean maybeHas(Predicate<T> filter);

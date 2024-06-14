@@ -8,11 +8,18 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.VarInt;
 import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
 
-public class HashMapPalette<T> implements Palette<T> {
+public class HashMapPalette<T> implements Palette<T>, ca.spottedleaf.moonrise.patches.fast_palette.FastPalette<T> { // Paper - optimise palette reads
     private final IdMap<T> registry;
     private final CrudeIncrementalIntIdentityHashBiMap<T> values;
     private final PaletteResize<T> resizeHandler;
     private final int bits;
+
+    // Paper start - optimise palette reads
+    @Override
+    public final T[] moonrise$getRawPalette(final ca.spottedleaf.moonrise.patches.fast_palette.FastPaletteData<T> container) {
+        return ((ca.spottedleaf.moonrise.patches.fast_palette.FastPalette<T>)this.values).moonrise$getRawPalette(container);
+    }
+    // Paper end - optimise palette reads
 
     public HashMapPalette(IdMap<T> registry, int bits, PaletteResize<T> resizeHandler, List<T> values) {
         this(registry, bits, resizeHandler);

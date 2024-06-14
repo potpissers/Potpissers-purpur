@@ -314,7 +314,7 @@ public class AABB {
     }
 
     @Nullable
-    private static Direction getDirection(AABB aabb, Vec3 start, double[] minDistance, @Nullable Direction facing, double deltaX, double deltaY, double deltaZ) {
+    public static Direction getDirection(AABB aabb, Vec3 start, double[] minDistance, @Nullable Direction facing, double deltaX, double deltaY, double deltaZ) { // Paper - optimise collisions - public
         return getDirection(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ, start, minDistance, facing, deltaX, deltaY, deltaZ);
     }
 

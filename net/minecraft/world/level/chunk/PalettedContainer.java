@@ -29,7 +29,7 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
     private final PaletteResize<T> dummyPaletteResize = (bits, objectAdded) -> 0;
     public final IdMap<T> registry;
     private final T @org.jetbrains.annotations.Nullable [] presetValues; // Paper - Anti-Xray - Add preset values
-    private volatile PalettedContainer.Data<T> data;
+    public volatile PalettedContainer.Data<T> data; // Paper - optimise collisions - public
     private final PalettedContainer.Strategy strategy;
     //private final ThreadingDetector threadingDetector = new ThreadingDetector("PalettedContainer"); // Paper - unused
 
@@ -75,6 +75,33 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
             );
     }
 
+    // Paper start - optimise palette reads
+    private void updateData(final PalettedContainer.Data<T> data) {
+        if (data != null) {
+            ((ca.spottedleaf.moonrise.patches.fast_palette.FastPaletteData<T>)(Object)data).moonrise$setPalette(
+                ((ca.spottedleaf.moonrise.patches.fast_palette.FastPalette<T>)data.palette).moonrise$getRawPalette((ca.spottedleaf.moonrise.patches.fast_palette.FastPaletteData<T>)(Object)data)
+            );
+        }
+    }
+
+    private T readPaletteSlow(final PalettedContainer.Data<T> data, final int paletteIdx) {
+        return data.palette.valueFor(paletteIdx);
+    }
+
+    private T readPalette(final PalettedContainer.Data<T> data, final int paletteIdx) {
+        final T[] palette = ((ca.spottedleaf.moonrise.patches.fast_palette.FastPaletteData<T>)(Object)data).moonrise$getPalette();
+        if (palette == null) {
+            return this.readPaletteSlow(data, paletteIdx);
+        }
+
+        final T ret = palette[paletteIdx];
+        if (ret == null) {
+            throw new IllegalArgumentException("Palette index out of bounds");
+        }
+        return ret;
+    }
+    // Paper end - optimise palette reads
+
     // Paper start - Anti-Xray - Add preset values
     @Deprecated @io.papermc.paper.annotation.DoNotUse
     public PalettedContainer(IdMap<T> registry, PalettedContainer.Strategy strategy, PalettedContainer.Configuration<T> configuration, BitStorage storage, List<T> values) {
@@ -109,6 +136,7 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
             }
         }
         // Paper end
+        this.updateData(this.data); // Paper - optimise palette reads
     }
 
     // Paper start - Anti-Xray - Add preset values
@@ -118,6 +146,7 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
         this.registry = registry;
         this.strategy = strategy;
         this.data = data;
+        this.updateData(this.data); // Paper - optimise palette reads
     }
 
     private PalettedContainer(PalettedContainer<T> other, T @org.jetbrains.annotations.Nullable [] presetValues) { // Paper - Anti-Xray - Add preset values
@@ -139,6 +168,7 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
         this.registry = registry;
         this.data = this.createOrReuseData(null, 0);
         this.data.palette.idFor(palette);
+        this.updateData(this.data); // Paper - optimise palette reads
     }
 
     private PalettedContainer.Data<T> createOrReuseData(@Nullable PalettedContainer.Data<T> data, int id) {
@@ -163,6 +193,7 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
         this.data = data1;
         // Paper start - Anti-Xray
         this.addPresetValues();
+        this.updateData(this.data); // Paper - optimise palette reads
         return objectAdded == null ? -1 : data1.palette.idFor(objectAdded);
     }
     private void addPresetValues() {
@@ -192,9 +223,12 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
     }
 
     private T getAndSet(int index, T state) {
-        int i = this.data.palette.idFor(state);
-        int andSet = this.data.storage.getAndSet(index, i);
-        return this.data.palette.valueFor(andSet);
+        // Paper start - optimise palette reads
+        final int paletteIdx = this.data.palette.idFor(state);
+        final PalettedContainer.Data<T> data = this.data;
+        final int prev = data.storage.getAndSet(index, paletteIdx);
+        return this.readPalette(data, prev);
+        // Paper end - optimise palette reads
     }
 
     public synchronized void set(int x, int y, int z, T state) { // Paper - synchronize
@@ -217,9 +251,11 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
         return this.get(this.strategy.getIndex(x, y, z));
     }
 
-    protected T get(int index) {
-        PalettedContainer.Data<T> data = this.data;
-        return data.palette.valueFor(data.storage.get(index));
+    public T get(int index) { // Paper - public
+        // Paper start - optimise palette reads
+        final PalettedContainer.Data<T> data = this.data;
+        return this.readPalette(data, data.storage.get(index));
+        // Paper end - optimise palette reads
     }
 
     @Override
@@ -240,6 +276,7 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
             buffer.readLongArray(data.storage.getRaw());
             this.data = data;
             this.addPresetValues(); // Paper - Anti-Xray - Add preset values (inefficient, but this isn't used by the server)
+            this.updateData(this.data); // Paper - optimise palette reads
         } finally {
             this.release();
         }
@@ -390,7 +427,44 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
         void accept(T state, int count);
     }
 
-    record Data<T>(PalettedContainer.Configuration<T> configuration, BitStorage storage, Palette<T> palette) {
+    // Paper start - optimise palette reads
+    public static final class Data<T> implements ca.spottedleaf.moonrise.patches.fast_palette.FastPaletteData<T> {
+
+        private final PalettedContainer.Configuration<T> configuration;
+        private final BitStorage storage;
+        private final Palette<T> palette;
+
+        private T[] moonrise$palette;
+
+        public Data(final PalettedContainer.Configuration<T> configuration, final BitStorage storage, final Palette<T> palette) {
+            this.configuration = configuration;
+            this.storage = storage;
+            this.palette = palette;
+        }
+
+        public PalettedContainer.Configuration<T> configuration() {
+            return this.configuration;
+        }
+
+        public BitStorage storage() {
+            return this.storage;
+        }
+
+        public Palette<T> palette() {
+            return this.palette;
+        }
+
+        @Override
+        public final T[] moonrise$getPalette() {
+            return this.moonrise$palette;
+        }
+
+        @Override
+        public final void moonrise$setPalette(final T[] palette) {
+            this.moonrise$palette = palette;
+        }
+        // Paper end - optimise palette reads
+
         public void copyFrom(Palette<T> palette, BitStorage bitStorage) {
             for (int i = 0; i < bitStorage.getSize(); i++) {
                 T object = palette.valueFor(bitStorage.get(i));

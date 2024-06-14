@@ -20,7 +20,7 @@ public class ArrayVoxelShape extends VoxelShape {
         );
     }
 
-    ArrayVoxelShape(DiscreteVoxelShape shape, DoubleList xs, DoubleList ys, DoubleList zs) {
+    public ArrayVoxelShape(DiscreteVoxelShape shape, DoubleList xs, DoubleList ys, DoubleList zs) { // Paper - optimise collisions - public
         super(shape);
         int i = shape.getXSize() + 1;
         int i1 = shape.getYSize() + 1;
@@ -34,6 +34,7 @@ public class ArrayVoxelShape extends VoxelShape {
                 new IllegalArgumentException("Lengths of point arrays must be consistent with the size of the VoxelShape.")
             );
         }
+        ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)this).moonrise$initCache(); // Paper - optimise collisions
     }
 
     @Override

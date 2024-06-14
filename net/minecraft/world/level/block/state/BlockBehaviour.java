@@ -416,7 +416,7 @@ public abstract class BlockBehaviour implements FeatureElement {
         return this.properties.destroyTime;
     }
 
-    public abstract static class BlockStateBase extends StateHolder<Block, BlockState> {
+    public abstract static class BlockStateBase extends StateHolder<Block, BlockState> implements ca.spottedleaf.moonrise.patches.starlight.blockstate.StarlightAbstractBlockState, ca.spottedleaf.moonrise.patches.collisions.block.CollisionBlockState { // Paper - rewrite chunk system // Paper - optimise collisions
         private static final Direction[] DIRECTIONS = Direction.values();
         private static final VoxelShape[] EMPTY_OCCLUSION_SHAPES = Util.make(new VoxelShape[DIRECTIONS.length], shape -> Arrays.fill(shape, Shapes.empty()));
         private static final VoxelShape[] FULL_BLOCK_OCCLUSION_SHAPES = Util.make(
@@ -454,6 +454,76 @@ public abstract class BlockBehaviour implements FeatureElement {
         private VoxelShape[] occlusionShapesByFace;
         private boolean propagatesSkylightDown;
         private int lightBlock;
+
+        // Paper start - rewrite chunk system
+        private boolean isConditionallyFullOpaque;
+
+        @Override
+        public final boolean starlight$isConditionallyFullOpaque() {
+            return this.isConditionallyFullOpaque;
+        }
+        // Paper end - rewrite chunk system
+        // Paper start - optimise collisions
+        private static final int RANDOM_OFFSET = 704237939;
+        private static final Direction[] DIRECTIONS_CACHED = Direction.values();
+        private static final java.util.concurrent.atomic.AtomicInteger ID_GENERATOR = new java.util.concurrent.atomic.AtomicInteger();
+        private final int id1 = it.unimi.dsi.fastutil.HashCommon.murmurHash3(it.unimi.dsi.fastutil.HashCommon.murmurHash3(ID_GENERATOR.getAndIncrement() + RANDOM_OFFSET) + RANDOM_OFFSET);
+        private final int id2 = it.unimi.dsi.fastutil.HashCommon.murmurHash3(it.unimi.dsi.fastutil.HashCommon.murmurHash3(ID_GENERATOR.getAndIncrement() + RANDOM_OFFSET) + RANDOM_OFFSET);
+        private boolean occludesFullBlock;
+        private boolean emptyCollisionShape;
+        private boolean emptyConstantCollisionShape;
+        private VoxelShape constantCollisionShape;
+
+        private static void initCaches(final VoxelShape shape, final boolean neighbours) {
+            ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape).moonrise$isFullBlock();
+            ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape).moonrise$occludesFullBlock();
+            shape.toAabbs();
+            if (!shape.isEmpty()) {
+                shape.bounds();
+            }
+            if (neighbours) {
+                for (final Direction direction : DIRECTIONS_CACHED) {
+                    initCaches(((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape).moonrise$getFaceShapeClamped(direction), false);
+                    initCaches(shape.getFaceShape(direction), false);
+                }
+            }
+        }
+
+        @Override
+        public final boolean moonrise$hasCache() {
+            return this.cache != null;
+        }
+
+        @Override
+        public final boolean moonrise$occludesFullBlock() {
+            return this.occludesFullBlock;
+        }
+
+        @Override
+        public final boolean moonrise$emptyCollisionShape() {
+            return this.emptyCollisionShape;
+        }
+
+        @Override
+        public final boolean moonrise$emptyContextCollisionShape() {
+            return this.emptyConstantCollisionShape;
+        }
+
+        @Override
+        public final int moonrise$uniqueId1() {
+            return this.id1;
+        }
+
+        @Override
+        public final int moonrise$uniqueId2() {
+            return this.id2;
+        }
+
+        @Override
+        public final VoxelShape moonrise$getConstantContextCollisionShape() {
+            return this.constantCollisionShape;
+        }
+        // Paper end - optimise collisions
 
         protected BlockStateBase(Block owner, Reference2ObjectArrayMap<Property<?>, Comparable<?>> values, MapCodec<BlockState> propertiesCodec) {
             super(owner, values, propertiesCodec);
@@ -533,6 +603,41 @@ public abstract class BlockBehaviour implements FeatureElement {
 
             this.propagatesSkylightDown = this.owner.propagatesSkylightDown(this.asState());
             this.lightBlock = this.owner.getLightBlock(this.asState());
+            // Paper start - rewrite chunk system
+            this.isConditionallyFullOpaque = this.canOcclude & this.useShapeForLightOcclusion;
+            // Paper end - rewrite chunk system
+            // Paper start - optimise collisions
+            if (this.cache != null) {
+                final VoxelShape collisionShape = this.cache.collisionShape;
+                if (this.isAir()) {
+                    this.constantCollisionShape = Shapes.empty();
+                } else {
+                    this.constantCollisionShape = null;
+                }
+                this.occludesFullBlock = ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)collisionShape).moonrise$occludesFullBlock();
+                this.emptyCollisionShape = collisionShape.isEmpty();
+                this.emptyConstantCollisionShape = this.constantCollisionShape != null && this.constantCollisionShape.isEmpty();
+                // init caches
+                initCaches(collisionShape, true);
+                if (this.constantCollisionShape != null) {
+                    initCaches(this.constantCollisionShape, true);
+                }
+            } else {
+                this.occludesFullBlock = false;
+                this.emptyCollisionShape = false;
+                this.emptyConstantCollisionShape = false;
+                this.constantCollisionShape = null;
+            }
+
+            if (this.occlusionShape != null) {
+                initCaches(this.occlusionShape, true);
+            }
+            if (this.occlusionShapesByFace != null) {
+                for (final VoxelShape shape : this.occlusionShapesByFace) {
+                    initCaches(shape, true);
+                }
+            }
+            // Paper end - optimise collisions
         }
 
         public Block getBlock() {

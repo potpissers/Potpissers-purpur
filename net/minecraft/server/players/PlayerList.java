@@ -1312,7 +1312,7 @@ public abstract class PlayerList {
 
     public void setViewDistance(int viewDistance) {
         this.viewDistance = viewDistance;
-        this.broadcastAll(new ClientboundSetChunkCacheRadiusPacket(viewDistance));
+        //this.broadcastAll(new ClientboundSetChunkCacheRadiusPacket(viewDistance)); // Paper - rewrite chunk system
 
         for (ServerLevel serverLevel : this.server.getAllLevels()) {
             if (serverLevel != null) {
@@ -1323,7 +1323,7 @@ public abstract class PlayerList {
 
     public void setSimulationDistance(int simulationDistance) {
         this.simulationDistance = simulationDistance;
-        this.broadcastAll(new ClientboundSetSimulationDistancePacket(simulationDistance));
+        //this.broadcastAll(new ClientboundSetSimulationDistancePacket(simulationDistance));  // Paper - rewrite chunk system
 
         for (ServerLevel serverLevel : this.server.getAllLevels()) {
             if (serverLevel != null) {

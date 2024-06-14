@@ -321,6 +321,7 @@ public class Main {
             WorldData worldData = worldStem.worldData();
             levelStorageAccess.saveDataTag(frozen, worldData);
             */
+            Class.forName(net.minecraft.world.entity.npc.VillagerTrades.class.getName()); // Paper - load this sync so it won't fail later async
             final DedicatedServer dedicatedServer = MinecraftServer.spin(
                 thread1 -> {
                     DedicatedServer dedicatedServer1 = new DedicatedServer(

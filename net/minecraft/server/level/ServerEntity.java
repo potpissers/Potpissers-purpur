@@ -91,6 +91,11 @@ public class ServerEntity {
     }
 
     public void sendChanges() {
+        // Paper start - optimise collisions
+        if (((ca.spottedleaf.moonrise.patches.chunk_system.entity.ChunkSystemEntity)this.entity).moonrise$isHardColliding()) {
+            this.teleportDelay = 9999;
+        }
+        // Paper end - optimise collisions
         List<Entity> passengers = this.entity.getPassengers();
         if (!passengers.equals(this.lastPassengers)) {
             this.broadcastAndSend(new ClientboundSetPassengersPacket(this.entity)); // CraftBukkit

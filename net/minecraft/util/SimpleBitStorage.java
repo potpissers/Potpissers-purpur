@@ -208,6 +208,20 @@ public class SimpleBitStorage implements BitStorage {
     private final int divideAdd; private final long divideAddUnsigned; // Paper - Perf: Optimize SimpleBitStorage
     private final int divideShift;
 
+    // Paper start - optimise bitstorage read/write operations
+    private static final int[] BETTER_MAGIC = new int[33];
+    static {
+        // 20 bits of precision
+        // since index is always [0, 4095] (i.e 12 bits), multiplication by a magic value here (20 bits)
+        // fits exactly in an int and allows us to use integer arithmetic
+        for (int bits = 1; bits < BETTER_MAGIC.length; ++bits) {
+            BETTER_MAGIC[bits] = (int)ca.spottedleaf.concurrentutil.util.IntegerUtil.getUnsignedDivisorMagic(64L / bits, 20);
+        }
+    }
+    private final int magic;
+    private final int mulBits;
+    // Paper end - optimise bitstorage read/write operations
+
     public SimpleBitStorage(int bits, int size, int[] data) {
         this(bits, size);
         int i = 0;
@@ -261,6 +275,13 @@ public class SimpleBitStorage implements BitStorage {
         } else {
             this.data = new long[i1];
         }
+        // Paper start - optimise bitstorage read/write operations
+        this.magic = BETTER_MAGIC[this.bits];
+        this.mulBits = (64 / this.bits) * this.bits;
+        if (this.size > 4096) {
+            throw new IllegalStateException("Size > 4096 not supported");
+        }
+        // Paper end - optimise bitstorage read/write operations
     }
 
     private int cellIndex(int index) {
@@ -269,28 +290,51 @@ public class SimpleBitStorage implements BitStorage {
 
     @Override
     public final int getAndSet(int index, int value) { // Paper - Perf: Optimize SimpleBitStorage
-        int i = this.cellIndex(index);
-        long l = this.data[i];
-        int i1 = (index - i * this.valuesPerLong) * this.bits;
-        int i2 = (int)(l >> i1 & this.mask);
-        this.data[i] = l & ~(this.mask << i1) | (value & this.mask) << i1;
-        return i2;
+        // Paper start - optimise bitstorage read/write operations
+        final int full = this.magic * index; // 20 bits of magic + 12 bits of index = barely int
+        final int divQ = full >>> 20;
+        final int divR = (full & 0xFFFFF) * this.mulBits >>> 20;
+
+        final long[] dataArray = this.data;
+
+        final long data = dataArray[divQ];
+        final long mask = this.mask;
+
+        final long write = data & ~(mask << divR) | ((long)value & mask) << divR;
+
+        dataArray[divQ] = write;
+
+        return (int)(data >>> divR & mask);
+        // Paper end - optimise bitstorage read/write operations
     }
 
     @Override
     public final void set(int index, int value) { // Paper - Perf: Optimize SimpleBitStorage
-        int i = this.cellIndex(index);
-        long l = this.data[i];
-        int i1 = (index - i * this.valuesPerLong) * this.bits;
-        this.data[i] = l & ~(this.mask << i1) | (value & this.mask) << i1;
+        // Paper start - optimise bitstorage read/write operations
+        final int full = this.magic * index; // 20 bits of magic + 12 bits of index = barely int
+        final int divQ = full >>> 20;
+        final int divR = (full & 0xFFFFF) * this.mulBits >>> 20;
+
+        final long[] dataArray = this.data;
+
+        final long data = dataArray[divQ];
+        final long mask = this.mask;
+
+        final long write = data & ~(mask << divR) | ((long)value & mask) << divR;
+
+        dataArray[divQ] = write;
+        // Paper end - optimise bitstorage read/write operations
     }
 
     @Override
     public final int get(int index) { // Paper - Perf: Optimize SimpleBitStorage
-        int i = this.cellIndex(index);
-        long l = this.data[i];
-        int i1 = (index - i * this.valuesPerLong) * this.bits;
-        return (int)(l >> i1 & this.mask);
+        // Paper start - optimise bitstorage read/write operations
+        final int full = this.magic * index; // 20 bits of magic + 12 bits of index = barely int
+        final int divQ = full >>> 20;
+        final int divR = (full & 0xFFFFF) * this.mulBits >>> 20;
+
+        return (int)(this.data[divQ] >>> divR & this.mask);
+        // Paper end - optimise bitstorage read/write operations
     }
 
     @Override
@@ -354,6 +398,67 @@ public class SimpleBitStorage implements BitStorage {
     public BitStorage copy() {
         return new SimpleBitStorage(this.bits, this.size, (long[])this.data.clone());
     }
+
+    // Paper start - block counting
+    @Override
+    public final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<it.unimi.dsi.fastutil.shorts.ShortArrayList> moonrise$countEntries() {
+        final int valuesPerLong = this.valuesPerLong;
+        final int bits = this.bits;
+        final long mask = (1L << bits) - 1L;
+        final int size = this.size;
+
+        if (bits <= 6) {
+            final it.unimi.dsi.fastutil.shorts.ShortArrayList[] byId = new it.unimi.dsi.fastutil.shorts.ShortArrayList[1 << bits];
+            final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<it.unimi.dsi.fastutil.shorts.ShortArrayList> ret = new it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<>(1 << bits);
+
+            int index = 0;
+
+            for (long value : this.data) {
+                int li = 0;
+                do {
+                    final int paletteIdx = (int)(value & mask);
+                    value >>= bits;
+                    ++li;
+
+                    final it.unimi.dsi.fastutil.shorts.ShortArrayList coords = byId[paletteIdx];
+                    if (coords != null) {
+                        coords.add((short)index++);
+                        continue;
+                    } else {
+                        final it.unimi.dsi.fastutil.shorts.ShortArrayList newCoords = new it.unimi.dsi.fastutil.shorts.ShortArrayList(64);
+                        byId[paletteIdx] = newCoords;
+                        newCoords.add((short)index++);
+                        ret.put(paletteIdx, newCoords);
+                        continue;
+                    }
+                } while (li < valuesPerLong && index < size);
+            }
+
+            return ret;
+        } else {
+            final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<it.unimi.dsi.fastutil.shorts.ShortArrayList> ret = new it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<>(
+                1 << 6
+            );
+
+            int index = 0;
+
+            for (long value : this.data) {
+                int li = 0;
+                do {
+                    final int paletteIdx = (int)(value & mask);
+                    value >>= bits;
+                    ++li;
+
+                    ret.computeIfAbsent(paletteIdx, (final int key) -> {
+                        return new it.unimi.dsi.fastutil.shorts.ShortArrayList(64);
+                    }).add((short)index++);
+                } while (li < valuesPerLong && index < size);
+            }
+
+            return ret;
+        }
+    }
+    // Paper end - block counting
 
     public static class InitializationException extends RuntimeException {
         InitializationException(String message) {

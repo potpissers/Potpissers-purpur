@@ -71,12 +71,12 @@ public class EntityStorage implements EntityPersistentStorage<Entity> {
         }
     }
 
-    private static ChunkPos readChunkPos(CompoundTag tag) {
+    public static ChunkPos readChunkPos(CompoundTag tag) { // Paper - public
         int[] intArray = tag.getIntArray("Position");
         return new ChunkPos(intArray[0], intArray[1]);
     }
 
-    private static void writeChunkPos(CompoundTag tag, ChunkPos pos) {
+    public static void writeChunkPos(CompoundTag tag, ChunkPos pos) { // Paper - public
         tag.put("Position", new IntArrayTag(new int[]{pos.x, pos.z}));
     }
 

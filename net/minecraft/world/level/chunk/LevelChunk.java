@@ -52,7 +52,7 @@ import net.minecraft.world.ticks.LevelChunkTicks;
 import net.minecraft.world.ticks.TickContainerAccess;
 import org.slf4j.Logger;
 
-public class LevelChunk extends ChunkAccess {
+public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.patches.chunk_system.level.chunk.ChunkSystemLevelChunk, ca.spottedleaf.moonrise.patches.starlight.chunk.StarlightChunk, ca.spottedleaf.moonrise.patches.getblock.GetBlockChunk { // Paper - rewrite chunk system // Paper - get block chunk optimisation
     static final Logger LOGGER = LogUtils.getLogger();
     private static final TickingBlockEntity NULL_TICKER = new TickingBlockEntity() {
         @Override
@@ -93,6 +93,39 @@ public class LevelChunk extends ChunkAccess {
     // Paper start
     boolean loadedTicketLevel;
     // Paper end
+    // Paper start - rewrite chunk system
+    private boolean postProcessingDone;
+    private net.minecraft.server.level.ServerChunkCache.ChunkAndHolder chunkAndHolder;
+
+    @Override
+    public final boolean moonrise$isPostProcessingDone() {
+        return this.postProcessingDone;
+    }
+
+    @Override
+    public final net.minecraft.server.level.ServerChunkCache.ChunkAndHolder moonrise$getChunkAndHolder() {
+        return this.chunkAndHolder;
+    }
+
+    @Override
+    public final void moonrise$setChunkAndHolder(final net.minecraft.server.level.ServerChunkCache.ChunkAndHolder holder) {
+        this.chunkAndHolder = holder;
+    }
+    // Paper end - rewrite chunk system
+    // Paper start - get block chunk optimisation
+    private static final BlockState AIR_BLOCKSTATE = Blocks.AIR.defaultBlockState();
+    private static final FluidState AIR_FLUIDSTATE = Fluids.EMPTY.defaultFluidState();
+    private static final BlockState VOID_AIR_BLOCKSTATE = Blocks.VOID_AIR.defaultBlockState();
+    private final int minSection;
+    private final int maxSection;
+    private final boolean debug;
+    private final BlockState defaultBlockState;
+
+    @Override
+    public final BlockState moonrise$getBlock(final int x, final int y, final int z) {
+        return this.getBlockStateFinal(x, y, z);
+    }
+    // Paper end - get block chunk optimisation
 
     public LevelChunk(Level level, ChunkPos pos) {
         this(level, pos, UpgradeData.EMPTY, new LevelChunkTicks<>(), new LevelChunkTicks<>(), 0L, null, null, null);
@@ -122,6 +155,14 @@ public class LevelChunk extends ChunkAccess {
         this.postLoad = postLoad;
         this.blockTicks = blockTicks;
         this.fluidTicks = fluidTicks;
+        // Paper start - get block chunk optimisation
+        this.minSection = ca.spottedleaf.moonrise.common.util.WorldUtil.getMinSection(level);
+        this.maxSection = ca.spottedleaf.moonrise.common.util.WorldUtil.getMaxSection(level);
+
+        final boolean empty = ((Object)this instanceof EmptyLevelChunk);
+        this.debug = !empty && this.level.isDebug();
+        this.defaultBlockState = empty ? VOID_AIR_BLOCKSTATE : AIR_BLOCKSTATE;
+        // Paper end - get block chunk optimisation
     }
 
     public LevelChunk(ServerLevel level, ProtoChunk chunk, @Nullable LevelChunk.PostLoadProcessor postLoad) {
@@ -159,13 +200,19 @@ public class LevelChunk extends ChunkAccess {
             }
         }
 
-        this.skyLightSources = chunk.skyLightSources;
+        // Paper - rewrite chunk system
         this.setLightCorrect(chunk.isLightCorrect());
         this.markUnsaved();
         this.needsDecoration = true; // CraftBukkit
         // CraftBukkit start
         this.persistentDataContainer = chunk.persistentDataContainer; // SPIGOT-6814: copy PDC to account for 1.17 to 1.18 chunk upgrading.
         // CraftBukkit end
+        // Paper start - rewrite chunk system
+        this.starlight$setBlockNibbles(((ca.spottedleaf.moonrise.patches.starlight.chunk.StarlightChunk)chunk).starlight$getBlockNibbles());
+        this.starlight$setSkyNibbles(((ca.spottedleaf.moonrise.patches.starlight.chunk.StarlightChunk)chunk).starlight$getSkyNibbles());
+        this.starlight$setSkyEmptinessMap(((ca.spottedleaf.moonrise.patches.starlight.chunk.StarlightChunk)chunk).starlight$getSkyEmptinessMap());
+        this.starlight$setBlockEmptinessMap(((ca.spottedleaf.moonrise.patches.starlight.chunk.StarlightChunk)chunk).starlight$getBlockEmptinessMap());
+        // Paper end - rewrite chunk system
     }
 
     public void setUnsavedListener(LevelChunk.UnsavedListener unsavedListener) {
@@ -341,7 +388,7 @@ public class LevelChunk extends ChunkAccess {
                 if (LightEngine.hasDifferentLightProperties(blockState, state)) {
                     ProfilerFiller profilerFiller = Profiler.get();
                     profilerFiller.push("updateSkyLightSources");
-                    this.skyLightSources.update(this, i, y, i2);
+                    // Paper - rewrite chunk system
                     profilerFiller.popPush("queueCheckLight");
                     this.level.getChunkSource().getLightEngine().checkBlock(pos);
                     profilerFiller.pop();
@@ -573,11 +620,12 @@ public class LevelChunk extends ChunkAccess {
 
     // CraftBukkit start
     public void loadCallback() {
+        if (this.loadedTicketLevel) { LOGGER.error("Double calling chunk load!", new Throwable()); } // Paper
         // Paper start
         this.loadedTicketLevel = true;
         // Paper end
         org.bukkit.Server server = this.level.getCraftServer();
-        this.level.getChunkSource().addLoadedChunk(this); // Paper
+        // Paper - rewrite chunk system
         if (server != null) {
             /*
              * If it's a new world, the first few chunks are generated inside
@@ -586,6 +634,7 @@ public class LevelChunk extends ChunkAccess {
              */
             org.bukkit.Chunk bukkitChunk = new org.bukkit.craftbukkit.CraftChunk(this);
             server.getPluginManager().callEvent(new org.bukkit.event.world.ChunkLoadEvent(bukkitChunk, this.needsDecoration));
+            org.bukkit.craftbukkit.event.CraftEventFactory.callEntitiesLoadEvent(this.level, this.chunkPos, ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.level).moonrise$getChunkTaskScheduler().chunkHolderManager.getChunkHolder(this.locX, this.locZ).getEntityChunk().getAllEntities()); // Paper - rewrite chunk system
 
             if (this.needsDecoration) {
                 this.needsDecoration = false;
@@ -612,13 +661,15 @@ public class LevelChunk extends ChunkAccess {
     }
 
     public void unloadCallback() {
+        if (!this.loadedTicketLevel) { LOGGER.error("Double calling chunk unload!", new Throwable()); } // Paper
         org.bukkit.Server server = this.level.getCraftServer();
+        org.bukkit.craftbukkit.event.CraftEventFactory.callEntitiesUnloadEvent(this.level, this.chunkPos, ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.level).moonrise$getChunkTaskScheduler().chunkHolderManager.getChunkHolder(this.locX, this.locZ).getEntityChunk().getAllEntities()); // Paper - rewrite chunk system
         org.bukkit.Chunk bukkitChunk = new org.bukkit.craftbukkit.CraftChunk(this);
-        org.bukkit.event.world.ChunkUnloadEvent unloadEvent = new org.bukkit.event.world.ChunkUnloadEvent(bukkitChunk, this.isUnsaved());
+        org.bukkit.event.world.ChunkUnloadEvent unloadEvent = new org.bukkit.event.world.ChunkUnloadEvent(bukkitChunk, true); // Paper - rewrite chunk system - force save to true so that mustNotSave is correctly set below
         server.getPluginManager().callEvent(unloadEvent);
         // note: saving can be prevented, but not forced if no saving is actually required
         this.mustNotSave = !unloadEvent.isSaveChunk();
-        this.level.getChunkSource().removeLoadedChunk(this); // Paper
+        // Paper - rewrite chunk system
         // Paper start
         this.loadedTicketLevel = false;
         // Paper end
@@ -626,8 +677,31 @@ public class LevelChunk extends ChunkAccess {
 
     @Override
     public boolean isUnsaved() {
-        return super.isUnsaved() && !this.mustNotSave;
+        // Paper start - rewrite chunk system
+        final long gameTime = this.level.getGameTime();
+        if (((ca.spottedleaf.moonrise.patches.chunk_system.ticks.ChunkSystemLevelChunkTicks)this.blockTicks).moonrise$isDirty(gameTime)
+            || ((ca.spottedleaf.moonrise.patches.chunk_system.ticks.ChunkSystemLevelChunkTicks)this.fluidTicks).moonrise$isDirty(gameTime)) {
+            return true;
+        }
+
+        return super.isUnsaved();
+        // Paper end - rewrite chunk system
     }
+
+    // Paper start - rewrite chunk system
+    @Override
+    public boolean tryMarkSaved() {
+        if (!this.isUnsaved()) {
+            return false;
+        }
+        ((ca.spottedleaf.moonrise.patches.chunk_system.ticks.ChunkSystemLevelChunkTicks)this.blockTicks).moonrise$clearDirty();
+        ((ca.spottedleaf.moonrise.patches.chunk_system.ticks.ChunkSystemLevelChunkTicks)this.fluidTicks).moonrise$clearDirty();
+
+        super.tryMarkSaved();
+
+        return true;
+    }
+    // Paper end - rewrite chunk system
     // CraftBukkit end
 
     public boolean isEmpty() {
@@ -706,6 +780,7 @@ public class LevelChunk extends ChunkAccess {
 
         this.pendingBlockEntities.clear();
         this.upgradeData.upgrade(this);
+        this.postProcessingDone = true; // Paper - rewrite chunk system
     }
 
     @Nullable

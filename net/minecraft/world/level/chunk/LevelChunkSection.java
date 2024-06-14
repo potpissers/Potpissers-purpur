@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 
-public class LevelChunkSection {
+public class LevelChunkSection implements ca.spottedleaf.moonrise.patches.block_counting.BlockCountingChunkSection { // Paper - block counting
     public static final int SECTION_WIDTH = 16;
     public static final int SECTION_HEIGHT = 16;
     public static final int SECTION_SIZE = 4096;
@@ -23,6 +23,30 @@ public class LevelChunkSection {
     private short tickingFluidCount;
     public final PalettedContainer<BlockState> states;
     private PalettedContainer<Holder<Biome>> biomes; // CraftBukkit - read/write
+
+    // Paper start - block counting
+    private static final it.unimi.dsi.fastutil.shorts.ShortArrayList FULL_LIST = new it.unimi.dsi.fastutil.shorts.ShortArrayList(16*16*16);
+    static {
+        for (short i = 0; i < (16*16*16); ++i) {
+            FULL_LIST.add(i);
+        }
+    }
+
+    private boolean isClient;
+    private static final short CLIENT_FORCED_SPECIAL_COLLIDING_BLOCKS = (short)9999;
+    private short specialCollidingBlocks;
+    private final ca.spottedleaf.moonrise.common.list.ShortList tickingBlocks = new ca.spottedleaf.moonrise.common.list.ShortList();
+
+    @Override
+    public final boolean moonrise$hasSpecialCollidingBlocks() {
+        return this.specialCollidingBlocks != 0;
+    }
+
+    @Override
+    public final ca.spottedleaf.moonrise.common.list.ShortList moonrise$getTickingBlockList() {
+        return this.tickingBlocks;
+    }
+    // Paper end - block counting
 
     private LevelChunkSection(LevelChunkSection section) {
         this.nonEmptyBlockCount = section.nonEmptyBlockCount;
@@ -69,6 +93,45 @@ public class LevelChunkSection {
         return this.setBlockState(x, y, z, state, true);
     }
 
+    // Paper start - block counting
+    private void updateBlockCallback(final int x, final int y, final int z, final BlockState newState,
+                                     final BlockState oldState) {
+        if (oldState == newState) {
+            return;
+        }
+
+        if (this.isClient) {
+            if (ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.isSpecialCollidingBlock(newState)) {
+                this.specialCollidingBlocks = CLIENT_FORCED_SPECIAL_COLLIDING_BLOCKS;
+            }
+            return;
+        }
+
+        final boolean isSpecialOld = ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.isSpecialCollidingBlock(oldState);
+        final boolean isSpecialNew = ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.isSpecialCollidingBlock(newState);
+        if (isSpecialOld != isSpecialNew) {
+            if (isSpecialOld) {
+                --this.specialCollidingBlocks;
+            } else {
+                ++this.specialCollidingBlocks;
+            }
+        }
+
+        final boolean oldTicking = oldState.isRandomlyTicking();
+        final boolean newTicking = newState.isRandomlyTicking();
+        if (oldTicking != newTicking) {
+            final ca.spottedleaf.moonrise.common.list.ShortList tickingBlocks = this.tickingBlocks;
+            final short position = (short)(x | (z << 4) | (y << (4+4)));
+
+            if (oldTicking) {
+                tickingBlocks.remove(position);
+            } else {
+                tickingBlocks.add(position);
+            }
+        }
+    }
+    // Paper end - block counting
+
     public BlockState setBlockState(int x, int y, int z, BlockState state, boolean useLocks) {
         BlockState blockState;
         if (useLocks) {
@@ -86,7 +149,7 @@ public class LevelChunkSection {
             }
         }
 
-        if (!fluidState.isEmpty()) {
+        if (!!fluidState.isRandomlyTicking()) { // Paper - block counting
             this.tickingFluidCount--;
         }
 
@@ -97,9 +160,11 @@ public class LevelChunkSection {
             }
         }
 
-        if (!fluidState1.isEmpty()) {
+        if (!!fluidState1.isRandomlyTicking()) { // Paper - block counting
             this.tickingFluidCount++;
         }
+
+        this.updateBlockCallback(x, y, z, state, blockState); // Paper - block counting
 
         return blockState;
     }
@@ -121,35 +186,70 @@ public class LevelChunkSection {
     }
 
     public void recalcBlockCounts() {
-        class BlockCounter implements PalettedContainer.CountConsumer<BlockState> {
-            public int nonEmptyBlockCount;
-            public int tickingBlockCount;
-            public int tickingFluidCount;
+        // Paper start - block counting
+        // reset, then recalculate
+        this.nonEmptyBlockCount = (short)0;
+        this.tickingBlockCount = (short)0;
+        this.tickingFluidCount = (short)0;
+        this.specialCollidingBlocks = (short)0;
+        this.tickingBlocks.clear();
 
-            @Override
-            public void accept(BlockState state, int count) {
-                FluidState fluidState = state.getFluidState();
-                if (!state.isAir()) {
-                    this.nonEmptyBlockCount += count;
-                    if (state.isRandomlyTicking()) {
-                        this.tickingBlockCount += count;
+        if (this.maybeHas((final BlockState state) -> !state.isAir())) {
+            final PalettedContainer.Data<BlockState> data = this.states.data;
+            final Palette<BlockState> palette = data.palette();
+            final int paletteSize = palette.getSize();
+            final net.minecraft.util.BitStorage storage = data.storage();
+
+            final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<it.unimi.dsi.fastutil.shorts.ShortArrayList> counts;
+            if (paletteSize == 1) {
+                counts = new it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<>(1);
+                counts.put(0, FULL_LIST);
+            } else {
+                counts = ((ca.spottedleaf.moonrise.patches.block_counting.BlockCountingBitStorage)storage).moonrise$countEntries();
+            }
+
+            for (final java.util.Iterator<it.unimi.dsi.fastutil.ints.Int2ObjectMap.Entry<it.unimi.dsi.fastutil.shorts.ShortArrayList>> iterator = counts.int2ObjectEntrySet().fastIterator(); iterator.hasNext();) {
+                final it.unimi.dsi.fastutil.ints.Int2ObjectMap.Entry<it.unimi.dsi.fastutil.shorts.ShortArrayList> entry = iterator.next();
+                final int paletteIdx = entry.getIntKey();
+                final it.unimi.dsi.fastutil.shorts.ShortArrayList coordinates = entry.getValue();
+                final int paletteCount = coordinates.size();
+
+                final BlockState state = palette.valueFor(paletteIdx);
+
+                if (state.isAir()) {
+                    continue;
+                }
+
+                if (ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.isSpecialCollidingBlock(state)) {
+                    this.specialCollidingBlocks += (short)paletteCount;
+                }
+                this.nonEmptyBlockCount += (short)paletteCount;
+                if (state.isRandomlyTicking()) {
+                    this.tickingBlockCount += (short)paletteCount;
+                    final short[] raw = coordinates.elements();
+                    final int rawLen = raw.length;
+
+                    final ca.spottedleaf.moonrise.common.list.ShortList tickingBlocks = this.tickingBlocks;
+
+                    tickingBlocks.setMinCapacity(Math.min((rawLen + tickingBlocks.size()) * 3 / 2, 16*16*16));
+
+                    java.util.Objects.checkFromToIndex(0, paletteCount, raw.length);
+                    for (int i = 0; i < paletteCount; ++i) {
+                        tickingBlocks.add(raw[i]);
                     }
                 }
 
-                if (!fluidState.isEmpty()) {
-                    this.nonEmptyBlockCount += count;
-                    if (fluidState.isRandomlyTicking()) {
-                        this.tickingFluidCount += count;
+                final FluidState fluid = state.getFluidState();
+
+                if (!fluid.isEmpty()) {
+                    //this.nonEmptyBlockCount += count; // fix vanilla bug: make non-empty block count correct
+                    if (fluid.isRandomlyTicking()) {
+                        this.tickingFluidCount += (short)paletteCount;
                     }
                 }
             }
         }
-
-        BlockCounter blockCounter = new BlockCounter();
-        this.states.count(blockCounter);
-        this.nonEmptyBlockCount = (short)blockCounter.nonEmptyBlockCount;
-        this.tickingBlockCount = (short)blockCounter.tickingBlockCount;
-        this.tickingFluidCount = (short)blockCounter.tickingFluidCount;
+        // Paper end - block counting
     }
 
     public PalettedContainer<BlockState> getStates() {
@@ -166,6 +266,11 @@ public class LevelChunkSection {
         PalettedContainer<Holder<Biome>> palettedContainer = this.biomes.recreate();
         palettedContainer.read(buffer);
         this.biomes = palettedContainer;
+        // Paper start - block counting
+        this.isClient = true;
+        // force has special colliding blocks to be true
+        this.specialCollidingBlocks = this.nonEmptyBlockCount != (short)0 && this.maybeHas(ca.spottedleaf.moonrise.patches.collisions.CollisionUtil::isSpecialCollidingBlock) ? CLIENT_FORCED_SPECIAL_COLLIDING_BLOCKS : (short)0;
+        // Paper end - block counting
     }
 
     public void readBiomes(FriendlyByteBuf buffer) {

@@ -34,55 +34,55 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.slf4j.Logger;
 
-public abstract class DistanceManager {
+public abstract class DistanceManager implements ca.spottedleaf.moonrise.patches.chunk_system.level.chunk.ChunkSystemDistanceManager, ca.spottedleaf.moonrise.patches.chunk_tick_iteration.ChunkTickDistanceManager { // Paper - rewrite chunk system // Paper - chunk tick iteration optimisation
     static final Logger LOGGER = LogUtils.getLogger();
     static final int PLAYER_TICKET_LEVEL = ChunkLevel.byStatus(FullChunkStatus.ENTITY_TICKING);
     private static final int INITIAL_TICKET_LIST_CAPACITY = 4;
     final Long2ObjectMap<ObjectSet<ServerPlayer>> playersPerChunk = new Long2ObjectOpenHashMap<>();
-    public final Long2ObjectOpenHashMap<SortedArraySet<Ticket<?>>> tickets = new Long2ObjectOpenHashMap<>();
-    private final DistanceManager.ChunkTicketTracker ticketTracker = new DistanceManager.ChunkTicketTracker();
-    private final DistanceManager.FixedPlayerDistanceChunkTracker naturalSpawnChunkCounter = new DistanceManager.FixedPlayerDistanceChunkTracker(8);
-    private final TickingTracker tickingTicketsTracker = new TickingTracker();
-    private final DistanceManager.PlayerTicketTracker playerTicketManager = new DistanceManager.PlayerTicketTracker(32);
-    final Set<ChunkHolder> chunksToUpdateFutures = new ReferenceOpenHashSet<>();
-    final ThrottlingChunkTaskDispatcher ticketDispatcher;
-    final LongSet ticketsToRelease = new LongOpenHashSet();
-    final Executor mainThreadExecutor;
+    // Paper - rewrite chunk system
+    // Paper - chunk tick iteration optimisation
+    // Paper - rewrite chunk system
     private long ticketTickCounter;
-    public int simulationDistance = 10;
+    // Paper - rewrite chunk system
 
     protected DistanceManager(Executor dispatcher, Executor mainThreadExecutor) {
         TaskScheduler<Runnable> taskScheduler = TaskScheduler.wrapExecutor("player ticket throttler", mainThreadExecutor);
-        this.ticketDispatcher = new ThrottlingChunkTaskDispatcher(taskScheduler, dispatcher, 4);
-        this.mainThreadExecutor = mainThreadExecutor;
+        // Paper - rewrite chunk system
     }
 
-    protected void purgeStaleTickets() {
-        this.ticketTickCounter++;
-        ObjectIterator<Entry<SortedArraySet<Ticket<?>>>> objectIterator = this.tickets.long2ObjectEntrySet().fastIterator();
+    // Paper start - rewrite chunk system
+    @Override
+    public final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManager moonrise$getChunkHolderManager() {
+        return ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.moonrise$getChunkMap().level).moonrise$getChunkTaskScheduler().chunkHolderManager;
+    }
+    // Paper end - rewrite chunk system
+    // Paper start - chunk tick iteration optimisation
+    private final ca.spottedleaf.moonrise.common.misc.PositionCountingAreaMap<ServerPlayer> spawnChunkTracker = new ca.spottedleaf.moonrise.common.misc.PositionCountingAreaMap<>();
 
-        while (objectIterator.hasNext()) {
-            Entry<SortedArraySet<Ticket<?>>> entry = objectIterator.next();
-            Iterator<Ticket<?>> iterator = entry.getValue().iterator();
-            boolean flag = false;
+    @Override
+    public final void moonrise$addPlayer(final ServerPlayer player, final SectionPos pos) {
+        this.spawnChunkTracker.add(player, pos.x(), pos.z(), ca.spottedleaf.moonrise.patches.chunk_tick_iteration.ChunkTickConstants.PLAYER_SPAWN_TRACK_RANGE);
+    }
 
-            while (iterator.hasNext()) {
-                Ticket<?> ticket = iterator.next();
-                if (ticket.timedOut(this.ticketTickCounter)) {
-                    iterator.remove();
-                    flag = true;
-                    this.tickingTicketsTracker.removeTicket(entry.getLongKey(), ticket);
-                }
-            }
+    @Override
+    public final void moonrise$removePlayer(final ServerPlayer player, final SectionPos pos) {
+        this.spawnChunkTracker.remove(player);
+    }
 
-            if (flag) {
-                this.ticketTracker.update(entry.getLongKey(), getTicketLevelAt(entry.getValue()), false);
-            }
-
-            if (entry.getValue().isEmpty()) {
-                objectIterator.remove();
-            }
+    @Override
+    public final void moonrise$updatePlayer(final ServerPlayer player,
+                                            final SectionPos oldPos, final SectionPos newPos,
+                                            final boolean oldIgnore, final boolean newIgnore) {
+        if (newIgnore) {
+            this.spawnChunkTracker.remove(player);
+        } else {
+            this.spawnChunkTracker.addOrUpdate(player, newPos.x(), newPos.z(), ca.spottedleaf.moonrise.patches.chunk_tick_iteration.ChunkTickConstants.PLAYER_SPAWN_TRACK_RANGE);
         }
+    }
+    // Paper end - chunk tick iteration optimisation
+
+    protected void purgeStaleTickets() {
+        this.moonrise$getChunkHolderManager().tick(); // Paper - rewrite chunk system
     }
 
     private static int getTicketLevelAt(SortedArraySet<Ticket<?>> tickets) {
@@ -98,77 +98,15 @@ public abstract class DistanceManager {
     protected abstract ChunkHolder updateChunkScheduling(long chunkPos, int i, @Nullable ChunkHolder newLevel, int holder);
 
     public boolean runAllUpdates(ChunkMap chunkMap) {
-        this.naturalSpawnChunkCounter.runAllUpdates();
-        this.tickingTicketsTracker.runAllUpdates();
-        this.playerTicketManager.runAllUpdates();
-        int i = Integer.MAX_VALUE - this.ticketTracker.runDistanceUpdates(Integer.MAX_VALUE);
-        boolean flag = i != 0;
-        if (flag) {
-        }
-
-        if (!this.chunksToUpdateFutures.isEmpty()) {
-            // CraftBukkit start - SPIGOT-7780: Call chunk unload events before updateHighestAllowedStatus
-            for (final ChunkHolder chunkHolder : this.chunksToUpdateFutures) {
-                chunkHolder.callEventIfUnloading(chunkMap);
-            }
-            // CraftBukkit end - SPIGOT-7780: Call chunk unload events before updateHighestAllowedStatus
-
-            for (ChunkHolder chunkHolder : this.chunksToUpdateFutures) {
-                chunkHolder.updateHighestAllowedStatus(chunkMap);
-            }
-
-            for (ChunkHolder chunkHolder : this.chunksToUpdateFutures) {
-                chunkHolder.updateFutures(chunkMap, this.mainThreadExecutor);
-            }
-
-            this.chunksToUpdateFutures.clear();
-            return true;
-        } else {
-            if (!this.ticketsToRelease.isEmpty()) {
-                LongIterator longIterator = this.ticketsToRelease.iterator();
-
-                while (longIterator.hasNext()) {
-                    long l = longIterator.nextLong();
-                    if (this.getTickets(l).stream().anyMatch(ticket -> ticket.getType() == TicketType.PLAYER)) {
-                        ChunkHolder updatingChunkIfPresent = chunkMap.getUpdatingChunkIfPresent(l);
-                        if (updatingChunkIfPresent == null) {
-                            throw new IllegalStateException();
-                        }
-
-                        CompletableFuture<ChunkResult<LevelChunk>> entityTickingChunkFuture = updatingChunkIfPresent.getEntityTickingChunkFuture();
-                        entityTickingChunkFuture.thenAccept(
-                            chunkResult -> this.mainThreadExecutor.execute(() -> this.ticketDispatcher.release(l, () -> {}, false))
-                        );
-                    }
-                }
-
-                this.ticketsToRelease.clear();
-            }
-
-            return flag;
-        }
+        return this.moonrise$getChunkHolderManager().processTicketUpdates(); // Paper - rewrite chunk system
     }
 
     void addTicket(long chunkPos, Ticket<?> ticket) {
-        SortedArraySet<Ticket<?>> tickets = this.getTickets(chunkPos);
-        int ticketLevelAt = getTicketLevelAt(tickets);
-        Ticket<?> ticket1 = tickets.addOrGet(ticket);
-        ticket1.setCreatedTick(this.ticketTickCounter);
-        if (ticket.getTicketLevel() < ticketLevelAt) {
-            this.ticketTracker.update(chunkPos, ticket.getTicketLevel(), true);
-        }
+        this.moonrise$getChunkHolderManager().addTicketAtLevel((TicketType)ticket.getType(), chunkPos, ticket.getTicketLevel(), ticket.key); // Paper - rewrite chunk system
     }
 
     void removeTicket(long chunkPos, Ticket<?> ticket) {
-        SortedArraySet<Ticket<?>> tickets = this.getTickets(chunkPos);
-        if (tickets.remove(ticket)) {
-        }
-
-        if (tickets.isEmpty()) {
-            this.tickets.remove(chunkPos);
-        }
-
-        this.ticketTracker.update(chunkPos, getTicketLevelAt(tickets), false);
+        this.moonrise$getChunkHolderManager().removeTicketAtLevel((TicketType)ticket.getType(), chunkPos, ticket.getTicketLevel(), ticket.key); // Paper - rewrite chunk system
     }
 
     public <T> void addTicket(TicketType<T> type, ChunkPos pos, int level, T value) {
@@ -181,68 +119,43 @@ public abstract class DistanceManager {
     }
 
     public <T> void addRegionTicket(TicketType<T> type, ChunkPos pos, int distance, T value) {
-        Ticket<T> ticket = new Ticket<>(type, ChunkLevel.byStatus(FullChunkStatus.FULL) - distance, value);
-        long packedChunkPos = pos.toLong();
-        this.addTicket(packedChunkPos, ticket); // Paper - diff on change above
-        this.tickingTicketsTracker.addTicket(packedChunkPos, ticket);
+        this.moonrise$getChunkHolderManager().addTicketAtLevel(type, pos, ChunkLevel.byStatus(FullChunkStatus.FULL) - distance, value); // Paper - rewrite chunk system
     }
 
     public <T> void removeRegionTicket(TicketType<T> type, ChunkPos pos, int distance, T value) {
-        Ticket<T> ticket = new Ticket<>(type, ChunkLevel.byStatus(FullChunkStatus.FULL) - distance, value);
-        long packedChunkPos = pos.toLong();
-        this.removeTicket(packedChunkPos, ticket); // Paper - diff on change above
-        this.tickingTicketsTracker.removeTicket(packedChunkPos, ticket);
+        this.moonrise$getChunkHolderManager().removeTicketAtLevel(type, pos, ChunkLevel.byStatus(FullChunkStatus.FULL) - distance, value); // Paper - rewrite chunk system
     }
 
     // Paper start
     public boolean addPluginRegionTicket(final ChunkPos pos, final org.bukkit.plugin.Plugin value) {
-        Ticket<org.bukkit.plugin.Plugin> ticket = new Ticket<>(TicketType.PLUGIN_TICKET, ChunkLevel.byStatus(FullChunkStatus.FULL) - 2, value); // Copied from below and keep in-line with force loading, add at level 31
-        final long packedChunkPos = pos.toLong();
-        final Set<Ticket<?>> tickets = this.getTickets(packedChunkPos);
-        if (tickets.contains(ticket)) {
-            return false;
-        }
-        this.addTicket(packedChunkPos, ticket);
-        this.tickingTicketsTracker.addTicket(packedChunkPos, ticket);
-        return true;
+        return this.moonrise$getChunkHolderManager().addTicketAtLevel(TicketType.PLUGIN_TICKET, pos, ChunkLevel.byStatus(FullChunkStatus.FULL) - 2, value); // Paper - rewrite chunk system
     }
 
     public boolean removePluginRegionTicket(final ChunkPos pos, final org.bukkit.plugin.Plugin value) {
-        Ticket<org.bukkit.plugin.Plugin> ticket = new Ticket<>(TicketType.PLUGIN_TICKET, ChunkLevel.byStatus(FullChunkStatus.FULL) - 2, value); // Copied from below and keep in-line with force loading, add at level 31
-        final long packedChunkPos = pos.toLong();
-        final Set<Ticket<?>> tickets = this.tickets.get(packedChunkPos); // Don't use getTickets, we don't want to create a new set
-        if (tickets == null || !tickets.contains(ticket)) {
-            return false;
-        }
-        this.removeTicket(packedChunkPos, ticket);
-        this.tickingTicketsTracker.removeTicket(packedChunkPos, ticket);
-        return true;
+        return this.moonrise$getChunkHolderManager().removeTicketAtLevel(TicketType.PLUGIN_TICKET, pos, ChunkLevel.byStatus(FullChunkStatus.FULL) - 2, value); // Paper - rewrite chunk system
     }
     // Paper end
 
     private SortedArraySet<Ticket<?>> getTickets(long chunkPos) {
-        return this.tickets.computeIfAbsent(chunkPos, l -> SortedArraySet.create(4));
+        throw new UnsupportedOperationException(); // Paper - rewrite chunk system
     }
 
     protected void updateChunkForced(ChunkPos pos, boolean add) {
-        Ticket<ChunkPos> ticket = new Ticket<>(TicketType.FORCED, ChunkMap.FORCED_TICKET_LEVEL, pos);
-        long packedChunkPos = pos.toLong();
+        // Paper start - rewrite chunk system
         if (add) {
-            this.addTicket(packedChunkPos, ticket);
-            this.tickingTicketsTracker.addTicket(packedChunkPos, ticket);
+            this.moonrise$getChunkHolderManager().addTicketAtLevel(TicketType.FORCED, pos, ChunkMap.FORCED_TICKET_LEVEL, pos);
         } else {
-            this.removeTicket(packedChunkPos, ticket);
-            this.tickingTicketsTracker.removeTicket(packedChunkPos, ticket);
+            this.moonrise$getChunkHolderManager().removeTicketAtLevel(TicketType.FORCED, pos, ChunkMap.FORCED_TICKET_LEVEL, pos);
         }
+        // Paper end - rewrite chunk system
     }
 
     public void addPlayer(SectionPos sectionPos, ServerPlayer player) {
         ChunkPos chunkPos = sectionPos.chunk();
         long packedChunkPos = chunkPos.toLong();
         this.playersPerChunk.computeIfAbsent(packedChunkPos, l -> new ObjectOpenHashSet<>()).add(player);
-        this.naturalSpawnChunkCounter.update(packedChunkPos, 0, true);
-        this.playerTicketManager.update(packedChunkPos, 0, true);
-        this.tickingTicketsTracker.addTicket(TicketType.PLAYER, chunkPos, this.getPlayerTicketLevel(), chunkPos);
+        // Paper - chunk tick iteration optimisation
+        // Paper - rewrite chunk system
     }
 
     public void removePlayer(SectionPos sectionPos, ServerPlayer player) {
@@ -254,136 +167,90 @@ public abstract class DistanceManager {
         if (set == null || set.isEmpty()) {
         // Paper end - some state corruption happens here, don't crash, clean up gracefully
             this.playersPerChunk.remove(packedChunkPos);
-            this.naturalSpawnChunkCounter.update(packedChunkPos, Integer.MAX_VALUE, false);
-            this.playerTicketManager.update(packedChunkPos, Integer.MAX_VALUE, false);
-            this.tickingTicketsTracker.removeTicket(TicketType.PLAYER, chunkPos, this.getPlayerTicketLevel(), chunkPos);
+            // Paper - chunk tick iteration optimisation
+            // Paper - rewrite chunk system
         }
     }
 
     private int getPlayerTicketLevel() {
-        return Math.max(0, ChunkLevel.byStatus(FullChunkStatus.ENTITY_TICKING) - this.simulationDistance);
+        throw new UnsupportedOperationException(); // Paper - rewrite chunk system
     }
 
     public boolean inEntityTickingRange(long chunkPos) {
-        return ChunkLevel.isEntityTicking(this.tickingTicketsTracker.getLevel(chunkPos));
+        // Paper start - rewrite chunk system
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder chunkHolder = this.moonrise$getChunkHolderManager().getChunkHolder(chunkPos);
+        return chunkHolder != null && chunkHolder.isEntityTickingReady();
+        // Paper end - rewrite chunk system
     }
 
     public boolean inBlockTickingRange(long chunkPos) {
-        return ChunkLevel.isBlockTicking(this.tickingTicketsTracker.getLevel(chunkPos));
+        // Paper start - rewrite chunk system
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder chunkHolder = this.moonrise$getChunkHolderManager().getChunkHolder(chunkPos);
+        return chunkHolder != null && chunkHolder.isTickingReady();
+        // Paper end - rewrite chunk system
     }
 
     protected String getTicketDebugString(long chunkPos) {
-        SortedArraySet<Ticket<?>> set = this.tickets.get(chunkPos);
-        return set != null && !set.isEmpty() ? set.first().toString() : "no_ticket";
+        return this.moonrise$getChunkHolderManager().getTicketDebugString(chunkPos); // Paper - rewrite chunk system
     }
 
     protected void updatePlayerTickets(int viewDistance) {
-        this.playerTicketManager.updateViewDistance(viewDistance);
+        this.moonrise$getChunkMap().setServerViewDistance(viewDistance); // Paper - rewrite chunk system
     }
 
     public void updateSimulationDistance(int simulationDistance) {
-        if (simulationDistance != this.simulationDistance) {
-            this.simulationDistance = simulationDistance;
-            this.tickingTicketsTracker.replacePlayerTicketsLevel(this.getPlayerTicketLevel());
-        }
+        // Paper start - rewrite chunk system
+        // note: vanilla does not clamp to 0, but we do simply because we need a min of 0
+        final int clamped = net.minecraft.util.Mth.clamp(simulationDistance, 0, ca.spottedleaf.moonrise.common.util.MoonriseConstants.MAX_VIEW_DISTANCE);
+
+        ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.moonrise$getChunkMap().level).moonrise$getPlayerChunkLoader().setTickDistance(clamped);
+        // Paper end - rewrite chunk system
     }
 
     public int getNaturalSpawnChunkCount() {
-        this.naturalSpawnChunkCounter.runAllUpdates();
-        return this.naturalSpawnChunkCounter.chunks.size();
+        return this.spawnChunkTracker.getTotalPositions(); // Paper - chunk tick iteration optimisation
     }
 
     public boolean hasPlayersNearby(long chunkPos) {
-        this.naturalSpawnChunkCounter.runAllUpdates();
-        return this.naturalSpawnChunkCounter.chunks.containsKey(chunkPos);
+        return this.spawnChunkTracker.hasObjectsNear(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkX(chunkPos), ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkZ(chunkPos)); // Paper - chunk tick iteration optimisation
     }
 
     public LongIterator getSpawnCandidateChunks() {
-        this.naturalSpawnChunkCounter.runAllUpdates();
-        return this.naturalSpawnChunkCounter.chunks.keySet().iterator();
+        return this.spawnChunkTracker.getPositions().iterator(); // Paper - chunk tick iteration optimisation
     }
 
     public String getDebugStatus() {
-        return this.ticketDispatcher.getDebugStatus();
+        return "No DistanceManager stats available"; // Paper - rewrite chunk system
     }
 
     private void dumpTickets(String filename) {
-        try (FileOutputStream fileOutputStream = new FileOutputStream(new File(filename))) {
-            for (Entry<SortedArraySet<Ticket<?>>> entry : this.tickets.long2ObjectEntrySet()) {
-                ChunkPos chunkPos = new ChunkPos(entry.getLongKey());
-
-                for (Ticket<?> ticket : entry.getValue()) {
-                    fileOutputStream.write(
-                        (chunkPos.x + "\t" + chunkPos.z + "\t" + ticket.getType() + "\t" + ticket.getTicketLevel() + "\t\n").getBytes(StandardCharsets.UTF_8)
-                    );
-                }
-            }
-        } catch (IOException var10) {
-            LOGGER.error("Failed to dump tickets to {}", filename, var10);
-        }
+        throw new UnsupportedOperationException(); // Paper - rewrite chunk system
     }
 
     @VisibleForTesting
     TickingTracker tickingTracker() {
-        return this.tickingTicketsTracker;
+        throw new UnsupportedOperationException(); // Paper - rewrite chunk system
     }
 
     public LongSet getTickingChunks() {
-        return this.tickingTicketsTracker.getTickingChunks();
+        throw new UnsupportedOperationException(); // Paper - rewrite chunk system
     }
 
     public void removeTicketsOnClosing() {
-        ImmutableSet<TicketType<?>> set = ImmutableSet.of(TicketType.UNKNOWN, TicketType.POST_TELEPORT, TicketType.FUTURE_AWAIT); // Paper - add additional tickets to preserve
-        ObjectIterator<Entry<SortedArraySet<Ticket<?>>>> objectIterator = this.tickets.long2ObjectEntrySet().fastIterator();
-
-        while (objectIterator.hasNext()) {
-            Entry<SortedArraySet<Ticket<?>>> entry = objectIterator.next();
-            Iterator<Ticket<?>> iterator = entry.getValue().iterator();
-            boolean flag = false;
-
-            while (iterator.hasNext()) {
-                Ticket<?> ticket = iterator.next();
-                if (!set.contains(ticket.getType())) {
-                    iterator.remove();
-                    flag = true;
-                    this.tickingTicketsTracker.removeTicket(entry.getLongKey(), ticket);
-                }
-            }
-
-            if (flag) {
-                this.ticketTracker.update(entry.getLongKey(), getTicketLevelAt(entry.getValue()), false);
-            }
-
-            if (entry.getValue().isEmpty()) {
-                objectIterator.remove();
-            }
-        }
+        // Paper - rewrite chunk system
     }
 
     public boolean hasTickets() {
-        return !this.tickets.isEmpty();
+        throw new UnsupportedOperationException();  // Paper - rewrite chunk system
     }
 
     // CraftBukkit start
     public <T> void removeAllTicketsFor(TicketType<T> ticketType, int ticketLevel, T ticketIdentifier) {
-        Ticket<T> target = new Ticket<>(ticketType, ticketLevel, ticketIdentifier);
-
-        for (java.util.Iterator<Entry<SortedArraySet<Ticket<?>>>> iterator = this.tickets.long2ObjectEntrySet().fastIterator(); iterator.hasNext();) {
-            Entry<SortedArraySet<Ticket<?>>> entry = iterator.next();
-            SortedArraySet<Ticket<?>> tickets = entry.getValue();
-            if (tickets.remove(target)) {
-                // copied from removeTicket
-                this.ticketTracker.update(entry.getLongKey(), DistanceManager.getTicketLevelAt(tickets), false);
-
-                // can't use entry after it's removed
-                if (tickets.isEmpty()) {
-                    iterator.remove();
-                }
-            }
-        }
+        this.moonrise$getChunkHolderManager().removeAllTicketsFor(ticketType, ticketLevel, ticketIdentifier); // Paper - rewrite chunk system
     }
     // CraftBukkit end
 
+/*  // Paper - rewrite chunk system
     class ChunkTicketTracker extends ChunkTracker {
         private static final int MAX_LEVEL = ChunkLevel.MAX_LEVEL + 1;
 
@@ -428,7 +295,7 @@ public abstract class DistanceManager {
         public int runDistanceUpdates(int toUpdateCount) {
             return this.runUpdates(toUpdateCount);
         }
-    }
+    }*/  // Paper - rewrite chunk system
 
     class FixedPlayerDistanceChunkTracker extends ChunkTracker {
         protected final Long2ByteMap chunks = new Long2ByteOpenHashMap();
@@ -487,6 +354,7 @@ public abstract class DistanceManager {
         }
     }
 
+/*  // Paper - rewrite chunk system
     class PlayerTicketTracker extends DistanceManager.FixedPlayerDistanceChunkTracker {
         private int viewDistance;
         private final Long2IntMap queueLevels = Long2IntMaps.synchronize(new Long2IntOpenHashMap());
@@ -563,5 +431,5 @@ public abstract class DistanceManager {
         private boolean haveTicketFor(int level) {
             return level <= this.viewDistance;
         }
-    }
+    }*/  // Paper - rewrite chunk system
 }

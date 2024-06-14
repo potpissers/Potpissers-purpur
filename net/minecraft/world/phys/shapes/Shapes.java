@@ -16,9 +16,15 @@ public final class Shapes {
     public static final double EPSILON = 1.0E-7;
     public static final double BIG_EPSILON = 1.0E-6;
     private static final VoxelShape BLOCK = Util.make(() -> {
-        DiscreteVoxelShape discreteVoxelShape = new BitSetDiscreteVoxelShape(1, 1, 1);
-        discreteVoxelShape.fill(0, 0, 0);
-        return new CubeVoxelShape(discreteVoxelShape);
+        // Paper start - optimise collisions
+        final DiscreteVoxelShape shape = new BitSetDiscreteVoxelShape(1, 1, 1);
+        shape.fill(0, 0, 0);
+
+        return new ArrayVoxelShape(
+            shape,
+            ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.ZERO_ONE, ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.ZERO_ONE, ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.ZERO_ONE
+        );
+        // Paper end - optimise collisions
     });
     public static final VoxelShape INFINITY = box(
         Double.NEGATIVE_INFINITY,
@@ -43,6 +49,30 @@ public final class Shapes {
         return BLOCK;
     }
 
+    // Paper start - optimise collisions
+    private static final DoubleArrayList[] PARTS_BY_BITS = new DoubleArrayList[] {
+        DoubleArrayList.wrap(generateCubeParts(1 << 0)),
+        DoubleArrayList.wrap(generateCubeParts(1 << 1)),
+        DoubleArrayList.wrap(generateCubeParts(1 << 2)),
+        DoubleArrayList.wrap(generateCubeParts(1 << 3))
+    };
+
+    private static double[] generateCubeParts(final int parts) {
+        // note: parts is a power of two, so we do not need to worry about loss of precision here
+        // note: parts is from [2^0, 2^3]
+        final double inc = 1.0 / (double)parts;
+
+        final double[] ret = new double[parts + 1];
+        double val = 0.0;
+        for (int i = 0; i <= parts; ++i) {
+            ret[i] = val;
+            val += inc;
+        }
+
+        return ret;
+    }
+    // Paper end - optimise collisions
+
     public static VoxelShape box(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         if (!(minX > maxX) && !(minY > maxY) && !(minZ > maxZ)) {
             return create(minX, minY, minZ, maxX, maxY, maxZ);
@@ -52,39 +82,42 @@ public final class Shapes {
     }
 
     public static VoxelShape create(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+        // Paper start - optimise collisions
         if (!(maxX - minX < 1.0E-7) && !(maxY - minY < 1.0E-7) && !(maxZ - minZ < 1.0E-7)) {
-            int i = findBits(minX, maxX);
-            int i1 = findBits(minY, maxY);
-            int i2 = findBits(minZ, maxZ);
-            if (i < 0 || i1 < 0 || i2 < 0) {
+            final int bitsX = findBits(minX, maxX);
+            final int bitsY = findBits(minY, maxY);
+            final int bitsZ = findBits(minZ, maxZ);
+            if (bitsX >= 0 && bitsY >= 0 && bitsZ >= 0) {
+                if (bitsX == 0 && bitsY == 0 && bitsZ == 0) {
+                    return BLOCK;
+                } else {
+                    final int sizeX = 1 << bitsX;
+                    final int sizeY = 1 << bitsY;
+                    final int sizeZ = 1 << bitsZ;
+                    final BitSetDiscreteVoxelShape shape = BitSetDiscreteVoxelShape.withFilledBounds(
+                        sizeX, sizeY, sizeZ,
+                        (int)Math.round(minX * (double)sizeX), (int)Math.round(minY * (double)sizeY), (int)Math.round(minZ * (double)sizeZ),
+                        (int)Math.round(maxX * (double)sizeX), (int)Math.round(maxY * (double)sizeY), (int)Math.round(maxZ * (double)sizeZ)
+                    );
+                    return new ArrayVoxelShape(
+                        shape,
+                        PARTS_BY_BITS[bitsX],
+                        PARTS_BY_BITS[bitsY],
+                        PARTS_BY_BITS[bitsZ]
+                    );
+                }
+            } else {
                 return new ArrayVoxelShape(
                     BLOCK.shape,
-                    DoubleArrayList.wrap(new double[]{minX, maxX}),
-                    DoubleArrayList.wrap(new double[]{minY, maxY}),
-                    DoubleArrayList.wrap(new double[]{minZ, maxZ})
+                    minX == 0.0 && maxX == 1.0 ? ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.ZERO_ONE : DoubleArrayList.wrap(new double[] { minX, maxX }),
+                    minY == 0.0 && maxY == 1.0 ? ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.ZERO_ONE : DoubleArrayList.wrap(new double[] { minY, maxY }),
+                    minZ == 0.0 && maxZ == 1.0 ? ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.ZERO_ONE : DoubleArrayList.wrap(new double[] { minZ, maxZ })
                 );
-            } else if (i == 0 && i1 == 0 && i2 == 0) {
-                return block();
-            } else {
-                int i3 = 1 << i;
-                int i4 = 1 << i1;
-                int i5 = 1 << i2;
-                BitSetDiscreteVoxelShape bitSetDiscreteVoxelShape = BitSetDiscreteVoxelShape.withFilledBounds(
-                    i3,
-                    i4,
-                    i5,
-                    (int)Math.round(minX * i3),
-                    (int)Math.round(minY * i4),
-                    (int)Math.round(minZ * i5),
-                    (int)Math.round(maxX * i3),
-                    (int)Math.round(maxY * i4),
-                    (int)Math.round(maxZ * i5)
-                );
-                return new CubeVoxelShape(bitSetDiscreteVoxelShape);
             }
         } else {
-            return empty();
+            return EMPTY;
         }
+        // Paper end - optimise collisions
     }
 
     public static VoxelShape create(AABB aabb) {
@@ -120,85 +153,52 @@ public final class Shapes {
     }
 
     public static VoxelShape or(VoxelShape shape1, VoxelShape... others) {
-        return Arrays.stream(others).reduce(shape1, Shapes::or);
+        int size = others.length;
+        if (size == 0) {
+            return shape1;
+        }
+
+        // reduce complexity of joins by splitting the merges
+
+        // add extra slot for first shape
+        ++size;
+        final VoxelShape[] tmp = Arrays.copyOf(others, size);
+        // insert first shape
+        tmp[size - 1] = shape1;
+
+        while (size > 1) {
+            int newSize = 0;
+            for (int i = 0; i < size; i += 2) {
+                final int next = i + 1;
+                if (next >= size) {
+                    // nothing to merge with, so leave it for next iteration
+                    tmp[newSize++] = tmp[i];
+                    break;
+                } else {
+                    // merge with adjacent
+                    final VoxelShape first = tmp[i];
+                    final VoxelShape second = tmp[next];
+
+                    tmp[newSize++] = Shapes.joinUnoptimized(first, second, BooleanOp.OR);
+                }
+            }
+            size = newSize;
+        }
+
+        return tmp[0].optimize();
+        // Paper end - optimise collisions
     }
 
     public static VoxelShape join(VoxelShape shape1, VoxelShape shape2, BooleanOp function) {
-        return joinUnoptimized(shape1, shape2, function).optimize();
+        return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.joinOptimized(shape1, shape2, function); // Paper - optimise collisions
     }
 
     public static VoxelShape joinUnoptimized(VoxelShape shape1, VoxelShape shape2, BooleanOp function) {
-        if (function.apply(false, false)) {
-            throw (IllegalArgumentException)Util.pauseInIde(new IllegalArgumentException());
-        } else if (shape1 == shape2) {
-            return function.apply(true, true) ? shape1 : empty();
-        } else {
-            boolean flag = function.apply(true, false);
-            boolean flag1 = function.apply(false, true);
-            if (shape1.isEmpty()) {
-                return flag1 ? shape2 : empty();
-            } else if (shape2.isEmpty()) {
-                return flag ? shape1 : empty();
-            } else {
-                IndexMerger indexMerger = createIndexMerger(1, shape1.getCoords(Direction.Axis.X), shape2.getCoords(Direction.Axis.X), flag, flag1);
-                IndexMerger indexMerger1 = createIndexMerger(
-                    indexMerger.size() - 1, shape1.getCoords(Direction.Axis.Y), shape2.getCoords(Direction.Axis.Y), flag, flag1
-                );
-                IndexMerger indexMerger2 = createIndexMerger(
-                    (indexMerger.size() - 1) * (indexMerger1.size() - 1), shape1.getCoords(Direction.Axis.Z), shape2.getCoords(Direction.Axis.Z), flag, flag1
-                );
-                BitSetDiscreteVoxelShape bitSetDiscreteVoxelShape = BitSetDiscreteVoxelShape.join(
-                    shape1.shape, shape2.shape, indexMerger, indexMerger1, indexMerger2, function
-                );
-                return (VoxelShape)(indexMerger instanceof DiscreteCubeMerger
-                        && indexMerger1 instanceof DiscreteCubeMerger
-                        && indexMerger2 instanceof DiscreteCubeMerger
-                    ? new CubeVoxelShape(bitSetDiscreteVoxelShape)
-                    : new ArrayVoxelShape(bitSetDiscreteVoxelShape, indexMerger.getList(), indexMerger1.getList(), indexMerger2.getList()));
-            }
-        }
+        return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.joinUnoptimized(shape1, shape2, function); // Paper - optimise collisions
     }
 
     public static boolean joinIsNotEmpty(VoxelShape shape1, VoxelShape shape2, BooleanOp resultOperator) {
-        if (resultOperator.apply(false, false)) {
-            throw (IllegalArgumentException)Util.pauseInIde(new IllegalArgumentException());
-        } else {
-            boolean isEmpty = shape1.isEmpty();
-            boolean isEmpty1 = shape2.isEmpty();
-            if (!isEmpty && !isEmpty1) {
-                if (shape1 == shape2) {
-                    return resultOperator.apply(true, true);
-                } else {
-                    boolean flag = resultOperator.apply(true, false);
-                    boolean flag1 = resultOperator.apply(false, true);
-
-                    for (Direction.Axis axis : AxisCycle.AXIS_VALUES) {
-                        if (shape1.max(axis) < shape2.min(axis) - 1.0E-7) {
-                            return flag || flag1;
-                        }
-
-                        if (shape2.max(axis) < shape1.min(axis) - 1.0E-7) {
-                            return flag || flag1;
-                        }
-                    }
-
-                    IndexMerger indexMerger = createIndexMerger(1, shape1.getCoords(Direction.Axis.X), shape2.getCoords(Direction.Axis.X), flag, flag1);
-                    IndexMerger indexMerger1 = createIndexMerger(
-                        indexMerger.size() - 1, shape1.getCoords(Direction.Axis.Y), shape2.getCoords(Direction.Axis.Y), flag, flag1
-                    );
-                    IndexMerger indexMerger2 = createIndexMerger(
-                        (indexMerger.size() - 1) * (indexMerger1.size() - 1),
-                        shape1.getCoords(Direction.Axis.Z),
-                        shape2.getCoords(Direction.Axis.Z),
-                        flag,
-                        flag1
-                    );
-                    return joinIsNotEmpty(indexMerger, indexMerger1, indexMerger2, shape1.shape, shape2.shape, resultOperator);
-                }
-            } else {
-                return resultOperator.apply(!isEmpty, !isEmpty1);
-            }
-        }
+        return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.isJoinNonEmpty(shape1, shape2, resultOperator); // Paper - optimise collisions
     }
 
     private static boolean joinIsNotEmpty(
@@ -230,52 +230,116 @@ public final class Shapes {
         return desiredOffset;
     }
 
-    public static boolean blockOccudes(VoxelShape shape, VoxelShape adjacentShape, Direction side) {
-        if (shape == block() && adjacentShape == block()) {
+    // Paper start - optimise collisions
+    public static boolean blockOccudes(final VoxelShape first, final VoxelShape second, final Direction direction) {
+        final boolean firstBlock = first == BLOCK;
+        final boolean secondBlock = second == BLOCK;
+
+        if (firstBlock & secondBlock) {
             return true;
-        } else if (adjacentShape.isEmpty()) {
+        }
+
+        if (first.isEmpty() | second.isEmpty()) {
             return false;
-        } else {
-            Direction.Axis axis = side.getAxis();
-            Direction.AxisDirection axisDirection = side.getAxisDirection();
-            VoxelShape voxelShape = axisDirection == Direction.AxisDirection.POSITIVE ? shape : adjacentShape;
-            VoxelShape voxelShape1 = axisDirection == Direction.AxisDirection.POSITIVE ? adjacentShape : shape;
-            BooleanOp booleanOp = axisDirection == Direction.AxisDirection.POSITIVE ? BooleanOp.ONLY_FIRST : BooleanOp.ONLY_SECOND;
-            return DoubleMath.fuzzyEquals(voxelShape.max(axis), 1.0, 1.0E-7)
-                && DoubleMath.fuzzyEquals(voxelShape1.min(axis), 0.0, 1.0E-7)
-                && !joinIsNotEmpty(new SliceShape(voxelShape, axis, voxelShape.shape.getSize(axis) - 1), new SliceShape(voxelShape1, axis, 0), booleanOp);
         }
+
+        // we optimise getOpposite, so we can use it
+        // secondly, use our cache to retrieve sliced shape
+        final VoxelShape newFirst = ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)first).moonrise$getFaceShapeClamped(direction);
+        if (newFirst.isEmpty()) {
+            return false;
+        }
+        final VoxelShape newSecond = ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)second).moonrise$getFaceShapeClamped(direction.getOpposite());
+        if (newSecond.isEmpty()) {
+            return false;
+        }
+
+        return !joinIsNotEmpty(newFirst, newSecond, BooleanOp.ONLY_FIRST);
+        // Paper end - optimise collisions
     }
 
-    public static boolean mergedFaceOccludes(VoxelShape shape, VoxelShape adjacentShape, Direction side) {
-        if (shape != block() && adjacentShape != block()) {
-            Direction.Axis axis = side.getAxis();
-            Direction.AxisDirection axisDirection = side.getAxisDirection();
-            VoxelShape voxelShape = axisDirection == Direction.AxisDirection.POSITIVE ? shape : adjacentShape;
-            VoxelShape voxelShape1 = axisDirection == Direction.AxisDirection.POSITIVE ? adjacentShape : shape;
-            if (!DoubleMath.fuzzyEquals(voxelShape.max(axis), 1.0, 1.0E-7)) {
-                voxelShape = empty();
-            }
+    // Paper start - optimise collisions
+    private static boolean mergedMayOccludeBlock(final VoxelShape shape1, final VoxelShape shape2) {
+        // if the combined bounds of the two shapes cannot occlude, then neither can the merged
+        final AABB bounds1 = shape1.bounds();
+        final AABB bounds2 = shape2.bounds();
 
-            if (!DoubleMath.fuzzyEquals(voxelShape1.min(axis), 0.0, 1.0E-7)) {
-                voxelShape1 = empty();
-            }
+        final double minX = Math.min(bounds1.minX, bounds2.minX);
+        final double minY = Math.min(bounds1.minY, bounds2.minY);
+        final double minZ = Math.min(bounds1.minZ, bounds2.minZ);
 
-            return !joinIsNotEmpty(
-                block(),
-                joinUnoptimized(new SliceShape(voxelShape, axis, voxelShape.shape.getSize(axis) - 1), new SliceShape(voxelShape1, axis, 0), BooleanOp.OR),
-                BooleanOp.ONLY_FIRST
-            );
-        } else {
+        final double maxX = Math.max(bounds1.maxX, bounds2.maxX);
+        final double maxY = Math.max(bounds1.maxY, bounds2.maxY);
+        final double maxZ = Math.max(bounds1.maxZ, bounds2.maxZ);
+
+        return (minX <= ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_EPSILON && maxX >= (1 - ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_EPSILON)) &&
+            (minY <= ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_EPSILON && maxY >= (1 - ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_EPSILON)) &&
+            (minZ <= ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_EPSILON && maxZ >= (1 - ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_EPSILON));
+    }
+    // Paper end - optimise collisions
+
+    // Paper start - optimise collisions
+    public static boolean mergedFaceOccludes(final VoxelShape first, final VoxelShape second, final Direction direction) {
+        // see if any of the shapes on their own occludes, only if cached
+        if (((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)first).moonrise$occludesFullBlockIfCached() || ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)second).moonrise$occludesFullBlockIfCached()) {
             return true;
         }
-    }
 
-    public static boolean faceShapeOccludes(VoxelShape voxelShape1, VoxelShape voxelShape2) {
-        return voxelShape1 == block()
-            || voxelShape2 == block()
-            || (!voxelShape1.isEmpty() || !voxelShape2.isEmpty())
-                && !joinIsNotEmpty(block(), joinUnoptimized(voxelShape1, voxelShape2, BooleanOp.OR), BooleanOp.ONLY_FIRST);
+        if (first.isEmpty() & second.isEmpty()) {
+            return false;
+        }
+
+        // we optimise getOpposite, so we can use it
+        // secondly, use our cache to retrieve sliced shape
+        final VoxelShape newFirst = ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)first).moonrise$getFaceShapeClamped(direction);
+        final VoxelShape newSecond = ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)second).moonrise$getFaceShapeClamped(direction.getOpposite());
+
+        // see if any of the shapes on their own occludes, only if cached
+        if (((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)newFirst).moonrise$occludesFullBlockIfCached() || ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)newSecond).moonrise$occludesFullBlockIfCached()) {
+            return true;
+        }
+
+        final boolean firstEmpty = newFirst.isEmpty();
+        final boolean secondEmpty = newSecond.isEmpty();
+
+        if (firstEmpty & secondEmpty) {
+            return false;
+        }
+
+        if (firstEmpty | secondEmpty) {
+            return secondEmpty ? ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)newFirst).moonrise$occludesFullBlock() : ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)newSecond).moonrise$occludesFullBlock();
+        }
+
+        if (newFirst == newSecond) {
+            return ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)newFirst).moonrise$occludesFullBlock();
+        }
+
+        return mergedMayOccludeBlock(newFirst, newSecond) && ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)newFirst).moonrise$orUnoptimized(newSecond)).moonrise$occludesFullBlock();
+    }
+    // Paper end - optimise collisions
+
+    // Paper start - optimise collisions
+    public static boolean faceShapeOccludes(final VoxelShape shape1, final VoxelShape shape2) {
+        if (((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape1).moonrise$occludesFullBlockIfCached() || ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape2).moonrise$occludesFullBlockIfCached()) {
+            return true;
+        }
+
+        final boolean s1Empty = shape1.isEmpty();
+        final boolean s2Empty = shape2.isEmpty();
+        if (s1Empty & s2Empty) {
+            return false;
+        }
+
+        if (s1Empty | s2Empty) {
+            return s2Empty ? ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape1).moonrise$occludesFullBlock() : ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape2).moonrise$occludesFullBlock();
+        }
+
+        if (shape1 == shape2) {
+            return ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape1).moonrise$occludesFullBlock();
+        }
+
+        return mergedMayOccludeBlock(shape1, shape2) && ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape1).moonrise$orUnoptimized(shape2)).moonrise$occludesFullBlock();
+        // Paper end - optimise collisions
     }
 
     @VisibleForTesting

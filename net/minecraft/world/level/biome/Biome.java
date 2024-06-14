@@ -117,20 +117,7 @@ public final class Biome {
 
     @Deprecated
     public float getTemperature(BlockPos pos, int seaLevel) {
-        long packedBlockPos = pos.asLong();
-        Long2FloatLinkedOpenHashMap map = this.temperatureCache.get();
-        float f = map.get(packedBlockPos);
-        if (!Float.isNaN(f)) {
-            return f;
-        } else {
-            float heightAdjustedTemperature = this.getHeightAdjustedTemperature(pos, seaLevel);
-            if (map.size() == 1024) {
-                map.removeFirstFloat();
-            }
-
-            map.put(packedBlockPos, heightAdjustedTemperature);
-            return heightAdjustedTemperature;
-        }
+        return this.getHeightAdjustedTemperature(pos, seaLevel); // Paper - optimise random ticking
     }
 
     public boolean shouldFreeze(LevelReader level, BlockPos pos) {

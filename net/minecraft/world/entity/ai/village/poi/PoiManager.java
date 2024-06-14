@@ -38,11 +38,136 @@ import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 import net.minecraft.world.level.chunk.storage.SectionStorage;
 import net.minecraft.world.level.chunk.storage.SimpleRegionStorage;
 
-public class PoiManager extends SectionStorage<PoiSection, PoiSection.Packed> {
+public class PoiManager extends SectionStorage<PoiSection, PoiSection.Packed> implements ca.spottedleaf.moonrise.patches.chunk_system.level.poi.ChunkSystemPoiManager { // Paper - rewrite chunk system
     public static final int MAX_VILLAGE_DISTANCE = 6;
     public static final int VILLAGE_SECTION_SIZE = 1;
     private final PoiManager.DistanceTracker distanceTracker;
     private final LongSet loadedChunks = new LongOpenHashSet();
+
+    // Paper start - rewrite chunk system
+    private final net.minecraft.server.level.ServerLevel world;
+
+    // the vanilla tracker needs to be replaced because it does not support level removes, and we need level removes
+    // to support poi unloading
+    private final ca.spottedleaf.moonrise.common.misc.Delayed26WayDistancePropagator3D villageDistanceTracker = new ca.spottedleaf.moonrise.common.misc.Delayed26WayDistancePropagator3D();
+
+    private static final int POI_DATA_SOURCE = 7;
+
+    private static int convertBetweenLevels(final int level) {
+        return POI_DATA_SOURCE - level;
+    }
+
+    private void updateDistanceTracking(long section) {
+        if (this.isVillageCenter(section)) {
+            this.villageDistanceTracker.setSource(section, POI_DATA_SOURCE);
+        } else {
+            this.villageDistanceTracker.removeSource(section);
+        }
+    }
+
+    @Override
+    public Optional<PoiSection> get(final long pos) {
+        final int chunkX = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkSectionX(pos);
+        final int chunkY = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkSectionY(pos);
+        final int chunkZ = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkSectionZ(pos);
+
+        ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(this.world, chunkX, chunkZ, "Accessing poi chunk off-main");
+
+        final ca.spottedleaf.moonrise.patches.chunk_system.level.poi.PoiChunk ret = ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.world).moonrise$getChunkTaskScheduler().chunkHolderManager.getPoiChunkIfLoaded(chunkX, chunkZ, true);
+
+        return ret == null ? Optional.empty() : ret.getSectionForVanilla(chunkY);
+    }
+
+    @Override
+    public Optional<PoiSection> getOrLoad(final long pos) {
+        final int chunkX = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkSectionX(pos);
+        final int chunkY = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkSectionY(pos);
+        final int chunkZ = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkSectionZ(pos);
+
+        ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(this.world, chunkX, chunkZ, "Accessing poi chunk off-main");
+
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManager manager = ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.world).moonrise$getChunkTaskScheduler().chunkHolderManager;
+
+        if (chunkY >= ca.spottedleaf.moonrise.common.util.WorldUtil.getMinSection(this.world) && chunkY <= ca.spottedleaf.moonrise.common.util.WorldUtil.getMaxSection(this.world)) {
+            final ca.spottedleaf.moonrise.patches.chunk_system.level.poi.PoiChunk ret = manager.getPoiChunkIfLoaded(chunkX, chunkZ, true);
+            if (ret != null) {
+                return ret.getSectionForVanilla(chunkY);
+            } else {
+                return manager.loadPoiChunk(chunkX, chunkZ).getSectionForVanilla(chunkY);
+            }
+        }
+        // retain vanilla behavior: do not load section if out of bounds!
+        return Optional.empty();
+    }
+
+    @Override
+    protected PoiSection getOrCreate(final long pos) {
+        final int chunkX = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkSectionX(pos);
+        final int chunkY = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkSectionY(pos);
+        final int chunkZ = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkSectionZ(pos);
+
+        ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(this.world, chunkX, chunkZ, "Accessing poi chunk off-main");
+
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManager manager = ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.world).moonrise$getChunkTaskScheduler().chunkHolderManager;
+
+        final ca.spottedleaf.moonrise.patches.chunk_system.level.poi.PoiChunk ret = manager.getPoiChunkIfLoaded(chunkX, chunkZ, true);
+        if (ret != null) {
+            return ret.getOrCreateSection(chunkY);
+        } else {
+            return manager.loadPoiChunk(chunkX, chunkZ).getOrCreateSection(chunkY);
+        }
+    }
+
+    @Override
+    public final net.minecraft.server.level.ServerLevel moonrise$getWorld() {
+        return this.world;
+    }
+
+    @Override
+    public final void moonrise$onUnload(final long coordinate) { // Paper - rewrite chunk system
+        final int chunkX = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkX(coordinate);
+        final int chunkZ = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkZ(coordinate);
+
+        final int minY = ca.spottedleaf.moonrise.common.util.WorldUtil.getMinSection(this.world);
+        final int maxY = ca.spottedleaf.moonrise.common.util.WorldUtil.getMaxSection(this.world);
+
+        ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(this.world, chunkX, chunkZ, "Unloading poi chunk off-main");
+        for (int sectionY = minY; sectionY <= maxY; ++sectionY) {
+            final long sectionPos = SectionPos.asLong(chunkX, sectionY, chunkZ);
+            this.updateDistanceTracking(sectionPos);
+        }
+    }
+
+    @Override
+    public final void moonrise$loadInPoiChunk(final ca.spottedleaf.moonrise.patches.chunk_system.level.poi.PoiChunk poiChunk) {
+        final int chunkX = poiChunk.chunkX;
+        final int chunkZ = poiChunk.chunkZ;
+
+        final int minY = ca.spottedleaf.moonrise.common.util.WorldUtil.getMinSection(this.world);
+        final int maxY = ca.spottedleaf.moonrise.common.util.WorldUtil.getMaxSection(this.world);
+
+        ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(this.world, chunkX, chunkZ, "Loading poi chunk off-main");
+        for (int sectionY = minY; sectionY <= maxY; ++sectionY) {
+            final PoiSection section = poiChunk.getSection(sectionY);
+            if (section != null && !((ca.spottedleaf.moonrise.patches.chunk_system.level.poi.ChunkSystemPoiSection)section).moonrise$isEmpty()) {
+                this.onSectionLoad(SectionPos.asLong(chunkX, sectionY, chunkZ));
+            }
+        }
+    }
+
+    @Override
+    public final void moonrise$checkConsistency(final net.minecraft.world.level.chunk.ChunkAccess chunk) {
+        final int chunkX = chunk.getPos().x;
+        final int chunkZ = chunk.getPos().z;
+
+        final int minY = ca.spottedleaf.moonrise.common.util.WorldUtil.getMinSection(chunk);
+        final int maxY = ca.spottedleaf.moonrise.common.util.WorldUtil.getMaxSection(chunk);
+        final LevelChunkSection[] sections = chunk.getSections();
+        for (int section = minY; section <= maxY; ++section) {
+            this.checkConsistencyWithBlocks(SectionPos.of(chunkX, section, chunkZ), sections[section - minY]);
+        }
+    }
+    // Paper end - rewrite chunk system
 
     public PoiManager(
         RegionStorageInfo info,
@@ -64,6 +189,7 @@ public class PoiManager extends SectionStorage<PoiSection, PoiSection.Packed> {
             levelHeightAccessor
         );
         this.distanceTracker = new PoiManager.DistanceTracker();
+        this.world = (net.minecraft.server.level.ServerLevel)levelHeightAccessor; // Paper - rewrite chunk system
     }
 
     public void add(BlockPos pos, Holder<PoiType> type) {
@@ -197,8 +323,10 @@ public class PoiManager extends SectionStorage<PoiSection, PoiSection.Packed> {
     }
 
     public int sectionsToVillage(SectionPos sectionPos) {
-        this.distanceTracker.runAllUpdates();
-        return this.distanceTracker.getLevel(sectionPos.asLong());
+        // Paper start - rewrite chunk system
+        this.villageDistanceTracker.propagateUpdates();
+        return convertBetweenLevels(this.villageDistanceTracker.getLevel(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkSectionKey(sectionPos)));
+        // Paper end - rewrite chunk system
     }
 
     boolean isVillageCenter(long chunkPos) {
@@ -212,19 +340,26 @@ public class PoiManager extends SectionStorage<PoiSection, PoiSection.Packed> {
 
     @Override
     public void tick(BooleanSupplier aheadOfTime) {
-        super.tick(aheadOfTime);
-        this.distanceTracker.runAllUpdates();
+        this.villageDistanceTracker.propagateUpdates(); // Paper - rewrite chunk system
     }
 
     @Override
-    protected void setDirty(long sectionPos) {
-        super.setDirty(sectionPos);
-        this.distanceTracker.update(sectionPos, this.distanceTracker.getLevelFromSource(sectionPos), false);
+    public void setDirty(long sectionPos) { // Paper - public
+        // Paper start - rewrite chunk system
+        final int chunkX = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkSectionX(sectionPos);
+        final int chunkZ = ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkSectionZ(sectionPos);
+        final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManager manager = ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.world).moonrise$getChunkTaskScheduler().chunkHolderManager;
+        final ca.spottedleaf.moonrise.patches.chunk_system.level.poi.PoiChunk chunk = manager.getPoiChunkIfLoaded(chunkX, chunkZ, false);
+        if (chunk != null) {
+            chunk.setDirty(true);
+        }
+        this.updateDistanceTracking(sectionPos);
+        // Paper end - rewrite chunk system
     }
 
     @Override
     protected void onSectionLoad(long sectionKey) {
-        this.distanceTracker.update(sectionKey, this.distanceTracker.getLevelFromSource(sectionKey), false);
+        this.updateDistanceTracking(sectionKey); // Paper - rewrite chunk system
     }
 
     public void checkConsistencyWithBlocks(SectionPos sectionPos, LevelChunkSection levelChunkSection) {
@@ -263,7 +398,7 @@ public class PoiManager extends SectionStorage<PoiSection, PoiSection.Packed> {
             .map(sectionPos -> Pair.of(sectionPos, this.getOrLoad(sectionPos.asLong())))
             .filter(pair -> !pair.getSecond().map(PoiSection::isValid).orElse(false))
             .map(pair -> pair.getFirst().chunk())
-            .filter(chunkPos -> this.loadedChunks.add(chunkPos.toLong()))
+            // Paper - rewrite chunk system
             .forEach(chunkPos -> levelReader.getChunk(chunkPos.x, chunkPos.z, ChunkStatus.EMPTY));
     }
 

@@ -5,10 +5,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-public final class IntegerProperty extends Property<Integer> {
+public final class IntegerProperty extends Property<Integer> implements ca.spottedleaf.moonrise.patches.blockstate_propertyaccess.PropertyAccess<Integer> { // Paper - optimise blockstate property access
     private final IntImmutableList values;
     public final int min;
     public final int max;
+
+    // Paper start - optimise blockstate property access
+    @Override
+    public final int moonrise$getIdFor(final Integer value) {
+        final int val = value.intValue();
+        final int ret = val - this.min;
+
+        return ret | ((this.max - ret) >> 31);
+    }
+
+    private void init() {
+        final int min = this.min;
+        final int max = this.max;
+
+        final Integer[] byId = new Integer[max - min + 1];
+        for (int i = min; i <= max; ++i) {
+            byId[i - min] = Integer.valueOf(i);
+        }
+
+        this.moonrise$setById(byId);
+    }
+    // Paper end - optimise blockstate property access
 
     private IntegerProperty(String name, int min, int max) {
         super(name, Integer.class);
@@ -21,6 +43,7 @@ public final class IntegerProperty extends Property<Integer> {
             this.max = max;
             this.values = IntImmutableList.toList(IntStream.range(min, max + 1));
         }
+        this.init(); // Paper - optimise blockstate property access
     }
 
     @Override

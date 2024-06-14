@@ -22,11 +22,29 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public final class FluidState extends StateHolder<Fluid, FluidState> {
+public final class FluidState extends StateHolder<Fluid, FluidState> implements ca.spottedleaf.moonrise.patches.fluid.FluidFluidState { // Paper - fluid method optimisations
     public static final Codec<FluidState> CODEC = codec(BuiltInRegistries.FLUID.byNameCodec(), Fluid::defaultFluidState).stable();
     public static final int AMOUNT_MAX = 9;
     public static final int AMOUNT_FULL = 8;
     protected final boolean isEmpty; // Paper - Perf: moved from isEmpty()
+
+    // Paper start - fluid method optimisations
+    private int amount;
+    //private boolean isEmpty;
+    private boolean isSource;
+    private float ownHeight;
+    private boolean isRandomlyTicking;
+    private BlockState legacyBlock;
+
+    @Override
+    public final void moonrise$initCaches() {
+        this.amount = this.getType().getAmount((FluidState)(Object)this);
+        //this.isEmpty = this.getType().isEmpty();
+        this.isSource = this.getType().isSource((FluidState)(Object)this);
+        this.ownHeight = this.getType().getOwnHeight((FluidState)(Object)this);
+        this.isRandomlyTicking = this.getType().isRandomlyTicking();
+    }
+    // Paper end - fluid method optimisations
 
     public FluidState(Fluid owner, Reference2ObjectArrayMap<Property<?>, Comparable<?>> values, MapCodec<FluidState> propertiesCodec) {
         super(owner, values, propertiesCodec);
@@ -38,11 +56,11 @@ public final class FluidState extends StateHolder<Fluid, FluidState> {
     }
 
     public boolean isSource() {
-        return this.getType().isSource(this);
+        return this.isSource; // Paper - fluid method optimisations
     }
 
     public boolean isSourceOfType(Fluid fluid) {
-        return this.owner == fluid && this.owner.isSource(this);
+        return this.isSource && this.owner == fluid;  // Paper - fluid method optimisations
     }
 
     public boolean isEmpty() {
@@ -54,11 +72,11 @@ public final class FluidState extends StateHolder<Fluid, FluidState> {
     }
 
     public float getOwnHeight() {
-        return this.getType().getOwnHeight(this);
+        return this.ownHeight; // Paper - fluid method optimisations
     }
 
     public int getAmount() {
-        return this.getType().getAmount(this);
+        return this.amount; // Paper - fluid method optimisations
     }
 
     public boolean shouldRenderBackwardUpFace(BlockGetter level, BlockPos pos) {
@@ -84,7 +102,7 @@ public final class FluidState extends StateHolder<Fluid, FluidState> {
     }
 
     public boolean isRandomlyTicking() {
-        return this.getType().isRandomlyTicking();
+        return this.isRandomlyTicking; // Paper - fluid method optimisations
     }
 
     public void randomTick(ServerLevel level, BlockPos pos, RandomSource random) {
@@ -96,7 +114,12 @@ public final class FluidState extends StateHolder<Fluid, FluidState> {
     }
 
     public BlockState createLegacyBlock() {
-        return this.getType().createLegacyBlock(this);
+        // Paper start - fluid method optimisations
+        if (this.legacyBlock != null) {
+            return this.legacyBlock;
+        }
+        return this.legacyBlock = this.getType().createLegacyBlock((FluidState)(Object)this);
+        // Paper end - fluid method optimisations
     }
 
     @Nullable

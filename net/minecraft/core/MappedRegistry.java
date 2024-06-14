@@ -51,6 +51,19 @@ public class MappedRegistry<T> implements WritableRegistry<T> {
         return this.getTags();
     }
 
+    // Paper start - fluid method optimisations
+    private void injectFluidRegister(
+        final ResourceKey<?> resourceKey,
+        final T object
+    ) {
+        if (resourceKey.registryKey() == (Object)net.minecraft.core.registries.Registries.FLUID) {
+            for (final net.minecraft.world.level.material.FluidState possibleState : ((net.minecraft.world.level.material.Fluid)object).getStateDefinition().getPossibleStates()) {
+                ((ca.spottedleaf.moonrise.patches.fluid.FluidFluidState)(Object)possibleState).moonrise$initCaches();
+            }
+        }
+    }
+    // Paper end - fluid method optimisations
+
     public MappedRegistry(ResourceKey<? extends Registry<T>> key, Lifecycle registryLifecycle) {
         this(key, registryLifecycle, false);
     }
@@ -116,6 +129,7 @@ public class MappedRegistry<T> implements WritableRegistry<T> {
             this.registrationInfos.put(key, registrationInfo);
             this.registryLifecycle = this.registryLifecycle.add(registrationInfo.lifecycle());
             this.temporaryUnfrozenMap.put(key.location(), value); // Paper - support pre-filling in registry mod API
+            this.injectFluidRegister(key, value); // Paper - fluid method optimisations
             return reference;
         }
     }
