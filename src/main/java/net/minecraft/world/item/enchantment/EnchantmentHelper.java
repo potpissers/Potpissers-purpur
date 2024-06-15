@@ -559,4 +559,14 @@ public class EnchantmentHelper {
     interface EnchantmentVisitor {
         void accept(Holder<Enchantment> enchantment, int level);
     }
+
+    // Purpur start - Enchantment convenience methods
+    public static Holder.Reference<Enchantment> getEnchantmentHolder(ResourceKey<Enchantment> enchantment) {
+        return net.minecraft.server.MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(enchantment);
+    }
+
+    public static int getItemEnchantmentLevel(ResourceKey<Enchantment> enchantment, ItemStack stack) {
+        return getItemEnchantmentLevel(getEnchantmentHolder(enchantment), stack);
+    }
+    // Purpur end - Enchantment convenience methods
 }
