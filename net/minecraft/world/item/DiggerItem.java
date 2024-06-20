@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.Block;
 
 public class DiggerItem extends Item {
     protected DiggerItem(ToolMaterial properties, TagKey<Block> mineableBlocks, float attackDamage, float attackSpeed, Item.Properties properties1) {
-        super(properties.applyToolProperties(properties1, mineableBlocks, attackDamage, attackSpeed));
+        super(properties.applyToolProperties(properties1, mineableBlocks, attackDamage, 0)); // CombatRevert
     }
 
     @Override

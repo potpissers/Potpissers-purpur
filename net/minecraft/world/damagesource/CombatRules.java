@@ -33,4 +33,13 @@ public class CombatRules {
         float f = Mth.clamp(enchantModifiers, 0.0F, org.purpurmc.purpur.PurpurConfig.limitArmor ? 20F : Float.MAX_VALUE); // Purpur - Add attribute clamping and armor limit config
         return damage * (1.0F - f / 25.0F);
     }
+
+    public static float getCubecoreDamageAfterMagicAbsorb(float damageDealt, float protection) {
+        float f = Mth.clamp(protection, 0.0F, org.purpurmc.purpur.PurpurConfig.limitArmor ? 20F : Float.MAX_VALUE); // Purpur
+        return damageDealt * (1.0F - (f * 0.75F) / 25.0F);
+    }
+
+    public static float getCubecoreDamageAfterAbsorb(float damage, DamageSource source, float armor, float armorToughnesss) {
+        return damage * (1.0F - (armor * 0.04F) - (armorToughnesss * 0.01F));
+    }
 }

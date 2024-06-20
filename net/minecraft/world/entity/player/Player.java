@@ -358,7 +358,7 @@ public abstract class Player extends LivingEntity {
 
         this.attackStrengthTicker++;
         ItemStack mainHandItem = this.getMainHandItem();
-        if (!ItemStack.matches(this.lastItemInMainHand, mainHandItem)) {
+        if (false && !ItemStack.matches(this.lastItemInMainHand, mainHandItem)) { // CombatRevert
             if (!ItemStack.isSameItem(this.lastItemInMainHand, mainHandItem)) {
                 this.resetAttackStrengthTicker();
             }
@@ -1290,7 +1290,15 @@ public abstract class Player extends LivingEntity {
                     if (f > 0.0F || f1 > 0.0F) {
                         boolean flag = attackStrengthScale > 0.9F;
                         boolean flag1;
+
+                        // CombatRevert start
+                        boolean isPvp = this instanceof ServerPlayer && target instanceof ServerPlayer;
+                        // CombatRevert end
                         if (this.isSprinting() && flag) {
+
+                            // CombatRevert start
+                                if (!isPvp)
+                                // CombatRevert end
                             this.sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
                             flag1 = true;
                         } else {
@@ -1306,7 +1314,7 @@ public abstract class Player extends LivingEntity {
                             && !this.hasEffect(MobEffects.BLINDNESS)
                             && !this.isPassenger()
                             && target instanceof LivingEntity
-                            && !this.isSprinting();
+                            && (isPvp || !this.isSprinting()); // CombatRevert
                         flag2 = flag2 && !this.level().paperConfig().entities.behavior.disablePlayerCrits; // Paper - Toggleable player crits
                         if (flag2) {
                             damageSource = damageSource.critical(true); // Paper start - critical damage API
@@ -1334,15 +1342,33 @@ public abstract class Player extends LivingEntity {
                             float f4 = this.getKnockback(target, damageSource) + (flag1 ? 1.0F : 0.0F);
 
                             // CamwenPurpur start
+
+                            // CombatRevert start
+                            boolean isSprintHit = false;
+                            // CombatRevert end
                             if (flag1 && this instanceof ServerPlayer serverPlayer) {
                                 if (serverPlayer.hasSprintHit)
                                     f4--;
-                                else
+                                else { // CombatRevert
                                     serverPlayer.hasSprintHit = true;
+
+                                    // CombatRevert start
+                                isSprintHit = true;
+                                // CombatRevert end
+                                } // CombatRevert
                             }
                             // CamwenPurpur end
                             if (f4 > 0.0F) {
                                 if (target instanceof LivingEntity livingEntity1) {
+
+                                    // CombatRevert start
+                                            if (isPvp && isSprintHit)
+                                        livingEntity1.knockback(
+                                            f4 * 0.75F, Mth.sin(this.getYRot() * (float) (Math.PI / 180.0)), -Mth.cos(this.getYRot() * (float) (Math.PI / 180.0))
+                                            , this, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK // Paper - knockback events
+                                        );
+                                    else
+                                            // CombatRevert end
                                     livingEntity1.knockback(
                                         f4 * 0.5F, Mth.sin(this.getYRot() * (float) (Math.PI / 180.0)), -Mth.cos(this.getYRot() * (float) (Math.PI / 180.0))
                                         , this, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK // Paper - knockback events
@@ -1391,6 +1417,9 @@ public abstract class Player extends LivingEntity {
                                     }
                                 }
 
+                                // CombatRevert start
+                                if (!isPvp)
+                                // CombatRevert end
                                 this.sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
                                 this.sweepAttack();
                             }
@@ -1419,11 +1448,15 @@ public abstract class Player extends LivingEntity {
                             }
 
                             if (flag2) {
+
+                                // CombatRevert start
+                                if (!isPvp)
+                                // CombatRevert end
                                 this.sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
                                 this.crit(target);
                             }
 
-                            if (!flag2 && !flag3) {
+                            if (!flag2 && !flag3 && !isPvp) { // CombatRevert
                                 if (flag) {
                                     this.sendSoundEffect(
                                             this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, this.getSoundSource(), 1.0F, 1.0F // Paper - send while respecting visibility
@@ -1483,6 +1516,10 @@ public abstract class Player extends LivingEntity {
 
                             this.causeFoodExhaustion(this.level().spigotConfig.combatExhaustion, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.ATTACK); // CraftBukkit - EntityExhaustionEvent // Spigot - Change to use configurable value
                         } else {
+
+                            // CombatRevert start
+                            if (!isPvp)
+                            // CombatRevert end
                             this.sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
                             // CraftBukkit start - resync on cancelled event
                             if (this instanceof ServerPlayer) {

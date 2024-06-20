@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class SwordItem extends Item {
     public SwordItem(ToolMaterial properties, float attackDamage, float attackSpeed, Item.Properties properties1) {
-        super(properties.applySwordProperties(properties1, attackDamage, attackSpeed));
+        super(properties.applySwordProperties(properties1, attackDamage, 0)); // CombatRevert
     }
 
     @Override

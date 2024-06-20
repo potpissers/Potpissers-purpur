@@ -2246,13 +2246,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
             // CamwenPurpur start
             if (this instanceof ServerPlayer serverPlayer && damageSource.getEntity() instanceof ServerPlayer serverPlayer1) {
                 if (!damageSource.isDirect() || NETHERITE_WEAPONS.contains(serverPlayer1.getMainHandItem().getBukkitStack().getType()))
-                    damageAmount = CombatRules.getDamageAfterAbsorb(this, damageAmount, damageSource, (float) this.getArmorValue(), 0);
+                    damageAmount = CombatRules.getCubecoreDamageAfterAbsorb(damageAmount, damageSource, (float) this.getArmorValue(), 0); // CombatRevert
                 else {
                     int pvpToughness = 0;
                     for (org.bukkit.inventory.ItemStack is : serverPlayer.getBukkitEntity().getInventory().getArmorContents())
                         if (is != null && NETHERITE_ARMOR.contains(is.getType()))
                             pvpToughness++;
-                    damageAmount = CombatRules.getDamageAfterAbsorb(this, damageAmount, damageSource, (float) this.getArmorValue(), pvpToughness);
+                    damageAmount = CombatRules.getCubecoreDamageAfterAbsorb(damageAmount, damageSource, (float) this.getArmorValue(), pvpToughness); // CombatRevert
                 }
             }
             else
@@ -2303,6 +2303,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
                     damageProtection = 0.0F;
                 // CamwenPurpur end
                 if (damageProtection > 0.0F) {
+
+                    // CombatRevert start
+                    if (this instanceof ServerPlayer && damageSource.getEntity() instanceof ServerPlayer)
+                        damageAmount = CombatRules.getCubecoreDamageAfterMagicAbsorb(damageAmount, damageProtection);
+                    else
+                    // CombatRevert end
                     damageAmount = CombatRules.getDamageAfterMagicAbsorb(damageAmount, damageProtection);
                 }
 
