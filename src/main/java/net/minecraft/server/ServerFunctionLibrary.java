@@ -118,7 +118,7 @@ public class ServerFunctionLibrary implements PreparableReloadListener {
                             return null;
                         }).join());
                     this.functions = builder.build();
-                    this.tags = this.tagsLoader.build((Map<ResourceLocation, List<TagLoader.EntryWithSource>>)intermediate.getFirst());
+                    this.tags = this.tagsLoader.build((Map<ResourceLocation, List<TagLoader.EntryWithSource>>)intermediate.getFirst(), null); // Paper - command function tags are not implemented yet
                 },
                 applyExecutor
             );
