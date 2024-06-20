@@ -351,9 +351,11 @@ public abstract class Player extends LivingEntity {
         ItemStack itemstack = this.getMainHandItem();
 
         if (!ItemStack.matches(this.lastItemInMainHand, itemstack)) {
-            if (!ItemStack.isSameItem(this.lastItemInMainHand, itemstack)) {
-                this.resetAttackStrengthTicker();
-            }
+            // CombatRevert start
+            // if (!ItemStack.isSameItem(this.lastItemInMainHand, itemstack)) {
+            //     this.resetAttackStrengthTicker();
+            // }
+            // CombatRevert end
 
             this.lastItemInMainHand = itemstack.copy();
         }
@@ -1343,16 +1345,21 @@ public abstract class Player extends LivingEntity {
                 if (f > 0.0F || f1 > 0.0F) {
                     boolean flag = f2 > 0.9F;
                     boolean flag1;
+                    boolean isPvp = false;
+                    if (this instanceof ServerPlayer && target instanceof ServerPlayer)
+                        isPvp = true;
 
                     if (this.isSprinting() && flag) {
-                        sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
+                        if (!isPvp) sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
                         flag1 = true;
                     } else {
                         flag1 = false;
                     }
 
                     f += itemstack.getItem().getAttackDamageBonus(target, f, damagesource);
-                    boolean flag2 = flag && this.fallDistance > 0.0F && !this.onGround() && !this.onClimbable() && !this.isInWater() && !this.hasEffect(MobEffects.BLINDNESS) && !this.isPassenger() && target instanceof LivingEntity && !this.isSprinting();
+                    boolean flag2;
+                        if (!isPvp) flag2 = flag && this.fallDistance > 0.0F && !this.onGround() && !this.onClimbable() && !this.isInWater() && !this.hasEffect(MobEffects.BLINDNESS) && !this.isPassenger() && target instanceof LivingEntity && !this.isSprinting();
+                        else flag2 = flag && this.fallDistance > 0.0F && !this.onGround() && !this.onClimbable() && !this.isInWater() && !this.hasEffect(MobEffects.BLINDNESS) && !this.isPassenger() && target instanceof LivingEntity;
 
                     flag2 = flag2 && !this.level().paperConfig().entities.behavior.disablePlayerCrits; // Paper - Toggleable player crits
                     if (flag2) {
@@ -1385,16 +1392,23 @@ public abstract class Player extends LivingEntity {
 
                     if (flag4) {
                         float f5 = this.getKnockback(target, damagesource) + (flag1 ? 1.0F : 0.0F);
+                        boolean isSprintHit = false;
                         if (flag1 && this instanceof ServerPlayer sp) {
                             if (sp.hasSprintHit) f5--;
-                            else sp.hasSprintHit = true;
+                            else {
+                                sp.hasSprintHit = true;
+                                isSprintHit = true;
+                            }
                         }
 
                         if (f5 > 0.0F) {
                             if (target instanceof LivingEntity) {
                                 LivingEntity entityliving1 = (LivingEntity) target;
 
-                                entityliving1.knockback((double) (f5 * 0.5F), (double) Mth.sin(this.getYRot() * 0.017453292F), (double) (-Mth.cos(this.getYRot() * 0.017453292F)), this, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK); // Paper - knockback events
+                                if (isPvp && f5 == 1F && isSprintHit)
+                                    entityliving1.knockback((double) (f5 * 0.75), (double) Mth.sin(this.getYRot() * 0.017453292F), (double) (-Mth.cos(this.getYRot() * 0.017453292F)), this, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK); // Paper - knockback events
+                                else
+                                    entityliving1.knockback((double) (f5 * 0.5F), (double) Mth.sin(this.getYRot() * 0.017453292F), (double) (-Mth.cos(this.getYRot() * 0.017453292F)), this, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK); // Paper - knockback events
                             } else {
                                 target.push((double) (-Mth.sin(this.getYRot() * 0.017453292F) * f5 * 0.5F), 0.1D, (double) (Mth.cos(this.getYRot() * 0.017453292F) * f5 * 0.5F), this); // Paper - Add EntityKnockbackByEntityEvent and EntityPushedByEntityAttackEvent
                             }
@@ -1436,7 +1450,7 @@ public abstract class Player extends LivingEntity {
                                 }
                             }
 
-                            sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
+                            if (!isPvp) sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
                             this.sweepAttack();
                         }
 
@@ -1464,11 +1478,11 @@ public abstract class Player extends LivingEntity {
                         }
 
                         if (flag2) {
-                            sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
+                            if (!isPvp) sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
                             this.crit(target);
                         }
 
-                        if (!flag2 && !flag3) {
+                        if (!flag2 && !flag3 && !isPvp) {
                             if (flag) {
                                 sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
                             } else {
@@ -1529,7 +1543,7 @@ public abstract class Player extends LivingEntity {
 
                         this.causeFoodExhaustion(this.level().spigotConfig.combatExhaustion, EntityExhaustionEvent.ExhaustionReason.ATTACK); // CraftBukkit - EntityExhaustionEvent // Spigot - Change to use configurable value
                     } else {
-                        sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
+                        if (!isPvp) sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
                         // CraftBukkit start - resync on cancelled event
                         if (this instanceof ServerPlayer) {
                             ((ServerPlayer) this).getBukkitEntity().updateInventory();

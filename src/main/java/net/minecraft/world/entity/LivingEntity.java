@@ -2298,13 +2298,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
             // this.hurtArmor(damagesource, f); // CraftBukkit - actuallyHurt(DamageSource, float, EntityDamageEvent) for handle damage
             if (this instanceof ServerPlayer sp && source.getEntity() instanceof ServerPlayer sp1) {
                 if (!source.isDirect() || netheriteWeapons.contains(sp1.getMainHandItem().getBukkitStack().getType()))
-                    amount = CombatRules.getDamageAfterAbsorb(this, amount, source, (float) this.getArmorValue(), 0);
+                    amount = CombatRules.getCubecoreDamageAfterAbsorb(amount, source, (float) this.getArmorValue(), 0);
                 else {
                     int pvpToughness = 0;
                     for (org.bukkit.inventory.ItemStack is : sp.getBukkitEntity().getInventory().getArmorContents())
                         if (is != null && netheriteArmor.contains(is.getType()))
                             pvpToughness++;
-                    amount = CombatRules.getDamageAfterAbsorb(this, amount, source, (float) this.getArmorValue(), pvpToughness);
+                    amount = CombatRules.getCubecoreDamageAfterAbsorb(amount, source, (float) this.getArmorValue(), pvpToughness);
                 }
             } else
                 amount = CombatRules.getDamageAfterAbsorb(this, amount, source, (float) this.getArmorValue(), (float) this.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
@@ -2356,7 +2356,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
                     f4 = 0.0F;
                 // CamwenPurpur end
                 if (f4 > 0.0F) {
-                    amount = CombatRules.getDamageAfterMagicAbsorb(amount, f4);
+                    if (this instanceof ServerPlayer && source.getEntity() instanceof ServerPlayer)
+                        amount = CombatRules.getCubecoreDamageAfterMagicAbsorb(amount, f4);
+                    else
+                        amount = CombatRules.getDamageAfterMagicAbsorb(amount, f4);
                 }
 
                 return amount;

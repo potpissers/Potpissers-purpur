@@ -941,94 +941,94 @@ public class Items {
     public static final Item NETHERITE_INGOT = registerItem("netherite_ingot", new Item(new Item.Properties().fireResistant()));
     public static final Item NETHERITE_SCRAP = registerItem("netherite_scrap", new Item(new Item.Properties().fireResistant()));
     public static final Item WOODEN_SWORD = registerItem(
-        "wooden_sword", new SwordItem(Tiers.WOOD, new Item.Properties().attributes(SwordItem.createAttributes(Tiers.WOOD, 3, -2.4F)))
+        "wooden_sword", new SwordItem(Tiers.WOOD, new Item.Properties().attributes(SwordItem.createAttributes(Tiers.WOOD, 3, 0)))
     );
     public static final Item WOODEN_SHOVEL = registerItem(
-        "wooden_shovel", new ShovelItem(Tiers.WOOD, new Item.Properties().attributes(ShovelItem.createAttributes(Tiers.WOOD, 1.5F, -3.0F)))
+        "wooden_shovel", new ShovelItem(Tiers.WOOD, new Item.Properties().attributes(ShovelItem.createAttributes(Tiers.WOOD, 1.5F, 0)))
     );
     public static final Item WOODEN_PICKAXE = registerItem(
-        "wooden_pickaxe", new PickaxeItem(Tiers.WOOD, new Item.Properties().attributes(PickaxeItem.createAttributes(Tiers.WOOD, 1.0F, -2.8F)))
+        "wooden_pickaxe", new PickaxeItem(Tiers.WOOD, new Item.Properties().attributes(PickaxeItem.createAttributes(Tiers.WOOD, 1.0F, 0.0F)))
     );
     public static final Item WOODEN_AXE = registerItem(
-        "wooden_axe", new AxeItem(Tiers.WOOD, new Item.Properties().attributes(AxeItem.createAttributes(Tiers.WOOD, 6.0F, -3.2F)))
+        "wooden_axe", new AxeItem(Tiers.WOOD, new Item.Properties().attributes(AxeItem.createAttributes(Tiers.WOOD, 6.0F, 0.0F)))
     );
     public static final Item WOODEN_HOE = registerItem(
-        "wooden_hoe", new HoeItem(Tiers.WOOD, new Item.Properties().attributes(HoeItem.createAttributes(Tiers.WOOD, 0.0F, -3.0F)))
+        "wooden_hoe", new HoeItem(Tiers.WOOD, new Item.Properties().attributes(HoeItem.createAttributes(Tiers.WOOD, 0.0F, 0.0F)))
     );
     public static final Item STONE_SWORD = registerItem(
-        "stone_sword", new SwordItem(Tiers.STONE, new Item.Properties().attributes(SwordItem.createAttributes(Tiers.STONE, 3, -2.4F)))
+        "stone_sword", new SwordItem(Tiers.STONE, new Item.Properties().attributes(SwordItem.createAttributes(Tiers.STONE, 3, 0.0F)))
     );
     public static final Item STONE_SHOVEL = registerItem(
-        "stone_shovel", new ShovelItem(Tiers.STONE, new Item.Properties().attributes(ShovelItem.createAttributes(Tiers.STONE, 1.5F, -3.0F)))
+        "stone_shovel", new ShovelItem(Tiers.STONE, new Item.Properties().attributes(ShovelItem.createAttributes(Tiers.STONE, 1.5F, 0.0F)))
     );
     public static final Item STONE_PICKAXE = registerItem(
-        "stone_pickaxe", new PickaxeItem(Tiers.STONE, new Item.Properties().attributes(PickaxeItem.createAttributes(Tiers.STONE, 1.0F, -2.8F)))
+        "stone_pickaxe", new PickaxeItem(Tiers.STONE, new Item.Properties().attributes(PickaxeItem.createAttributes(Tiers.STONE, 1.0F, 0.0F)))
     );
     public static final Item STONE_AXE = registerItem(
-        "stone_axe", new AxeItem(Tiers.STONE, new Item.Properties().attributes(AxeItem.createAttributes(Tiers.STONE, 7.0F, -3.2F)))
+        "stone_axe", new AxeItem(Tiers.STONE, new Item.Properties().attributes(AxeItem.createAttributes(Tiers.STONE, 7.0F, 0.0F)))
     );
     public static final Item STONE_HOE = registerItem(
-        "stone_hoe", new HoeItem(Tiers.STONE, new Item.Properties().attributes(HoeItem.createAttributes(Tiers.STONE, -1.0F, -2.0F)))
+        "stone_hoe", new HoeItem(Tiers.STONE, new Item.Properties().attributes(HoeItem.createAttributes(Tiers.STONE, -1.0F, 0.0F)))
     );
     public static final Item GOLDEN_SWORD = registerItem(
-        "golden_sword", new SwordItem(Tiers.GOLD, new Item.Properties().attributes(SwordItem.createAttributes(Tiers.GOLD, 3, -2.4F)))
+        "golden_sword", new SwordItem(Tiers.GOLD, new Item.Properties().attributes(SwordItem.createAttributes(Tiers.GOLD, 3, 0.0F)))
     );
     public static final Item GOLDEN_SHOVEL = registerItem(
-        "golden_shovel", new ShovelItem(Tiers.GOLD, new Item.Properties().attributes(ShovelItem.createAttributes(Tiers.GOLD, 1.5F, -3.0F)))
+        "golden_shovel", new ShovelItem(Tiers.GOLD, new Item.Properties().attributes(ShovelItem.createAttributes(Tiers.GOLD, 1.5F, 0.0F)))
     );
     public static final Item GOLDEN_PICKAXE = registerItem(
-        "golden_pickaxe", new PickaxeItem(Tiers.GOLD, new Item.Properties().attributes(PickaxeItem.createAttributes(Tiers.GOLD, 1.0F, -2.8F)))
+        "golden_pickaxe", new PickaxeItem(Tiers.GOLD, new Item.Properties().attributes(PickaxeItem.createAttributes(Tiers.GOLD, 1.0F, 0.0F)))
     );
     public static final Item GOLDEN_AXE = registerItem(
-        "golden_axe", new AxeItem(Tiers.GOLD, new Item.Properties().attributes(AxeItem.createAttributes(Tiers.GOLD, 6.0F, -3.0F)))
+        "golden_axe", new AxeItem(Tiers.GOLD, new Item.Properties().attributes(AxeItem.createAttributes(Tiers.GOLD, 6.0F, 0.0F)))
     );
     public static final Item GOLDEN_HOE = registerItem(
-        "golden_hoe", new HoeItem(Tiers.GOLD, new Item.Properties().attributes(HoeItem.createAttributes(Tiers.GOLD, 0.0F, -3.0F)))
+        "golden_hoe", new HoeItem(Tiers.GOLD, new Item.Properties().attributes(HoeItem.createAttributes(Tiers.GOLD, 0.0F, 0.0F)))
     );
     public static final Item IRON_SWORD = registerItem(
-        "iron_sword", new SwordItem(Tiers.IRON, new Item.Properties().attributes(SwordItem.createAttributes(Tiers.IRON, 3, -2.4F)))
+        "iron_sword", new SwordItem(Tiers.IRON, new Item.Properties().attributes(SwordItem.createAttributes(Tiers.IRON, 3, 0.0F)))
     );
     public static final Item IRON_SHOVEL = registerItem(
-        "iron_shovel", new ShovelItem(Tiers.IRON, new Item.Properties().attributes(ShovelItem.createAttributes(Tiers.IRON, 1.5F, -3.0F)))
+        "iron_shovel", new ShovelItem(Tiers.IRON, new Item.Properties().attributes(ShovelItem.createAttributes(Tiers.IRON, 1.5F, 0.0F)))
     );
     public static final Item IRON_PICKAXE = registerItem(
-        "iron_pickaxe", new PickaxeItem(Tiers.IRON, new Item.Properties().attributes(PickaxeItem.createAttributes(Tiers.IRON, 1.0F, -2.8F)))
+        "iron_pickaxe", new PickaxeItem(Tiers.IRON, new Item.Properties().attributes(PickaxeItem.createAttributes(Tiers.IRON, 1.0F, 0.0F)))
     );
     public static final Item IRON_AXE = registerItem(
-        "iron_axe", new AxeItem(Tiers.IRON, new Item.Properties().attributes(AxeItem.createAttributes(Tiers.IRON, 6.0F, -3.1F)))
+        "iron_axe", new AxeItem(Tiers.IRON, new Item.Properties().attributes(AxeItem.createAttributes(Tiers.IRON, 6.0F, 0.0F)))
     );
     public static final Item IRON_HOE = registerItem(
-        "iron_hoe", new HoeItem(Tiers.IRON, new Item.Properties().attributes(HoeItem.createAttributes(Tiers.IRON, -2.0F, -1.0F)))
+        "iron_hoe", new HoeItem(Tiers.IRON, new Item.Properties().attributes(HoeItem.createAttributes(Tiers.IRON, -2.0F, 0.0F)))
     );
     public static final Item DIAMOND_SWORD = registerItem(
-        "diamond_sword", new SwordItem(Tiers.DIAMOND, new Item.Properties().attributes(SwordItem.createAttributes(Tiers.DIAMOND, 3, -2.4F)))
+        "diamond_sword", new SwordItem(Tiers.DIAMOND, new Item.Properties().attributes(SwordItem.createAttributes(Tiers.DIAMOND, 3, 0.0F)))
     );
     public static final Item DIAMOND_SHOVEL = registerItem(
-        "diamond_shovel", new ShovelItem(Tiers.DIAMOND, new Item.Properties().attributes(ShovelItem.createAttributes(Tiers.DIAMOND, 1.5F, -3.0F)))
+        "diamond_shovel", new ShovelItem(Tiers.DIAMOND, new Item.Properties().attributes(ShovelItem.createAttributes(Tiers.DIAMOND, 1.5F, 0.0F)))
     );
     public static final Item DIAMOND_PICKAXE = registerItem(
-        "diamond_pickaxe", new PickaxeItem(Tiers.DIAMOND, new Item.Properties().attributes(PickaxeItem.createAttributes(Tiers.DIAMOND, 1.0F, -2.8F)))
+        "diamond_pickaxe", new PickaxeItem(Tiers.DIAMOND, new Item.Properties().attributes(PickaxeItem.createAttributes(Tiers.DIAMOND, 1.0F, 0.0F)))
     );
     public static final Item DIAMOND_AXE = registerItem(
-        "diamond_axe", new AxeItem(Tiers.DIAMOND, new Item.Properties().attributes(AxeItem.createAttributes(Tiers.DIAMOND, 5.0F, -3.0F)))
+        "diamond_axe", new AxeItem(Tiers.DIAMOND, new Item.Properties().attributes(AxeItem.createAttributes(Tiers.DIAMOND, 5.0F, 0.0F)))
     );
     public static final Item DIAMOND_HOE = registerItem(
         "diamond_hoe", new HoeItem(Tiers.DIAMOND, new Item.Properties().attributes(HoeItem.createAttributes(Tiers.DIAMOND, -3.0F, 0.0F)))
     );
     public static final Item NETHERITE_SWORD = registerItem(
         "netherite_sword",
-        new SwordItem(Tiers.NETHERITE, new Item.Properties().fireResistant().attributes(SwordItem.createAttributes(Tiers.NETHERITE, 3, -2.4F)))
+        new SwordItem(Tiers.NETHERITE, new Item.Properties().fireResistant().attributes(SwordItem.createAttributes(Tiers.NETHERITE, 3, 0.0F)))
     );
     public static final Item NETHERITE_SHOVEL = registerItem(
         "netherite_shovel",
-        new ShovelItem(Tiers.NETHERITE, new Item.Properties().fireResistant().attributes(ShovelItem.createAttributes(Tiers.NETHERITE, 1.5F, -3.0F)))
+        new ShovelItem(Tiers.NETHERITE, new Item.Properties().fireResistant().attributes(ShovelItem.createAttributes(Tiers.NETHERITE, 1.5F, 0.0F)))
     );
     public static final Item NETHERITE_PICKAXE = registerItem(
         "netherite_pickaxe",
-        new PickaxeItem(Tiers.NETHERITE, new Item.Properties().fireResistant().attributes(PickaxeItem.createAttributes(Tiers.NETHERITE, 1.0F, -2.8F)))
+        new PickaxeItem(Tiers.NETHERITE, new Item.Properties().fireResistant().attributes(PickaxeItem.createAttributes(Tiers.NETHERITE, 1.0F, 0.0F)))
     );
     public static final Item NETHERITE_AXE = registerItem(
-        "netherite_axe", new AxeItem(Tiers.NETHERITE, new Item.Properties().fireResistant().attributes(AxeItem.createAttributes(Tiers.NETHERITE, 5.0F, -3.0F)))
+        "netherite_axe", new AxeItem(Tiers.NETHERITE, new Item.Properties().fireResistant().attributes(AxeItem.createAttributes(Tiers.NETHERITE, 5.0F, 0.0F)))
     );
     public static final Item NETHERITE_HOE = registerItem(
         "netherite_hoe", new HoeItem(Tiers.NETHERITE, new Item.Properties().fireResistant().attributes(HoeItem.createAttributes(Tiers.NETHERITE, -4.0F, 0.0F)))
