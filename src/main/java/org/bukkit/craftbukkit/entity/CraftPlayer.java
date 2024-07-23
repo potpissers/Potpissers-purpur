@@ -1462,6 +1462,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         }
 
         if (entity.isVehicle() && !ignorePassengers) { // Paper - Teleport API
+            if (!new org.purpurmc.purpur.event.entity.EntityTeleportHinderedEvent(entity.getBukkitEntity(), org.purpurmc.purpur.event.entity.EntityTeleportHinderedEvent.Reason.IS_VEHICLE, cause).callEvent()) // Purpur start
             return false;
         }
 
