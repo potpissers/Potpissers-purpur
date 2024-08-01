@@ -72,7 +72,7 @@ public class TridentItem extends Item implements ProjectileItem {
             if (j >= 10) {
                 float f = EnchantmentHelper.getTridentSpinAttackStrength(stack, entityhuman);
 
-                if (f <= 0.0F || entityhuman.isInWaterOrRain()) {
+                if (true) {//f <= 0.0F || entityhuman.isInWaterOrRain()) {
                     if (!TridentItem.isTooDamagedToUse(stack)) {
                         Holder<SoundEvent> holder = (Holder) EnchantmentHelper.pickHighestLevel(stack, EnchantmentEffectComponents.TRIDENT_SOUND).orElse(SoundEvents.TRIDENT_THROW);
 
@@ -160,8 +160,8 @@ public class TridentItem extends Item implements ProjectileItem {
 
         if (TridentItem.isTooDamagedToUse(itemstack)) {
             return InteractionResultHolder.fail(itemstack);
-        } else if (EnchantmentHelper.getTridentSpinAttackStrength(itemstack, user) > 0.0F && !user.isInWaterOrRain()) {
-            return InteractionResultHolder.fail(itemstack);
+        // } else if (EnchantmentHelper.getTridentSpinAttackStrength(itemstack, user) > 0.0F && !user.isInWaterOrRain()) {
+        //     return InteractionResultHolder.fail(itemstack);
         } else {
             user.startUsingItem(hand);
             return InteractionResultHolder.consume(itemstack);

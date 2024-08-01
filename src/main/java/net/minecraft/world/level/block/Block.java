@@ -454,7 +454,7 @@ public class Block extends BlockBehaviour implements ItemLike {
     public void playerDestroy(Level world, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool, boolean includeDrops, boolean dropExp) {
         // Paper end - fix drops not preventing stats/food exhaustion
         player.awardStat(Stats.BLOCK_MINED.get(this));
-        player.causeFoodExhaustion(0.005F, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED); // CraftBukkit - EntityExhaustionEvent
+        player.causeFoodExhaustion(0.025F, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED); // CraftBukkit - EntityExhaustionEvent//0.005F, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED); // CraftBukkit - EntityExhaustionEvent
         if (includeDrops) { // Paper - fix drops not preventing stats/food exhaustion
         Block.dropResources(state, world, pos, blockEntity, player, tool, dropExp); // Paper - Properly handle xp dropping
         } // Paper - fix drops not preventing stats/food exhaustion

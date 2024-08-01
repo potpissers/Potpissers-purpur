@@ -426,13 +426,13 @@ public class SpigotWorldConfig
             this.set( "hunger.regen-exhaustion", 6.0 );
         }
 
-        this.jumpWalkExhaustion = (float) this.getDouble( "hunger.jump-walk-exhaustion", 0.05 );
-        this.jumpSprintExhaustion = (float) this.getDouble( "hunger.jump-sprint-exhaustion", 0.2 );
-        this.combatExhaustion = (float) this.getDouble( "hunger.combat-exhaustion", 0.1 );
-        this.regenExhaustion = (float) this.getDouble( "hunger.regen-exhaustion", 6.0 );
-        this.swimMultiplier = (float) this.getDouble( "hunger.swim-multiplier", 0.01 );
+        this.jumpWalkExhaustion = .2f;//(float) this.getDouble( "hunger.jump-walk-exhaustion", 0.05 );
+        this.jumpSprintExhaustion = 0.8f;//(float) this.getDouble( "hunger.jump-sprint-exhaustion", 0.2 );
+        this.combatExhaustion = 0.3f;//(float) this.getDouble( "hunger.combat-exhaustion", 0.1 );
+        this.regenExhaustion = 4.0f;//(float) this.getDouble( "hunger.regen-exhaustion", 6.0 );
+        this.swimMultiplier = 0.015f;//(float) this.getDouble( "hunger.swim-multiplier", 0.01 );
         this.sprintMultiplier = (float) this.getDouble( "hunger.sprint-multiplier", 0.1 );
-        this.otherMultiplier = (float) this.getDouble( "hunger.other-multiplier", 0.0 );
+        this.otherMultiplier = .01f;//(float) this.getDouble( "hunger.other-multiplier", 0.0 );
     }
 
     public int currentPrimedTnt = 0;

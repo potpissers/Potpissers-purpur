@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -13,6 +14,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -232,7 +234,11 @@ public abstract class Projectile extends Entity implements TraceableEntity {
         Vec3 vec3d = shooter.getKnownMovement();
         // Paper start - allow disabling relative velocity
         if (!shooter.level().paperConfig().misc.disableRelativeProjectileVelocity) {
-        this.setDeltaMovement(this.getDeltaMovement().add(vec3d.x, shooter.onGround() ? 0.0D : vec3d.y, vec3d.z));
+            if (!(this instanceof ThrownPotion)) {
+                if (!(this instanceof ThrownEnderpearl) || vec3d.y > 0)
+                    this.setDeltaMovement(this.getDeltaMovement().add(0, shooter.onGround() ? 0.0D : Math.clamp(vec3d.y, -0.3739040364667261, 0.41999998688697815), 0)); // Paper - allow disabling relative velocity
+            } // keeping the downward pearl meme would be nice
+            // x and y set to 0, having it just be capped to walk-speed variance might be nice
         }
         // Paper end - allow disabling relative velocity
     }

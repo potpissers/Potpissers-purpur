@@ -18,7 +18,7 @@ public class FoodData {
     private int tickTimer;
     // CraftBukkit start
     private Player entityhuman;
-    public int saturatedRegenRate = 10;
+    public int saturatedRegenRate = 80;//10;
     public int unsaturatedRegenRate = 80;
     public int starvationRate = 80;
     // CraftBukkit end
@@ -85,17 +85,19 @@ public class FoodData {
 
         boolean flag = player.level().getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
 
-        if (flag && this.saturationLevel > 0.0F && player.isHurt() && this.foodLevel >= 20) {
-            ++this.tickTimer;
-            if (this.tickTimer >= this.saturatedRegenRate) { // CraftBukkit
-                float f = Math.min(this.saturationLevel, 6.0F);
-
-                player.heal(f / 6.0F, org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.SATIATED, true); // CraftBukkit - added RegainReason // Paper - This is fast regen
-                // this.addExhaustion(f); CraftBukkit - EntityExhaustionEvent
-                player.causeFoodExhaustion(f, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.REGEN); // CraftBukkit - EntityExhaustionEvent
-                this.tickTimer = 0;
-            }
-        } else if (flag && this.foodLevel >= 18 && player.isHurt()) {
+        // CamwenPurpur start
+        // if (flag && this.saturationLevel > 0.0F && player.isHurt() && this.foodLevel >= 20) {
+        //     ++this.tickTimer;
+        //     if (this.tickTimer >= this.saturatedRegenRate) { // CraftBukkit
+        //         float f = Math.min(this.saturationLevel, 6.0F);
+        //
+        //         player.heal(f / 6.0F, org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.SATIATED, true); // CraftBukkit - added RegainReason // Paper - This is fast regen
+        //         // this.addExhaustion(f); CraftBukkit - EntityExhaustionEvent
+        //         player.causeFoodExhaustion(f, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.REGEN); // CraftBukkit - EntityExhaustionEvent
+        //         this.tickTimer = 0;
+        //     }
+        // CamwenPurpur end
+        if (flag && this.foodLevel >= 18 && player.isHurt()) {//} else if (flag && this.foodLevel >= 18 && player.isHurt()) {
             ++this.tickTimer;
             if (this.tickTimer >= this.unsaturatedRegenRate) { // CraftBukkit - add regen rate manipulation
                 player.heal(1.0F, org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.SATIATED); // CraftBukkit - added RegainReason

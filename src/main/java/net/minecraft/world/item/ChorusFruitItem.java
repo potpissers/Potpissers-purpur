@@ -68,7 +68,7 @@ public class ChorusFruitItem extends Item {
                 Player entityhuman = (Player) user;
 
                 entityhuman.resetCurrentImpulseContext();
-                entityhuman.getCooldowns().addCooldown(this, 20);
+                // entityhuman.getCooldowns().addCooldown(this, 20);
             }
         }
 

@@ -202,6 +202,7 @@ import org.bukkit.inventory.MainHand;
 
 public class ServerPlayer extends net.minecraft.world.entity.player.Player implements ca.spottedleaf.moonrise.patches.chunk_system.player.ChunkSystemServerPlayer { // Paper - rewrite chunk system
 
+    public boolean hasSprintHit = false;
     private static final Logger LOGGER = LogUtils.getLogger();
     public long lastSave = MinecraftServer.currentTick; // Paper - Incremental chunk and player saving
     private static final int NEUTRAL_MOB_DEATH_NOTIFICATION_RADII_XZ = 32;
@@ -779,6 +780,8 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
         if (this.invulnerableTime > 0) {
             --this.invulnerableTime;
         }
+        if (this.knockbackInvulnerableTime > 0)
+            --this.knockbackInvulnerableTime;
 
         // Paper start - Configurable container update tick rate
         if (--containerUpdateDelay <= 0) {

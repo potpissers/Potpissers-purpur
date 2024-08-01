@@ -113,6 +113,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
+import org.bukkit.enchantments.Enchantment;
 import org.slf4j.Logger;
 import org.bukkit.craftbukkit.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
@@ -1384,6 +1385,10 @@ public abstract class Player extends LivingEntity {
 
                     if (flag4) {
                         float f5 = this.getKnockback(target, damagesource) + (flag1 ? 1.0F : 0.0F);
+                        if (flag1 && this instanceof ServerPlayer sp) {
+                            if (sp.hasSprintHit) f5--;
+                            else sp.hasSprintHit = true;
+                        }
 
                         if (f5 > 0.0F) {
                             if (target instanceof LivingEntity) {
@@ -1471,7 +1476,8 @@ public abstract class Player extends LivingEntity {
                             }
                         }
 
-                        if (f1 > 0.0F) {
+                        if (f1 > 0.0F || itemstack.getBukkitStack().hasEnchant(Enchantment.BREACH) ||
+                            (target.isInWater() && itemstack.getBukkitStack().hasEnchant(Enchantment.IMPALING))) {
                             this.magicCrit(target);
                         }
 

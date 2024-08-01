@@ -2735,6 +2735,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
                 break;
             case STOP_SPRINTING:
                 this.player.setSprinting(false);
+                this.player.hasSprintHit = false;
                 break;
             case STOP_SLEEPING:
                 if (this.player.isSleeping()) {

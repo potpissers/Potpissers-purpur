@@ -132,12 +132,12 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
+import org.bukkit.Material;
 import org.slf4j.Logger;
 
 // CraftBukkit start
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 import com.google.common.base.Function;
 import java.util.UUID;
 import org.bukkit.Location;
@@ -148,7 +148,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.ArrowBodyCountChangeEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
-import org.bukkit.event.entity.EntityKnockbackEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRemoveEvent;
@@ -160,6 +159,8 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 
 public abstract class LivingEntity extends Entity implements Attackable {
 
+    HashSet<Material> netheriteArmor = new HashSet<>(List.of(Material.NETHERITE_HELMET, Material.NETHERITE_CHESTPLATE, Material.NETHERITE_LEGGINGS, Material.NETHERITE_BOOTS));
+    HashSet<Material> netheriteWeapons = new HashSet<>(List.of(Material.NETHERITE_SWORD, Material.NETHERITE_AXE, Material.MACE, Material.TRIDENT));
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String TAG_ACTIVE_EFFECTS = "active_effects";
     private static final ResourceLocation SPEED_MODIFIER_POWDER_SNOW_ID = ResourceLocation.withDefaultNamespace("powder_snow");
@@ -1547,7 +1548,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
                 // if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event.
                 // CraftBukkit end
                 this.lastHurt = amount;
-                flag1 = false;
+                if (!(this instanceof ServerPlayer) || this.knockbackInvulnerableTime > 0) flag1 = false;
+                else {
+                    this.invulnerableTime = this.invulnerableDuration;
+                    this.hurtDuration = 10;
+                    this.hurtTime = this.hurtDuration;
+                }
             } else {
                 // Paper start - only call damage event when actuallyHurt will be called - move call logic down
                 event = this.handleEntityDamage(source, amount);
@@ -1635,6 +1641,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
                     }
                     // Paper end - Check distance in entity interactions
 
+                    if (this instanceof ServerPlayer) this.knockbackInvulnerableTime = this.invulnerableDuration / 2 - 1;
                     this.knockback(0.4000000059604645D, d0, d1, entity1, entity1 == null ? io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.DAMAGE : io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK); // CraftBukkit // Paper - knockback events
                     if (!flag) {
                         this.indicateDamage(d0, d1);
@@ -2034,7 +2041,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
     }
 
     public void knockback(double d0, double d1, double d2, @Nullable Entity attacker, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause cause) { // Paper - knockback events
-        d0 *= 1.0D - this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
+        if (!(this instanceof ServerPlayer && attacker instanceof ServerPlayer)) d0 *= 1.0D - this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
         if (true || d0 > 0.0D) { // CraftBukkit - Call event even when force is 0
             //this.hasImpulse = true; // CraftBukkit - Move down
 
@@ -2049,7 +2056,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
             // Paper start - knockback events // this only works on melee attacks I think
             Vec3 finalVelocity;
             if (this instanceof ServerPlayer && attacker instanceof ServerPlayer)
-                finalVelocity = new Vec3(vec3d.x / 2.0D - vec3d1.x, Math.min(0.4D, vec3d.y / 2.0D + d0), vec3d.z / 2.0D - vec3d1.z);
+                finalVelocity = new Vec3(vec3d.x / 2.0D - vec3d1.x, Math.max(Math.min(0.4D, vec3d.y / 2.0D + d0), 0.3608000051972503), vec3d.z / 2.0D - vec3d1.z);
             else
                 finalVelocity = new Vec3(vec3d.x / 2.0D - vec3d1.x, this.onGround() ? Math.min(0.4D, vec3d.y / 2.0D + d0) : vec3d.y, vec3d.z / 2.0D - vec3d1.z);
             Vec3 diff = finalVelocity.subtract(vec3d);
@@ -2289,7 +2296,18 @@ public abstract class LivingEntity extends Entity implements Attackable {
     protected float getDamageAfterArmorAbsorb(DamageSource source, float amount) {
         if (!source.is(DamageTypeTags.BYPASSES_ARMOR)) {
             // this.hurtArmor(damagesource, f); // CraftBukkit - actuallyHurt(DamageSource, float, EntityDamageEvent) for handle damage
-            amount = CombatRules.getDamageAfterAbsorb(this, amount, source, (float) this.getArmorValue(), (float) this.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
+            if (this instanceof ServerPlayer sp && source.getEntity() instanceof ServerPlayer sp1) {
+                if (!source.isDirect() || netheriteWeapons.contains(sp1.getMainHandItem().getBukkitStack().getType()))
+                    amount = CombatRules.getDamageAfterAbsorb(this, amount, source, (float) this.getArmorValue(), 0);
+                else {
+                    int pvpToughness = 0;
+                    for (org.bukkit.inventory.ItemStack is : sp.getBukkitEntity().getInventory().getArmorContents())
+                        if (is != null && netheriteArmor.contains(is.getType()))
+                            pvpToughness++;
+                    amount = CombatRules.getDamageAfterAbsorb(this, amount, source, (float) this.getArmorValue(), pvpToughness);
+                }
+            } else
+                amount = CombatRules.getDamageAfterAbsorb(this, amount, source, (float) this.getArmorValue(), (float) this.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
         }
 
         return amount;
@@ -2333,7 +2351,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
                 } else {
                     f4 = 0.0F;
                 }
-
+                // CamwenPurpur start
+                if (source.getDirectEntity() instanceof AbstractArrow aa && aa.getWeaponItem().getBukkitStack().getType().equals(Material.CROSSBOW))
+                    f4 = 0.0F;
+                // CamwenPurpur end
                 if (f4 > 0.0F) {
                     amount = CombatRules.getDamageAfterMagicAbsorb(amount, f4);
                 }
