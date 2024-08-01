@@ -288,6 +288,10 @@ public class FishingHook extends Projectile {
         if (!this.level().isClientSide) {
             this.setHookedEntity(result.getEntity());
         }
+
+        // CamwenPurpurVanilla start
+        result.getEntity().hurtOrSimulate(this.damageSources().thrown(this, this.getOwner()), 0); // this being stolen from snowball, which extends throwableProjectile, might be problematic since this extends Projectile
+        // CamwenPurpurVanilla end
     }
 
     @Override
