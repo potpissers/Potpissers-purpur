@@ -1544,7 +1544,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
                 if (!this.actuallyHurt(source, (float) event.getFinalDamage() - this.lastHurt, event)) {
                     return false;
                 }
-                if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event.
+                // if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event.
                 // CraftBukkit end
                 this.lastHurt = amount;
                 flag1 = false;
@@ -1557,7 +1557,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
                 if (!this.actuallyHurt(source, (float) event.getFinalDamage(), event)) {
                     return false;
                 }
-                if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event.
+                // if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event.
                 this.lastHurt = amount;
                 this.invulnerableTime = this.invulnerableDuration; // CraftBukkit - restore use of maxNoDamageTicks
                 // this.actuallyHurt(damagesource, f);
@@ -2046,8 +2046,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
 
             Vec3 vec3d1 = (new Vec3(d1, 0.0D, d2)).normalize().scale(d0);
 
-            // Paper start - knockback events
-            Vec3 finalVelocity = new Vec3(vec3d.x / 2.0D - vec3d1.x, this.onGround() ? Math.min(0.4D, vec3d.y / 2.0D + d0) : vec3d.y, vec3d.z / 2.0D - vec3d1.z);
+            // Paper start - knockback events // this only works on melee attacks I think
+            Vec3 finalVelocity;
+            if (this instanceof ServerPlayer && attacker instanceof ServerPlayer)
+                finalVelocity = new Vec3(vec3d.x / 2.0D - vec3d1.x, Math.min(0.4D, vec3d.y / 2.0D + d0), vec3d.z / 2.0D - vec3d1.z);
+            else
+                finalVelocity = new Vec3(vec3d.x / 2.0D - vec3d1.x, this.onGround() ? Math.min(0.4D, vec3d.y / 2.0D + d0) : vec3d.y, vec3d.z / 2.0D - vec3d1.z);
             Vec3 diff = finalVelocity.subtract(vec3d);
             io.papermc.paper.event.entity.EntityKnockbackEvent event = CraftEventFactory.callEntityKnockbackEvent((org.bukkit.craftbukkit.entity.CraftLivingEntity) this.getBukkitEntity(), attacker, attacker, cause, d0, diff);
             // Paper end - knockback events
