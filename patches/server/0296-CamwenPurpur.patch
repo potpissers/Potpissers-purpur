@@ -1,0 +1,341 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: cameron <cuckmeron@gmail.com>
+Date: Thu, 1 Aug 2024 10:50:33 -0400
+Subject: [PATCH] CamwenPurpur
+
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index f19c64d572c947ac8f44f7e25e170a32d4093961..9de2f752c17dcb9bbfa49ebb9f03ae60861e627a 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -202,6 +202,7 @@ import org.bukkit.inventory.MainHand;
+ 
+ public class ServerPlayer extends net.minecraft.world.entity.player.Player implements ca.spottedleaf.moonrise.patches.chunk_system.player.ChunkSystemServerPlayer { // Paper - rewrite chunk system
+ 
++    public boolean hasSprintHit = false;
+     private static final Logger LOGGER = LogUtils.getLogger();
+     public long lastSave = MinecraftServer.currentTick; // Paper - Incremental chunk and player saving
+     private static final int NEUTRAL_MOB_DEATH_NOTIFICATION_RADII_XZ = 32;
+@@ -779,6 +780,8 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+         if (this.invulnerableTime > 0) {
+             --this.invulnerableTime;
+         }
++        if (this.knockbackInvulnerableTime > 0)
++            --this.knockbackInvulnerableTime;
+ 
+         // Paper start - Configurable container update tick rate
+         if (--containerUpdateDelay <= 0) {
+diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+index 3c038a992083f96b6406e786c5bb1177c1fe4c51..697187712f7341d1764658cc5e07cdf76b64120e 100644
+--- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
++++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+@@ -2650,6 +2650,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
+                 break;
+             case STOP_SPRINTING:
+                 this.player.setSprinting(false);
++                this.player.hasSprintHit = false;
+                 break;
+             case STOP_SLEEPING:
+                 if (this.player.isSleeping()) {
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 8bbe0cc1c0e8de5e28b782a0aa5c655a280a0dd4..4a8122d4f6befcddb22bf9b113894d8ff122adef 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -353,6 +353,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     protected boolean wasEyeInWater;
+     private final Set<TagKey<Fluid>> fluidOnEyes;
+     public int invulnerableTime;
++    public int knockbackInvulnerableTime = 0;
+     protected boolean firstTick;
+     protected final SynchedEntityData entityData;
+     protected static final EntityDataAccessor<Byte> DATA_SHARED_FLAGS_ID = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BYTE);
+@@ -1368,7 +1369,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     }
+ 
+     protected void playEntityOnFireExtinguishedSound() {
+-        this.playSound(SoundEvents.GENERIC_EXTINGUISH_FIRE, 0.7F, 1.6F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
++        if (!(this instanceof ServerPlayer)) this.playSound(SoundEvents.GENERIC_EXTINGUISH_FIRE, 0.7F, 1.6F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
+     }
+ 
+     public void extinguishFire() {
+diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+index f366d0290c0a4e68c8a208b0c729e9005cd2673a..69e9144500facee455b7abbfabbd6a6fe911f97b 100644
+--- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
++++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+@@ -132,12 +132,12 @@ import net.minecraft.world.phys.HitResult;
+ import net.minecraft.world.phys.Vec3;
+ import net.minecraft.world.scores.PlayerTeam;
+ import net.minecraft.world.scores.Scoreboard;
++import org.bukkit.Material;
+ import org.slf4j.Logger;
+ 
+ // CraftBukkit start
+ import java.util.ArrayList;
+ import java.util.HashSet;
+-import java.util.Set;
+ import com.google.common.base.Function;
+ import java.util.UUID;
+ import org.bukkit.Location;
+@@ -148,7 +148,6 @@ import org.bukkit.entity.Player;
+ import org.bukkit.event.entity.ArrowBodyCountChangeEvent;
+ import org.bukkit.event.entity.EntityDamageEvent;
+ import org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
+-import org.bukkit.event.entity.EntityKnockbackEvent;
+ import org.bukkit.event.entity.EntityPotionEffectEvent;
+ import org.bukkit.event.entity.EntityRegainHealthEvent;
+ import org.bukkit.event.entity.EntityRemoveEvent;
+@@ -157,10 +156,11 @@ import org.bukkit.event.entity.EntityTeleportEvent;
+ import org.bukkit.event.player.PlayerItemConsumeEvent;
+ // CraftBukkit end
+ 
+-import co.aikar.timings.MinecraftTimings; // Paper
+ 
+ public abstract class LivingEntity extends Entity implements Attackable {
+ 
++    HashSet<Material> netheriteArmor = new HashSet<>(List.of(Material.NETHERITE_HELMET, Material.NETHERITE_CHESTPLATE, Material.NETHERITE_LEGGINGS, Material.NETHERITE_BOOTS));
++    HashSet<Material> netheriteWeapons = new HashSet<>(List.of(Material.NETHERITE_SWORD, Material.NETHERITE_AXE, Material.MACE, Material.TRIDENT));
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private static final String TAG_ACTIVE_EFFECTS = "active_effects";
+     private static final ResourceLocation SPEED_MODIFIER_POWDER_SNOW_ID = ResourceLocation.withDefaultNamespace("powder_snow");
+@@ -1535,7 +1535,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
+                 // if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event.
+                 // CraftBukkit end
+                 this.lastHurt = amount;
+-                flag1 = false;
++                if (!(this instanceof ServerPlayer) || this.knockbackInvulnerableTime > 0) flag1 = false;
++                else {
++                    this.invulnerableTime = this.invulnerableDuration;
++                    this.hurtDuration = 10;
++                    this.hurtTime = this.hurtDuration;
++                }
+             } else {
+                 // Paper start - only call damage event when actuallyHurt will be called - move call logic down
+                 event = this.handleEntityDamage(source, amount);
+@@ -1623,6 +1628,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+                     }
+                     // Paper end - Check distance in entity interactions
+ 
++                    if (this instanceof ServerPlayer) this.knockbackInvulnerableTime = this.invulnerableDuration / 2 - 1;
+                     this.knockback(0.4000000059604645D, d0, d1, entity1, entity1 == null ? io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.DAMAGE : io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK); // CraftBukkit // Paper - knockback events
+                     if (!flag) {
+                         this.indicateDamage(d0, d1);
+@@ -2022,7 +2028,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+     }
+ 
+     public void knockback(double d0, double d1, double d2, @Nullable Entity attacker, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause cause) { // Paper - knockback events
+-        d0 *= 1.0D - this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
++        if (!(this instanceof ServerPlayer && attacker instanceof ServerPlayer)) d0 *= 1.0D - this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
+         if (true || d0 > 0.0D) { // CraftBukkit - Call event even when force is 0
+             //this.hasImpulse = true; // CraftBukkit - Move down
+ 
+@@ -2037,7 +2043,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+             // Paper start - knockback events // this only works on melee attacks I think
+             Vec3 finalVelocity;
+             if (this instanceof ServerPlayer && attacker instanceof ServerPlayer)
+-                finalVelocity = new Vec3(vec3d.x / 2.0D - vec3d1.x, Math.min(0.4D, vec3d.y / 2.0D + d0), vec3d.z / 2.0D - vec3d1.z);
++                finalVelocity = new Vec3(vec3d.x / 2.0D - vec3d1.x, Math.max(Math.min(0.4D, vec3d.y / 2.0D + d0), 0.3608000051972503), vec3d.z / 2.0D - vec3d1.z);
+             else
+                 finalVelocity = new Vec3(vec3d.x / 2.0D - vec3d1.x, this.onGround() ? Math.min(0.4D, vec3d.y / 2.0D + d0) : vec3d.y, vec3d.z / 2.0D - vec3d1.z);
+             Vec3 diff = finalVelocity.subtract(vec3d);
+@@ -2263,7 +2269,18 @@ public abstract class LivingEntity extends Entity implements Attackable {
+     protected float getDamageAfterArmorAbsorb(DamageSource source, float amount) {
+         if (!source.is(DamageTypeTags.BYPASSES_ARMOR)) {
+             // this.hurtArmor(damagesource, f); // CraftBukkit - actuallyHurt(DamageSource, float, EntityDamageEvent) for handle damage
+-            amount = CombatRules.getDamageAfterAbsorb(this, amount, source, (float) this.getArmorValue(), (float) this.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
++            if (this instanceof ServerPlayer sp && source.getEntity() instanceof ServerPlayer sp1) {
++                if (!source.isDirect() || netheriteWeapons.contains(sp1.getMainHandItem().getBukkitStack().getType()))
++                    amount = CombatRules.getDamageAfterAbsorb(this, amount, source, (float) this.getArmorValue(), 0);
++                else {
++                    int pvpToughness = 0;
++                    for (org.bukkit.inventory.ItemStack is : sp.getBukkitEntity().getInventory().getArmorContents())
++                        if (is != null && netheriteArmor.contains(is.getType()))
++                            pvpToughness++;
++                    amount = CombatRules.getDamageAfterAbsorb(this, amount, source, (float) this.getArmorValue(), pvpToughness);
++                }
++            } else
++                amount = CombatRules.getDamageAfterAbsorb(this, amount, source, (float) this.getArmorValue(), (float) this.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
+         }
+ 
+         return amount;
+diff --git a/src/main/java/net/minecraft/world/entity/player/Player.java b/src/main/java/net/minecraft/world/entity/player/Player.java
+index 330b21946564e6a7b463a258c02fee3f91e0f057..a3b91512e00cb59e181d1b957dc2af972c0ff8ea 100644
+--- a/src/main/java/net/minecraft/world/entity/player/Player.java
++++ b/src/main/java/net/minecraft/world/entity/player/Player.java
+@@ -113,6 +113,7 @@ import net.minecraft.world.phys.AABB;
+ import net.minecraft.world.phys.Vec3;
+ import net.minecraft.world.scores.PlayerTeam;
+ import net.minecraft.world.scores.Scoreboard;
++import org.bukkit.enchantments.Enchantment;
+ import org.slf4j.Logger;
+ import org.bukkit.craftbukkit.entity.CraftHumanEntity;
+ import org.bukkit.craftbukkit.event.CraftEventFactory;
+@@ -1384,6 +1385,10 @@ public abstract class Player extends LivingEntity {
+ 
+                     if (flag4) {
+                         float f5 = this.getKnockback(target, damagesource) + (flag1 ? 1.0F : 0.0F);
++                        if (flag1 && this instanceof ServerPlayer sp) {
++                            if (sp.hasSprintHit) f5--;
++                            else sp.hasSprintHit = true;
++                        }
+ 
+                         if (f5 > 0.0F) {
+                             if (target instanceof LivingEntity) {
+@@ -1471,7 +1476,7 @@ public abstract class Player extends LivingEntity {
+                             }
+                         }
+ 
+-                        if (f1 > 0.0F) {
++                        if (f1 > 0.0F || itemstack.getBukkitStack().hasEnchant(Enchantment.BREACH)) {
+                             this.magicCrit(target);
+                         }
+ 
+diff --git a/src/main/java/net/minecraft/world/entity/projectile/AbstractArrow.java b/src/main/java/net/minecraft/world/entity/projectile/AbstractArrow.java
+index 1dd61ee306231f77664dee7e4f2b617fe2e3659f..6b95a5184a10cce9cfa7a9343bf6acc51e2ca70f 100644
+--- a/src/main/java/net/minecraft/world/entity/projectile/AbstractArrow.java
++++ b/src/main/java/net/minecraft/world/entity/projectile/AbstractArrow.java
+@@ -837,7 +837,7 @@ public abstract class AbstractArrow extends Projectile {
+     }
+ 
+     protected float getWaterInertia() {
+-        return 0.6F;
++        return 0.99F;//6F;
+     }
+ 
+     public void setNoPhysics(boolean noClip) {
+diff --git a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
+index e8e1fe11d6c9042979345941833fa2895000c39a..400572792ab41a390ca0b91ab559e5b2deaada47 100644
+--- a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
++++ b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
+@@ -13,6 +13,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
+ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+ import net.minecraft.server.level.ServerEntity;
+ import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.ServerPlayer;
+ import net.minecraft.tags.EntityTypeTags;
+ import net.minecraft.util.Mth;
+ import net.minecraft.world.damagesource.DamageSource;
+@@ -205,7 +206,10 @@ public abstract class Projectile extends Entity implements TraceableEntity {
+             vec3d = vec3d.normalize().scale(2D);
+         }
+         if (!shooter.level().paperConfig().misc.disableRelativeProjectileVelocity) {
+-        this.setDeltaMovement(this.getDeltaMovement().add(vec3d.x, shooter.onGround() ? 0.0D : vec3d.y, vec3d.z));
++            if (!(this instanceof ThrownPotion))
++                // && !(this instanceof AbstractArrow aa && !aa.shotFromCrossbow()))
++                this.setDeltaMovement(this.getDeltaMovement().add(vec3d.x, shooter.onGround() ? 0.0D : vec3d.y, vec3d.z)); // Paper - allow disabling relative velocity
++            // && (shooter instanceof ServerPlayer sp && sp.pvpVelocityBypass))
+         }
+         // Paper end - allow disabling relative velocity
+     }
+diff --git a/src/main/java/net/minecraft/world/food/FoodConstants.java b/src/main/java/net/minecraft/world/food/FoodConstants.java
+index 807b07471283edf99b82ebf256e9e601595bf1d1..a1f91e5ac9bc8764fc2bff101af45b766e776002 100644
+--- a/src/main/java/net/minecraft/world/food/FoodConstants.java
++++ b/src/main/java/net/minecraft/world/food/FoodConstants.java
+@@ -7,7 +7,7 @@ public class FoodConstants {
+     public static final float SATURATION_FLOOR = 2.5F;
+     public static final float EXHAUSTION_DROP = 4.0F;
+     public static final int HEALTH_TICK_COUNT = 80;
+-    public static final int HEALTH_TICK_COUNT_SATURATED = 10;
++    public static final int HEALTH_TICK_COUNT_SATURATED = 80;//10;
+     public static final int HEAL_LEVEL = 18;
+     public static final int SPRINT_LEVEL = 6;
+     public static final int STARVE_LEVEL = 0;
+@@ -17,15 +17,15 @@ public class FoodConstants {
+     public static final float FOOD_SATURATION_GOOD = 0.8F;
+     public static final float FOOD_SATURATION_MAX = 1.0F;
+     public static final float FOOD_SATURATION_SUPERNATURAL = 1.2F;
+-    public static final float EXHAUSTION_HEAL = 6.0F;
+-    public static final float EXHAUSTION_JUMP = 0.05F;
+-    public static final float EXHAUSTION_SPRINT_JUMP = 0.2F;
+-    public static final float EXHAUSTION_MINE = 0.005F;
+-    public static final float EXHAUSTION_ATTACK = 0.1F;
+-    public static final float EXHAUSTION_WALK = 0.0F;
+-    public static final float EXHAUSTION_CROUCH = 0.0F;
++    public static final float EXHAUSTION_HEAL = 4.0F;//6.0F;
++    public static final float EXHAUSTION_JUMP = 0.2F;//0.05F;
++    public static final float EXHAUSTION_SPRINT_JUMP = 0.8F;//0.2F;
++    public static final float EXHAUSTION_MINE = 0.025F;//0.005F;
++    public static final float EXHAUSTION_ATTACK = 0.3F;//0.1F;
++    public static final float EXHAUSTION_WALK = 0.01F;//0.0F;
++    public static final float EXHAUSTION_CROUCH = 0.01F;//0.0F;
+     public static final float EXHAUSTION_SPRINT = 0.1F;
+-    public static final float EXHAUSTION_SWIM = 0.01F;
++    public static final float EXHAUSTION_SWIM = 0.015F;//0.01F;
+ 
+     public static float saturationByModifier(int nutrition, float saturationModifier) {
+         return (float)nutrition * saturationModifier * 2.0F;
+diff --git a/src/main/java/net/minecraft/world/food/FoodData.java b/src/main/java/net/minecraft/world/food/FoodData.java
+index 842a908051bdf6c5f0ef8ce3ac84a7ce210500b5..f1d85c8307e7481418df9d17b9c41fcecf7cce67 100644
+--- a/src/main/java/net/minecraft/world/food/FoodData.java
++++ b/src/main/java/net/minecraft/world/food/FoodData.java
+@@ -18,7 +18,7 @@ public class FoodData {
+     private int tickTimer;
+     // CraftBukkit start
+     private Player entityhuman;
+-    public int saturatedRegenRate = 10;
++    public int saturatedRegenRate = 80;//10;
+     public int unsaturatedRegenRate = 80;
+     public int starvationRate = 80;
+     // CraftBukkit end
+diff --git a/src/main/java/net/minecraft/world/item/ChorusFruitItem.java b/src/main/java/net/minecraft/world/item/ChorusFruitItem.java
+index 9f59f63203807abc3802d3e2f060d90d0d754860..b994ce10d2b11751aa9024232808ab205f32ff9e 100644
+--- a/src/main/java/net/minecraft/world/item/ChorusFruitItem.java
++++ b/src/main/java/net/minecraft/world/item/ChorusFruitItem.java
+@@ -68,7 +68,7 @@ public class ChorusFruitItem extends Item {
+                 Player entityhuman = (Player) user;
+ 
+                 entityhuman.resetCurrentImpulseContext();
+-                entityhuman.getCooldowns().addCooldown(this, 20);
++                // entityhuman.getCooldowns().addCooldown(this, 20);
+             }
+         }
+ 
+diff --git a/src/main/java/net/minecraft/world/item/EnderpearlItem.java b/src/main/java/net/minecraft/world/item/EnderpearlItem.java
+index 11b04455f09d8bfdf44499bb8359dc715c2daffd..f89609a220d3188ef9c243a9b8c398758901f79e 100644
+--- a/src/main/java/net/minecraft/world/item/EnderpearlItem.java
++++ b/src/main/java/net/minecraft/world/item/EnderpearlItem.java
+@@ -36,7 +36,7 @@ public class EnderpearlItem extends Item {
+ 
+                 world.playSound((Player) null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENDER_PEARL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (net.minecraft.world.entity.Entity.SHARED_RANDOM.nextFloat() * 0.4F + 0.8F));
+                 user.awardStat(Stats.ITEM_USED.get(this));
+-                user.getCooldowns().addCooldown(this, user.getAbilities().instabuild ? world.purpurConfig.enderPearlCooldownCreative : world.purpurConfig.enderPearlCooldown); // Purpur
++                // user.getCooldowns().addCooldown(this, user.getAbilities().instabuild ? world.purpurConfig.enderPearlCooldownCreative : world.purpurConfig.enderPearlCooldown); // Purpur
+             } else {
+                 // Paper end - PlayerLaunchProjectileEvent
+                 if (user instanceof net.minecraft.server.level.ServerPlayer) {
+diff --git a/src/main/java/net/minecraft/world/item/TridentItem.java b/src/main/java/net/minecraft/world/item/TridentItem.java
+index 8cf0b69fee110af05b89afa8e3236575aa6850e2..c729f25557b2394de27beb52fab0b4dff78703ff 100644
+--- a/src/main/java/net/minecraft/world/item/TridentItem.java
++++ b/src/main/java/net/minecraft/world/item/TridentItem.java
+@@ -72,7 +72,7 @@ public class TridentItem extends Item implements ProjectileItem {
+             if (j >= 10) {
+                 float f = EnchantmentHelper.getTridentSpinAttackStrength(stack, entityhuman);
+ 
+-                if (f <= 0.0F || entityhuman.isInWaterOrRain()) {
++                if (true) {//f <= 0.0F || entityhuman.isInWaterOrRain()) {
+                     if (!TridentItem.isTooDamagedToUse(stack)) {
+                         Holder<SoundEvent> holder = (Holder) EnchantmentHelper.pickHighestLevel(stack, EnchantmentEffectComponents.TRIDENT_SOUND).orElse(SoundEvents.TRIDENT_THROW);
+ 
+@@ -160,8 +160,8 @@ public class TridentItem extends Item implements ProjectileItem {
+ 
+         if (TridentItem.isTooDamagedToUse(itemstack)) {
+             return InteractionResultHolder.fail(itemstack);
+-        } else if (EnchantmentHelper.getTridentSpinAttackStrength(itemstack, user) > 0.0F && !user.isInWaterOrRain()) {
+-            return InteractionResultHolder.fail(itemstack);
++        // } else if (EnchantmentHelper.getTridentSpinAttackStrength(itemstack, user) > 0.0F && !user.isInWaterOrRain()) {
++        //     return InteractionResultHolder.fail(itemstack);
+         } else {
+             user.startUsingItem(hand);
+             return InteractionResultHolder.consume(itemstack);
+diff --git a/src/main/java/net/minecraft/world/item/enchantment/Enchantments.java b/src/main/java/net/minecraft/world/item/enchantment/Enchantments.java
+index 06ff34a333532c569d80919b702728d89e649969..24179f61a7aeeb2541f4e49d78a7dbb91b93a40a 100644
+--- a/src/main/java/net/minecraft/world/item/enchantment/Enchantments.java
++++ b/src/main/java/net/minecraft/world/item/enchantment/Enchantments.java
+@@ -455,7 +455,7 @@ public class Enchantments {
+                     new EnchantmentAttributeEffect(
+                         ResourceLocation.withDefaultNamespace("enchantment.soul_speed"),
+                         Attributes.MOVEMENT_SPEED,
+-                        LevelBasedValue.perLevel(0.0405F, 0.0105F),
++                        LevelBasedValue.perLevel(0.0405F / 3, 0.0105F / 3),
+                         AttributeModifier.Operation.ADD_VALUE
+                     ),
+                     AllOfCondition.allOf(
