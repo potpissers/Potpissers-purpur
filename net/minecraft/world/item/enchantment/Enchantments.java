@@ -509,7 +509,7 @@ public class Enchantments {
                         new EnchantmentAttributeEffect(
                             ResourceLocation.withDefaultNamespace("enchantment.soul_speed"),
                             Attributes.MOVEMENT_SPEED,
-                            LevelBasedValue.perLevel(0.0405F, 0.0105F),
+                            LevelBasedValue.perLevel(0.0405F / 35, 0.0105F), // CamwenPurpur -> should be camwenPurpurVanilla probably
                             AttributeModifier.Operation.ADD_VALUE
                         ),
                         new EnchantmentAttributeEffect(

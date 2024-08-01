@@ -264,6 +264,10 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     protected boolean wasEyeInWater;
     private final Set<TagKey<Fluid>> fluidOnEyes = new HashSet<>();
     public int invulnerableTime;
+
+    // CamwenPurpur start
+    public int knockbackInvulnerableTime = 0;
+    // CamwenPurpur end
     protected boolean firstTick = true;
     protected final SynchedEntityData entityData;
     protected static final EntityDataAccessor<Byte> DATA_SHARED_FLAGS_ID = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BYTE);
@@ -1354,7 +1358,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
 
     protected void playEntityOnFireExtinguishedSound() {
-        this.playSound(SoundEvents.GENERIC_EXTINGUISH_FIRE, 0.7F, 1.6F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
+        if (!(this instanceof ServerPlayer)) this.playSound(SoundEvents.GENERIC_EXTINGUISH_FIRE, 0.7F, 1.6F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F); // CamwenPurpur
     }
 
     public void extinguishFire() {

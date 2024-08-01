@@ -773,7 +773,7 @@ public abstract class AbstractArrow extends Projectile {
     }
 
     protected float getWaterInertia() {
-        return 0.6F;
+        return 0.99F;//6F;
     }
 
     public void setNoPhysics(boolean noPhysics) {

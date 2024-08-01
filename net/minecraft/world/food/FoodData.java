@@ -13,7 +13,7 @@ public class FoodData {
     public float exhaustionLevel;
     private int tickTimer;
     // CraftBukkit start
-    public int saturatedRegenRate = 10;
+    public int saturatedRegenRate = 80; //10; CamwenPurpur
     public int unsaturatedRegenRate = 80;
     public int starvationRate = 80;
     // CraftBukkit end
@@ -64,7 +64,7 @@ public class FoodData {
         }
 
         boolean _boolean = serverLevel.getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
-        if (_boolean && this.saturationLevel > 0.0F && player.isHurt() && this.foodLevel >= 20) {
+        if (false && _boolean && this.saturationLevel > 0.0F && player.isHurt() && this.foodLevel >= 20) { // CamwenPurpur
             this.tickTimer++;
             if (this.tickTimer >= this.saturatedRegenRate) { // CraftBukkit
                 float min = Math.min(this.saturationLevel, 6.0F);

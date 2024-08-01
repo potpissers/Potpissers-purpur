@@ -2692,6 +2692,10 @@ public class ServerGamePacketListenerImpl
                     break;
                 case STOP_SPRINTING:
                     this.player.setSprinting(false);
+
+                    // CamwenPurpur start
+                    this.player.hasSprintHit = false;
+                    // CamwenPurpur end
                     break;
                 case STOP_SLEEPING:
                     if (this.player.isSleeping()) {

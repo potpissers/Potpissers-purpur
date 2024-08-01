@@ -136,12 +136,12 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
+import org.bukkit.Material;
 import org.slf4j.Logger;
 
 // CraftBukkit start
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.LinkedList;
 import java.util.UUID;
 import net.minecraft.world.item.component.Consumable;
@@ -152,7 +152,6 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.event.entity.ArrowBodyCountChangeEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
-import org.bukkit.event.entity.EntityKnockbackEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRemoveEvent;
@@ -162,6 +161,11 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 // CraftBukkit end
 
 public abstract class LivingEntity extends Entity implements Attackable {
+
+    // CamwenPurpur start
+    Set<Material> NETHERITE_ARMOR = Set.of(Material.NETHERITE_HELMET, Material.NETHERITE_CHESTPLATE, Material.NETHERITE_LEGGINGS, Material.NETHERITE_BOOTS);
+    Set<Material> NETHERITE_WEAPONS = Set.of(Material.NETHERITE_SWORD, Material.NETHERITE_AXE, Material.MACE, Material.TRIDENT);
+    // CamwenPurpur end
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String TAG_ACTIVE_EFFECTS = "active_effects";
     private static final ResourceLocation SPEED_MODIFIER_POWDER_SNOW_ID = ResourceLocation.withDefaultNamespace("powder_snow");
@@ -1482,7 +1486,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
                 // if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event. // CamwenPurpurVanilla
                 // CraftBukkit end
                 this.lastHurt = amount;
-                flag1 = false;
+                if (!(this instanceof ServerPlayer) || this.knockbackInvulnerableTime > 0) flag1 = false;
+                else {
+                    this.invulnerableTime = this.invulnerableDuration;
+                    this.hurtDuration = 10;
+                    this.hurtTime = this.hurtDuration;
+                }
             } else {
                 // Paper start - only call damage event when actuallyHurt will be called - move call logic down
                 event = this.handleEntityDamage(damageSource, amount, 0); // Paper - fix invulnerability reduction in EntityDamageEvent - pass lastDamage reduction (none in this branch)
@@ -1534,6 +1543,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
                     }
                     // Paper end - Check distance in entity interactions
 
+                    // CamwenPurpur start
+                    if (this instanceof ServerPlayer)
+                        this.knockbackInvulnerableTime = this.invulnerableDuration / 2 - 1;
+                    // CamwenPurpur end
                     this.knockback(0.4F, d, d1, damageSource.getDirectEntity(), damageSource.getDirectEntity() == null ? io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.DAMAGE : io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK); // CraftBukkit // Paper - knockback events
                     if (!flag) {
                         this.indicateDamage(d, d1);
@@ -1989,6 +2002,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
     }
 
     public void knockback(double strength, double x, double z, @Nullable Entity attacker, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause eventCause) { // Paper - knockback events
+
+        // CamwenPurpur start
+ if (!(this instanceof ServerPlayer && attacker instanceof ServerPlayer) )
+        // CamwenPurpur end
         strength *= 1.0 - this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
         if (true || !(strength <= 0.0)) { // CraftBukkit - Call event even when force is 0
             // this.hasImpulse = true; // CraftBukkit - Move down
@@ -2005,7 +2022,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
                 deltaMovement.x / 2.0 - vec3.x,
                 this.onGround() ? Math.min(0.4, deltaMovement.y / 2.0 + strength) : deltaMovement.y,
                 deltaMovement.z / 2.0 - vec3.z
-            ) : new Vec3(deltaMovement.x / 2.0D - vec3.x, Math.min(0.4D, deltaMovement.y / 2.0D + d0), deltaMovement.z / 2.0D - vec3.z); // CamwenPurpurVanilla
+            ) : new Vec3(deltaMovement.x / 2.0D - vec3.x, Math.max(Math.min(0.4D, deltaMovement.y / 2.0D + strength), 0.3608000051972503), deltaMovement.z / 2.0D - vec3.z); // CamwenPurpurVanilla // CamwenPurpur Math.min(0.4D, deltaMovement.y / 2.0D + d0)
             Vec3 diff = finalVelocity.subtract(deltaMovement);
             io.papermc.paper.event.entity.EntityKnockbackEvent event = CraftEventFactory.callEntityKnockbackEvent((org.bukkit.craftbukkit.entity.CraftLivingEntity) this.getBukkitEntity(), attacker, attacker, eventCause, strength, diff);
             // Paper end - knockback events
@@ -2225,6 +2242,21 @@ public abstract class LivingEntity extends Entity implements Attackable {
     protected float getDamageAfterArmorAbsorb(DamageSource damageSource, float damageAmount) {
         if (!damageSource.is(DamageTypeTags.BYPASSES_ARMOR)) {
             // this.hurtArmor(damageSource, damageAmount); // CraftBukkit - actuallyHurt(DamageSource, float, EntityDamageEvent) for damage handling
+
+            // CamwenPurpur start
+            if (this instanceof ServerPlayer serverPlayer && damageSource.getEntity() instanceof ServerPlayer serverPlayer1) {
+                if (!damageSource.isDirect() || NETHERITE_WEAPONS.contains(serverPlayer1.getMainHandItem().getBukkitStack().getType()))
+                    damageAmount = CombatRules.getDamageAfterAbsorb(this, damageAmount, damageSource, (float) this.getArmorValue(), 0);
+                else {
+                    int pvpToughness = 0;
+                    for (org.bukkit.inventory.ItemStack is : serverPlayer.getBukkitEntity().getInventory().getArmorContents())
+                        if (is != null && NETHERITE_ARMOR.contains(is.getType()))
+                            pvpToughness++;
+                    damageAmount = CombatRules.getDamageAfterAbsorb(this, damageAmount, damageSource, (float) this.getArmorValue(), pvpToughness);
+                }
+            }
+            else
+            // CamwenPurpur end
             damageAmount = CombatRules.getDamageAfterAbsorb(
                 this, damageAmount, damageSource, this.getArmorValue(), (float)this.getAttributeValue(Attributes.ARMOR_TOUGHNESS)
             );
@@ -2266,6 +2298,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
                     damageProtection = 0.0F;
                 }
 
+                // CamwenPurpur start
+                if (damageSource.getDirectEntity() instanceof AbstractArrow aa && aa.getWeaponItem().getBukkitStack().getType().equals(Material.CROSSBOW))
+                    damageProtection = 0.0F;
+                // CamwenPurpur end
                 if (damageProtection > 0.0F) {
                     damageAmount = CombatRules.getDamageAfterMagicAbsorb(damageAmount, damageProtection);
                 }

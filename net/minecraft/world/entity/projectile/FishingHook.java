@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -115,6 +116,30 @@ public class FishingHook extends Projectile {
         this.setDeltaMovement(vec3);
         this.setYRot((float)(Mth.atan2(vec3.x, vec3.z) * 180.0F / (float)Math.PI));
         this.setXRot((float)(Mth.atan2(vec3.y, vec3.horizontalDistance()) * 180.0F / (float)Math.PI));
+
+        // CamwenPurpur start
+        // float f = thrower.getXRot();
+        // float f1 = thrower.getYRot();
+        // float f2 = Mth.cos(-f1 * 0.017453292F - 3.1415927F);
+        // float f3 = Mth.sin(-f1 * 0.017453292F - 3.1415927F);
+        // float f4 = -Mth.cos(-f * 0.017453292F);
+        // float f5 = Mth.sin(-f * 0.017453292F);
+        // double d0 = thrower.getX() - (double) f3 * 0.3D;
+        // double d1 = thrower.getEyeY();
+        // double d2 = thrower.getZ() - (double) f2 * 0.3D;
+        //
+        // this.moveTo(d0, d1, d2, f1, f);
+        // Vec3 vec3d = new Vec3((double) (-f3), (double) Mth.clamp(-(f5 / f4), -5.0F, 5.0F), (double) (-f2));
+        // double d3 = vec3d.length();
+        //
+        // double motionY = (double)(-Math.sin(f / 180.0F * (float)Math.PI)); // re-adding the randomness memes for this would be nice
+        //
+        // vec3d = vec3d.multiply(0.6D / d3 + this.random.triangle(0.5D, 0.0103365D), 0.6D / d3 + this.random.triangle(0.5D, 0.0103365D), 0.6D / d3 + this.random.triangle(0.5D, 0.0103365D));
+        // vec3d = vec3d.with(Direction.Axis.Y, motionY);
+        // this.setDeltaMovement(vec3d.add(0, thrower.onGround() ? 0.0D : Math.clamp(vec3d.y, -0.3739040364667261, 0.41999998688697815), 0));
+        // this.setYRot((float) (Mth.atan2(vec3d.x, vec3d.z) * 57.2957763671875D));
+        // this.setXRot((float) (Mth.atan2(vec3d.y, vec3d.horizontalDistance()) * 57.2957763671875D));
+        // CamwenPurpur end
         this.yRotO = this.getYRot();
         this.xRotO = this.getXRot();
     }

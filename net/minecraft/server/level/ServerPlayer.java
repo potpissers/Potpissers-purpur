@@ -179,6 +179,10 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.slf4j.Logger;
 
 public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patches.chunk_system.player.ChunkSystemServerPlayer { // Paper - rewrite chunk system
+
+    // CamwenPurpur start
+    public boolean hasSprintHit = false;
+    // CamwenPurpur end
     private static final Logger LOGGER = LogUtils.getLogger();
     public long lastSave = MinecraftServer.currentTick; // Paper - Incremental chunk and player saving
     private static final int NEUTRAL_MOB_DEATH_NOTIFICATION_RADII_XZ = 32;
@@ -814,6 +818,11 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
         if (this.invulnerableTime > 0) {
             this.invulnerableTime--;
         }
+
+        // CamwenPurpur start
+        if (this.knockbackInvulnerableTime > 0)
+            --this.knockbackInvulnerableTime;
+        // CamwenPurpur end
 
         // Paper start - Configurable container update tick rate
         if (--this.containerUpdateDelay <= 0) {

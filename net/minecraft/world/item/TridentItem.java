@@ -78,7 +78,7 @@ public class TridentItem extends Item implements ProjectileItem {
                 return false;
             } else {
                 float tridentSpinAttackStrength = EnchantmentHelper.getTridentSpinAttackStrength(stack, player);
-                if (tridentSpinAttackStrength > 0.0F && !player.isInWaterOrRain()) {
+                if (false && tridentSpinAttackStrength > 0.0F && !player.isInWaterOrRain()) { // CamwenPurpur
                     return false;
                 } else if (stack.nextDamageWillBreak()) {
                     return false;
@@ -169,8 +169,10 @@ public class TridentItem extends Item implements ProjectileItem {
         ItemStack itemInHand = player.getItemInHand(hand);
         if (itemInHand.nextDamageWillBreak()) {
             return InteractionResult.FAIL;
-        } else if (EnchantmentHelper.getTridentSpinAttackStrength(itemInHand, player) > 0.0F && !player.isInWaterOrRain()) {
-            return InteractionResult.FAIL;
+            // CamwenPurpur start
+        // } else if (EnchantmentHelper.getTridentSpinAttackStrength(itemInHand, player) > 0.0F && !player.isInWaterOrRain()) {
+        //     return InteractionResult.FAIL;
+            // CamwenPurpur end
         } else {
             player.startUsingItem(hand);
             return InteractionResult.CONSUME;

@@ -113,6 +113,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team;
+import org.bukkit.enchantments.Enchantment;
 import org.slf4j.Logger;
 
 public abstract class Player extends LivingEntity {
@@ -1331,6 +1332,15 @@ public abstract class Player extends LivingEntity {
                         boolean flag4 = target.hurtOrSimulate(damageSource, f2);
                         if (flag4) {
                             float f4 = this.getKnockback(target, damageSource) + (flag1 ? 1.0F : 0.0F);
+
+                            // CamwenPurpur start
+                            if (flag1 && this instanceof ServerPlayer serverPlayer) {
+                                if (serverPlayer.hasSprintHit)
+                                    f4--;
+                                else
+                                    serverPlayer.hasSprintHit = true;
+                            }
+                            // CamwenPurpur end
                             if (f4 > 0.0F) {
                                 if (target instanceof LivingEntity livingEntity1) {
                                     livingEntity1.knockback(
@@ -1425,7 +1435,10 @@ public abstract class Player extends LivingEntity {
                                 }
                             }
 
-                            if (f1 > 0.0F) {
+                            // CamwenPurpur start
+                            org.bukkit.inventory.ItemStack itemStack = weaponItem.getBukkitStack();
+                            // CamwenPurpur end
+                            if (f1 > 0.0F || itemStack.hasEnchant(org.bukkit.enchantments.Enchantment.BREACH) || target.isInWater() && itemStack.hasEnchant(org.bukkit.enchantments.Enchantment.IMPALING)) { // CamwenPurpur
                                 this.magicCrit(target);
                             }
 

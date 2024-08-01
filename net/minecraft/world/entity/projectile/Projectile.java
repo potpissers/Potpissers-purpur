@@ -6,12 +6,15 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -202,7 +205,7 @@ public abstract class Projectile extends Entity implements TraceableEntity {
         if (Double.isNaN(knownMovement.x) || Double.isNaN(knownMovement.y) || Double.isNaN(knownMovement.z)) {
             knownMovement = new Vec3(0, 0, 0);
         }
-        if (!shooter.level().paperConfig().misc.disableRelativeProjectileVelocity) {
+        if (!shooter.level().paperConfig().misc.disableRelativeProjectileVelocity && !(this instanceof ThrownPotion)) { // CamwenPurpur
         this.setDeltaMovement(this.getDeltaMovement().add(knownMovement.x, shooter.onGround() ? 0.0 : knownMovement.y, knownMovement.z));
         }
         // Paper end - allow disabling relative velocity

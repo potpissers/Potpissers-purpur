@@ -1471,7 +1471,7 @@ public class Items {
     public static final Item CHICKEN = registerItem("chicken", new Item.Properties().food(Foods.CHICKEN, Consumables.CHICKEN));
     public static final Item COOKED_CHICKEN = registerItem("cooked_chicken", new Item.Properties().food(Foods.COOKED_CHICKEN));
     public static final Item ROTTEN_FLESH = registerItem("rotten_flesh", new Item.Properties().food(Foods.ROTTEN_FLESH, Consumables.ROTTEN_FLESH));
-    public static final Item ENDER_PEARL = registerItem("ender_pearl", EnderpearlItem::new, new Item.Properties().stacksTo(16).useCooldown(1.0F));
+    public static final Item ENDER_PEARL = registerItem("ender_pearl", EnderpearlItem::new, new Item.Properties().stacksTo(16).useCooldown(0F)); // CamwenPurpur 1.0F
     public static final Item BLAZE_ROD = registerItem("blaze_rod");
     public static final Item GHAST_TEAR = registerItem("ghast_tear");
     public static final Item GOLD_NUGGET = registerItem("gold_nugget");
@@ -1605,7 +1605,7 @@ public class Items {
         new Item.Properties().rarity(Rarity.UNCOMMON).component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
     );
     public static final Item FIRE_CHARGE = registerItem("fire_charge", FireChargeItem::new);
-    public static final Item WIND_CHARGE = registerItem("wind_charge", WindChargeItem::new, new Item.Properties().useCooldown(0.5F));
+    public static final Item WIND_CHARGE = registerItem("wind_charge", WindChargeItem::new, new Item.Properties().useCooldown(0F)); // CamwenPurpur 0.5F
     public static final Item WRITABLE_BOOK = registerItem(
         "writable_book", WritableBookItem::new, new Item.Properties().stacksTo(1).component(DataComponents.WRITABLE_BOOK_CONTENT, WritableBookContent.EMPTY)
     );
@@ -1813,7 +1813,7 @@ public class Items {
         "end_crystal", EndCrystalItem::new, new Item.Properties().component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
     );
     public static final Item CHORUS_FRUIT = registerItem(
-        "chorus_fruit", new Item.Properties().food(Foods.CHORUS_FRUIT, Consumables.CHORUS_FRUIT).useCooldown(1.0F)
+        "chorus_fruit", new Item.Properties().food(Foods.CHORUS_FRUIT, Consumables.CHORUS_FRUIT).useCooldown(0F) // CamwenPurpur 1.0F
     );
     public static final Item POPPED_CHORUS_FRUIT = registerItem("popped_chorus_fruit");
     public static final Item TORCHFLOWER_SEEDS = registerItem("torchflower_seeds", createBlockItemWithCustomItemName(Blocks.TORCHFLOWER_CROP));

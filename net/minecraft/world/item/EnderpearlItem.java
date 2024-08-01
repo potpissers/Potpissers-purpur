@@ -44,7 +44,7 @@ public class EnderpearlItem extends Item {
                     0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F)
                 );
                 player.awardStat(Stats.ITEM_USED.get(this));
-                player.getCooldowns().addCooldown(itemInHand, player.getAbilities().instabuild ? level.purpurConfig.enderPearlCooldownCreative : level.purpurConfig.enderPearlCooldown); // Purpur - Configurable Ender Pearl cooldown
+                // player.getCooldowns().addCooldown(itemInHand, player.getAbilities().instabuild ? level.purpurConfig.enderPearlCooldownCreative : level.purpurConfig.enderPearlCooldown); // Purpur - Configurable Ender Pearl cooldown // CamwenPurpur
             } else {
             // Paper end - PlayerLaunchProjectileEvent
                 player.containerMenu.sendAllDataToRemote();
