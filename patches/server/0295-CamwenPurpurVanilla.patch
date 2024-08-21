@@ -5,10 +5,10 @@ Subject: [PATCH] CamwenPurpurVanilla
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index 33d86a94b0678f32c87eaf562f2bbb2e63435a8d..f366d0290c0a4e68c8a208b0c729e9005cd2673a 100644
+index 380d70851d764a636c2cf3c617f609073f3eeca6..71c1d98b5e89662e32cc9bdf9340f592448ba32d 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-@@ -1532,7 +1532,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -1544,7 +1544,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
                  if (!this.actuallyHurt(source, (float) event.getFinalDamage() - this.lastHurt, event)) {
                      return false;
                  }
@@ -17,7 +17,7 @@ index 33d86a94b0678f32c87eaf562f2bbb2e63435a8d..f366d0290c0a4e68c8a208b0c729e900
                  // CraftBukkit end
                  this.lastHurt = amount;
                  flag1 = false;
-@@ -1545,7 +1545,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -1557,7 +1557,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
                  if (!this.actuallyHurt(source, (float) event.getFinalDamage(), event)) {
                      return false;
                  }
@@ -26,7 +26,7 @@ index 33d86a94b0678f32c87eaf562f2bbb2e63435a8d..f366d0290c0a4e68c8a208b0c729e900
                  this.lastHurt = amount;
                  this.invulnerableTime = this.invulnerableDuration; // CraftBukkit - restore use of maxNoDamageTicks
                  // this.actuallyHurt(damagesource, f);
-@@ -2034,8 +2034,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -2046,8 +2046,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
  
              Vec3 vec3d1 = (new Vec3(d1, 0.0D, d2)).normalize().scale(d0);
  

@@ -5,7 +5,7 @@ Subject: [PATCH] CamwenPurpur
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index f19c64d572c947ac8f44f7e25e170a32d4093961..9de2f752c17dcb9bbfa49ebb9f03ae60861e627a 100644
+index ceb9c794345922772a69a867a96531167e881d24..3b8908521d0cb6332be90aaaa1fc95096c6148cc 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -202,6 +202,7 @@ import org.bukkit.inventory.MainHand;
@@ -26,10 +26,10 @@ index f19c64d572c947ac8f44f7e25e170a32d4093961..9de2f752c17dcb9bbfa49ebb9f03ae60
          // Paper start - Configurable container update tick rate
          if (--containerUpdateDelay <= 0) {
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 3c038a992083f96b6406e786c5bb1177c1fe4c51..697187712f7341d1764658cc5e07cdf76b64120e 100644
+index 50b4e3fb244b8bac1a6a6d90aaf3b4be075b2500..6227728598d1b7411a82c49dd86ee42dfcec4023 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -2650,6 +2650,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
+@@ -2727,6 +2727,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
                  break;
              case STOP_SPRINTING:
                  this.player.setSprinting(false);
@@ -38,7 +38,7 @@ index 3c038a992083f96b6406e786c5bb1177c1fe4c51..697187712f7341d1764658cc5e07cdf7
              case STOP_SLEEPING:
                  if (this.player.isSleeping()) {
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 8bbe0cc1c0e8de5e28b782a0aa5c655a280a0dd4..4a8122d4f6befcddb22bf9b113894d8ff122adef 100644
+index e3e71558d9d99fa878511f051d1d8592f8684ac0..da5bf46e1b3a67bc143a76718cad5c56abedcfc3 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -353,6 +353,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -49,7 +49,7 @@ index 8bbe0cc1c0e8de5e28b782a0aa5c655a280a0dd4..4a8122d4f6befcddb22bf9b113894d8f
      protected boolean firstTick;
      protected final SynchedEntityData entityData;
      protected static final EntityDataAccessor<Byte> DATA_SHARED_FLAGS_ID = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BYTE);
-@@ -1368,7 +1369,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1377,7 +1378,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      }
  
      protected void playEntityOnFireExtinguishedSound() {
@@ -59,7 +59,7 @@ index 8bbe0cc1c0e8de5e28b782a0aa5c655a280a0dd4..4a8122d4f6befcddb22bf9b113894d8f
  
      public void extinguishFire() {
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index f366d0290c0a4e68c8a208b0c729e9005cd2673a..69e9144500facee455b7abbfabbd6a6fe911f97b 100644
+index 71c1d98b5e89662e32cc9bdf9340f592448ba32d..82c9a52edebe6755b1ad1761d89aaa6e352f253b 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
 @@ -132,12 +132,12 @@ import net.minecraft.world.phys.HitResult;
@@ -84,11 +84,7 @@ index f366d0290c0a4e68c8a208b0c729e9005cd2673a..69e9144500facee455b7abbfabbd6a6f
  import org.bukkit.event.entity.EntityPotionEffectEvent;
  import org.bukkit.event.entity.EntityRegainHealthEvent;
  import org.bukkit.event.entity.EntityRemoveEvent;
-@@ -157,10 +156,11 @@ import org.bukkit.event.entity.EntityTeleportEvent;
- import org.bukkit.event.player.PlayerItemConsumeEvent;
- // CraftBukkit end
- 
--import co.aikar.timings.MinecraftTimings; // Paper
+@@ -160,6 +159,8 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
  
  public abstract class LivingEntity extends Entity implements Attackable {
  
@@ -97,7 +93,7 @@ index f366d0290c0a4e68c8a208b0c729e9005cd2673a..69e9144500facee455b7abbfabbd6a6f
      private static final Logger LOGGER = LogUtils.getLogger();
      private static final String TAG_ACTIVE_EFFECTS = "active_effects";
      private static final ResourceLocation SPEED_MODIFIER_POWDER_SNOW_ID = ResourceLocation.withDefaultNamespace("powder_snow");
-@@ -1535,7 +1535,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -1547,7 +1548,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
                  // if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event.
                  // CraftBukkit end
                  this.lastHurt = amount;
@@ -111,7 +107,7 @@ index f366d0290c0a4e68c8a208b0c729e9005cd2673a..69e9144500facee455b7abbfabbd6a6f
              } else {
                  // Paper start - only call damage event when actuallyHurt will be called - move call logic down
                  event = this.handleEntityDamage(source, amount);
-@@ -1623,6 +1628,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -1635,6 +1641,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
                      }
                      // Paper end - Check distance in entity interactions
  
@@ -119,7 +115,7 @@ index f366d0290c0a4e68c8a208b0c729e9005cd2673a..69e9144500facee455b7abbfabbd6a6f
                      this.knockback(0.4000000059604645D, d0, d1, entity1, entity1 == null ? io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.DAMAGE : io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK); // CraftBukkit // Paper - knockback events
                      if (!flag) {
                          this.indicateDamage(d0, d1);
-@@ -2022,7 +2028,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -2034,7 +2041,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
      }
  
      public void knockback(double d0, double d1, double d2, @Nullable Entity attacker, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause cause) { // Paper - knockback events
@@ -128,7 +124,7 @@ index f366d0290c0a4e68c8a208b0c729e9005cd2673a..69e9144500facee455b7abbfabbd6a6f
          if (true || d0 > 0.0D) { // CraftBukkit - Call event even when force is 0
              //this.hasImpulse = true; // CraftBukkit - Move down
  
-@@ -2037,7 +2043,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -2049,7 +2056,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
              // Paper start - knockback events // this only works on melee attacks I think
              Vec3 finalVelocity;
              if (this instanceof ServerPlayer && attacker instanceof ServerPlayer)
@@ -137,7 +133,7 @@ index f366d0290c0a4e68c8a208b0c729e9005cd2673a..69e9144500facee455b7abbfabbd6a6f
              else
                  finalVelocity = new Vec3(vec3d.x / 2.0D - vec3d1.x, this.onGround() ? Math.min(0.4D, vec3d.y / 2.0D + d0) : vec3d.y, vec3d.z / 2.0D - vec3d1.z);
              Vec3 diff = finalVelocity.subtract(vec3d);
-@@ -2263,7 +2269,18 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -2289,7 +2296,18 @@ public abstract class LivingEntity extends Entity implements Attackable {
      protected float getDamageAfterArmorAbsorb(DamageSource source, float amount) {
          if (!source.is(DamageTypeTags.BYPASSES_ARMOR)) {
              // this.hurtArmor(damagesource, f); // CraftBukkit - actuallyHurt(DamageSource, float, EntityDamageEvent) for handle damage
@@ -203,7 +199,7 @@ index 1dd61ee306231f77664dee7e4f2b617fe2e3659f..6b95a5184a10cce9cfa7a9343bf6acc5
  
      public void setNoPhysics(boolean noClip) {
 diff --git a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
-index e8e1fe11d6c9042979345941833fa2895000c39a..400572792ab41a390ca0b91ab559e5b2deaada47 100644
+index 99ed1be743cd63171be4c5a2f9e973756052cea6..228e496dfc6153b605abf2c38d5b4b9370d1cb26 100644
 --- a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
 +++ b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
 @@ -13,6 +13,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -214,7 +210,7 @@ index e8e1fe11d6c9042979345941833fa2895000c39a..400572792ab41a390ca0b91ab559e5b2
  import net.minecraft.tags.EntityTypeTags;
  import net.minecraft.util.Mth;
  import net.minecraft.world.damagesource.DamageSource;
-@@ -205,7 +206,10 @@ public abstract class Projectile extends Entity implements TraceableEntity {
+@@ -235,7 +236,10 @@ public abstract class Projectile extends Entity implements TraceableEntity {
              vec3d = vec3d.normalize().scale(2D);
          }
          if (!shooter.level().paperConfig().misc.disableRelativeProjectileVelocity) {

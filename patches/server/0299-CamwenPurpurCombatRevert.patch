@@ -24,10 +24,10 @@ index ffd009bca3fdbfd0b14df78072ef8d472a57cd65..7ceb0f3a1e5b1f9da7ec6c8b355597bd
 +    }
  }
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index 69e9144500facee455b7abbfabbd6a6fe911f97b..680c5dac43f84879544bf74faa316d7685b1dfcd 100644
+index 82c9a52edebe6755b1ad1761d89aaa6e352f253b..e347b3390ebb8520e52f56d622f4aaaba577d9f2 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-@@ -2271,13 +2271,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -2298,13 +2298,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
              // this.hurtArmor(damagesource, f); // CraftBukkit - actuallyHurt(DamageSource, float, EntityDamageEvent) for handle damage
              if (this instanceof ServerPlayer sp && source.getEntity() instanceof ServerPlayer sp1) {
                  if (!source.isDirect() || netheriteWeapons.contains(sp1.getMainHandItem().getBukkitStack().getType()))
@@ -43,7 +43,7 @@ index 69e9144500facee455b7abbfabbd6a6fe911f97b..680c5dac43f84879544bf74faa316d76
                  }
              } else
                  amount = CombatRules.getDamageAfterAbsorb(this, amount, source, (float) this.getArmorValue(), (float) this.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
-@@ -2326,7 +2326,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -2353,7 +2353,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
                  }
  
                  if (f4 > 0.0F) {
