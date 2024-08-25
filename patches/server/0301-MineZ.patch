@@ -1,0 +1,67 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: cuckm <cuckmeron@gmail.com>
+Date: Sun, 20 Oct 2024 10:53:13 -0400
+Subject: [PATCH] MineZ
+
+
+diff --git a/src/main/java/net/minecraft/data/worldgen/DimensionTypes.java b/src/main/java/net/minecraft/data/worldgen/DimensionTypes.java
+index 64df656bbb0e66a70856579de2a2ba13179704ef..17427435c17069dbadd3e7625ff3e07588ddf35a 100644
+--- a/src/main/java/net/minecraft/data/worldgen/DimensionTypes.java
++++ b/src/main/java/net/minecraft/data/worldgen/DimensionTypes.java
+@@ -26,7 +26,7 @@ public class DimensionTypes {
+                 BlockTags.INFINIBURN_OVERWORLD,
+                 BuiltinDimensionTypes.OVERWORLD_EFFECTS,
+                 0.0F,
+-                new DimensionType.MonsterSettings(false, true, UniformInt.of(0, 7), 0)
++                new DimensionType.MonsterSettings(false, true, ConstantInt.of(15), 15)//0, 7), 0)
+             )
+         );
+         dimensionTypeRegisterable.register(
+@@ -86,7 +86,7 @@ public class DimensionTypes {
+                 BlockTags.INFINIBURN_OVERWORLD,
+                 BuiltinDimensionTypes.OVERWORLD_EFFECTS,
+                 0.0F,
+-                new DimensionType.MonsterSettings(false, true, UniformInt.of(0, 7), 0)
++                new DimensionType.MonsterSettings(false, true, ConstantInt.of(15), 15)//0, 7), 0)
+             )
+         );
+     }
+diff --git a/src/main/java/net/minecraft/world/effect/RegenerationMobEffect.java b/src/main/java/net/minecraft/world/effect/RegenerationMobEffect.java
+index 426f61d55b9692cf085368df4e4df6f6997aa420..49fc04265288416a81569c260da6806eed63397d 100644
+--- a/src/main/java/net/minecraft/world/effect/RegenerationMobEffect.java
++++ b/src/main/java/net/minecraft/world/effect/RegenerationMobEffect.java
+@@ -19,7 +19,7 @@ class RegenerationMobEffect extends MobEffect {
+ 
+     @Override
+     public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+-        int k = 50 >> amplifier;
++        int k = 25 >> amplifier; // 50, MineZ
+ 
+         return k > 0 ? duration % k == 0 : true;
+     }
+diff --git a/src/main/java/net/minecraft/world/entity/monster/Monster.java b/src/main/java/net/minecraft/world/entity/monster/Monster.java
+index 6511b8c737a57fbc72122dd04e2b544987a49b92..fdc376d8ea254727d4f0e146b8817d4956db9864 100644
+--- a/src/main/java/net/minecraft/world/entity/monster/Monster.java
++++ b/src/main/java/net/minecraft/world/entity/monster/Monster.java
+@@ -95,7 +95,7 @@ public abstract class Monster extends PathfinderMob implements Enemy {
+             }
+         }
+         // Purpur end
+-        if (world.getBrightness(LightLayer.SKY, pos) > random.nextInt(32)) {
++        if (false) {//world.getBrightness(LightLayer.SKY, pos) > random.nextInt(32)) {
+             return false;
+         } else {
+             DimensionType dimensionType = world.dimensionType();
+diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java b/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java
+index 40f15a30b1a0dd2040e75045f32f33082e70aaeb..9bd35b1d1348b0381f8fff4d498eec8e57379868 100644
+--- a/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java
++++ b/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java
+@@ -455,7 +455,7 @@ public abstract class BlockBehaviour implements FeatureElement {
+             this.spawnTerrainParticles = true;
+             this.instrument = NoteBlockInstrument.HARP;
+             this.isValidSpawn = (iblockdata, iblockaccess, blockposition, entitytypes) -> {
+-                return iblockdata.isFaceSturdy(iblockaccess, blockposition, Direction.UP) && iblockdata.getLightEmission() < 14;
++                return iblockdata.isFaceSturdy(iblockaccess, blockposition, Direction.UP) && true;//iblockdata.getLightEmission() < 14;
+             };
+             this.isRedstoneConductor = (iblockdata, iblockaccess, blockposition) -> {
+                 return iblockdata.isCollisionShapeFullBlock(iblockaccess, blockposition);
