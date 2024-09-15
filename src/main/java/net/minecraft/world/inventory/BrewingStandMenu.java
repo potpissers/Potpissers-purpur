@@ -41,14 +41,14 @@ public class BrewingStandMenu extends AbstractContainerMenu {
     // CraftBukkit end
 
     public BrewingStandMenu(int syncId, Inventory playerInventory) {
-        this(syncId, playerInventory, new SimpleContainer(5), new SimpleContainerData(2));
+        this(syncId, playerInventory, new SimpleContainer(5), new io.papermc.paper.inventory.BrewingSimpleContainerData()); // Paper - Add totalBrewTime
     }
 
     public BrewingStandMenu(int syncId, Inventory playerInventory, Container inventory, ContainerData propertyDelegate) {
         super(MenuType.BREWING_STAND, syncId);
         this.player = playerInventory; // CraftBukkit
         checkContainerSize(inventory, 5);
-        checkContainerDataCount(propertyDelegate, 2);
+        checkContainerDataCount(propertyDelegate, 3); // Paper - Add recipeBrewTime
         this.brewingStand = inventory;
         this.brewingStandData = propertyDelegate;
         PotionBrewing potionbrewer = playerInventory.player.level().potionBrewing();
@@ -60,7 +60,20 @@ public class BrewingStandMenu extends AbstractContainerMenu {
         // Paper end - custom potion mixes
         this.ingredientSlot = this.addSlot(new BrewingStandMenu.IngredientsSlot(potionbrewer, inventory, 3, 79, 17));
         this.addSlot(new BrewingStandMenu.FuelSlot(inventory, 4, 17, 17));
-        this.addDataSlots(propertyDelegate);
+        // Paper start - Add recipeBrewTime
+        this.addDataSlots(new SimpleContainerData(2) {
+            @Override
+            public int get(final int index) {
+                if (index == 0) return 400 * propertyDelegate.get(index) / propertyDelegate.get(2);
+                return propertyDelegate.get(index);
+            }
+
+            @Override
+            public void set(final int index, final int value) {
+                propertyDelegate.set(index, value);
+            }
+        });
+        // Paper end - Add recipeBrewTime
 
         int j;
 

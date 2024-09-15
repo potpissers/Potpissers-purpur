@@ -49,6 +49,7 @@ public class BrewingStandBlockEntity extends BaseContainerBlockEntity implements
     public static final int NUM_DATA_VALUES = 2;
     private NonNullList<ItemStack> items;
     public int brewTime;
+    public int recipeBrewTime = 400; // Paper - Add recipeBrewTime
     private boolean[] lastPotionCount;
     private Item ingredient;
     public int fuel;
@@ -99,6 +100,11 @@ public class BrewingStandBlockEntity extends BaseContainerBlockEntity implements
                     case 1:
                         j = BrewingStandBlockEntity.this.fuel;
                         break;
+                    // Paper start - Add recipeBrewTime
+                    case 2:
+                        j = BrewingStandBlockEntity.this.recipeBrewTime;
+                        break;
+                    // Paper end - Add recipeBrewTime
                     default:
                         j = 0;
                 }
@@ -114,13 +120,18 @@ public class BrewingStandBlockEntity extends BaseContainerBlockEntity implements
                         break;
                     case 1:
                         BrewingStandBlockEntity.this.fuel = value;
+                        // Paper start - Add recipeBrewTime
+                    case 2:
+                        BrewingStandBlockEntity.this.recipeBrewTime = value;
+                        break;
+                    // Paper end - Add recipeBrewTime
                 }
 
             }
 
             @Override
             public int getCount() {
-                return 2;
+                return 3; // Paper - Add recipeBrewTime
             }
         };
     }
@@ -188,7 +199,8 @@ public class BrewingStandBlockEntity extends BaseContainerBlockEntity implements
             // CraftBukkit start
             BrewingStartEvent event = new BrewingStartEvent(CraftBlock.at(world, pos), CraftItemStack.asCraftMirror(itemstack1), 400);
             world.getCraftServer().getPluginManager().callEvent(event);
-            blockEntity.brewTime = event.getTotalBrewTime(); // 400 -> event.getTotalBrewTime()
+            blockEntity.recipeBrewTime = event.getRecipeBrewTime(); // Paper - use recipe brew time from event
+            blockEntity.brewTime = event.getBrewingTime(); // 400 -> event.getTotalBrewTime() // Paper - use brewing time from event
             // CraftBukkit end
             blockEntity.ingredient = itemstack1.getItem();
             setChanged(world, pos, state);
