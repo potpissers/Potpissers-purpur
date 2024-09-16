@@ -96,7 +96,7 @@ public class Zombie extends Monster {
     private boolean canBreakDoors;
     private int inWaterTime;
     public int conversionTime;
-    private int lastTick = MinecraftServer.currentTick; // CraftBukkit - add field
+    // private int lastTick = MinecraftServer.currentTick; // CraftBukkit - add field // Paper - remove anti tick skipping measures / wall time
     private boolean shouldBurnInDay = true; // Paper - Add more Zombie API
 
     public Zombie(EntityType<? extends Zombie> type, Level world) {
@@ -219,10 +219,7 @@ public class Zombie extends Monster {
     public void tick() {
         if (!this.level().isClientSide && this.isAlive() && !this.isNoAi()) {
             if (this.isUnderWaterConverting()) {
-                // CraftBukkit start - Use wall time instead of ticks for conversion
-                int elapsedTicks = MinecraftServer.currentTick - this.lastTick;
-                this.conversionTime -= elapsedTicks;
-                // CraftBukkit end
+                --this.conversionTime; // Paper - remove anti tick skipping measures / wall time
                 if (this.conversionTime < 0) {
                     this.doUnderWaterConversion();
                 }
@@ -239,7 +236,7 @@ public class Zombie extends Monster {
         }
 
         super.tick();
-        this.lastTick = MinecraftServer.currentTick; // CraftBukkit
+        // this.lastTick = MinecraftServer.currentTick; // CraftBukkit // Paper - remove anti tick skipping measures / wall time
     }
 
     @Override
@@ -280,7 +277,7 @@ public class Zombie extends Monster {
     }
     // Paper end - Add more Zombie API
     public void startUnderWaterConversion(int ticksUntilWaterConversion) {
-        this.lastTick = MinecraftServer.currentTick; // CraftBukkit
+        // this.lastTick = MinecraftServer.currentTick; // CraftBukkit // Paper - remove anti tick skipping measures / wall time
         this.conversionTime = ticksUntilWaterConversion;
         this.getEntityData().set(Zombie.DATA_DROWNED_CONVERSION_ID, true);
     }

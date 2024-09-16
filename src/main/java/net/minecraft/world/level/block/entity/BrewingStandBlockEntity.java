@@ -54,7 +54,7 @@ public class BrewingStandBlockEntity extends BaseContainerBlockEntity implements
     public int fuel;
     protected final ContainerData dataAccess;
     // CraftBukkit start - add fields and methods
-    private int lastTick = MinecraftServer.currentTick;
+    // private int lastTick = MinecraftServer.currentTick; // Paper - remove anti tick skipping measures / wall time
     public List<HumanEntity> transaction = new java.util.ArrayList<HumanEntity>();
     private int maxStack = MAX_STACK;
 
@@ -169,12 +169,10 @@ public class BrewingStandBlockEntity extends BaseContainerBlockEntity implements
         boolean flag1 = blockEntity.brewTime > 0;
         ItemStack itemstack1 = (ItemStack) blockEntity.items.get(3);
 
-        // CraftBukkit start - Use wall time instead of ticks for brewing
-        int elapsedTicks = MinecraftServer.currentTick - blockEntity.lastTick;
-        blockEntity.lastTick = MinecraftServer.currentTick;
+        // Paper - remove anti tick skipping measures / wall time
 
         if (flag1) {
-            blockEntity.brewTime -= elapsedTicks;
+            --blockEntity.brewTime; // Paper - remove anti tick skipping measures / wall time - revert to vanilla
             boolean flag2 = blockEntity.brewTime <= 0; // == -> <=
             // CraftBukkit end
 

@@ -60,7 +60,7 @@ public class ItemEntity extends Entity implements TraceableEntity {
     @Nullable
     public UUID target;
     public final float bobOffs;
-    private int lastTick = MinecraftServer.currentTick - 1; // CraftBukkit
+    // private int lastTick = MinecraftServer.currentTick - 1; // CraftBukkit // Paper - remove anti tick skipping measures / wall time
     public boolean canMobPickup = true; // Paper - Item#canEntityPickup
     private int despawnRate = -1; // Paper - Alternative item-despawn-rate
     public net.kyori.adventure.util.TriState frictionState = net.kyori.adventure.util.TriState.NOT_SET; // Paper - Friction API
@@ -153,12 +153,11 @@ public class ItemEntity extends Entity implements TraceableEntity {
             this.discard(EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
         } else {
             super.tick();
-            // CraftBukkit start - Use wall time for pickup and despawn timers
-            int elapsedTicks = MinecraftServer.currentTick - this.lastTick;
-            if (this.pickupDelay != 32767) this.pickupDelay -= elapsedTicks;
-            if (this.age != -32768) this.age += elapsedTicks;
-            this.lastTick = MinecraftServer.currentTick;
-            // CraftBukkit end
+            // Paper start - remove anti tick skipping measures / wall time - revert to vanilla
+            if (this.pickupDelay > 0 && this.pickupDelay != 32767) {
+                --this.pickupDelay;
+            }
+            // Paper end - remove anti tick skipping measures / wall time - revert to vanilla
 
             this.xo = this.getX();
             this.yo = this.getY();
@@ -211,7 +210,7 @@ public class ItemEntity extends Entity implements TraceableEntity {
                 this.mergeWithNeighbours();
             }
 
-            /* CraftBukkit start - moved up
+            // Paper - remove anti tick skipping measures / wall time - revert to vanilla /* CraftBukkit start - moved up
             if (this.age != -32768) {
                 ++this.age;
             }
@@ -242,12 +241,14 @@ public class ItemEntity extends Entity implements TraceableEntity {
     // Spigot start - copied from above
     @Override
     public void inactiveTick() {
-        // CraftBukkit start - Use wall time for pickup and despawn timers
-        int elapsedTicks = MinecraftServer.currentTick - this.lastTick;
-        if (this.pickupDelay != 32767) this.pickupDelay -= elapsedTicks;
-        if (this.age != -32768) this.age += elapsedTicks;
-        this.lastTick = MinecraftServer.currentTick;
-        // CraftBukkit end
+        // Paper start - remove anti tick skipping measures / wall time - copied from above
+        if (this.pickupDelay > 0 && this.pickupDelay != 32767) {
+            --this.pickupDelay;
+        }
+        if (this.age != -32768) {
+            ++this.age;
+        }
+        // Paper end - remove anti tick skipping measures / wall time - copied from above
 
         if (!this.level().isClientSide && this.age >= this.despawnRate) { // Spigot // Paper - Alternative item-despawn-rate
             // CraftBukkit start - fire ItemDespawnEvent
