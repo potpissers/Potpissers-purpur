@@ -50,7 +50,7 @@ import org.slf4j.Logger;
 public class PlayerAdvancements {
 
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
+    private static final Gson GSON = (new GsonBuilder()).create(); // Paper - Remove pretty printing from advancements
     private final PlayerList playerList;
     private final Path playerSavePath;
     private AdvancementTree tree;
