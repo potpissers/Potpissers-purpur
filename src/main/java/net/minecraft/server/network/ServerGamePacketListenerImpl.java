@@ -2245,23 +2245,31 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
 
         PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(this.getCraftPlayer(), command, new LazyPlayerSet(this.server));
         this.cserver.getPluginManager().callEvent(event);
-
-        if (event.isCancelled()) {
-            return;
-        }
         command = event.getMessage().substring(1);
 
-        ParseResults<CommandSourceStack> parseresults = this.parseCommand(command);
-        // CraftBukkit end
+        // Paper start - Fix cancellation and message changing
+        ParseResults<CommandSourceStack> parseresults = this.parseCommand(packet.command());
 
-        Map map;
-
+        Map<String, PlayerChatMessage> map;
         try {
-            map = (packet.command().equals(command)) ? this.collectSignedArguments(packet, SignableCommand.of(parseresults), lastSeenMessages) : Collections.emptyMap(); // CraftBukkit
+            // Always parse the original command to add to the chat chain
+            map = this.collectSignedArguments(packet, SignableCommand.of(parseresults), lastSeenMessages);
         } catch (SignedMessageChain.DecodeException signedmessagechain_a) {
             this.handleMessageDecodeFailure(signedmessagechain_a);
             return;
         }
+
+        if (event.isCancelled()) {
+            // Only now are we actually good to return
+            return;
+        }
+
+        // Remove signed parts if the command was changed
+        if (!command.equals(packet.command())) {
+            parseresults = this.parseCommand(command);
+            map = Collections.emptyMap();
+        }
+        // Paper end - Fix cancellation and message changing
 
         CommandSigningContext.SignedArguments commandsigningcontext_a = new CommandSigningContext.SignedArguments(map);
 
