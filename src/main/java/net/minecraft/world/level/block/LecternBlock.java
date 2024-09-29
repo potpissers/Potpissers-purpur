@@ -157,7 +157,24 @@ public class LecternBlock extends BaseEntityBlock {
         BlockEntity tileentity = world.getBlockEntity(pos);
 
         if (tileentity instanceof LecternBlockEntity tileentitylectern) {
-            tileentitylectern.setBook(stack.consumeAndReturn(1, user));
+            // Paper start - Add PlayerInsertLecternBookEvent
+            ItemStack eventSourcedBookStack = null;
+            if (user instanceof final net.minecraft.server.level.ServerPlayer serverPlayer) {
+                final io.papermc.paper.event.player.PlayerInsertLecternBookEvent event = new io.papermc.paper.event.player.PlayerInsertLecternBookEvent(
+                    serverPlayer.getBukkitEntity(),
+                    org.bukkit.craftbukkit.block.CraftBlock.at(world, pos),
+                    org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(stack.copyWithCount(1))
+                );
+                if (!event.callEvent()) return;
+                eventSourcedBookStack = org.bukkit.craftbukkit.inventory.CraftItemStack.unwrap(event.getBook());
+            }
+            if (eventSourcedBookStack == null) {
+                eventSourcedBookStack = stack.consumeAndReturn(1, user);
+            } else {
+                stack.consume(1, user);
+            }
+            tileentitylectern.setBook(eventSourcedBookStack);
+            // Paper end - Add PlayerInsertLecternBookEvent
             LecternBlock.resetBookState(user, world, pos, state, true);
             world.playSound((Player) null, pos, SoundEvents.BOOK_PUT, SoundSource.BLOCKS, 1.0F, 1.0F);
         }
