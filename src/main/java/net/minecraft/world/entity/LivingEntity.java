@@ -2625,7 +2625,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
 
     @Override
     protected void onBelowWorld() {
-        this.hurt(this.damageSources().fellOutOfWorld(), 4.0F);
+        this.hurt(this.damageSources().fellOutOfWorld(), this.level().getWorld().getVoidDamageAmount()); // Paper - use configured void damage amount
     }
 
     protected void updateSwingTime() {
