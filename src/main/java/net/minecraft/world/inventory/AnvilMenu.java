@@ -53,6 +53,7 @@ public class AnvilMenu extends ItemCombinerMenu {
     public int maximumRepairCost = 40;
     private CraftAnvilView bukkitEntity;
     // CraftBukkit end
+    public boolean bypassEnchantmentLevelRestriction = false; // Paper - bypass anvil level restrictions
 
     public AnvilMenu(int syncId, Inventory inventory) {
         this(syncId, inventory, ContainerLevelAccess.NULL);
@@ -231,7 +232,7 @@ public class AnvilMenu extends ItemCombinerMenu {
                             flag2 = true;
                         } else {
                             flag1 = true;
-                            if (i2 > enchantment.getMaxLevel()) {
+                            if (i2 > enchantment.getMaxLevel() && !this.bypassEnchantmentLevelRestriction) { // Paper - bypass anvil level restrictions
                                 i2 = enchantment.getMaxLevel();
                             }
 
