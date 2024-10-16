@@ -791,7 +791,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
         // PacketUtils.ensureRunningOnSameThread(packet, this, this.player.serverLevel()); // Paper - AsyncTabCompleteEvent; run this async
         // CraftBukkit start
         if (this.chatSpamTickCount.addAndGet(io.papermc.paper.configuration.GlobalConfiguration.get().spamLimiter.tabSpamIncrement) > io.papermc.paper.configuration.GlobalConfiguration.get().spamLimiter.tabSpamLimit && !this.server.getPlayerList().isOp(this.player.getGameProfile())) { // Paper - configurable tab spam limits
-            this.disconnect(Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM); // Paper - Kick event cause
+            this.disconnectAsync(Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM); // Paper - Kick event cause // Paper - add proper async disconnect
             return;
         }
         // CraftBukkit end
@@ -803,7 +803,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
         // Paper start
         final int index;
         if (packet.getCommand().length() > 64 && ((index = packet.getCommand().indexOf(' ')) == -1 || index >= 64)) {
-            this.disconnect(Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM);
+            this.disconnectAsync(Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM); // Paper - add proper async disconnect
             return;
         }
         // Paper end
@@ -1190,14 +1190,14 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
 
             if (byteTotal > byteAllowed) {
                 ServerGamePacketListenerImpl.LOGGER.warn("{} tried to send a book too large. Book size: {} - Allowed: {} - Pages: {}", this.player.getScoreboardName(), byteTotal, byteAllowed, pageList.size());
-                this.disconnect(Component.literal("Book too large!"), org.bukkit.event.player.PlayerKickEvent.Cause.ILLEGAL_ACTION); // Paper - kick event cause
+                this.disconnectAsync(Component.literal("Book too large!"), org.bukkit.event.player.PlayerKickEvent.Cause.ILLEGAL_ACTION); // Paper - kick event cause // Paper - add proper async disconnect
                 return;
             }
         }
         // Paper end - Book size limits
         // CraftBukkit start
         if (this.lastBookTick + 20 > MinecraftServer.currentTick) {
-            this.disconnect(Component.literal("Book edited too quickly!"), org.bukkit.event.player.PlayerKickEvent.Cause.ILLEGAL_ACTION); // Paper - kick event cause
+            this.disconnectAsync(Component.literal("Book edited too quickly!"), org.bukkit.event.player.PlayerKickEvent.Cause.ILLEGAL_ACTION); // Paper - kick event cause // Paper - add proper async disconnect
             return;
         }
         this.lastBookTick = MinecraftServer.currentTick;
@@ -2354,7 +2354,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
 
     private void tryHandleChat(String s, Runnable runnable, boolean sync) { // CraftBukkit
         if (ServerGamePacketListenerImpl.isChatMessageIllegal(s)) {
-            this.disconnect((Component) Component.translatable("multiplayer.disconnect.illegal_characters"), org.bukkit.event.player.PlayerKickEvent.Cause.ILLEGAL_CHARACTERS); // Paper
+            this.disconnectAsync((Component) Component.translatable("multiplayer.disconnect.illegal_characters"), org.bukkit.event.player.PlayerKickEvent.Cause.ILLEGAL_CHARACTERS); // Paper // Paper - add proper async disconnect
         } else if (this.player.isRemoved() || this.player.getChatVisibility() == ChatVisiblity.HIDDEN) { // CraftBukkit - dead men tell no tales
             this.send(new ClientboundSystemChatPacket(Component.translatable("chat.disabled.options").withStyle(ChatFormatting.RED), false));
         } else {
@@ -2377,7 +2377,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
 
             if (optional.isEmpty()) {
                 ServerGamePacketListenerImpl.LOGGER.warn("Failed to validate message acknowledgements from {}", this.player.getName().getString());
-                this.disconnect(ServerGamePacketListenerImpl.CHAT_VALIDATION_FAILED, org.bukkit.event.player.PlayerKickEvent.Cause.CHAT_VALIDATION_FAILED); // Paper - kick event causes
+                this.disconnectAsync(ServerGamePacketListenerImpl.CHAT_VALIDATION_FAILED, org.bukkit.event.player.PlayerKickEvent.Cause.CHAT_VALIDATION_FAILED); // Paper - kick event causes // Paper - add proper async disconnect
             }
 
             return optional;
@@ -2550,7 +2550,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
         // this.chatSpamTickCount += 20;
         if (counted && this.chatSpamTickCount.addAndGet(20) > 200 && !this.server.getPlayerList().isOp(this.player.getGameProfile()) && !this.server.isSingleplayerOwner(this.player.getGameProfile())) { // Paper - exclude from SpigotConfig.spamExclusions
             // CraftBukkit end
-            this.disconnect((Component) Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM); // Paper - kick event cause
+            this.disconnectAsync((Component) Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM); // Paper - kick event cause // Paper - add proper async disconnect
         }
 
     }
@@ -2562,7 +2562,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
         synchronized (this.lastSeenMessages) {
             if (!this.lastSeenMessages.applyOffset(packet.offset())) {
                 ServerGamePacketListenerImpl.LOGGER.warn("Failed to validate message acknowledgements from {}", this.player.getName().getString());
-                this.disconnect(ServerGamePacketListenerImpl.CHAT_VALIDATION_FAILED, org.bukkit.event.player.PlayerKickEvent.Cause.CHAT_VALIDATION_FAILED); // Paper - kick event causes
+                this.disconnectAsync(ServerGamePacketListenerImpl.CHAT_VALIDATION_FAILED, org.bukkit.event.player.PlayerKickEvent.Cause.CHAT_VALIDATION_FAILED); // Paper - kick event causes // Paper - add proper async disconnect
             }
 
         }
@@ -2710,7 +2710,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
             }
 
             if (i > 4096) {
-                this.disconnect((Component) Component.translatable("multiplayer.disconnect.too_many_pending_chats"), org.bukkit.event.player.PlayerKickEvent.Cause.TOO_MANY_PENDING_CHATS); // Paper - kick event cause
+                this.disconnectAsync((Component) Component.translatable("multiplayer.disconnect.too_many_pending_chats"), org.bukkit.event.player.PlayerKickEvent.Cause.TOO_MANY_PENDING_CHATS); // Paper - kick event cause // Paper - add proper async disconnect
             }
 
         }
@@ -3314,7 +3314,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
         // Paper start - auto recipe limit
         if (!org.bukkit.Bukkit.isPrimaryThread()) {
             if (this.recipeSpamPackets.addAndGet(io.papermc.paper.configuration.GlobalConfiguration.get().spamLimiter.recipeSpamIncrement) > io.papermc.paper.configuration.GlobalConfiguration.get().spamLimiter.recipeSpamLimit) {
-                this.disconnect(net.minecraft.network.chat.Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM); // Paper - kick event cause
+                this.disconnectAsync(net.minecraft.network.chat.Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM); // Paper - kick event cause // Paper - add proper async disconnect
                 return;
             }
         }

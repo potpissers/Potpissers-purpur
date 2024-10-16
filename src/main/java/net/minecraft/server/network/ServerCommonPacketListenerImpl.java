@@ -136,11 +136,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
             this.latency = (this.latency * 3 + i) / 4;
             this.keepAlivePending = false;
         } else if (!this.isSingleplayerOwner()) {
-            // Paper start - This needs to be handled on the main thread for plugins
-            server.submit(() -> {
-                this.disconnect(ServerCommonPacketListenerImpl.TIMEOUT_DISCONNECTION_MESSAGE, PlayerKickEvent.Cause.TIMEOUT); // Paper - kick event cause
-            });
-            // Paper end - This needs to be handled on the main thread for plugins
+            this.disconnectAsync(ServerCommonPacketListenerImpl.TIMEOUT_DISCONNECTION_MESSAGE, PlayerKickEvent.Cause.TIMEOUT); // Paper - add proper async disconnect
         }
 
     }
@@ -403,6 +399,31 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
         // CraftBukkit - Don't wait
         minecraftserver.scheduleOnMain(networkmanager::handleDisconnection); // Paper
     }
+
+    // Paper start - add proper async disconnect
+    public void disconnectAsync(net.kyori.adventure.text.Component reason, PlayerKickEvent.Cause cause) {
+        this.disconnectAsync(io.papermc.paper.adventure.PaperAdventure.asVanilla(reason), cause);
+    }
+
+    public void disconnectAsync(Component reason, PlayerKickEvent.Cause cause) {
+        this.disconnectAsync(new DisconnectionDetails(reason), cause);
+    }
+
+    public void disconnectAsync(DisconnectionDetails disconnectionInfo, PlayerKickEvent.Cause cause) {
+        if (this.cserver.isPrimaryThread()) {
+            this.disconnect(disconnectionInfo, cause);
+            return;
+        }
+        this.connection.setReadOnly();
+        this.server.scheduleOnMain(() -> {
+            ServerCommonPacketListenerImpl.this.disconnect(disconnectionInfo, cause);
+            if (ServerCommonPacketListenerImpl.this.player.quitReason == null) {
+                // cancelled
+                ServerCommonPacketListenerImpl.this.connection.enableAutoRead();
+            }
+        });
+    }
+    // Paper end - add proper async disconnect
 
     protected boolean isSingleplayerOwner() {
         return this.server.isSingleplayerOwner(this.playerProfile());

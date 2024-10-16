@@ -850,6 +850,14 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
 
     }
 
+    // Paper start - add proper async disconnect
+    public void enableAutoRead() {
+        if (this.channel != null) {
+            this.channel.config().setAutoRead(true);
+        }
+    }
+    // Paper end - add proper async disconnect
+
     public void setupCompression(int compressionThreshold, boolean rejectsBadPackets) {
         if (compressionThreshold >= 0) {
             com.velocitypowered.natives.compression.VelocityCompressor compressor = com.velocitypowered.natives.util.Natives.compress.get().create(io.papermc.paper.configuration.GlobalConfiguration.get().misc.compressionLevel.or(-1)); // Paper - Use Velocity cipher
