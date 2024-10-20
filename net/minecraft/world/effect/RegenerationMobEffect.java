@@ -19,7 +19,7 @@ class RegenerationMobEffect extends MobEffect {
 
     @Override
     public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
-        int i = 50 >> amplifier;
+        int i = 25 >> amplifier; // MineZ 50
         return i <= 0 || duration % i == 0;
     }
 }
