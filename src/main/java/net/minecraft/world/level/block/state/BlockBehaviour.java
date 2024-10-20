@@ -455,7 +455,7 @@ public abstract class BlockBehaviour implements FeatureElement {
             this.spawnTerrainParticles = true;
             this.instrument = NoteBlockInstrument.HARP;
             this.isValidSpawn = (iblockdata, iblockaccess, blockposition, entitytypes) -> {
-                return iblockdata.isFaceSturdy(iblockaccess, blockposition, Direction.UP) && iblockdata.getLightEmission() < 14;
+                return iblockdata.isFaceSturdy(iblockaccess, blockposition, Direction.UP) && true;//iblockdata.getLightEmission() < 14;
             };
             this.isRedstoneConductor = (iblockdata, iblockaccess, blockposition) -> {
                 return iblockdata.isCollisionShapeFullBlock(iblockaccess, blockposition);

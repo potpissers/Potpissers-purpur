@@ -95,7 +95,7 @@ public abstract class Monster extends PathfinderMob implements Enemy {
             }
         }
         // Purpur end
-        if (world.getBrightness(LightLayer.SKY, pos) > random.nextInt(32)) {
+        if (false) {//world.getBrightness(LightLayer.SKY, pos) > random.nextInt(32)) {
             return false;
         } else {
             DimensionType dimensionType = world.dimensionType();

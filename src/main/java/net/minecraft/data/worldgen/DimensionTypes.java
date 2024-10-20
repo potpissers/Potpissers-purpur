@@ -26,7 +26,7 @@ public class DimensionTypes {
                 BlockTags.INFINIBURN_OVERWORLD,
                 BuiltinDimensionTypes.OVERWORLD_EFFECTS,
                 0.0F,
-                new DimensionType.MonsterSettings(false, true, UniformInt.of(0, 7), 0)
+                new DimensionType.MonsterSettings(false, true, ConstantInt.of(15), 15)//0, 7), 0)
             )
         );
         dimensionTypeRegisterable.register(
@@ -86,7 +86,7 @@ public class DimensionTypes {
                 BlockTags.INFINIBURN_OVERWORLD,
                 BuiltinDimensionTypes.OVERWORLD_EFFECTS,
                 0.0F,
-                new DimensionType.MonsterSettings(false, true, UniformInt.of(0, 7), 0)
+                new DimensionType.MonsterSettings(false, true, ConstantInt.of(15), 15)//0, 7), 0)
             )
         );
     }
