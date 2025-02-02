@@ -657,7 +657,7 @@ public class ServerGamePacketListenerImpl
                 // CraftBukkit end
 
                 this.player.serverLevel().getChunkSource().move(this.player);
-                rootVehicle.recordMovementThroughBlocks(new Vec3(x, y, z), rootVehicle.position());
+                if (!rootVehicle.isSpectator() && rootVehicle.isAffectedByBlocks()) rootVehicle.recordMovementThroughBlocks(new Vec3(x, y, z), rootVehicle.position());
                 Vec3 vec3 = new Vec3(rootVehicle.getX() - x, rootVehicle.getY() - y, rootVehicle.getZ() - z);
                 this.handlePlayerKnownMovement(vec3);
                 rootVehicle.setOnGroundWithMovement(packet.onGround(), vec3);
@@ -1574,7 +1574,7 @@ public class ServerGamePacketListenerImpl
                                 Vec3 vec3 = new Vec3(this.player.getX() - x, this.player.getY() - y, this.player.getZ() - z);
                                 this.player.setOnGroundWithMovement(packet.isOnGround(), packet.horizontalCollision(), vec3);
                                 this.player.doCheckFallDamage(vec3.x, vec3.y, vec3.z, packet.isOnGround());
-                                this.player.recordMovementThroughBlocks(new Vec3(x, y, z), this.player.position());
+                                if (!this.player.isSpectator() && this.player.isAffectedByBlocks()) this.player.recordMovementThroughBlocks(new Vec3(x, y, z), this.player.position());
                                 this.handlePlayerKnownMovement(vec3);
                                 if (flag) {
                                     this.player.resetFallDistance();
