@@ -140,7 +140,7 @@ public interface Registry<T> extends Keyable, HolderLookup.RegistryLookup<T>, Id
     Holder<T> wrapAsHolder(T value);
 
     default Iterable<Holder<T>> getTagOrEmpty(TagKey<T> key) {
-        return DataFixUtils.orElse(this.get(key), List.<T>of());
+        return DataFixUtils.orElse(this.get(key), List.of());
     }
 
     default Optional<Holder<T>> getRandomElementOf(TagKey<T> key, RandomSource random) {

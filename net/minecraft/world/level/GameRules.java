@@ -281,8 +281,8 @@ public class GameRules {
 
     private <T extends GameRules.Value<T>> void callVisitorCap(GameRules.GameRuleTypeVisitor visitor, GameRules.Key<?> key, GameRules.Type<?> type) {
         if (type.requiredFeatures.isSubsetOf(this.enabledFeatures)) {
-            visitor.visit(key, type);
-            type.callVisitor(visitor, key);
+            visitor.visit((GameRules.Key<T>) key, (GameRules.Type<T>) type);
+            ((GameRules.Type<T>) type).callVisitor(visitor, (GameRules.Key<T>) key);
         }
     }
 

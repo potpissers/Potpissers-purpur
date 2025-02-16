@@ -34,7 +34,7 @@ public class RecipeMap {
     }
 
     public <I extends RecipeInput, T extends Recipe<I>> Collection<RecipeHolder<T>> byType(RecipeType<T> type) {
-        return (Collection<RecipeHolder<T>>)this.byType.get(type);
+        return (Collection)this.byType.get(type);
     }
 
     public Collection<RecipeHolder<?>> values() {

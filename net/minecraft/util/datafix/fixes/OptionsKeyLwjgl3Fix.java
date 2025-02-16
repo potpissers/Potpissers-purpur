@@ -6,6 +6,7 @@ import com.mojang.datafixers.DataFixUtils;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.stream.Collectors;
@@ -160,7 +161,7 @@ public class OptionsKeyLwjgl3Fix extends DataFix {
                 } else {
                     return Pair.of(entry.getKey(), entry.getValue());
                 }
-            }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond)))).result().orElse(dynamic))
+            }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond)))).result().orElse((Dynamic) dynamic))
         );
     }
 }

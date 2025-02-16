@@ -6,7 +6,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 
 public class StringDecomposer {
-    private static final char REPLACEMENT_CHAR = '�';
+    private static final char REPLACEMENT_CHAR = '\uFFFD';
     private static final Optional<Object> STOP_ITERATION = Optional.of(Unit.INSTANCE);
 
     private static boolean feedChar(Style style, FormattedCharSink sink, int position, char character) {

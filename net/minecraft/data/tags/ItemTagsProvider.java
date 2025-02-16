@@ -42,7 +42,7 @@ public abstract class ItemTagsProvider extends IntrinsicHolderTagsProvider<Item>
         return super.createContentsProvider().thenCombine(this.blockTags, (provider, tagLookup) -> {
             this.tagsToCopy.forEach((tagKey, tagKey1) -> {
                 TagBuilder rawBuilder = this.getOrCreateRawBuilder((TagKey<Item>)tagKey1);
-                Optional<TagBuilder> optional = tagLookup.apply((TagKey<? super TagKey<Block>>)tagKey);
+                Optional<TagBuilder> optional = tagLookup.apply(tagKey);
                 optional.orElseThrow(() -> new IllegalStateException("Missing block tag " + tagKey1.location())).build().forEach(rawBuilder::add);
             });
             return (HolderLookup.Provider)provider;

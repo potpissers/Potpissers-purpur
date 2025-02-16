@@ -19,7 +19,7 @@ import net.minecraft.util.Unit;
 
 public final class DataComponentPatch {
     public static final DataComponentPatch EMPTY = new DataComponentPatch(Reference2ObjectMaps.emptyMap());
-    public static final Codec<DataComponentPatch> CODEC = Codec.dispatchedMap(DataComponentPatch.PatchKey.CODEC, DataComponentPatch.PatchKey::valueCodec)
+    public static final Codec<DataComponentPatch> CODEC = Codec.<PatchKey, Object>dispatchedMap(DataComponentPatch.PatchKey.CODEC, DataComponentPatch.PatchKey::valueCodec)
         .xmap(map -> {
             if (map.isEmpty()) {
                 return EMPTY;

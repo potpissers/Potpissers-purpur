@@ -19,7 +19,7 @@ public record ConditionalEffect<T>(T effect, Optional<LootItemCondition> require
                     ValidationContext validationContext = new ValidationContext(collector, contextKeySet);
                     condition.validate(validationContext);
                     return collector.getReport()
-                        .map(string -> DataResult.error(() -> "Validation error in enchantment effect condition: " + string))
+                        .map(string -> DataResult.<LootItemCondition>error(() -> "Validation error in enchantment effect condition: " + string))
                         .orElseGet(() -> DataResult.success(condition));
                 }
             );

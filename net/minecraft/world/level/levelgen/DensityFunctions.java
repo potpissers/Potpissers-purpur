@@ -300,7 +300,7 @@ public final class DensityFunctions {
                     }
                     break;
                 case MAX:
-                    double d1 = this.argument2.maxValue();
+                    d1 = this.argument2.maxValue();
 
                     for (int i2 = 0; i2 < array.length; i2++) {
                         double d2 = array[i2];

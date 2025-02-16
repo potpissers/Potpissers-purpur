@@ -23,7 +23,7 @@ public class BlockEntityUUIDFix extends AbstractUUIDFix {
             .map(dynamic -> replaceUUIDString((Dynamic<?>)dynamic, "Id", "Id").orElse((Dynamic<?>)dynamic))
             .map(dynamic -> skullTag.remove("Owner").set("SkullOwner", (Dynamic<?>)dynamic))
             .result()
-            .orElse(skullTag);
+            .orElse((Dynamic) skullTag);
     }
 
     private Dynamic<?> updateConduit(Dynamic<?> conduitTag) {

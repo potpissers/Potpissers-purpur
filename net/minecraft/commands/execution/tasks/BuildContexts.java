@@ -52,7 +52,7 @@ public class BuildContexts<T extends ExecutionCommandSource<T>> {
                     }
 
                     RedirectModifier<T> redirectModifier = topContext.getRedirectModifier();
-                    if (redirectModifier instanceof CustomModifierExecutor<T> customModifierExecutor) {
+                    if (redirectModifier instanceof CustomModifierExecutor.ModifierAdapter<T> customModifierExecutor) {
                         customModifierExecutor.apply(originalSource, list, contextChain, chainModifiers1, ExecutionControl.create(context, frame));
                         return;
                     }
@@ -91,11 +91,11 @@ public class BuildContexts<T extends ExecutionCommandSource<T>> {
 
         if (list.isEmpty()) {
             if (chainModifiers1.isReturn()) {
-                context.queueNext(new CommandQueueEntry<>(frame, FallthroughTask.instance()));
+                context.queueNext(new CommandQueueEntry<T>(frame, FallthroughTask.instance()));
             }
         } else {
             CommandContext<T> topContext1 = contextChain.getTopContext();
-            if (topContext1.getCommand() instanceof CustomCommandExecutor<T> customCommandExecutor) {
+            if (topContext1.getCommand() instanceof CustomCommandExecutor.CommandAdapter<T> customCommandExecutor) {
                 ExecutionControl<T> executionControl = ExecutionControl.create(context, frame);
 
                 for (T executionCommandSource1 : list) {

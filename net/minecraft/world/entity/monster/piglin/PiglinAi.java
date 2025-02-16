@@ -167,7 +167,7 @@ public class PiglinAi {
         brain.addActivityAndRemoveMemoryWhenStopped(
             Activity.FIGHT,
             10,
-            ImmutableList.of(
+            ImmutableList.<BehaviorControl<? super Piglin>>of(
                 StopAttackingIfTargetInvalid.create((level, entity) -> !isNearestValidAttackTarget(level, piglin, entity)),
                 BehaviorBuilder.triggerIf(PiglinAi::hasCrossbow, BackUpIfTooClose.create(5, 0.75F)),
                 SetWalkTargetFromAttackTargetIfTargetOutOfReach.create(1.0F),
@@ -190,7 +190,7 @@ public class PiglinAi {
                 StartAttacking.<Piglin>create((level, piglin) -> piglin.isAdult(), PiglinAi::findNearestValidAttackTarget),
                 BehaviorBuilder.triggerIf(level -> !level.isDancing(), GoToTargetLocation.create(MemoryModuleType.CELEBRATE_LOCATION, 2, 1.0F)),
                 BehaviorBuilder.triggerIf(Piglin::isDancing, GoToTargetLocation.create(MemoryModuleType.CELEBRATE_LOCATION, 4, 0.6F)),
-                new RunOne<LivingEntity>(
+                new RunOne<>(
                     ImmutableList.of(
                         Pair.of(SetEntityLookTarget.create(EntityType.PIGLIN, 8.0F), 1),
                         Pair.of(RandomStroll.stroll(0.6F, 2, 1), 1),
@@ -223,7 +223,7 @@ public class PiglinAi {
                 SetWalkTargetAwayFrom.entity(MemoryModuleType.AVOID_TARGET, 1.0F, 12, true),
                 createIdleLookBehaviors(),
                 createIdleMovementBehaviors(),
-                EraseMemoryIf.<PathfinderMob>create(PiglinAi::wantsToStopFleeing, MemoryModuleType.AVOID_TARGET)
+                EraseMemoryIf.create(PiglinAi::wantsToStopFleeing, MemoryModuleType.AVOID_TARGET)
             ),
             MemoryModuleType.AVOID_TARGET
         );
@@ -245,7 +245,7 @@ public class PiglinAi {
                             .build()
                     )
                 ),
-                DismountOrSkipMounting.<LivingEntity>create(8, PiglinAi::wantsToStopRiding)
+                DismountOrSkipMounting.create(8, PiglinAi::wantsToStopRiding)
             ),
             MemoryModuleType.RIDE_TARGET
         );

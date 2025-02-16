@@ -195,14 +195,14 @@ public class Brain<E extends LivingEntity> {
         if (optional == null) {
             throw new IllegalStateException("Unregistered memory fetched: " + type);
         } else {
-            return optional.map(ExpirableValue::getValue);
+            return (Optional<U>) optional.map(ExpirableValue::getValue);
         }
     }
 
     @Nullable
     public <U> Optional<U> getMemoryInternal(MemoryModuleType<U> type) {
         Optional<? extends ExpirableValue<?>> optional = this.memories.get(type);
-        return optional == null ? null : optional.map(ExpirableValue::getValue);
+        return optional == null ? null : (Optional<U>) optional.map(ExpirableValue::getValue);
     }
 
     public <U> long getTimeUntilExpiry(MemoryModuleType<U> memoryType) {

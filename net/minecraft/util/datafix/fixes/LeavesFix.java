@@ -353,7 +353,7 @@ public class LeavesFix extends DataFix {
                 : data.update(DSL.remainderFinder(), dynamic -> dynamic.set("BlockStates", dynamic.createLongList(Arrays.stream(this.storage.getRaw()))))
                     .set(
                         this.paletteFinder,
-                        this.palette.stream().map(dynamic -> Pair.of(References.BLOCK_STATE.typeName(), dynamic)).collect(Collectors.toList())
+                        this.palette.stream().<Pair<String, Dynamic<?>>>map(dynamic -> Pair.of(References.BLOCK_STATE.typeName(), dynamic)).collect(Collectors.toList())
                     );
         }
 

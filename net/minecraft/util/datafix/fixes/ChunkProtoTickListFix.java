@@ -181,7 +181,7 @@ public class ChunkProtoTickListFix extends DataFix {
         int i2 = index >>> 8 & 15;
         String string = idGetter.apply(palette != null ? palette.get().get(i, i1, i2) : null);
         return data.createMap(
-            ImmutableMap.builder()
+            ImmutableMap.<Dynamic<?>, Dynamic<?>>builder()
                 .put(data.createString("i"), data.createString(string))
                 .put(data.createString("x"), data.createInt(x * 16 + i))
                 .put(data.createString("y"), data.createInt(y * 16 + i1))

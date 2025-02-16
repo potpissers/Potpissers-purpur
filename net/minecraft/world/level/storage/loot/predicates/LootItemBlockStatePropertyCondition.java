@@ -27,7 +27,7 @@ public record LootItemBlockStatePropertyCondition(Holder<Block> block, Optional<
     private static DataResult<LootItemBlockStatePropertyCondition> validate(LootItemBlockStatePropertyCondition condition) {
         return condition.properties()
             .flatMap(statePropertiesPredicate -> statePropertiesPredicate.checkState(condition.block().value().getStateDefinition()))
-            .map(string -> DataResult.error(() -> "Block " + condition.block() + " has no property" + string))
+            .map(string -> DataResult.<LootItemBlockStatePropertyCondition>error(() -> "Block " + condition.block() + " has no property" + string))
             .orElse(DataResult.success(condition));
     }
 

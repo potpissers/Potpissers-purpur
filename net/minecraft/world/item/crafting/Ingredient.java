@@ -27,7 +27,7 @@ public final class Ingredient implements StackedContents.IngredientInfo<Holder<I
     public static final StreamCodec<RegistryFriendlyByteBuf, Optional<Ingredient>> OPTIONAL_CONTENTS_STREAM_CODEC = ByteBufCodecs.holderSet(Registries.ITEM)
         .map(
             items -> items.size() == 0 ? Optional.empty() : Optional.of(new Ingredient((HolderSet<Item>)items)),
-            optional -> optional.<HolderSet.Direct<Item>>map(ingredient -> ingredient.values).orElse(HolderSet.direct())
+            optional -> optional.map(ingredient -> ingredient.values).orElse(HolderSet.direct())
         );
     public static final Codec<HolderSet<Item>> NON_AIR_HOLDER_SET_CODEC = HolderSetCodec.create(Registries.ITEM, Item.CODEC, false);
     public static final Codec<Ingredient> CODEC = ExtraCodecs.nonEmptyHolderSet(NON_AIR_HOLDER_SET_CODEC)

@@ -262,7 +262,7 @@ public class Climate {
                     throw new IllegalStateException("Expecting parameter space to be 7, got " + size);
                 } else {
                     List<Climate.RTree.Leaf<T>> list = nodes.stream()
-                        .map(node -> new Climate.RTree.Leaf(node.getFirst(), node.getSecond()))
+                        .map(node -> new Climate.RTree.Leaf<>(node.getFirst(), node.getSecond()))
                         .collect(Collectors.toCollection(ArrayList::new));
                     return new Climate.RTree<>(build(size, list));
                 }

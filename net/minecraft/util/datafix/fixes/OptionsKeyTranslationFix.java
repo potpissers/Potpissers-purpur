@@ -5,6 +5,7 @@ import com.mojang.datafixers.DataFix;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
 import java.util.stream.Collectors;
 
 public class OptionsKeyTranslationFix extends DataFix {
@@ -26,7 +27,7 @@ public class OptionsKeyTranslationFix extends DataFix {
                 }
 
                 return Pair.of(entry.getKey(), entry.getValue());
-            }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond)))).result().orElse(dynamic))
+            }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond)))).result().orElse((Dynamic) dynamic))
         );
     }
 }

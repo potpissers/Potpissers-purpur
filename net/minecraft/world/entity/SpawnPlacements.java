@@ -74,7 +74,7 @@ public class SpawnPlacements {
         EntityType<T> entityType, ServerLevelAccessor level, EntitySpawnReason spawnReason, BlockPos pos, RandomSource random
     ) {
         SpawnPlacements.Data data = DATA_BY_TYPE.get(entityType);
-        return data == null || data.predicate.test(entityType, level, spawnReason, pos, random);
+        return data == null || data.predicate.test((EntityType) entityType, level, spawnReason, pos, random);
     }
 
     static {

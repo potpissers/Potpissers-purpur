@@ -113,7 +113,8 @@ public class ItemSpawnEggFix extends DataFix {
                     Typed<?> typed2 = typed.getOrCreateTyped(opticFinder2);
                     Typed<?> typed3 = typed2.getOrCreateTyped(opticFinder3);
                     Typed<?> typed4 = typed3.getOrCreateTyped(opticFinder4);
-                    Typed<?> typed5 = Util.writeAndReadTypedOrThrow(typed4, typeRaw, dynamic2 -> dynamic2.set("id", dynamic.createString(string)));
+                    Dynamic<?> f_Dynamic = dynamic;
+                    Typed<?> typed5 = Util.writeAndReadTypedOrThrow(typed4, typeRaw, dynamic2 -> dynamic2.set("id", f_Dynamic.createString(string)));
                     typed1 = typed.set(opticFinder2, typed2.set(opticFinder3, typed3.set(opticFinder4, typed5)));
                 }
 

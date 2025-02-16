@@ -74,7 +74,7 @@ import org.slf4j.Logger;
 
 public class RegistryDataLoader {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final Comparator<ResourceKey<?>> ERROR_KEY_COMPARATOR = Comparator.comparing(ResourceKey::registry).thenComparing(ResourceKey::location);
+    private static final Comparator<ResourceKey<?>> ERROR_KEY_COMPARATOR = Comparator.<ResourceKey<?>, ResourceLocation>comparing(ResourceKey::registry).thenComparing(ResourceKey::location);
     private static final RegistrationInfo NETWORK_REGISTRATION_INFO = new RegistrationInfo(Optional.empty(), Lifecycle.experimental());
     private static final Function<Optional<KnownPack>, RegistrationInfo> REGISTRATION_INFO_CACHE = Util.memoize(optional -> {
         Lifecycle lifecycle = optional.map(KnownPack::isVanilla).map(_boolean -> Lifecycle.stable()).orElse(Lifecycle.experimental());

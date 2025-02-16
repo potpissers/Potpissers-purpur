@@ -43,7 +43,7 @@ public class InteractWith {
                                 testEntity -> testEntity.distanceToSqr(entity) <= i && predicate.test(testEntity)
                             );
                             optional.ifPresent(target -> {
-                                interact.set(target);
+                                interact.set((T)target);
                                 lookTarget.set(new EntityTracker(target, true));
                                 walkTarget.set(new WalkTarget(new EntityTracker(target, false), speedModifier, maxDist));
                             });

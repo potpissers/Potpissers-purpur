@@ -36,7 +36,7 @@ public record EitherHolder<T>(Optional<Holder<T>> holder, ResourceKey<T> key) {
     }
 
     public Either<Holder<T>, ResourceKey<T>> asEither() {
-        return this.holder.map(Either::left).orElseGet(() -> Either.right(this.key));
+        return this.holder.<Either<Holder<T>, ResourceKey<T>>>map(Either::left).orElseGet(() -> Either.right(this.key));
     }
 
     public static <T> EitherHolder<T> fromEither(Either<Holder<T>, ResourceKey<T>> either) {

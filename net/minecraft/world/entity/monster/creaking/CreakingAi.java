@@ -45,7 +45,7 @@ public class CreakingAi {
         brain.addActivity(Activity.CORE, 0, ImmutableList.of(new Swim<Creaking>(0.8F) {
             @Override
             protected boolean checkExtraStartConditions(ServerLevel level, Creaking owner) {
-                return owner.canMove() && super.checkExtraStartConditions(level, (LivingEntity)owner);
+                return owner.canMove() && super.checkExtraStartConditions(level, owner);
             }
         }, new LookAtTargetSink(45, 90), new MoveToTargetSink()));
     }

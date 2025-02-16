@@ -59,7 +59,7 @@ public interface Leashable {
             return new Leashable.LeashData(Either.left(tag.getCompound("leash").getUUID("UUID")));
         } else {
             if (tag.contains("leash", 11)) {
-                Either<UUID, BlockPos> either = NbtUtils.readBlockPos(tag, "leash").map(Either::right).orElse(null);
+                Either<UUID, BlockPos> either = NbtUtils.readBlockPos(tag, "leash").<Either<UUID, BlockPos>>map(Either::right).orElse(null);
                 if (either != null) {
                     return new Leashable.LeashData(either);
                 }

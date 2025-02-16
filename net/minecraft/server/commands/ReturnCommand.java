@@ -18,7 +18,7 @@ import net.minecraft.commands.execution.tasks.FallthroughTask;
 public class ReturnCommand {
     public static <T extends ExecutionCommandSource<T>> void register(CommandDispatcher<T> dispatcher) {
         dispatcher.register(
-            (LiteralArgumentBuilder<T>)LiteralArgumentBuilder.<ExecutionCommandSource>literal("return")
+            (LiteralArgumentBuilder<T>)LiteralArgumentBuilder.<T>literal("return")
                 .requires(executionCommandSource -> executionCommandSource.hasPermission(2))
                 .then(
                     RequiredArgumentBuilder.<T, Integer>argument("value", IntegerArgumentType.integer())

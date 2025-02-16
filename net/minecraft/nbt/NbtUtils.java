@@ -306,7 +306,7 @@ public final class NbtUtils {
                     indent(indentLevel + 1, stringBuilder);
                 }
 
-                int ix = list.stream().mapToInt(String::length).max().orElse(0);
+                ix = list.stream().mapToInt(String::length).max().orElse(0);
                 String stringx = Strings.repeat(" ", ix);
 
                 for (int i2 = 0; i2 < list.size(); i2++) {
@@ -333,7 +333,7 @@ public final class NbtUtils {
             case 11:
                 IntArrayTag intArrayTag = (IntArrayTag)tag;
                 int[] asIntArray = intArrayTag.getAsIntArray();
-                int ix = 0;
+                ix = 0;
 
                 for (int i3 : asIntArray) {
                     ix = Math.max(ix, String.format(Locale.ROOT, "%X", i3).length());

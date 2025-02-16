@@ -117,7 +117,7 @@ public class AdventureModePredicate {
         return predicates.stream()
             .flatMap(blockPredicate1 -> blockPredicate1.blocks().orElseThrow().stream())
             .distinct()
-            .map(holder -> holder.value().getName().withStyle(ChatFormatting.DARK_GRAY))
+            .<Component>map(holder -> holder.value().getName().withStyle(ChatFormatting.DARK_GRAY))
             .toList();
     }
 

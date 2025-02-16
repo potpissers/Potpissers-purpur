@@ -21,7 +21,7 @@ public record TracingExecutor(ExecutorService service) implements Executor {
                 }
             });
         } else {
-            return (Executor)(TracyClient.isAvailable() ? runnable -> this.service.execute(() -> {
+            return (TracyClient.isAvailable() ? runnable -> this.service.execute(() -> {
                 try (Zone zone = TracyClient.beginZone(name, SharedConstants.IS_RUNNING_IN_IDE)) {
                     runnable.run();
                 }

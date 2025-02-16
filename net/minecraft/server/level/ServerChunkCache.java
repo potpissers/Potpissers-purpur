@@ -601,7 +601,8 @@ public class ServerChunkCache extends ChunkSource {
             super.doRunTask(task);
         }
 
-        protected boolean pollTask() {
+        @Override
+        public boolean pollTask() {
             if (ServerChunkCache.this.runDistanceManagerUpdates()) {
                 return true;
             } else {

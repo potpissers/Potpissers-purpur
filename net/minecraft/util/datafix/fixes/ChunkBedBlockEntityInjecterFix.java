@@ -11,6 +11,7 @@ import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.types.templates.List.ListType;
+import com.mojang.datafixers.types.templates.TaggedChoice;
 import com.mojang.serialization.Dynamic;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +41,8 @@ public class ChunkBedBlockEntityInjecterFix extends DataFix {
         return TypeRewriteRule.seq(
             this.fixTypeEverywhere(
                 "InjectBedBlockEntityType",
-                this.getInputSchema().findChoiceType(References.BLOCK_ENTITY),
-                this.getOutputSchema().findChoiceType(References.BLOCK_ENTITY),
+                (TaggedChoice.TaggedChoiceType<String>) this.getInputSchema().findChoiceType(References.BLOCK_ENTITY),
+                (TaggedChoice.TaggedChoiceType<String>) this.getOutputSchema().findChoiceType(References.BLOCK_ENTITY),
                 dynamicOps -> pair -> pair
             ),
             this.fixTypeEverywhereTyped(

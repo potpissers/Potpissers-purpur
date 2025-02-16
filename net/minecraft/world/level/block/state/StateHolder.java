@@ -134,7 +134,7 @@ public abstract class StateHolder<O, S> {
                 Property<?> property = entry.getKey();
                 map.put(
                     property,
-                    property.getPossibleValues().stream().map(comparable -> possibleStateMap.get(this.makeNeighbourValues(property, comparable))).toArray()
+                    (S[]) property.getPossibleValues().stream().map(comparable -> possibleStateMap.get(this.makeNeighbourValues(property, comparable))).toArray()
                 );
             }
 

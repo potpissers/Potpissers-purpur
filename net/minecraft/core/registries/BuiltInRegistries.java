@@ -323,7 +323,7 @@ public class BuiltInRegistries {
         Bootstrap.checkBootstrapCalled(() -> "registry " + key.location());
         ResourceLocation resourceLocation = key.location();
         LOADERS.put(resourceLocation, () -> bootstrap.run(registry));
-        WRITABLE_REGISTRY.register((ResourceKey<WritableRegistry<?>>)key, registry, RegistrationInfo.BUILT_IN);
+        WRITABLE_REGISTRY.register((ResourceKey)key, registry, RegistrationInfo.BUILT_IN);
         return registry;
     }
 

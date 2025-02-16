@@ -19,14 +19,14 @@ public class StartHuntingHoglin {
                     instance,
                     (nearestVisibleHuntableHoglin, angryAt, huntedRecently, nearestVisibleAdultPiglins) -> (level, piglin, gameTime) -> {
                         if (!piglin.isBaby()
-                            && !instance.<List>tryGet(nearestVisibleAdultPiglins)
+                            && !instance.tryGet(nearestVisibleAdultPiglins)
                                 .map(adultPiglin -> adultPiglin.stream().anyMatch(StartHuntingHoglin::hasHuntedRecently))
                                 .isPresent()) {
                             Hoglin hoglin = instance.get(nearestVisibleHuntableHoglin);
                             PiglinAi.setAngerTarget(level, piglin, hoglin);
                             PiglinAi.dontKillAnyMoreHoglinsForAWhile(piglin);
                             PiglinAi.broadcastAngerTarget(level, piglin, hoglin);
-                            instance.<List>tryGet(nearestVisibleAdultPiglins)
+                            instance.tryGet(nearestVisibleAdultPiglins)
                                 .ifPresent(adultPiglin -> adultPiglin.forEach(PiglinAi::dontKillAnyMoreHoglinsForAWhile));
                             return true;
                         } else {

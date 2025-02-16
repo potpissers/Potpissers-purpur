@@ -45,7 +45,7 @@ public class SuggestionProviders {
             throw new IllegalArgumentException("A command suggestion provider is already registered with the name " + name);
         } else {
             PROVIDERS_BY_NAME.put(name, provider);
-            return new SuggestionProviders.Wrapper(name, provider);
+            return (SuggestionProvider<S>) new Wrapper(name, provider);
         }
     }
 

@@ -44,7 +44,7 @@ public class FixProjectileStoredItem extends DataFix {
 
     private static <T> Function<Typed<?>, Typed<?>> fixChoiceCap(String itemId, FixProjectileStoredItem.SubFixer<?> fixer, Type<?> oldType, Type<T> newType) {
         OpticFinder<?> opticFinder = DSL.namedChoice(itemId, oldType);
-        return typed -> typed.updateTyped(opticFinder, newType, typed1 -> fixer.fix(typed1, newType));
+        return typed -> typed.updateTyped(opticFinder, newType, typed1 -> fixer.fix(typed1, (Type) newType));
     }
 
     private static <T> Typed<T> fixArrow(Typed<?> typed, Type<T> newType) {

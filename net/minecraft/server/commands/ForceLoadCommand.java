@@ -198,7 +198,7 @@ public class ForceLoadCommand {
                         source.sendSuccess(
                             () -> Component.translatable(
                                 "commands.forceload." + (add ? "added" : "removed") + ".multiple",
-                                i2,
+                                i2x,
                                 Component.translationArg(resourceKey.location()),
                                 Component.translationArg(chunkPos2),
                                 Component.translationArg(chunkPos3)

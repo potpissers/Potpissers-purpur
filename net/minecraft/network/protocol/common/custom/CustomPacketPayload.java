@@ -34,7 +34,7 @@ public interface CustomPacketPayload {
 
             private <T extends CustomPacketPayload> void writeCap(B buffer, CustomPacketPayload.Type<T> type, CustomPacketPayload payload) {
                 buffer.writeResourceLocation(type.id());
-                StreamCodec<B, T> streamCodec = this.findCodec(type.id);
+                StreamCodec<B, T> streamCodec = (StreamCodec<B, T>) this.findCodec(type.id);
                 streamCodec.encode(buffer, (T)payload);
             }
 

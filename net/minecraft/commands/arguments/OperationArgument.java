@@ -57,7 +57,7 @@ public class OperationArgument implements ArgumentType<OperationArgument.Operati
     }
 
     private static OperationArgument.Operation getOperation(String name) throws CommandSyntaxException {
-        return (OperationArgument.Operation)(name.equals("><") ? (targetScore, sourceScore) -> {
+        return (name.equals("><") ? (targetScore, sourceScore) -> {
             int i = targetScore.get();
             targetScore.set(sourceScore.get());
             sourceScore.set(i);

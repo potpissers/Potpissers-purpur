@@ -119,7 +119,7 @@ public abstract class Settings<T extends Settings<T>> {
         String stringRaw = this.getStringRaw(key);
         V object = MoreObjects.firstNonNull(stringRaw != null ? serializer.apply(stringRaw) : null, defaultValue);
         this.properties.put(key, deserializer.apply(object));
-        return new Settings.MutableValue<>(key, object, deserializer);
+        return new Settings<T>.MutableValue<>(key, object, deserializer);
     }
 
     protected <V> V get(String key, Function<String, V> serializer, UnaryOperator<V> modifier, Function<V, String> deserializer, V defaultValue) {

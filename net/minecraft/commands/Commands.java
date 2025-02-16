@@ -375,7 +375,7 @@ public class Commands {
     ) {
         for (CommandNode<CommandSourceStack> commandNode : rootCommandSource.getChildren()) {
             if (commandNode.canUse(source)) {
-                ArgumentBuilder<SharedSuggestionProvider, ?> argumentBuilder = commandNode.createBuilder();
+                ArgumentBuilder<SharedSuggestionProvider, ?> argumentBuilder = (ArgumentBuilder) commandNode.createBuilder();
                 argumentBuilder.requires(suggestions -> true);
                 if (argumentBuilder.getCommand() != null) {
                     argumentBuilder.executes(commandContext -> 0);

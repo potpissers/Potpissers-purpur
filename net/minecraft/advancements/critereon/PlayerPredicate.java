@@ -246,11 +246,11 @@ public record PlayerPredicate(
         private static <T> MapCodec<PlayerPredicate.StatMatcher<T>> createTypedCodec(StatType<T> statType) {
             return RecordCodecBuilder.mapCodec(
                 instance -> instance.group(
-                        (App<Mu<? extends PlayerPredicate.StatMatcher<?>>, Holder<T>>)statType.getRegistry()
+                        statType.getRegistry()
                             .holderByNameCodec()
                             .fieldOf("stat")
                             .forGetter(PlayerPredicate.StatMatcher::value),
-                        (App<Mu<? extends PlayerPredicate.StatMatcher<?>>, MinMaxBounds.Ints>)MinMaxBounds.Ints.CODEC
+                        MinMaxBounds.Ints.CODEC
                             .optionalFieldOf("value", MinMaxBounds.Ints.ANY)
                             .forGetter(PlayerPredicate.StatMatcher::range)
                     )

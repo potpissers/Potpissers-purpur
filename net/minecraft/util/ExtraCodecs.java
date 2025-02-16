@@ -225,7 +225,7 @@ public class ExtraCodecs {
             P object1 = list1.get(1);
             return factory.apply(object, object1);
         }), object -> ImmutableList.of(minGetter.apply((I)object), maxGetter.apply((I)object)));
-        Codec<I> codec2 = RecordCodecBuilder.<Pair>create(
+        Codec<I> codec2 = RecordCodecBuilder.<Pair<P, P>>create(
                 instance -> instance.group(codec.fieldOf(minFieldName).forGetter(Pair::getFirst), codec.fieldOf(maxFieldName).forGetter(Pair::getSecond))
                     .apply(instance, Pair::of)
             )

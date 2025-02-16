@@ -112,7 +112,7 @@ public class HoglinAi {
                 SetWalkTargetAwayFrom.entity(MemoryModuleType.AVOID_TARGET, 1.3F, 15, false),
                 createIdleMovementBehaviors(),
                 SetEntityLookTargetSometimes.create(8.0F, UniformInt.of(30, 60)),
-                EraseMemoryIf.<PathfinderMob>create(HoglinAi::wantsToStopFleeing, MemoryModuleType.AVOID_TARGET)
+                EraseMemoryIf.create(HoglinAi::wantsToStopFleeing, MemoryModuleType.AVOID_TARGET)
             ),
             MemoryModuleType.AVOID_TARGET
         );

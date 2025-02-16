@@ -52,7 +52,7 @@ import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 public class Sheep extends Animal implements Shearable {
     private static final int EAT_ANIMATION_TICKS = 40;
     private static final EntityDataAccessor<Byte> DATA_WOOL_ID = SynchedEntityData.defineId(Sheep.class, EntityDataSerializers.BYTE);
-    private static final Map<DyeColor, Integer> COLOR_BY_DYE = Maps.newEnumMap(
+    private static final Map<DyeColor, Integer> COLOR_BY_DYE = Maps.<DyeColor, Integer>newEnumMap(
         Arrays.stream(DyeColor.values()).collect(Collectors.toMap(dyeColor -> (DyeColor)dyeColor, Sheep::createSheepColor))
     );
     private int eatAnimationTick;

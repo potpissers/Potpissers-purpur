@@ -36,7 +36,7 @@ public class EncoderCache {
             public <T> DataResult<T> encode(A input, DynamicOps<T> ops, T value) {
                 return EncoderCache.this.cache
                     .getUnchecked(new EncoderCache.Key<>(codec, input, ops))
-                    .map(object -> object instanceof Tag tag ? tag.copy() : object);
+                    .map(object -> (T) (object instanceof Tag tag ? tag.copy() : object));
             }
         };
     }

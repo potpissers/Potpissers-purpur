@@ -1607,7 +1607,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
 
             return map.object2IntEntrySet()
                 .stream()
-                .sorted(Comparator.comparing(Entry::getIntValue).reversed())
+                .sorted(Comparator.<Entry<String>, Integer>comparing(Entry::getIntValue).reversed())
                 .limit(5L)
                 .map(entry -> entry.getKey() + ":" + entry.getIntValue())
                 .collect(Collectors.joining(","));

@@ -64,7 +64,7 @@ public class HolderSetCodec<E> implements Codec<HolderSet<E>> {
 
     private static <E> DataResult<HolderSet<E>> lookupTag(HolderGetter<E> input, TagKey<E> tagKey) {
         return input.get(tagKey)
-            .map(DataResult::success)
+            .map(DataResult::<HolderSet<E>>success)
             .orElseGet(() -> DataResult.error(() -> "Missing tag: '" + tagKey.location() + "' in '" + tagKey.registry().location() + "'"));
     }
 
