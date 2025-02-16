@@ -1630,7 +1630,7 @@ public abstract class Player extends LivingEntity {
     }
 
     @Override
-    protected boolean canGlide() {
+    public boolean canGlide() {
         return !this.abilities.flying && super.canGlide();
     }
 

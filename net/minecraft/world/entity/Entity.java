@@ -295,7 +295,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     private final Set<String> tags = new io.papermc.paper.util.SizeLimitedSet<>(new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>(), MAX_ENTITY_TAG_COUNT); // Paper - fully limit tag size - replace set impl
     private final double[] pistonDeltas = new double[]{0.0, 0.0, 0.0};
     private long pistonDeltasGameTime;
-    private EntityDimensions dimensions;
+    protected EntityDimensions dimensions;
     private float eyeHeight;
     public boolean isInPowderSnow;
     public boolean wasInPowderSnow;
@@ -1895,7 +1895,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return this.isInWater() || flag;
     }
 
-    void updateInWaterStateAndDoWaterCurrentPushing() {
+    public void updateInWaterStateAndDoWaterCurrentPushing() {
         if (this.getVehicle() instanceof AbstractBoat abstractBoat && !abstractBoat.isUnderWater()) {
             this.wasTouchingWater = false;
         } else if (this.updateFluidHeightAndDoFluidPushing(FluidTags.WATER, 0.014)) {

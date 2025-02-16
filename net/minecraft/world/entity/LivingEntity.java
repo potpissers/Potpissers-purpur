@@ -3524,7 +3524,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
         }
     }
 
-    protected boolean canGlide() {
+    public boolean canGlide() {
         if (!this.onGround() && !this.isPassenger() && !this.hasEffect(MobEffects.LEVITATION)) {
             for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
                 if (canGlideUsing(this.getItemBySlot(equipmentSlot), equipmentSlot)) {

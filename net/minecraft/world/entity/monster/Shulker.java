@@ -74,7 +74,7 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
         Vec3i unitVec3i = Direction.SOUTH.getUnitVec3i();
         return new Vector3f(unitVec3i.getX(), unitVec3i.getY(), unitVec3i.getZ());
     });
-    private static final float MAX_SCALE = 3.0F;
+    public static final float MAX_SCALE = 3.0F;
     private float currentPeekAmountO;
     private float currentPeekAmount;
     @Nullable

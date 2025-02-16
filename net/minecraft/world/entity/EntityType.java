@@ -1067,7 +1067,7 @@ public class EntityType<T extends Entity> implements FeatureElement, EntityTypeT
     @Nullable
     private Component description;
     private final Optional<ResourceKey<LootTable>> lootTable;
-    private final EntityDimensions dimensions;
+    public EntityDimensions dimensions;
     private final float spawnDimensionsScale;
     private final FeatureFlagSet requiredFeatures;
 

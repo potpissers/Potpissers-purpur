@@ -17,7 +17,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 
 public class FuelValues {
-    private final Object2IntSortedMap<Item> values;
+    public final Object2IntSortedMap<Item> values;
 
     FuelValues(Object2IntSortedMap<Item> values) {
         this.values = values;

@@ -89,7 +89,7 @@ public abstract class BlockBehaviour implements FeatureElement {
         Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH, Direction.DOWN, Direction.UP
     };
     public final boolean hasCollision;
-    protected final float explosionResistance;
+    public float explosionResistance;
     protected final boolean isRandomlyTicking;
     protected final SoundType soundType;
     protected final float friction;
