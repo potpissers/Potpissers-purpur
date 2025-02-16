@@ -45,7 +45,7 @@ public class CrossbowItem extends ProjectileWeaponItem {
     private static final float START_SOUND_PERCENT = 0.2F;
     private static final float MID_SOUND_PERCENT = 0.5F;
     private static final float ARROW_POWER = 3.15F;
-    private static final float FIREWORK_POWER = 1.6F;
+    public static final float FIREWORK_POWER = 1.6F;
     public static final float MOB_ARROW_POWER = 1.6F;
     private static final CrossbowItem.ChargingSounds DEFAULT_SOUNDS = new CrossbowItem.ChargingSounds(
         Optional.of(SoundEvents.CROSSBOW_LOADING_START), Optional.of(SoundEvents.CROSSBOW_LOADING_MIDDLE), Optional.of(SoundEvents.CROSSBOW_LOADING_END)

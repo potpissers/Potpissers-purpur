@@ -21,11 +21,11 @@ import net.minecraft.world.phys.Vec3;
 public class EyeOfEnder extends Entity implements ItemSupplier {
     private static final float MIN_CAMERA_DISTANCE_SQUARED = 12.25F;
     private static final EntityDataAccessor<ItemStack> DATA_ITEM_STACK = SynchedEntityData.defineId(EyeOfEnder.class, EntityDataSerializers.ITEM_STACK);
-    private double tx;
-    private double ty;
-    private double tz;
-    private int life;
-    private boolean surviveAfterDeath;
+    public double tx;
+    public double ty;
+    public double tz;
+    public int life;
+    public boolean surviveAfterDeath;
 
     public EyeOfEnder(EntityType<? extends EyeOfEnder> entityType, Level level) {
         super(entityType, level);

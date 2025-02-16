@@ -307,7 +307,7 @@ public class Zoglin extends Monster implements HoglinBase {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.ZOGLIN_DEATH;
     }
 

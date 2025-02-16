@@ -45,7 +45,7 @@ public class Phantom extends FlyingMob implements Enemy {
     public static final int TICKS_PER_FLAP = Mth.ceil(24.166098F);
     private static final EntityDataAccessor<Integer> ID_SIZE = SynchedEntityData.defineId(Phantom.class, EntityDataSerializers.INT);
     Vec3 moveTargetPoint = Vec3.ZERO;
-    BlockPos anchorPoint = BlockPos.ZERO;
+    public BlockPos anchorPoint = BlockPos.ZERO;
     Phantom.AttackPhase attackPhase = Phantom.AttackPhase.CIRCLE;
 
     public Phantom(EntityType<? extends Phantom> entityType, Level level) {
@@ -197,12 +197,12 @@ public class Phantom extends FlyingMob implements Enemy {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.PHANTOM_DEATH;
     }
 
     @Override
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 1.0F;
     }
 

@@ -16,10 +16,10 @@ import net.minecraft.world.level.Level;
 
 public class Skeleton extends AbstractSkeleton {
     private static final int TOTAL_CONVERSION_TIME = 300;
-    private static final EntityDataAccessor<Boolean> DATA_STRAY_CONVERSION_ID = SynchedEntityData.defineId(Skeleton.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> DATA_STRAY_CONVERSION_ID = SynchedEntityData.defineId(Skeleton.class, EntityDataSerializers.BOOLEAN);
     public static final String CONVERSION_TAG = "StrayConversionTime";
-    private int inPowderSnowTime;
-    private int conversionTime;
+    public int inPowderSnowTime;
+    public int conversionTime;
 
     public Skeleton(EntityType<? extends Skeleton> entityType, Level level) {
         super(entityType, level);
@@ -112,7 +112,7 @@ public class Skeleton extends AbstractSkeleton {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.SKELETON_DEATH;
     }
 

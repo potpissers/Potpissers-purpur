@@ -265,7 +265,7 @@ public class Slime extends Mob implements Enemy {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return this.isTiny() ? SoundEvents.SLIME_DEATH_SMALL : SoundEvents.SLIME_DEATH;
     }
 
@@ -305,7 +305,7 @@ public class Slime extends Mob implements Enemy {
     }
 
     @Override
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 0.4F * this.getSize();
     }
 

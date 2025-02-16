@@ -29,7 +29,7 @@ import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 
 public class StructureManager {
-    private final LevelAccessor level;
+    public final LevelAccessor level;
     private final WorldOptions worldOptions;
     private final StructureCheck structureCheck;
 

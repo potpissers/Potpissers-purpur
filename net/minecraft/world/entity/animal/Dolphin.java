@@ -341,7 +341,7 @@ public class Dolphin extends AgeableWaterCreature {
 
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.DOLPHIN_DEATH;
     }
 

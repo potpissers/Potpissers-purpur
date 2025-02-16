@@ -47,9 +47,9 @@ public class PrimedTnt extends Entity implements TraceableEntity {
         }
     };
     @Nullable
-    private LivingEntity owner;
+    public LivingEntity owner;
     private boolean usedPortal;
-    private float explosionPower = 4.0F;
+    public float explosionPower = 4.0F;
 
     public PrimedTnt(EntityType<? extends PrimedTnt> entityType, Level level) {
         super(entityType, level);

@@ -86,8 +86,8 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
     private final PacketFlow receiving;
     private volatile boolean sendLoginDisconnect = true;
     private final Queue<Consumer<Connection>> pendingActions = Queues.newConcurrentLinkedQueue();
-    private Channel channel;
-    private SocketAddress address;
+    public Channel channel;
+    public SocketAddress address;
     @Nullable
     private volatile PacketListener disconnectListener;
     @Nullable

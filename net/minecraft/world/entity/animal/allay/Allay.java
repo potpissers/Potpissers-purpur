@@ -111,8 +111,8 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
     private final DynamicGameEventListener<Allay.JukeboxListener> dynamicJukeboxListener;
     private final SimpleContainer inventory = new SimpleContainer(1);
     @Nullable
-    private BlockPos jukeboxPos;
-    private long duplicationCooldown;
+    public BlockPos jukeboxPos;
+    public long duplicationCooldown;
     private float holdingItemAnimationTicks;
     private float holdingItemAnimationTicks0;
     private float dancingAnimationTicks;
@@ -227,12 +227,12 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.ALLAY_DEATH;
     }
 
     @Override
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 0.4F;
     }
 
@@ -508,7 +508,7 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
         }
     }
 
-    private void duplicateAllay() {
+    public void duplicateAllay() {
         Allay allay = EntityType.ALLAY.create(this.level(), EntitySpawnReason.BREEDING);
         if (allay != null) {
             allay.moveTo(this.position());
@@ -519,12 +519,12 @@ public class Allay extends PathfinderMob implements InventoryCarrier, VibrationS
         }
     }
 
-    private void resetDuplicationCooldown() {
+    public void resetDuplicationCooldown() {
         this.duplicationCooldown = 6000L;
         this.entityData.set(DATA_CAN_DUPLICATE, false);
     }
 
-    private boolean canDuplicate() {
+    public boolean canDuplicate() {
         return this.entityData.get(DATA_CAN_DUPLICATE);
     }
 

@@ -55,7 +55,7 @@ public final class NaturalSpawner {
     public static final int SPAWN_DISTANCE_CHUNK = 8;
     public static final int SPAWN_DISTANCE_BLOCK = 128;
     static final int MAGIC_NUMBER = (int)Math.pow(17.0, 2.0);
-    private static final MobCategory[] SPAWNING_CATEGORIES = Stream.of(MobCategory.values())
+    public static final MobCategory[] SPAWNING_CATEGORIES = Stream.of(MobCategory.values())
         .filter(category -> category != MobCategory.MISC)
         .toArray(MobCategory[]::new);
 

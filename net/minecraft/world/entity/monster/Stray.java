@@ -46,7 +46,7 @@ public class Stray extends AbstractSkeleton {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.STRAY_DEATH;
     }
 

@@ -100,7 +100,7 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
     public static final float DEFAULT_TAIL_ANGLE = (float) (Math.PI / 5);
     private float interestedAngle;
     private float interestedAngleO;
-    private boolean isWet;
+    public boolean isWet;
     private boolean isShaking;
     private float shakeAnim;
     private float shakeAnimO;
@@ -235,12 +235,12 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.WOLF_DEATH;
     }
 
     @Override
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 0.4F;
     }
 
@@ -551,7 +551,7 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
         return DyeColor.byId(this.entityData.get(DATA_COLLAR_COLOR));
     }
 
-    private void setCollarColor(DyeColor collarColor) {
+    public void setCollarColor(DyeColor collarColor) {
         this.entityData.set(DATA_COLLAR_COLOR, collarColor.getId());
     }
 

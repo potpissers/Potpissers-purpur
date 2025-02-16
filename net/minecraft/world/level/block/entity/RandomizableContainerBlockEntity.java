@@ -17,8 +17,8 @@ import net.minecraft.world.level.storage.loot.LootTable;
 
 public abstract class RandomizableContainerBlockEntity extends BaseContainerBlockEntity implements RandomizableContainer {
     @Nullable
-    protected ResourceKey<LootTable> lootTable;
-    protected long lootTableSeed = 0L;
+    public ResourceKey<LootTable> lootTable;
+    public long lootTableSeed = 0L;
 
     protected RandomizableContainerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);

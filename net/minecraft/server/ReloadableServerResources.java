@@ -21,7 +21,7 @@ public class ReloadableServerResources {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final CompletableFuture<Unit> DATA_RELOAD_INITIAL_TASK = CompletableFuture.completedFuture(Unit.INSTANCE);
     private final ReloadableServerRegistries.Holder fullRegistryHolder;
-    private final Commands commands;
+    public Commands commands;
     private final RecipeManager recipes;
     private final ServerAdvancementManager advancements;
     private final ServerFunctionLibrary functionLibrary;

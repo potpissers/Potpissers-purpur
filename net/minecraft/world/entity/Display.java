@@ -48,7 +48,7 @@ public abstract class Display extends Entity {
     private static final EntityDataAccessor<Integer> DATA_TRANSFORMATION_INTERPOLATION_DURATION_ID = SynchedEntityData.defineId(
         Display.class, EntityDataSerializers.INT
     );
-    private static final EntityDataAccessor<Integer> DATA_POS_ROT_INTERPOLATION_DURATION_ID = SynchedEntityData.defineId(
+    public static final EntityDataAccessor<Integer> DATA_POS_ROT_INTERPOLATION_DURATION_ID = SynchedEntityData.defineId(
         Display.class, EntityDataSerializers.INT
     );
     private static final EntityDataAccessor<Vector3f> DATA_TRANSLATION_ID = SynchedEntityData.defineId(Display.class, EntityDataSerializers.VECTOR3);
@@ -132,7 +132,7 @@ public abstract class Display extends Entity {
         return false;
     }
 
-    private static Transformation createTransformation(SynchedEntityData synchedEntityData) {
+    public static Transformation createTransformation(SynchedEntityData synchedEntityData) {
         Vector3f vector3f = synchedEntityData.get(DATA_TRANSLATION_ID);
         Quaternionf quaternionf = synchedEntityData.get(DATA_LEFT_ROTATION_ID);
         Vector3f vector3f1 = synchedEntityData.get(DATA_SCALE_ID);
@@ -273,7 +273,7 @@ public abstract class Display extends Entity {
         }
     }
 
-    private void setTransformation(Transformation transformation) {
+    public void setTransformation(Transformation transformation) {
         this.entityData.set(DATA_TRANSLATION_ID, transformation.getTranslation());
         this.entityData.set(DATA_LEFT_ROTATION_ID, transformation.getLeftRotation());
         this.entityData.set(DATA_SCALE_ID, transformation.getScale());
@@ -357,19 +357,19 @@ public abstract class Display extends Entity {
         return this.renderState;
     }
 
-    private void setTransformationInterpolationDuration(int transformationInterpolationDuration) {
+    public void setTransformationInterpolationDuration(int transformationInterpolationDuration) {
         this.entityData.set(DATA_TRANSFORMATION_INTERPOLATION_DURATION_ID, transformationInterpolationDuration);
     }
 
-    private int getTransformationInterpolationDuration() {
+    public int getTransformationInterpolationDuration() {
         return this.entityData.get(DATA_TRANSFORMATION_INTERPOLATION_DURATION_ID);
     }
 
-    private void setTransformationInterpolationDelay(int transformationInterpolationDelay) {
+    public void setTransformationInterpolationDelay(int transformationInterpolationDelay) {
         this.entityData.set(DATA_TRANSFORMATION_INTERPOLATION_START_DELTA_TICKS_ID, transformationInterpolationDelay, true);
     }
 
-    private int getTransformationInterpolationDelay() {
+    public int getTransformationInterpolationDelay() {
         return this.entityData.get(DATA_TRANSFORMATION_INTERPOLATION_START_DELTA_TICKS_ID);
     }
 
@@ -381,20 +381,20 @@ public abstract class Display extends Entity {
         return this.entityData.get(DATA_POS_ROT_INTERPOLATION_DURATION_ID);
     }
 
-    private void setBillboardConstraints(Display.BillboardConstraints billboardConstraints) {
+    public void setBillboardConstraints(Display.BillboardConstraints billboardConstraints) {
         this.entityData.set(DATA_BILLBOARD_RENDER_CONSTRAINTS_ID, billboardConstraints.getId());
     }
 
-    private Display.BillboardConstraints getBillboardConstraints() {
+    public Display.BillboardConstraints getBillboardConstraints() {
         return Display.BillboardConstraints.BY_ID.apply(this.entityData.get(DATA_BILLBOARD_RENDER_CONSTRAINTS_ID));
     }
 
-    private void setBrightnessOverride(@Nullable Brightness brightnessOverride) {
+    public void setBrightnessOverride(@Nullable Brightness brightnessOverride) {
         this.entityData.set(DATA_BRIGHTNESS_OVERRIDE_ID, brightnessOverride != null ? brightnessOverride.pack() : -1);
     }
 
     @Nullable
-    private Brightness getBrightnessOverride() {
+    public Brightness getBrightnessOverride() {
         int i = this.entityData.get(DATA_BRIGHTNESS_OVERRIDE_ID);
         return i != -1 ? Brightness.unpack(i) : null;
     }
@@ -403,47 +403,47 @@ public abstract class Display extends Entity {
         return this.entityData.get(DATA_BRIGHTNESS_OVERRIDE_ID);
     }
 
-    private void setViewRange(float viewRange) {
+    public void setViewRange(float viewRange) {
         this.entityData.set(DATA_VIEW_RANGE_ID, viewRange);
     }
 
-    private float getViewRange() {
+    public float getViewRange() {
         return this.entityData.get(DATA_VIEW_RANGE_ID);
     }
 
-    private void setShadowRadius(float shadowRadius) {
+    public void setShadowRadius(float shadowRadius) {
         this.entityData.set(DATA_SHADOW_RADIUS_ID, shadowRadius);
     }
 
-    private float getShadowRadius() {
+    public float getShadowRadius() {
         return this.entityData.get(DATA_SHADOW_RADIUS_ID);
     }
 
-    private void setShadowStrength(float shadowStrength) {
+    public void setShadowStrength(float shadowStrength) {
         this.entityData.set(DATA_SHADOW_STRENGTH_ID, shadowStrength);
     }
 
-    private float getShadowStrength() {
+    public float getShadowStrength() {
         return this.entityData.get(DATA_SHADOW_STRENGTH_ID);
     }
 
-    private void setWidth(float width) {
+    public void setWidth(float width) {
         this.entityData.set(DATA_WIDTH_ID, width);
     }
 
-    private float getWidth() {
+    public float getWidth() {
         return this.entityData.get(DATA_WIDTH_ID);
     }
 
-    private void setHeight(float height) {
+    public void setHeight(float height) {
         this.entityData.set(DATA_HEIGHT_ID, height);
     }
 
-    private int getGlowColorOverride() {
+    public int getGlowColorOverride() {
         return this.entityData.get(DATA_GLOW_COLOR_OVERRIDE_ID);
     }
 
-    private void setGlowColorOverride(int glowColorOverride) {
+    public void setGlowColorOverride(int glowColorOverride) {
         this.entityData.set(DATA_GLOW_COLOR_OVERRIDE_ID, glowColorOverride);
     }
 
@@ -460,7 +460,7 @@ public abstract class Display extends Entity {
         }
     }
 
-    private float getHeight() {
+    public float getHeight() {
         return this.entityData.get(DATA_HEIGHT_ID);
     }
 
@@ -571,11 +571,11 @@ public abstract class Display extends Entity {
             }
         }
 
-        private BlockState getBlockState() {
+        public BlockState getBlockState() {
             return this.entityData.get(DATA_BLOCK_STATE_ID);
         }
 
-        private void setBlockState(BlockState blockState) {
+        public void setBlockState(BlockState blockState) {
             this.entityData.set(DATA_BLOCK_STATE_ID, blockState);
         }
 
@@ -669,19 +669,19 @@ public abstract class Display extends Entity {
             }
         }
 
-        private ItemStack getItemStack() {
+        public ItemStack getItemStack() {
             return this.entityData.get(DATA_ITEM_STACK_ID);
         }
 
-        private void setItemStack(ItemStack itemStack) {
+        public void setItemStack(ItemStack itemStack) {
             this.entityData.set(DATA_ITEM_STACK_ID, itemStack);
         }
 
-        private void setItemTransform(ItemDisplayContext itemTransform) {
+        public void setItemTransform(ItemDisplayContext itemTransform) {
             this.entityData.set(DATA_ITEM_DISPLAY_ID, itemTransform.getId());
         }
 
-        private ItemDisplayContext getItemTransform() {
+        public ItemDisplayContext getItemTransform() {
             return ItemDisplayContext.BY_ID.apply(this.entityData.get(DATA_ITEM_DISPLAY_ID));
         }
 
@@ -801,8 +801,8 @@ public abstract class Display extends Entity {
         private static final byte INITIAL_TEXT_OPACITY = -1;
         public static final int INITIAL_BACKGROUND = 1073741824;
         private static final EntityDataAccessor<Component> DATA_TEXT_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.COMPONENT);
-        private static final EntityDataAccessor<Integer> DATA_LINE_WIDTH_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.INT);
-        private static final EntityDataAccessor<Integer> DATA_BACKGROUND_COLOR_ID = SynchedEntityData.defineId(
+        public static final EntityDataAccessor<Integer> DATA_LINE_WIDTH_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.INT);
+        public static final EntityDataAccessor<Integer> DATA_BACKGROUND_COLOR_ID = SynchedEntityData.defineId(
             Display.TextDisplay.class, EntityDataSerializers.INT
         );
         private static final EntityDataAccessor<Byte> DATA_TEXT_OPACITY_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.BYTE);
@@ -837,15 +837,15 @@ public abstract class Display extends Entity {
             }
         }
 
-        private Component getText() {
+        public Component getText() {
             return this.entityData.get(DATA_TEXT_ID);
         }
 
-        private void setText(Component text) {
+        public void setText(Component text) {
             this.entityData.set(DATA_TEXT_ID, text);
         }
 
-        private int getLineWidth() {
+        public int getLineWidth() {
             return this.entityData.get(DATA_LINE_WIDTH_ID);
         }
 
@@ -853,15 +853,15 @@ public abstract class Display extends Entity {
             this.entityData.set(DATA_LINE_WIDTH_ID, lineWidth);
         }
 
-        private byte getTextOpacity() {
+        public byte getTextOpacity() {
             return this.entityData.get(DATA_TEXT_OPACITY_ID);
         }
 
-        private void setTextOpacity(byte textOpacity) {
+        public void setTextOpacity(byte textOpacity) {
             this.entityData.set(DATA_TEXT_OPACITY_ID, textOpacity);
         }
 
-        private int getBackgroundColor() {
+        public int getBackgroundColor() {
             return this.entityData.get(DATA_BACKGROUND_COLOR_ID);
         }
 
@@ -869,11 +869,11 @@ public abstract class Display extends Entity {
             this.entityData.set(DATA_BACKGROUND_COLOR_ID, backgroundColor);
         }
 
-        private byte getFlags() {
+        public byte getFlags() {
             return this.entityData.get(DATA_STYLE_FLAGS_ID);
         }
 
-        private void setFlags(byte flags) {
+        public void setFlags(byte flags) {
             this.entityData.set(DATA_STYLE_FLAGS_ID, flags);
         }
 

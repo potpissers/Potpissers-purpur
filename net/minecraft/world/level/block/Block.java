@@ -324,7 +324,7 @@ public class Block extends BlockBehaviour implements ItemLike {
         }
     }
 
-    protected void popExperience(ServerLevel level, BlockPos pos, int amount) {
+    public void popExperience(ServerLevel level, BlockPos pos, int amount) {
         if (level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
             ExperienceOrb.award(level, Vec3.atCenterOf(pos), amount);
         }

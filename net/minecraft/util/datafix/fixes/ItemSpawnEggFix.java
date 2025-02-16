@@ -16,7 +16,7 @@ import net.minecraft.Util;
 import net.minecraft.util.datafix.schemas.NamespacedSchema;
 
 public class ItemSpawnEggFix extends DataFix {
-    private static final String[] ID_TO_ENTITY = DataFixUtils.make(new String[256], array -> {
+    public static final String[] ID_TO_ENTITY = DataFixUtils.make(new String[256], array -> {
         array[1] = "Item";
         array[2] = "XPOrb";
         array[7] = "ThrownEgg";

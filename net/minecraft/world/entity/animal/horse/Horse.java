@@ -76,7 +76,7 @@ public class Horse extends AbstractHorse implements VariantHolder<Variant> {
         return this.entityData.get(DATA_ID_TYPE_VARIANT);
     }
 
-    private void setVariantAndMarkings(Variant variant, Markings marking) {
+    public void setVariantAndMarkings(Variant variant, Markings marking) {
         this.setTypeVariant(variant.getId() & 0xFF | marking.getId() << 8 & 0xFF00);
     }
 
@@ -108,7 +108,7 @@ public class Horse extends AbstractHorse implements VariantHolder<Variant> {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.HORSE_DEATH;
     }
 

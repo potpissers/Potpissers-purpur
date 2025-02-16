@@ -26,7 +26,7 @@ public class DecoratedPotBlockEntity extends BlockEntity implements Randomizable
     public long wobbleStartedAtTick;
     @Nullable
     public DecoratedPotBlockEntity.WobbleStyle lastWobbleStyle;
-    private PotDecorations decorations;
+    public PotDecorations decorations;
     private ItemStack item = ItemStack.EMPTY;
     @Nullable
     protected ResourceKey<LootTable> lootTable;

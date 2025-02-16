@@ -14,7 +14,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.util.datafix.schemas.NamespacedSchema;
 
 public class ItemIdFix extends DataFix {
-    private static final Int2ObjectMap<String> ITEM_NAMES = DataFixUtils.make(new Int2ObjectOpenHashMap<>(), map -> {
+    public static final Int2ObjectMap<String> ITEM_NAMES = DataFixUtils.make(new Int2ObjectOpenHashMap<>(), map -> {
         map.put(1, "minecraft:stone");
         map.put(2, "minecraft:grass");
         map.put(3, "minecraft:dirt");

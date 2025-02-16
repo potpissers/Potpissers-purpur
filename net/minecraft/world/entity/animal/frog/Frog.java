@@ -313,7 +313,7 @@ public class Frog extends Animal implements VariantHolder<Holder<FrogVariant>> {
 
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.FROG_DEATH;
     }
 

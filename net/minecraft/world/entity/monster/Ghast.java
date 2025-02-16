@@ -114,12 +114,12 @@ public class Ghast extends FlyingMob implements Enemy {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.GHAST_DEATH;
     }
 
     @Override
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 5.0F;
     }
 

@@ -217,9 +217,9 @@ public class HoverEvent {
         private static final Codec<HoverEvent.ItemStackInfo> SIMPLE_CODEC = ItemStack.SIMPLE_ITEM_CODEC
             .xmap(HoverEvent.ItemStackInfo::new, HoverEvent.ItemStackInfo::getItemStack);
         public static final Codec<HoverEvent.ItemStackInfo> CODEC = Codec.withAlternative(FULL_CODEC, SIMPLE_CODEC);
-        private final Holder<Item> item;
-        private final int count;
-        private final DataComponentPatch components;
+        public final Holder<Item> item;
+        public final int count;
+        public final DataComponentPatch components;
         @Nullable
         private ItemStack itemStack;
 

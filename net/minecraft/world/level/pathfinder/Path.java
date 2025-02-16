@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 public class Path {
-    private final List<Node> nodes;
+    public final List<Node> nodes;
     @Nullable
     private Path.DebugData debugData;
     private int nextNodeIndex;

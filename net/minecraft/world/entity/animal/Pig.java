@@ -50,7 +50,7 @@ import net.minecraft.world.phys.Vec3;
 public class Pig extends Animal implements ItemSteerable, Saddleable {
     private static final EntityDataAccessor<Boolean> DATA_SADDLE_ID = SynchedEntityData.defineId(Pig.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_BOOST_TIME = SynchedEntityData.defineId(Pig.class, EntityDataSerializers.INT);
-    private final ItemBasedSteering steering = new ItemBasedSteering(this.entityData, DATA_BOOST_TIME, DATA_SADDLE_ID);
+    public final ItemBasedSteering steering = new ItemBasedSteering(this.entityData, DATA_BOOST_TIME, DATA_SADDLE_ID);
 
     public Pig(EntityType<? extends Pig> entityType, Level level) {
         super(entityType, level);
@@ -120,7 +120,7 @@ public class Pig extends Animal implements ItemSteerable, Saddleable {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.PIG_DEATH;
     }
 

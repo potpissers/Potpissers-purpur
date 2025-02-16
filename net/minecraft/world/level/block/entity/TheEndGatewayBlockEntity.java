@@ -32,11 +32,11 @@ public class TheEndGatewayBlockEntity extends TheEndPortalBlockEntity {
     private static final int ATTENTION_INTERVAL = 2400;
     private static final int EVENT_COOLDOWN = 1;
     private static final int GATEWAY_HEIGHT_ABOVE_SURFACE = 10;
-    private long age;
+    public long age;
     private int teleportCooldown;
     @Nullable
-    private BlockPos exitPortal;
-    private boolean exactTeleport;
+    public BlockPos exitPortal;
+    public boolean exactTeleport;
 
     public TheEndGatewayBlockEntity(BlockPos pos, BlockState blockState) {
         super(BlockEntityType.END_GATEWAY, pos, blockState);

@@ -160,7 +160,7 @@ public class GrindstoneBlock extends FaceAttachedHorizontalDirectionalBlock {
     }
 
     @Override
-    protected MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         return new SimpleMenuProvider(
             (containerId, playerInventory, player) -> new GrindstoneMenu(containerId, playerInventory, ContainerLevelAccess.create(level, pos)),
             CONTAINER_TITLE

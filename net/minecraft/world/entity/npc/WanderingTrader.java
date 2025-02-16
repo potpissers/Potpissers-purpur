@@ -204,7 +204,7 @@ public class WanderingTrader extends AbstractVillager implements Consumable.Over
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.WANDERING_TRADER_DEATH;
     }
 
@@ -250,7 +250,7 @@ public class WanderingTrader extends AbstractVillager implements Consumable.Over
     }
 
     @Nullable
-    BlockPos getWanderTarget() {
+    public BlockPos getWanderTarget() {
         return this.wanderTarget;
     }
 

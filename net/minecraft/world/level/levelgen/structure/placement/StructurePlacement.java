@@ -25,11 +25,11 @@ public abstract class StructurePlacement {
         .byNameCodec()
         .dispatch(StructurePlacement::type, StructurePlacementType::codec);
     private static final int HIGHLY_ARBITRARY_RANDOM_SALT = 10387320;
-    private final Vec3i locateOffset;
-    private final StructurePlacement.FrequencyReductionMethod frequencyReductionMethod;
-    private final float frequency;
-    private final int salt;
-    private final Optional<StructurePlacement.ExclusionZone> exclusionZone;
+    public final Vec3i locateOffset;
+    public final StructurePlacement.FrequencyReductionMethod frequencyReductionMethod;
+    public final float frequency;
+    public final int salt;
+    public final Optional<StructurePlacement.ExclusionZone> exclusionZone;
 
     protected static <S extends StructurePlacement> P5<Mu<S>, Vec3i, StructurePlacement.FrequencyReductionMethod, Float, Integer, Optional<StructurePlacement.ExclusionZone>> placementCodec(
         Instance<S> instance

@@ -25,7 +25,7 @@ public class MinecartFurnace extends AbstractMinecart {
     private static final EntityDataAccessor<Boolean> DATA_ID_FUEL = SynchedEntityData.defineId(MinecartFurnace.class, EntityDataSerializers.BOOLEAN);
     private static final int FUEL_TICKS_PER_ITEM = 3600;
     private static final int MAX_FUEL_TICKS = 32000;
-    private int fuel;
+    public int fuel;
     public Vec3 push = Vec3.ZERO;
 
     public MinecartFurnace(EntityType<? extends MinecartFurnace> entityType, Level level) {

@@ -28,7 +28,7 @@ public abstract class BaseEntityBlock extends Block implements EntityBlock {
 
     @Nullable
     @Override
-    protected MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         return blockEntity instanceof MenuProvider ? (MenuProvider)blockEntity : null;
     }

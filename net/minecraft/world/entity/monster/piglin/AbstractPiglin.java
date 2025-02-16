@@ -25,7 +25,7 @@ public abstract class AbstractPiglin extends Monster {
         AbstractPiglin.class, EntityDataSerializers.BOOLEAN
     );
     public static final int CONVERSION_TIME = 300;
-    protected int timeInOverworld;
+    public int timeInOverworld;
 
     public AbstractPiglin(EntityType<? extends AbstractPiglin> entityType, Level level) {
         super(entityType, level);
@@ -47,7 +47,7 @@ public abstract class AbstractPiglin extends Monster {
         this.getEntityData().set(DATA_IMMUNE_TO_ZOMBIFICATION, immuneToZombification);
     }
 
-    protected boolean isImmuneToZombification() {
+    public boolean isImmuneToZombification() {
         return this.getEntityData().get(DATA_IMMUNE_TO_ZOMBIFICATION);
     }
 

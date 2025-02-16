@@ -36,7 +36,7 @@ public class ChunkHolder extends GenerationChunkHolder {
     private volatile CompletableFuture<ChunkResult<LevelChunk>> fullChunkFuture = UNLOADED_LEVEL_CHUNK_FUTURE;
     private volatile CompletableFuture<ChunkResult<LevelChunk>> tickingChunkFuture = UNLOADED_LEVEL_CHUNK_FUTURE;
     private volatile CompletableFuture<ChunkResult<LevelChunk>> entityTickingChunkFuture = UNLOADED_LEVEL_CHUNK_FUTURE;
-    private int oldTicketLevel;
+    public int oldTicketLevel;
     private int ticketLevel;
     private int queueLevel;
     private boolean hasChangedSections;
@@ -45,7 +45,7 @@ public class ChunkHolder extends GenerationChunkHolder {
     private final BitSet skyChangedLightSectionFilter = new BitSet();
     private final LevelLightEngine lightEngine;
     private final ChunkHolder.LevelChangeListener onLevelChange;
-    private final ChunkHolder.PlayerProvider playerProvider;
+    public final ChunkHolder.PlayerProvider playerProvider;
     private boolean wasAccessibleSinceLastSave;
     private CompletableFuture<?> pendingFullStateConfirmation = CompletableFuture.completedFuture(null);
     private CompletableFuture<?> sendSync = CompletableFuture.completedFuture(null);

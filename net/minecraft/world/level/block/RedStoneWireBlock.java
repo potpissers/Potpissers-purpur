@@ -91,7 +91,7 @@ public class RedStoneWireBlock extends Block {
     private static final float PARTICLE_DENSITY = 0.2F;
     private final BlockState crossState;
     private final RedstoneWireEvaluator evaluator = new DefaultRedstoneWireEvaluator(this);
-    private boolean shouldSignal = true;
+    public boolean shouldSignal = true;
 
     @Override
     public MapCodec<RedStoneWireBlock> codec() {
@@ -280,7 +280,7 @@ public class RedStoneWireBlock extends Block {
     }
 
     @Override
-    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockPos blockPos = pos.below();
         BlockState blockState = level.getBlockState(blockPos);
         return this.canSurviveOn(level, blockPos, blockState);

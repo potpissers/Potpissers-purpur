@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 public abstract class StateHolder<O, S> {
     public static final String NAME_TAG = "Name";
     public static final String PROPERTIES_TAG = "Properties";
-    private static final Function<Entry<Property<?>, Comparable<?>>, String> PROPERTY_ENTRY_TO_STRING_FUNCTION = new Function<Entry<Property<?>, Comparable<?>>, String>() {
+    public static final Function<Entry<Property<?>, Comparable<?>>, String> PROPERTY_ENTRY_TO_STRING_FUNCTION = new Function<Entry<Property<?>, Comparable<?>>, String>() {
         @Override
         public String apply(@Nullable Entry<Property<?>, Comparable<?>> propertyEntry) {
             if (propertyEntry == null) {

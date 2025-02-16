@@ -115,7 +115,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     private long lastGossipDecayTime;
     private int villagerXp;
     private long lastRestockGameTime;
-    private int numberOfRestocksToday;
+    public int numberOfRestocksToday;
     private long lastRestockCheckDayTime;
     private boolean assignProfessionWhenSpawned;
     private static final ImmutableList<MemoryModuleType<?>> MEMORY_TYPES = ImmutableList.of(
@@ -339,7 +339,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
         }
     }
 
-    private void setUnhappy() {
+    public void setUnhappy() {
         this.setUnhappyCounter(40);
         if (!this.level().isClientSide()) {
             this.makeSound(SoundEvents.VILLAGER_NO);
@@ -559,7 +559,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.VILLAGER_DEATH;
     }
 
@@ -622,7 +622,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
         super.die(cause);
     }
 
-    private void releaseAllPois() {
+    public void releaseAllPois() {
         this.releasePoi(MemoryModuleType.HOME);
         this.releasePoi(MemoryModuleType.JOB_SITE);
         this.releasePoi(MemoryModuleType.POTENTIAL_JOB_SITE);
@@ -711,7 +711,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
         return VillagerData.canLevelUp(level) && this.villagerXp >= VillagerData.getMaxXpPerLevel(level);
     }
 
-    private void increaseMerchantCareer() {
+    public void increaseMerchantCareer() {
         this.setVillagerData(this.getVillagerData().setLevel(this.getVillagerData().getLevel() + 1));
         this.updateTrades();
     }

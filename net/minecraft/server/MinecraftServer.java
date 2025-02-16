@@ -174,7 +174,7 @@ import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
 public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements ServerInfo, ChunkIOErrorReporter, CommandSource {
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
     public static final String VANILLA_BRAND = "vanilla";
     private static final float AVERAGE_TICK_TIME_SMOOTHING = 0.8F;
     private static final int TICK_STATS_SPAN = 100;
@@ -194,8 +194,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
         "Demo World", GameType.SURVIVAL, false, Difficulty.NORMAL, false, new GameRules(FeatureFlags.DEFAULT_FLAGS), WorldDataConfiguration.DEFAULT
     );
     public static final GameProfile ANONYMOUS_PLAYER_PROFILE = new GameProfile(Util.NIL_UUID, "Anonymous Player");
-    protected final LevelStorageSource.LevelStorageAccess storageSource;
-    protected final PlayerDataStorage playerDataStorage;
+    public LevelStorageSource.LevelStorageAccess storageSource;
+    public final PlayerDataStorage playerDataStorage;
     private final List<Runnable> tickables = Lists.newArrayList();
     private MetricsRecorder metricsRecorder = InactiveMetricsRecorder.INSTANCE;
     private Consumer<ProfileResults> onMetricsRecordingStopped = results -> this.stopRecordingMetrics();
@@ -204,18 +204,18 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
     @Nullable
     private MinecraftServer.TimeProfiler debugCommandProfiler;
     private boolean debugCommandProfilerDelayStart;
-    private final ServerConnectionListener connection;
-    private final ChunkProgressListenerFactory progressListenerFactory;
+    private ServerConnectionListener connection;
+    public final ChunkProgressListenerFactory progressListenerFactory;
     @Nullable
     private ServerStatus status;
     @Nullable
     private ServerStatus.Favicon statusIcon;
     private final RandomSource random = RandomSource.create();
-    private final DataFixer fixerUpper;
+    public final DataFixer fixerUpper;
     private String localIp;
     private int port = -1;
     private final LayeredRegistryAccess<RegistryLayer> registries;
-    private final Map<ResourceKey<Level>, ServerLevel> levels = Maps.newLinkedHashMap();
+    private Map<ResourceKey<Level>, ServerLevel> levels = Maps.newLinkedHashMap();
     private PlayerList playerList;
     private volatile boolean running = true;
     private boolean stopped;
@@ -240,7 +240,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
     private long lastOverloadWarningNanos;
     protected final Services services;
     private long lastServerStatus;
-    private final Thread serverThread;
+    public final Thread serverThread;
     private long lastTickNanos = Util.getNanos();
     private long taskExecutionStartNanos = Util.getNanos();
     private long idleTimeNanos;
@@ -256,14 +256,14 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
     private final ServerFunctionManager functionManager;
     private boolean enforceWhitelist;
     private float smoothedTickTimeMillis;
-    private final Executor executor;
+    public final Executor executor;
     @Nullable
     private String serverId;
-    private MinecraftServer.ReloadableResources resources;
+    public MinecraftServer.ReloadableResources resources;
     private final StructureTemplateManager structureTemplateManager;
     private final ServerTickRateManager tickRateManager;
-    protected final WorldData worldData;
-    private final PotionBrewing potionBrewing;
+    protected WorldData worldData;
+    public PotionBrewing potionBrewing;
     private FuelValues fuelValues;
     private int emptyTicks;
     private volatile boolean isSaving;
@@ -495,7 +495,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
         serverLevelData.setGameType(GameType.SPECTATOR);
     }
 
-    private void prepareLevels(ChunkProgressListener listener) {
+    public void prepareLevels(ChunkProgressListener listener) {
         ServerLevel serverLevel = this.overworld();
         LOGGER.info("Preparing start region for dimension {}", serverLevel.dimension().location());
         BlockPos sharedSpawnPos = serverLevel.getSharedSpawnPos();
@@ -2064,7 +2064,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
         return 0;
     }
 
-    record ReloadableResources(CloseableResourceManager resourceManager, ReloadableServerResources managers) implements AutoCloseable {
+    public record ReloadableResources(CloseableResourceManager resourceManager, ReloadableServerResources managers) implements AutoCloseable {
         @Override
         public void close() {
             this.resourceManager.close();

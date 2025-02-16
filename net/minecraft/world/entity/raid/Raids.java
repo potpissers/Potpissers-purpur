@@ -25,7 +25,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class Raids extends SavedData {
     private static final String RAID_FILE_ID = "raids";
-    private final Map<Integer, Raid> raidMap = Maps.newHashMap();
+    public final Map<Integer, Raid> raidMap = Maps.newHashMap();
     private final ServerLevel level;
     private int nextAvailableID;
     private int tick;

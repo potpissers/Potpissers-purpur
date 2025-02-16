@@ -228,7 +228,7 @@ public class SurfaceRules {
         }
     }
 
-    interface Condition {
+    public interface Condition {
         boolean test();
     }
 
@@ -254,7 +254,7 @@ public class SurfaceRules {
         KeyDispatchDataCodec<? extends SurfaceRules.ConditionSource> codec();
     }
 
-    protected static final class Context {
+    public static final class Context {
         private static final int HOW_FAR_BELOW_PRELIMINARY_SURFACE_LEVEL_TO_BUILD_SURFACE = 8;
         private static final int SURFACE_CELL_BITS = 4;
         private static final int SURFACE_CELL_SIZE = 16;
@@ -264,16 +264,16 @@ public class SurfaceRules {
         final SurfaceRules.Condition steep = new SurfaceRules.Context.SteepMaterialCondition(this);
         final SurfaceRules.Condition hole = new SurfaceRules.Context.HoleCondition(this);
         final SurfaceRules.Condition abovePreliminarySurface = new SurfaceRules.Context.AbovePreliminarySurfaceCondition();
-        final RandomState randomState;
+        public final RandomState randomState;
         final ChunkAccess chunk;
         private final NoiseChunk noiseChunk;
         private final Function<BlockPos, Holder<Biome>> biomeGetter;
-        final WorldGenerationContext context;
+        public final WorldGenerationContext context;
         private long lastPreliminarySurfaceCellOrigin = Long.MAX_VALUE;
         private final int[] preliminarySurfaceCache = new int[4];
         long lastUpdateXZ = -9223372036854775807L;
-        int blockX;
-        int blockZ;
+        public int blockX;
+        public int blockZ;
         int surfaceDepth;
         private long lastSurfaceDepth2Update = this.lastUpdateXZ - 1L;
         private double surfaceSecondary;
@@ -282,7 +282,7 @@ public class SurfaceRules {
         long lastUpdateY = -9223372036854775807L;
         final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         Supplier<Holder<Biome>> biome;
-        int blockY;
+        public int blockY;
         int waterHeight;
         int stoneDepthBelow;
         int stoneDepthAbove;
@@ -448,7 +448,7 @@ public class SurfaceRules {
         }
     }
 
-    abstract static class LazyCondition implements SurfaceRules.Condition {
+    public abstract static class LazyCondition implements SurfaceRules.Condition {
         protected final SurfaceRules.Context context;
         private long lastUpdate;
         @Nullable
@@ -491,7 +491,7 @@ public class SurfaceRules {
         }
     }
 
-    abstract static class LazyYCondition extends SurfaceRules.LazyCondition {
+    public abstract static class LazyYCondition extends SurfaceRules.LazyCondition {
         protected LazyYCondition(SurfaceRules.Context context) {
             super(context);
         }
@@ -684,7 +684,7 @@ public class SurfaceRules {
         }
     }
 
-    protected interface SurfaceRule {
+    public interface SurfaceRule {
         @Nullable
         BlockState tryApply(int x, int y, int z);
     }
@@ -735,7 +735,7 @@ public class SurfaceRules {
         }
     }
 
-    record VerticalGradientConditionSource(ResourceLocation randomName, VerticalAnchor trueAtAndBelow, VerticalAnchor falseAtAndAbove)
+    public record VerticalGradientConditionSource(ResourceLocation randomName, VerticalAnchor trueAtAndBelow, VerticalAnchor falseAtAndAbove)
         implements SurfaceRules.ConditionSource {
         static final KeyDispatchDataCodec<SurfaceRules.VerticalGradientConditionSource> CODEC = KeyDispatchDataCodec.of(
             RecordCodecBuilder.mapCodec(

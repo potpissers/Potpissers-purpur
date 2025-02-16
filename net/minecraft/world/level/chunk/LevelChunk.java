@@ -75,8 +75,8 @@ public class LevelChunk extends ChunkAccess {
         }
     };
     private final Map<BlockPos, LevelChunk.RebindableTickingBlockEntityWrapper> tickersInLevel = Maps.newHashMap();
-    private boolean loaded;
-    final Level level;
+    public boolean loaded;
+    public final Level level;
     @Nullable
     private Supplier<FullChunkStatus> fullStatus;
     @Nullable

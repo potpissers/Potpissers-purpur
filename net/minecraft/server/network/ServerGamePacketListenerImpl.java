@@ -1441,7 +1441,7 @@ public class ServerGamePacketListenerImpl
         }
     }
 
-    private static boolean isChatMessageIllegal(String message) {
+    public static boolean isChatMessageIllegal(String message) {
         for (int i = 0; i < message.length(); i++) {
             if (!StringUtil.isAllowedChatCharacter(message.charAt(i))) {
                 return true;

@@ -27,7 +27,7 @@ public class ThrownTrident extends AbstractArrow {
     private static final EntityDataAccessor<Byte> ID_LOYALTY = SynchedEntityData.defineId(ThrownTrident.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Boolean> ID_FOIL = SynchedEntityData.defineId(ThrownTrident.class, EntityDataSerializers.BOOLEAN);
     private static final float WATER_INERTIA = 0.99F;
-    private boolean dealtDamage;
+    public boolean dealtDamage;
     public int clientSideReturnTridentTickCount;
 
     public ThrownTrident(EntityType<? extends ThrownTrident> entityType, Level level) {

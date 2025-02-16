@@ -187,7 +187,7 @@ public class SnowGolem extends AbstractGolem implements Shearable, RangedAttackM
 
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.SNOW_GOLEM_DEATH;
     }
 

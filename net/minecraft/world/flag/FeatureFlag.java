@@ -1,8 +1,8 @@
 package net.minecraft.world.flag;
 
 public class FeatureFlag {
-    final FeatureFlagUniverse universe;
-    final long mask;
+    public final FeatureFlagUniverse universe;
+    public final long mask;
 
     FeatureFlag(FeatureFlagUniverse universe, int maskBit) {
         this.universe = universe;

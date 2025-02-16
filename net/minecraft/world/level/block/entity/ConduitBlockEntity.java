@@ -39,11 +39,11 @@ public class ConduitBlockEntity extends BlockEntity {
     private float activeRotation;
     private boolean isActive;
     private boolean isHunting;
-    private final List<BlockPos> effectBlocks = Lists.newArrayList();
+    public final List<BlockPos> effectBlocks = Lists.newArrayList();
     @Nullable
-    private LivingEntity destroyTarget;
+    public LivingEntity destroyTarget;
     @Nullable
-    private UUID destroyTargetUUID;
+    public UUID destroyTargetUUID;
     private long nextAmbientSoundActivation;
 
     public ConduitBlockEntity(BlockPos pos, BlockState blockState) {
@@ -233,7 +233,7 @@ public class ConduitBlockEntity extends BlockEntity {
         }
     }
 
-    private static AABB getDestroyRangeAABB(BlockPos pos) {
+    public static AABB getDestroyRangeAABB(BlockPos pos) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();

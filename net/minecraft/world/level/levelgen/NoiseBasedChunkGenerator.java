@@ -55,7 +55,7 @@ public final class NoiseBasedChunkGenerator extends ChunkGenerator {
             .apply(instance, instance.stable(NoiseBasedChunkGenerator::new))
     );
     private static final BlockState AIR = Blocks.AIR.defaultBlockState();
-    private final Holder<NoiseGeneratorSettings> settings;
+    public final Holder<NoiseGeneratorSettings> settings;
     private final Supplier<Aquifer.FluidPicker> globalFluidPicker;
 
     public NoiseBasedChunkGenerator(BiomeSource biomeSource, Holder<NoiseGeneratorSettings> settings) {

@@ -36,9 +36,9 @@ import net.minecraft.world.level.pathfinder.PathType;
 
 public abstract class Animal extends AgeableMob {
     protected static final int PARENT_AGE_AFTER_BREEDING = 6000;
-    private int inLove;
+    public int inLove;
     @Nullable
-    private UUID loveCause;
+    public UUID loveCause;
 
     protected Animal(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);

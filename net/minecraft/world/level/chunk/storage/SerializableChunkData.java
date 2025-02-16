@@ -92,7 +92,7 @@ public record SerializableChunkData(
     List<CompoundTag> blockEntities,
     CompoundTag structureData
 ) {
-    private static final Codec<PalettedContainer<BlockState>> BLOCK_STATE_CODEC = PalettedContainer.codecRW(
+    public static final Codec<PalettedContainer<BlockState>> BLOCK_STATE_CODEC = PalettedContainer.codecRW(
         Block.BLOCK_STATE_REGISTRY, BlockState.CODEC, PalettedContainer.Strategy.SECTION_STATES, Blocks.AIR.defaultBlockState()
     );
     private static final Logger LOGGER = LogUtils.getLogger();

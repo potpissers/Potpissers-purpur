@@ -593,7 +593,7 @@ public class GameRules {
             this.onChanged(context.getSource().getServer());
         }
 
-        protected void onChanged(@Nullable MinecraftServer server) {
+        public void onChanged(@Nullable MinecraftServer server) {
             if (server != null) {
                 this.type.callback.accept(server, this.getSelf());
             }

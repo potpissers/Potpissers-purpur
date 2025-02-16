@@ -72,7 +72,7 @@ public class Blaze extends Monster {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.BLAZE_DEATH;
     }
 

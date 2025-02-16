@@ -65,12 +65,12 @@ public class TrialSpawnerData {
             )
             .apply(instance, TrialSpawnerData::new)
     );
-    protected final Set<UUID> detectedPlayers = new HashSet<>();
-    protected final Set<UUID> currentMobs = new HashSet<>();
-    protected long cooldownEndsAt;
-    protected long nextMobSpawnsAt;
+    public final Set<UUID> detectedPlayers = new HashSet<>();
+    public final Set<UUID> currentMobs = new HashSet<>();
+    public long cooldownEndsAt;
+    public long nextMobSpawnsAt;
     protected int totalMobsSpawned;
-    protected Optional<SpawnData> nextSpawnData;
+    public Optional<SpawnData> nextSpawnData;
     protected Optional<ResourceKey<LootTable>> ejectingLootTable;
     @Nullable
     protected Entity displayEntity;

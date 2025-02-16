@@ -170,7 +170,7 @@ public final class BundleContents implements TooltipComponent {
             }
         }
 
-        private int getMaxAmountToAdd(ItemStack stack) {
+        public int getMaxAmountToAdd(ItemStack stack) {
             Fraction fraction = Fraction.ONE.subtract(this.weight);
             return Math.max(fraction.divideBy(BundleContents.getWeight(stack)).intValue(), 0);
         }

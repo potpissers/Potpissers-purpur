@@ -4,7 +4,7 @@ import net.minecraft.util.Mth;
 
 public class RangedAttribute extends Attribute {
     private final double minValue;
-    private final double maxValue;
+    public double maxValue;
 
     public RangedAttribute(String descriptionId, double defaultValue, double min, double max) {
         super(descriptionId, defaultValue);

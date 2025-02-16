@@ -56,7 +56,7 @@ public class VaultSharedData {
         return !this.connectedPlayers.isEmpty();
     }
 
-    Set<UUID> getConnectedPlayers() {
+    public Set<UUID> getConnectedPlayers() {
         return this.connectedPlayers;
     }
 

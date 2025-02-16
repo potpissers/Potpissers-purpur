@@ -54,10 +54,10 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
     public static final int BURN_TIME_STANDARD = 200;
     public static final int BURN_COOL_SPEED = 2;
     protected NonNullList<ItemStack> items = NonNullList.withSize(3, ItemStack.EMPTY);
-    int litTimeRemaining;
+    public int litTimeRemaining;
     int litTotalTime;
-    int cookingTimer;
-    int cookingTotalTime;
+    public int cookingTimer;
+    public int cookingTotalTime;
     protected final ContainerData dataAccess = new ContainerData() {
         @Override
         public int get(int index) {
@@ -97,7 +97,7 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
             return 4;
         }
     };
-    private final Reference2IntOpenHashMap<ResourceKey<Recipe<?>>> recipesUsed = new Reference2IntOpenHashMap<>();
+    public final Reference2IntOpenHashMap<ResourceKey<Recipe<?>>> recipesUsed = new Reference2IntOpenHashMap<>();
     private final RecipeManager.CachedCheck<SingleRecipeInput, ? extends AbstractCookingRecipe> quickCheck;
 
     protected AbstractFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState, RecipeType<? extends AbstractCookingRecipe> recipeType) {
@@ -260,7 +260,7 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
         return fuelValues.burnDuration(stack);
     }
 
-    private static int getTotalCookTime(ServerLevel level, AbstractFurnaceBlockEntity furnace) {
+    public static int getTotalCookTime(ServerLevel level, AbstractFurnaceBlockEntity furnace) {
         SingleRecipeInput singleRecipeInput = new SingleRecipeInput(furnace.getItem(0));
         return furnace.quickCheck.getRecipeFor(singleRecipeInput, level).map(recipe -> recipe.value().cookingTime()).orElse(200);
     }

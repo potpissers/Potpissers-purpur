@@ -162,7 +162,7 @@ public class MoveControl implements Control {
         return this.wantedZ;
     }
 
-    protected static enum Operation {
+    public static enum Operation {
         WAIT,
         MOVE_TO,
         STRAFE,

@@ -458,7 +458,7 @@ public class Creaking extends Monster {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.CREAKING_DEATH;
     }
 

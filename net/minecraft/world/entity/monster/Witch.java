@@ -48,7 +48,7 @@ public class Witch extends Raider implements RangedAttackMob {
         SPEED_MODIFIER_DRINKING_ID, -0.25, AttributeModifier.Operation.ADD_VALUE
     );
     private static final EntityDataAccessor<Boolean> DATA_USING_ITEM = SynchedEntityData.defineId(Witch.class, EntityDataSerializers.BOOLEAN);
-    private int usingTime;
+    public int usingTime;
     private NearestHealableRaiderTargetGoal<Raider> healRaidersGoal;
     private NearestAttackableWitchTargetGoal<Player> attackPlayersGoal;
 
@@ -90,7 +90,7 @@ public class Witch extends Raider implements RangedAttackMob {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.WITCH_DEATH;
     }
 

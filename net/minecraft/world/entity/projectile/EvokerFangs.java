@@ -19,7 +19,7 @@ public class EvokerFangs extends Entity implements TraceableEntity {
     public static final int ATTACK_DURATION = 20;
     public static final int LIFE_OFFSET = 2;
     public static final int ATTACK_TRIGGER_TICKS = 14;
-    private int warmupDelayTicks;
+    public int warmupDelayTicks;
     private boolean sentSpikeEvent;
     private int lifeTicks = 22;
     private boolean clientSideAttackStarted;

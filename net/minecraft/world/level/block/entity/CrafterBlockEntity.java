@@ -31,7 +31,7 @@ public class CrafterBlockEntity extends RandomizableContainerBlockEntity impleme
     public static final int DATA_TRIGGERED = 9;
     public static final int NUM_DATA = 10;
     private NonNullList<ItemStack> items = NonNullList.withSize(9, ItemStack.EMPTY);
-    private int craftingTicksRemaining = 0;
+    public int craftingTicksRemaining = 0;
     protected final ContainerData containerData = new ContainerData() {
         private final int[] slotStates = new int[9];
         private int triggered = 0;

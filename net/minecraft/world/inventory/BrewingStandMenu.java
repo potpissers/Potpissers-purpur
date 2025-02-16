@@ -31,7 +31,7 @@ public class BrewingStandMenu extends AbstractContainerMenu {
     private static final int USE_ROW_SLOT_START = 32;
     private static final int USE_ROW_SLOT_END = 41;
     private final Container brewingStand;
-    private final ContainerData brewingStandData;
+    public final ContainerData brewingStandData;
     private final Slot ingredientSlot;
 
     public BrewingStandMenu(int containerId, Inventory playerInventory) {

@@ -50,19 +50,19 @@ public class FishingHook extends Projectile {
     private static final Logger LOGGER = LogUtils.getLogger();
     private final RandomSource syncronizedRandom = RandomSource.create();
     private boolean biting;
-    private int outOfWaterTime;
+    public int outOfWaterTime;
     private static final int MAX_OUT_OF_WATER_TIME = 10;
-    private static final EntityDataAccessor<Integer> DATA_HOOKED_ENTITY = SynchedEntityData.defineId(FishingHook.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> DATA_HOOKED_ENTITY = SynchedEntityData.defineId(FishingHook.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_BITING = SynchedEntityData.defineId(FishingHook.class, EntityDataSerializers.BOOLEAN);
     private int life;
     private int nibble;
-    private int timeUntilLured;
-    private int timeUntilHooked;
-    private float fishAngle;
+    public int timeUntilLured;
+    public int timeUntilHooked;
+    public float fishAngle;
     private boolean openWater = true;
     @Nullable
-    private Entity hookedIn;
-    private FishingHook.FishHookState currentState = FishingHook.FishHookState.FLYING;
+    public Entity hookedIn;
+    public FishingHook.FishHookState currentState = FishingHook.FishHookState.FLYING;
     private final int luck;
     private final int lureSpeed;
 
@@ -280,7 +280,7 @@ public class FishingHook extends Projectile {
         this.setDeltaMovement(this.getDeltaMovement().normalize().scale(result.distanceTo(this)));
     }
 
-    private void setHookedEntity(@Nullable Entity hookedEntity) {
+    public void setHookedEntity(@Nullable Entity hookedEntity) {
         this.hookedIn = hookedEntity;
         this.getEntityData().set(DATA_HOOKED_ENTITY, hookedEntity == null ? 0 : hookedEntity.getId() + 1);
     }
@@ -386,7 +386,7 @@ public class FishingHook extends Projectile {
         }
     }
 
-    private boolean calculateOpenWater(BlockPos pos) {
+    public boolean calculateOpenWater(BlockPos pos) {
         FishingHook.OpenWaterType openWaterType = FishingHook.OpenWaterType.INVALID;
 
         for (int i = -1; i <= 2; i++) {
@@ -505,7 +505,7 @@ public class FishingHook extends Projectile {
         super.handleEntityEvent(id);
     }
 
-    protected void pullEntity(Entity entity) {
+    public void pullEntity(Entity entity) {
         Entity owner = this.getOwner();
         if (owner != null) {
             Vec3 vec3 = new Vec3(owner.getX() - this.getX(), owner.getY() - this.getY(), owner.getZ() - this.getZ()).scale(0.1);
@@ -574,7 +574,7 @@ public class FishingHook extends Projectile {
         }
     }
 
-    static enum FishHookState {
+    public static enum FishHookState {
         FLYING,
         HOOKED_IN_ENTITY,
         BOBBING;

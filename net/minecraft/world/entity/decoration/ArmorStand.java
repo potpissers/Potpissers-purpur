@@ -79,13 +79,13 @@ public class ArmorStand extends LivingEntity {
     private final NonNullList<ItemStack> armorItems = NonNullList.withSize(4, ItemStack.EMPTY);
     private boolean invisible;
     public long lastHit;
-    private int disabledSlots;
-    private Rotations headPose = DEFAULT_HEAD_POSE;
-    private Rotations bodyPose = DEFAULT_BODY_POSE;
-    private Rotations leftArmPose = DEFAULT_LEFT_ARM_POSE;
-    private Rotations rightArmPose = DEFAULT_RIGHT_ARM_POSE;
-    private Rotations leftLegPose = DEFAULT_LEFT_LEG_POSE;
-    private Rotations rightLegPose = DEFAULT_RIGHT_LEG_POSE;
+    public int disabledSlots;
+    public Rotations headPose = DEFAULT_HEAD_POSE;
+    public Rotations bodyPose = DEFAULT_BODY_POSE;
+    public Rotations leftArmPose = DEFAULT_LEFT_ARM_POSE;
+    public Rotations rightArmPose = DEFAULT_RIGHT_ARM_POSE;
+    public Rotations leftLegPose = DEFAULT_LEFT_LEG_POSE;
+    public Rotations rightLegPose = DEFAULT_RIGHT_LEG_POSE;
 
     public ArmorStand(EntityType<? extends ArmorStand> entityType, Level level) {
         super(entityType, level);
@@ -347,7 +347,7 @@ public class ArmorStand extends LivingEntity {
         return equipmentSlot;
     }
 
-    private boolean isDisabled(EquipmentSlot slot) {
+    public boolean isDisabled(EquipmentSlot slot) {
         return (this.disabledSlots & 1 << slot.getFilterBit(0)) != 0 || slot.getType() == EquipmentSlot.Type.HAND && !this.showArms();
     }
 
@@ -608,7 +608,7 @@ public class ArmorStand extends LivingEntity {
         return this.isMarker();
     }
 
-    private void setSmall(boolean small) {
+    public void setSmall(boolean small) {
         this.entityData.set(DATA_CLIENT_FLAGS, this.setBit(this.entityData.get(DATA_CLIENT_FLAGS), 1, small));
     }
 
@@ -632,7 +632,7 @@ public class ArmorStand extends LivingEntity {
         return (this.entityData.get(DATA_CLIENT_FLAGS) & 8) == 0;
     }
 
-    private void setMarker(boolean marker) {
+    public void setMarker(boolean marker) {
         this.entityData.set(DATA_CLIENT_FLAGS, this.setBit(this.entityData.get(DATA_CLIENT_FLAGS), 16, marker));
     }
 
@@ -732,7 +732,7 @@ public class ArmorStand extends LivingEntity {
 
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.ARMOR_STAND_BREAK;
     }
 

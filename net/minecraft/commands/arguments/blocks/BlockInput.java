@@ -17,7 +17,7 @@ public class BlockInput implements Predicate<BlockInWorld> {
     private final BlockState state;
     private final Set<Property<?>> properties;
     @Nullable
-    private final CompoundTag tag;
+    public final CompoundTag tag;
 
     public BlockInput(BlockState state, Set<Property<?>> properties, @Nullable CompoundTag tag) {
         this.state = state;

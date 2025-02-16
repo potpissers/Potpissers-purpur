@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 
 public class DimensionDataStorage implements AutoCloseable {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private final Map<String, Optional<SavedData>> cache = new HashMap<>();
+    public final Map<String, Optional<SavedData>> cache = new HashMap<>();
     private final DataFixer fixerUpper;
     private final HolderLookup.Provider registries;
     private final Path dataFolder;

@@ -80,9 +80,9 @@ public class BeehiveBlockEntity extends BlockEntity {
     private static final int MIN_TICKS_BEFORE_REENTERING_HIVE = 400;
     private static final int MIN_OCCUPATION_TICKS_NECTAR = 2400;
     public static final int MIN_OCCUPATION_TICKS_NECTARLESS = 600;
-    private final List<BeehiveBlockEntity.BeeData> stored = Lists.newArrayList();
+    private List<BeehiveBlockEntity.BeeData> stored = Lists.newArrayList();
     @Nullable
-    private BlockPos savedFlowerPos;
+    public BlockPos savedFlowerPos;
 
     public BeehiveBlockEntity(BlockPos pos, BlockState blockState) {
         super(BlockEntityType.BEEHIVE, pos, blockState);

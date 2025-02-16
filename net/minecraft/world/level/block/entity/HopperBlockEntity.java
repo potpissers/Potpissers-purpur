@@ -33,7 +33,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
     public static final int HOPPER_CONTAINER_SIZE = 5;
     private static final int[][] CACHED_SLOTS = new int[54][];
     private NonNullList<ItemStack> items = NonNullList.withSize(5, ItemStack.EMPTY);
-    private int cooldownTime = -1;
+    public int cooldownTime = -1;
     private long tickedGameTime;
     private Direction facing;
 
@@ -413,7 +413,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
         return true;
     }
 
-    private void setCooldown(int cooldownTime) {
+    public void setCooldown(int cooldownTime) {
         this.cooldownTime = cooldownTime;
     }
 

@@ -84,7 +84,7 @@ public abstract class ChunkGenerator {
         .dispatchStable(ChunkGenerator::codec, Function.identity());
     protected final BiomeSource biomeSource;
     private final Supplier<List<FeatureSorter.StepFeatureData>> featuresPerStep;
-    private final Function<Holder<Biome>, BiomeGenerationSettings> generationSettingsGetter;
+    public final Function<Holder<Biome>, BiomeGenerationSettings> generationSettingsGetter;
 
     public ChunkGenerator(BiomeSource biomeSource) {
         this(biomeSource, biome -> biome.value().getGenerationSettings());

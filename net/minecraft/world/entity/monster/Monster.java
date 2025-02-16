@@ -73,7 +73,7 @@ public abstract class Monster extends PathfinderMob implements Enemy {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.HOSTILE_DEATH;
     }
 

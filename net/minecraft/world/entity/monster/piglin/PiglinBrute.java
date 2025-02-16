@@ -150,7 +150,7 @@ public class PiglinBrute extends AbstractPiglin {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.PIGLIN_BRUTE_DEATH;
     }
 

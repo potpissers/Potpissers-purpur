@@ -8,9 +8,9 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameRules;
 
 public class FoodData {
-    private int foodLevel = 20;
-    private float saturationLevel = 5.0F;
-    private float exhaustionLevel;
+    public int foodLevel = 20;
+    public float saturationLevel = 5.0F;
+    public float exhaustionLevel;
     private int tickTimer;
 
     private void add(int foodLevel, float saturationLevel) {

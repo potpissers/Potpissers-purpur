@@ -31,7 +31,7 @@ public class Inventory implements Container, Nameable {
     public final NonNullList<ItemStack> items = NonNullList.withSize(36, ItemStack.EMPTY);
     public final NonNullList<ItemStack> armor = NonNullList.withSize(4, ItemStack.EMPTY);
     public final NonNullList<ItemStack> offhand = NonNullList.withSize(1, ItemStack.EMPTY);
-    private final List<NonNullList<ItemStack>> compartments = ImmutableList.of(this.items, this.armor, this.offhand);
+    public final List<NonNullList<ItemStack>> compartments = ImmutableList.of(this.items, this.armor, this.offhand);
     public int selected;
     public final Player player;
     private int timesChanged;

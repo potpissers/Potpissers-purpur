@@ -78,7 +78,7 @@ public class MappedRegistry<T> implements WritableRegistry<T> {
         }
     }
 
-    private void validateWrite(ResourceKey<T> key) {
+    public void validateWrite(ResourceKey<T> key) {
         if (this.frozen) {
             throw new IllegalStateException("Registry is already frozen (trying to add key " + key + ")");
         }

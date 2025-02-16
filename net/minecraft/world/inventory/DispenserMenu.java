@@ -12,7 +12,7 @@ public class DispenserMenu extends AbstractContainerMenu {
     private static final int INV_SLOT_END = 36;
     private static final int USE_ROW_SLOT_START = 36;
     private static final int USE_ROW_SLOT_END = 45;
-    private final Container dispenser;
+    public final Container dispenser;
 
     public DispenserMenu(int containerId, Inventory playerInventory) {
         this(containerId, playerInventory, new SimpleContainer(9));

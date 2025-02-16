@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 public class Pack {
     private static final Logger LOGGER = LogUtils.getLogger();
     private final PackLocationInfo location;
-    private final Pack.ResourcesSupplier resources;
+    public final Pack.ResourcesSupplier resources;
     private final Pack.Metadata metadata;
     private final PackSelectionConfig selectionConfig;
 

@@ -54,7 +54,7 @@ public class StructureTemplateManager {
     private static final String STRUCTURE_GENERATED_DIRECTORY_NAME = "structures";
     private static final String STRUCTURE_FILE_EXTENSION = ".nbt";
     private static final String STRUCTURE_TEXT_FILE_EXTENSION = ".snbt";
-    private final Map<ResourceLocation, Optional<StructureTemplate>> structureRepository = Maps.newConcurrentMap();
+    public final Map<ResourceLocation, Optional<StructureTemplate>> structureRepository = Maps.newConcurrentMap();
     private final DataFixer fixerUpper;
     private ResourceManager resourceManager;
     private final Path generatedDir;
@@ -117,7 +117,7 @@ public class StructureTemplateManager {
         this.structureRepository.clear();
     }
 
-    private Optional<StructureTemplate> loadFromResource(ResourceLocation id) {
+    public Optional<StructureTemplate> loadFromResource(ResourceLocation id) {
         ResourceLocation resourceLocation = RESOURCE_LISTER.idToFile(id);
         return this.load(() -> this.resourceManager.open(resourceLocation), throwable -> LOGGER.error("Couldn't load structure {}", id, throwable));
     }
@@ -141,7 +141,7 @@ public class StructureTemplateManager {
         }
     }
 
-    private Optional<StructureTemplate> loadFromGenerated(ResourceLocation id) {
+    public Optional<StructureTemplate> loadFromGenerated(ResourceLocation id) {
         if (!Files.isDirectory(this.generatedDir)) {
             return Optional.empty();
         } else {
@@ -237,7 +237,7 @@ public class StructureTemplateManager {
         }
     }
 
-    private StructureTemplate readStructure(InputStream stream) throws IOException {
+    public StructureTemplate readStructure(InputStream stream) throws IOException {
         CompoundTag compressed = NbtIo.readCompressed(stream, NbtAccounter.unlimitedHeap());
         return this.readStructure(compressed);
     }

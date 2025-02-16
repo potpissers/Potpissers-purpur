@@ -71,7 +71,7 @@ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
     private boolean inputDown;
     private double waterLevel;
     private float landFriction;
-    private AbstractBoat.Status status;
+    public AbstractBoat.Status status;
     private AbstractBoat.Status oldStatus;
     private double lastYd;
     private boolean isAboveBubbleColumn;
@@ -432,7 +432,7 @@ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
         this.setDeltaMovement(deltaMovement.add(vec3.scale(flag ? 0.15F : 0.2F)));
     }
 
-    private AbstractBoat.Status getStatus() {
+    public AbstractBoat.Status getStatus() {
         AbstractBoat.Status status = this.isUnderwater();
         if (status != null) {
             this.waterLevel = this.getBoundingBox().maxY;
@@ -825,7 +825,7 @@ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
     }
 
     @Override
-    protected final Item getDropItem() {
+    public final Item getDropItem() {
         return this.dropItem.get();
     }
 

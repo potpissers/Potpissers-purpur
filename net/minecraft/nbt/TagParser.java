@@ -94,7 +94,7 @@ public class TagParser {
         }
     }
 
-    private Tag type(String value) {
+    public Tag type(String value) {
         try {
             if (FLOAT_PATTERN.matcher(value).matches()) {
                 return FloatTag.valueOf(Float.parseFloat(value.substring(0, value.length() - 1)));
@@ -220,7 +220,7 @@ public class TagParser {
         }
     }
 
-    private Tag readArrayTag() throws CommandSyntaxException {
+    public Tag readArrayTag() throws CommandSyntaxException {
         this.expect('[');
         int cursor = this.reader.getCursor();
         char c = this.reader.read();

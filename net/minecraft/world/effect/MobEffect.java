@@ -40,7 +40,7 @@ public class MobEffect implements FeatureElement {
     public static final Codec<Holder<MobEffect>> CODEC = BuiltInRegistries.MOB_EFFECT.holderByNameCodec();
     public static final StreamCodec<RegistryFriendlyByteBuf, Holder<MobEffect>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.MOB_EFFECT);
     private static final int AMBIENT_ALPHA = Mth.floor(38.25F);
-    private final Map<Holder<Attribute>, MobEffect.AttributeTemplate> attributeModifiers = new Object2ObjectOpenHashMap<>();
+    public final Map<Holder<Attribute>, MobEffect.AttributeTemplate> attributeModifiers = new Object2ObjectOpenHashMap<>();
     private final MobEffectCategory category;
     private final int color;
     private final Function<MobEffectInstance, ParticleOptions> particleFactory;
@@ -181,7 +181,7 @@ public class MobEffect implements FeatureElement {
         return this.requiredFeatures;
     }
 
-    record AttributeTemplate(ResourceLocation id, double amount, AttributeModifier.Operation operation) {
+    public record AttributeTemplate(ResourceLocation id, double amount, AttributeModifier.Operation operation) {
         public AttributeModifier create(int level) {
             return new AttributeModifier(this.id, this.amount * (level + 1), this.operation);
         }

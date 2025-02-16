@@ -56,7 +56,7 @@ public class ZombieHorse extends AbstractHorse {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.ZOMBIE_HORSE_DEATH;
     }
 

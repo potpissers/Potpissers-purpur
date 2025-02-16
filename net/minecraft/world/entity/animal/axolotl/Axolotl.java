@@ -444,7 +444,7 @@ public class Axolotl extends Animal implements VariantHolder<Axolotl.Variant>, B
 
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.AXOLOTL_DEATH;
     }
 

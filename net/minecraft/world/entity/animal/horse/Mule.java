@@ -26,7 +26,7 @@ public class Mule extends AbstractChestedHorse {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.MULE_DEATH;
     }
 

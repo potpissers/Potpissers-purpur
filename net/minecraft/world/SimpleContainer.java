@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class SimpleContainer implements Container, StackedContentsCompatible {
     private final int size;
-    private final NonNullList<ItemStack> items;
+    public final NonNullList<ItemStack> items;
     @Nullable
     private List<ContainerListener> listeners;
 

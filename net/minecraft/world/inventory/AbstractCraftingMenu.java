@@ -12,8 +12,8 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 public abstract class AbstractCraftingMenu extends RecipeBookMenu {
     private final int width;
     private final int height;
-    protected final CraftingContainer craftSlots;
-    protected final ResultContainer resultSlots = new ResultContainer();
+    public final CraftingContainer craftSlots;
+    public final ResultContainer resultSlots = new ResultContainer();
 
     public AbstractCraftingMenu(MenuType<?> menuType, int containerId, int width, int height) {
         super(menuType, containerId);

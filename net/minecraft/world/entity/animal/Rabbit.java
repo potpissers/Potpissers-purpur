@@ -82,7 +82,7 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
     private int jumpDuration;
     private boolean wasOnGround;
     private int jumpDelayTicks;
-    int moreCarrotTicks;
+    public int moreCarrotTicks;
 
     public Rabbit(EntityType<? extends Rabbit> entityType, Level level) {
         super(entityType, level);
@@ -92,7 +92,7 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
     }
 
     @Override
-    protected void registerGoals() {
+    public void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(1, new ClimbOnTopOfPowderSnowGoal(this, this.level()));
         this.goalSelector.addGoal(1, new Rabbit.RabbitPanicGoal(this, 2.2));
@@ -297,7 +297,7 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.RABBIT_DEATH;
     }
 

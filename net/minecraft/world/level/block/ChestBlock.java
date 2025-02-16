@@ -81,7 +81,7 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
             return Optional.empty();
         }
     };
-    private static final DoubleBlockCombiner.Combiner<ChestBlockEntity, Optional<MenuProvider>> MENU_PROVIDER_COMBINER = new DoubleBlockCombiner.Combiner<ChestBlockEntity, Optional<MenuProvider>>() {
+    public static DoubleBlockCombiner.Combiner<ChestBlockEntity, Optional<MenuProvider>> MENU_PROVIDER_COMBINER = new DoubleBlockCombiner.Combiner<ChestBlockEntity, Optional<MenuProvider>>() {
         @Override
         public Optional<MenuProvider> acceptDouble(final ChestBlockEntity first, final ChestBlockEntity second) {
             final Container container = new CompoundContainer(first, second);
@@ -284,7 +284,7 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
 
     @Nullable
     @Override
-    protected MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         return this.combine(state, level, pos, false).apply(MENU_PROVIDER_COMBINER).orElse(null);
     }
 
@@ -322,7 +322,7 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
         return isBlockedChestByBlock(level, pos) || isCatSittingOnChest(level, pos);
     }
 
-    private static boolean isBlockedChestByBlock(BlockGetter level, BlockPos pos) {
+    public static boolean isBlockedChestByBlock(BlockGetter level, BlockPos pos) {
         BlockPos blockPos = pos.above();
         return level.getBlockState(blockPos).isRedstoneConductor(level, blockPos);
     }

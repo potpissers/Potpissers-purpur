@@ -146,11 +146,11 @@ public class Panda extends Animal {
         this.entityData.set(EAT_COUNTER, eating ? 1 : 0);
     }
 
-    private int getEatCounter() {
+    public int getEatCounter() {
         return this.entityData.get(EAT_COUNTER);
     }
 
-    private void setEatCounter(int eatCounter) {
+    public void setEatCounter(int eatCounter) {
         this.entityData.set(EAT_COUNTER, eatCounter);
     }
 
@@ -670,7 +670,7 @@ public class Panda extends Animal {
 
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.PANDA_DEATH;
     }
 

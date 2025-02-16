@@ -60,7 +60,7 @@ public class MapItem extends Item {
         return getSavedData(mapId, level);
     }
 
-    private static MapId createNewSavedData(
+    public static MapId createNewSavedData(
         Level level, int x, int z, int scale, boolean trackingPosition, boolean unlimitedTracking, ResourceKey<Level> dimension
     ) {
         MapItemSavedData mapItemSavedData = MapItemSavedData.createFresh(x, z, (byte)scale, trackingPosition, unlimitedTracking, dimension);

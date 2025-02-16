@@ -69,7 +69,7 @@ public class WitherBoss extends Monster implements RangedAttackMob {
     private final int[] nextHeadUpdate = new int[2];
     private final int[] idleHeadUpdates = new int[2];
     private int destroyBlocksTick;
-    private final ServerBossEvent bossEvent = (ServerBossEvent)new ServerBossEvent(
+    public final ServerBossEvent bossEvent = (ServerBossEvent)new ServerBossEvent(
             this.getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS
         )
         .setDarkenScreen(true);
@@ -144,7 +144,7 @@ public class WitherBoss extends Monster implements RangedAttackMob {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.WITHER_DEATH;
     }
 

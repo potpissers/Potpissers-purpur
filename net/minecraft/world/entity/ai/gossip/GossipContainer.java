@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 public class GossipContainer {
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final int DISCARD_THRESHOLD = 2;
-    private final Map<UUID, GossipContainer.EntityGossips> gossips = Maps.newHashMap();
+    public final Map<UUID, GossipContainer.EntityGossips> gossips = Maps.newHashMap();
 
     @VisibleForDebug
     public Map<UUID, Object2IntMap<GossipType>> getGossipEntries() {
@@ -168,7 +168,7 @@ public class GossipContainer {
         return i > gossipType.max ? Math.max(gossipType.max, existing) : i;
     }
 
-    static class EntityGossips {
+    public static class EntityGossips {
         final Object2IntMap<GossipType> entries = new Object2IntOpenHashMap<>();
 
         public int weightedValue(Predicate<GossipType> gossipType) {

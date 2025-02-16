@@ -88,8 +88,8 @@ public class FolderRepositorySource implements RepositorySource {
         }
     }
 
-    static class FolderPackDetector extends PackDetector<Pack.ResourcesSupplier> {
-        protected FolderPackDetector(DirectoryValidator validator) {
+    public static class FolderPackDetector extends PackDetector<Pack.ResourcesSupplier> {
+        public FolderPackDetector(DirectoryValidator validator) {
             super(validator);
         }
 

@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 
 public final class ItemContainerContents {
     private static final int NO_SLOT = -1;
-    private static final int MAX_SIZE = 256;
+    public static final int MAX_SIZE = 256;
     public static final ItemContainerContents EMPTY = new ItemContainerContents(NonNullList.create());
     public static final Codec<ItemContainerContents> CODEC = ItemContainerContents.Slot.CODEC
         .sizeLimitedListOf(256)
@@ -23,7 +23,7 @@ public final class ItemContainerContents {
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemContainerContents> STREAM_CODEC = ItemStack.OPTIONAL_STREAM_CODEC
         .apply(ByteBufCodecs.list(256))
         .map(ItemContainerContents::new, contents -> contents.items);
-    private final NonNullList<ItemStack> items;
+    public final NonNullList<ItemStack> items;
     private final int hashCode;
 
     private ItemContainerContents(NonNullList<ItemStack> items) {

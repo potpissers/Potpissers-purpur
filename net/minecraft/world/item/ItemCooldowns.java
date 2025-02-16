@@ -11,8 +11,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.component.UseCooldown;
 
 public class ItemCooldowns {
-    private final Map<ResourceLocation, ItemCooldowns.CooldownInstance> cooldowns = Maps.newHashMap();
-    private int tickCount;
+    public final Map<ResourceLocation, ItemCooldowns.CooldownInstance> cooldowns = Maps.newHashMap();
+    public int tickCount;
 
     public boolean isOnCooldown(ItemStack stack) {
         return this.getCooldownPercent(stack, 0.0F) > 0.0F;
@@ -71,6 +71,6 @@ public class ItemCooldowns {
     protected void onCooldownEnded(ResourceLocation group) {
     }
 
-    record CooldownInstance(int startTime, int endTime) {
+    public record CooldownInstance(int startTime, int endTime) {
     }
 }

@@ -226,7 +226,7 @@ public class Sheep extends Animal implements Shearable {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.SHEEP_DEATH;
     }
 

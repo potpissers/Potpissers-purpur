@@ -352,7 +352,7 @@ public class ComposterBlock extends Block implements WorldlyContainerHolder {
         }
     }
 
-    static class EmptyContainer extends SimpleContainer implements WorldlyContainer {
+    public static class EmptyContainer extends SimpleContainer implements WorldlyContainer {
         public EmptyContainer() {
             super(0);
         }
@@ -373,7 +373,7 @@ public class ComposterBlock extends Block implements WorldlyContainerHolder {
         }
     }
 
-    static class InputContainer extends SimpleContainer implements WorldlyContainer {
+    public static class InputContainer extends SimpleContainer implements WorldlyContainer {
         private final BlockState state;
         private final LevelAccessor level;
         private final BlockPos pos;
@@ -418,7 +418,7 @@ public class ComposterBlock extends Block implements WorldlyContainerHolder {
         }
     }
 
-    static class OutputContainer extends SimpleContainer implements WorldlyContainer {
+    public static class OutputContainer extends SimpleContainer implements WorldlyContainer {
         private final BlockState state;
         private final LevelAccessor level;
         private final BlockPos pos;

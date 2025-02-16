@@ -88,7 +88,7 @@ public abstract class AbstractWindCharge extends AbstractHurtingProjectile imple
     public void push(double x, double y, double z) {
     }
 
-    protected abstract void explode(Vec3 pos);
+    public abstract void explode(Vec3 pos);
 
     @Override
     protected void onHitBlock(BlockHitResult result) {

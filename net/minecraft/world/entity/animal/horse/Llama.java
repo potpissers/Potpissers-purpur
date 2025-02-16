@@ -258,7 +258,7 @@ public class Llama extends AbstractChestedHorse implements VariantHolder<Llama.V
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.LLAMA_DEATH;
     }
 

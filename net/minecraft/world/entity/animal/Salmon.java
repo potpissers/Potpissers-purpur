@@ -51,7 +51,7 @@ public class Salmon extends AbstractSchoolingFish implements VariantHolder<Salmo
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.SALMON_DEATH;
     }
 

@@ -12,7 +12,7 @@ public class Objective {
     private final Scoreboard scoreboard;
     private final String name;
     private final ObjectiveCriteria criteria;
-    private Component displayName;
+    public Component displayName;
     private Component formattedDisplayName;
     private ObjectiveCriteria.RenderType renderType;
     private boolean displayAutoUpdate;

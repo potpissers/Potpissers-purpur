@@ -13,7 +13,7 @@ import net.minecraft.util.StringRepresentable;
 
 public class ObjectiveCriteria {
     private static final Map<String, ObjectiveCriteria> CUSTOM_CRITERIA = Maps.newHashMap();
-    private static final Map<String, ObjectiveCriteria> CRITERIA_CACHE = Maps.newHashMap();
+    public static final Map<String, ObjectiveCriteria> CRITERIA_CACHE = Maps.newHashMap();
     public static final ObjectiveCriteria DUMMY = registerCustom("dummy");
     public static final ObjectiveCriteria TRIGGER = registerCustom("trigger");
     public static final ObjectiveCriteria DEATH_COUNT = registerCustom("deathCount");

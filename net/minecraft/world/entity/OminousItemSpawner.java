@@ -26,7 +26,7 @@ public class OminousItemSpawner extends Entity {
     private static final String TAG_ITEM = "item";
     private static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(OminousItemSpawner.class, EntityDataSerializers.ITEM_STACK);
     public static final int TICKS_BEFORE_ABOUT_TO_SPAWN_SOUND = 36;
-    private long spawnItemAfterTicks;
+    public long spawnItemAfterTicks;
 
     public OminousItemSpawner(EntityType<? extends OminousItemSpawner> entityType, Level level) {
         super(entityType, level);
@@ -172,7 +172,7 @@ public class OminousItemSpawner extends Entity {
         return this.getEntityData().get(DATA_ITEM);
     }
 
-    private void setItem(ItemStack item) {
+    public void setItem(ItemStack item) {
         this.getEntityData().set(DATA_ITEM, item);
     }
 

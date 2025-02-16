@@ -208,14 +208,14 @@ public class ServerPlayer extends Player {
     private float lastSentHealth = -1.0E8F;
     private int lastSentFood = -99999999;
     private boolean lastFoodSaturationZero = true;
-    private int lastSentExp = -99999999;
+    public int lastSentExp = -99999999;
     private ChatVisiblity chatVisibility = ChatVisiblity.FULL;
-    private ParticleStatus particleStatus = ParticleStatus.ALL;
+    public ParticleStatus particleStatus = ParticleStatus.ALL;
     private boolean canChatColor = true;
     private long lastActionTime = Util.getMillis();
     @Nullable
     private Entity camera;
-    private boolean isChangingDimension;
+    public boolean isChangingDimension;
     public boolean seenCredits;
     private final ServerRecipeBook recipeBook;
     @Nullable
@@ -223,7 +223,7 @@ public class ServerPlayer extends Player {
     private int levitationStartTime;
     private boolean disconnected;
     private int requestedViewDistance = 2;
-    private String language = "en_us";
+    public String language = "en_us";
     @Nullable
     private Vec3 startingToFallPosition;
     @Nullable
@@ -241,13 +241,13 @@ public class ServerPlayer extends Player {
     private boolean textFilteringEnabled;
     private boolean allowsListing;
     private boolean spawnExtraParticlesOnFall;
-    private WardenSpawnTracker wardenSpawnTracker = new WardenSpawnTracker(0, 0, 0);
+    public WardenSpawnTracker wardenSpawnTracker = new WardenSpawnTracker(0, 0, 0);
     @Nullable
     private BlockPos raidOmenPosition;
     private Vec3 lastKnownClientMovement = Vec3.ZERO;
     private Input lastClientInput = Input.EMPTY;
     private final Set<ThrownEnderpearl> enderPearls = new HashSet<>();
-    private final ContainerSynchronizer containerSynchronizer = new ContainerSynchronizer() {
+    public final ContainerSynchronizer containerSynchronizer = new ContainerSynchronizer() {
         @Override
         public void sendInitialData(AbstractContainerMenu container, NonNullList<ItemStack> items, ItemStack carriedItem, int[] initialData) {
             ServerPlayer.this.connection
@@ -617,7 +617,7 @@ public class ServerPlayer extends Player {
         this.lastSentExp = -1;
     }
 
-    private void initMenu(AbstractContainerMenu menu) {
+    public void initMenu(AbstractContainerMenu menu) {
         menu.addSlotListener(this.containerListener);
         menu.setSynchronizer(this.containerSynchronizer);
     }
@@ -982,7 +982,7 @@ public class ServerPlayer extends Player {
         }
     }
 
-    private static Optional<ServerPlayer.RespawnPosAngle> findRespawnAndUseSpawnBlock(
+    public static Optional<ServerPlayer.RespawnPosAngle> findRespawnAndUseSpawnBlock(
         ServerLevel level, BlockPos pos, float angle, boolean forced, boolean useCharge
     ) {
         BlockState blockState = level.getBlockState(pos);
@@ -1083,7 +1083,7 @@ public class ServerPlayer extends Player {
         this.connection.send(new ClientboundPlayerRotationPacket(yRot, xRot));
     }
 
-    private void triggerDimensionChangeTriggers(ServerLevel level) {
+    public void triggerDimensionChangeTriggers(ServerLevel level) {
         ResourceKey<Level> resourceKey = level.dimension();
         ResourceKey<Level> resourceKey1 = this.level().dimension();
         CriteriaTriggers.CHANGED_DIMENSION.trigger(this, resourceKey, resourceKey1);
@@ -1237,7 +1237,7 @@ public class ServerPlayer extends Player {
         this.connection.send(new ClientboundOpenSignEditorPacket(signEntity.getBlockPos(), isFrontText));
     }
 
-    private void nextContainerCounter() {
+    public void nextContainerCounter() {
         this.containerCounter = this.containerCounter % 100 + 1;
     }
 
@@ -1470,7 +1470,7 @@ public class ServerPlayer extends Player {
     }
 
     @Override
-    protected void completeUsingItem() {
+    public void completeUsingItem() {
         if (!this.useItem.isEmpty() && this.isUsingItem()) {
             this.connection.send(new ClientboundEntityEventPacket(this, (byte)9));
             super.completeUsingItem();
@@ -2208,7 +2208,7 @@ public class ServerPlayer extends Player {
         return TicketType.ENDER_PEARL.timeout();
     }
 
-    record RespawnPosAngle(Vec3 position, float yaw) {
+    public record RespawnPosAngle(Vec3 position, float yaw) {
         public static ServerPlayer.RespawnPosAngle of(Vec3 position, BlockPos towardsPos) {
             return new ServerPlayer.RespawnPosAngle(position, calculateLookAtYaw(position, towardsPos));
         }

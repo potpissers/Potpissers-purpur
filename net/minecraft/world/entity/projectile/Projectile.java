@@ -36,11 +36,11 @@ import net.minecraft.world.phys.Vec3;
 
 public abstract class Projectile extends Entity implements TraceableEntity {
     @Nullable
-    private UUID ownerUUID;
+    public UUID ownerUUID;
     @Nullable
-    private Entity cachedOwner;
-    private boolean leftOwner;
-    private boolean hasBeenShot;
+    public Entity cachedOwner;
+    public boolean leftOwner;
+    public boolean hasBeenShot;
     @Nullable
     private Entity lastDeflectedBy;
 

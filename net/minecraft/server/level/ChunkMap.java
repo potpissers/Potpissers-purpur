@@ -115,34 +115,34 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
     public static final int MIN_VIEW_DISTANCE = 2;
     public static final int MAX_VIEW_DISTANCE = 32;
     public static final int FORCED_TICKET_LEVEL = ChunkLevel.byStatus(FullChunkStatus.ENTITY_TICKING);
-    private final Long2ObjectLinkedOpenHashMap<ChunkHolder> updatingChunkMap = new Long2ObjectLinkedOpenHashMap<>();
-    private volatile Long2ObjectLinkedOpenHashMap<ChunkHolder> visibleChunkMap = this.updatingChunkMap.clone();
+    public final Long2ObjectLinkedOpenHashMap<ChunkHolder> updatingChunkMap = new Long2ObjectLinkedOpenHashMap<>();
+    public volatile Long2ObjectLinkedOpenHashMap<ChunkHolder> visibleChunkMap = this.updatingChunkMap.clone();
     private final Long2ObjectLinkedOpenHashMap<ChunkHolder> pendingUnloads = new Long2ObjectLinkedOpenHashMap<>();
     private final List<ChunkGenerationTask> pendingGenerationTasks = new ArrayList<>();
-    final ServerLevel level;
+    public final ServerLevel level;
     private final ThreadedLevelLightEngine lightEngine;
     private final BlockableEventLoop<Runnable> mainThreadExecutor;
     private final RandomState randomState;
     private final ChunkGeneratorStructureState chunkGeneratorState;
     private final Supplier<DimensionDataStorage> overworldDataStorage;
     private final PoiManager poiManager;
-    final LongSet toDrop = new LongOpenHashSet();
+    public final LongSet toDrop = new LongOpenHashSet();
     private boolean modified;
     private final ChunkTaskDispatcher worldgenTaskDispatcher;
     private final ChunkTaskDispatcher lightTaskDispatcher;
-    private final ChunkProgressListener progressListener;
+    public final ChunkProgressListener progressListener;
     private final ChunkStatusUpdateListener chunkStatusListener;
-    private final ChunkMap.DistanceManager distanceManager;
+    public final ChunkMap.DistanceManager distanceManager;
     private final AtomicInteger tickingGenerated = new AtomicInteger();
     private final String storageName;
     private final PlayerMap playerMap = new PlayerMap();
-    private final Int2ObjectMap<ChunkMap.TrackedEntity> entityMap = new Int2ObjectOpenHashMap<>();
+    public final Int2ObjectMap<ChunkMap.TrackedEntity> entityMap = new Int2ObjectOpenHashMap<>();
     private final Long2ByteMap chunkTypeCache = new Long2ByteOpenHashMap();
     private final Long2LongMap nextChunkSaveTime = new Long2LongOpenHashMap();
     private final LongSet chunksToEagerlySave = new LongLinkedOpenHashSet();
     private final Queue<Runnable> unloadQueue = Queues.newConcurrentLinkedQueue();
     private final AtomicInteger activeChunkWrites = new AtomicInteger();
-    private int serverViewDistance;
+    public int serverViewDistance;
     private final WorldGenContext worldGenContext;
 
     public ChunkMap(
@@ -257,7 +257,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
     }
 
     @Nullable
-    protected ChunkHolder getVisibleChunkIfPresent(long chunkPos) {
+    public ChunkHolder getVisibleChunkIfPresent(long chunkPos) {
         return this.visibleChunkMap.get(chunkPos);
     }
 
@@ -755,7 +755,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
         }
     }
 
-    private boolean save(ChunkAccess chunk) {
+    public boolean save(ChunkAccess chunk) {
         this.poiManager.flush(chunk.getPos());
         if (!chunk.tryMarkSaved()) {
             return false;
@@ -818,7 +818,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
         }
     }
 
-    protected void setServerViewDistance(int viewDistance) {
+    public void setServerViewDistance(int viewDistance) {
         int i = Mth.clamp(viewDistance, 2, 32);
         if (i != this.serverViewDistance) {
             this.serverViewDistance = i;
@@ -950,7 +950,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
         }
     }
 
-    boolean anyPlayerCloseEnoughForSpawning(ChunkPos chunkPos) {
+    public boolean anyPlayerCloseEnoughForSpawning(ChunkPos chunkPos) {
         return this.distanceManager.hasPlayersNearby(chunkPos.toLong()) && this.anyPlayerCloseEnoughForSpawningInternal(chunkPos);
     }
 
@@ -1099,7 +1099,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
         return builder.build();
     }
 
-    protected void addEntity(Entity entity) {
+    public void addEntity(Entity entity) {
         if (!(entity instanceof EnderDragonPart)) {
             EntityType<?> type = entity.getType();
             int i = type.clientTrackingRange() * 16;
@@ -1253,12 +1253,12 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
         }
     }
 
-    class TrackedEntity {
-        final ServerEntity serverEntity;
+    public class TrackedEntity {
+        public final ServerEntity serverEntity;
         final Entity entity;
         private final int range;
         SectionPos lastSectionPos;
-        private final Set<ServerPlayerConnection> seenBy = Sets.newIdentityHashSet();
+        public final Set<ServerPlayerConnection> seenBy = Sets.newIdentityHashSet();
 
         public TrackedEntity(final Entity entity, final int range, final int updateInterval, final boolean trackDelta) {
             this.serverEntity = new ServerEntity(ChunkMap.this.level, entity, updateInterval, trackDelta, this::broadcast);

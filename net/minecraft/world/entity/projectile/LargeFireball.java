@@ -14,7 +14,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class LargeFireball extends Fireball {
-    private int explosionPower = 1;
+    public int explosionPower = 1;
 
     public LargeFireball(EntityType<? extends LargeFireball> entityType, Level level) {
         super(entityType, level);

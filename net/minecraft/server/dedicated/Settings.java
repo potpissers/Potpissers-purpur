@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 
 public abstract class Settings<T extends Settings<T>> {
     private static final Logger LOGGER = LogUtils.getLogger();
-    protected final Properties properties;
+    public final Properties properties;
 
     public Settings(Properties properties) {
         this.properties = properties;
@@ -93,7 +93,7 @@ public abstract class Settings<T extends Settings<T>> {
     }
 
     @Nullable
-    private String getStringRaw(String key) {
+    public String getStringRaw(String key) {
         return (String)this.properties.get(key);
     }
 

@@ -12,8 +12,8 @@ public class ItemBasedSteering {
     private final SynchedEntityData entityData;
     private final EntityDataAccessor<Integer> boostTimeAccessor;
     private final EntityDataAccessor<Boolean> hasSaddleAccessor;
-    private boolean boosting;
-    private int boostTime;
+    public boolean boosting;
+    public int boostTime;
 
     public ItemBasedSteering(SynchedEntityData entityData, EntityDataAccessor<Integer> boostTimeAccessor, EntityDataAccessor<Boolean> hasSaddleAccessor) {
         this.entityData = entityData;
@@ -47,7 +47,7 @@ public class ItemBasedSteering {
         return this.boosting ? 1.0F + 1.15F * Mth.sin((float)this.boostTime / this.boostTimeTotal() * (float) Math.PI) : 1.0F;
     }
 
-    private int boostTimeTotal() {
+    public int boostTimeTotal() {
         return this.entityData.get(this.boostTimeAccessor);
     }
 

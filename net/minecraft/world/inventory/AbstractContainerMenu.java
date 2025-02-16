@@ -45,20 +45,20 @@ public abstract class AbstractContainerMenu {
     public static final int CARRIED_SLOT_SIZE = Integer.MAX_VALUE;
     public static final int SLOTS_PER_ROW = 9;
     public static final int SLOT_SIZE = 18;
-    private final NonNullList<ItemStack> lastSlots = NonNullList.create();
-    public final NonNullList<Slot> slots = NonNullList.create();
-    private final List<DataSlot> dataSlots = Lists.newArrayList();
+    public NonNullList<ItemStack> lastSlots = NonNullList.create();
+    public NonNullList<Slot> slots = NonNullList.create();
+    public List<DataSlot> dataSlots = Lists.newArrayList();
     private ItemStack carried = ItemStack.EMPTY;
-    private final NonNullList<ItemStack> remoteSlots = NonNullList.create();
-    private final IntList remoteDataSlots = new IntArrayList();
+    public NonNullList<ItemStack> remoteSlots = NonNullList.create();
+    public IntList remoteDataSlots = new IntArrayList();
     private ItemStack remoteCarried = ItemStack.EMPTY;
     private int stateId;
     @Nullable
     private final MenuType<?> menuType;
     public final int containerId;
-    private int quickcraftType = -1;
-    private int quickcraftStatus;
-    private final Set<Slot> quickcraftSlots = Sets.newHashSet();
+    public int quickcraftType = -1;
+    public int quickcraftStatus;
+    public final Set<Slot> quickcraftSlots = Sets.newHashSet();
     private final List<ContainerListener> containerListeners = Lists.newArrayList();
     @Nullable
     private ContainerSynchronizer synchronizer;
@@ -708,7 +708,7 @@ public abstract class AbstractContainerMenu {
         return dragMode == 0 || dragMode == 1 || dragMode == 2 && player.hasInfiniteMaterials();
     }
 
-    protected void resetQuickCraft() {
+    public void resetQuickCraft() {
         this.quickcraftStatus = 0;
         this.quickcraftSlots.clear();
     }

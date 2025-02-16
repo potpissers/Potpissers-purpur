@@ -7,8 +7,8 @@ import java.util.stream.IntStream;
 
 public final class IntegerProperty extends Property<Integer> {
     private final IntImmutableList values;
-    private final int min;
-    private final int max;
+    public final int min;
+    public final int max;
 
     private IntegerProperty(String name, int min, int max) {
         super(name, Integer.class);

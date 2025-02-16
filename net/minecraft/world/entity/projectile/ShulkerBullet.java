@@ -36,11 +36,11 @@ public class ShulkerBullet extends Projectile {
     @Nullable
     private Entity finalTarget;
     @Nullable
-    private Direction currentMoveDirection;
-    private int flightSteps;
-    private double targetDeltaX;
-    private double targetDeltaY;
-    private double targetDeltaZ;
+    public Direction currentMoveDirection;
+    public int flightSteps;
+    public double targetDeltaX;
+    public double targetDeltaY;
+    public double targetDeltaZ;
     @Nullable
     private UUID targetId;
 

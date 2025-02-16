@@ -6,7 +6,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 public class ItemStackLinkedSet {
-    private static final Strategy<? super ItemStack> TYPE_AND_TAG = new Strategy<ItemStack>() {
+    public static final Strategy<? super ItemStack> TYPE_AND_TAG = new Strategy<ItemStack>() {
         @Override
         public int hashCode(@Nullable ItemStack stack) {
             return ItemStack.hashItemAndComponents(stack);

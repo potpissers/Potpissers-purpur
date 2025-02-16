@@ -38,19 +38,19 @@ public class StructureBlockEntity extends BlockEntity {
     public static final String AUTHOR_TAG = "author";
     @Nullable
     private ResourceLocation structureName;
-    private String author = "";
-    private String metaData = "";
-    private BlockPos structurePos = new BlockPos(0, 1, 0);
-    private Vec3i structureSize = Vec3i.ZERO;
-    private Mirror mirror = Mirror.NONE;
-    private Rotation rotation = Rotation.NONE;
-    private StructureMode mode;
-    private boolean ignoreEntities = true;
+    public String author = "";
+    public String metaData = "";
+    public BlockPos structurePos = new BlockPos(0, 1, 0);
+    public Vec3i structureSize = Vec3i.ZERO;
+    public Mirror mirror = Mirror.NONE;
+    public Rotation rotation = Rotation.NONE;
+    public StructureMode mode;
+    public boolean ignoreEntities = true;
     private boolean powered;
-    private boolean showAir;
-    private boolean showBoundingBox = true;
-    private float integrity = 1.0F;
-    private long seed;
+    public boolean showAir;
+    public boolean showBoundingBox = true;
+    public float integrity = 1.0F;
+    public long seed;
 
     public StructureBlockEntity(BlockPos pos, BlockState blockState) {
         super(BlockEntityType.STRUCTURE_BLOCK, pos, blockState);

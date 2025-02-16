@@ -218,7 +218,7 @@ public class ZombifiedPiglin extends Zombie implements NeutralMob {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.ZOMBIFIED_PIGLIN_DEATH;
     }
 

@@ -48,7 +48,7 @@ public class ItemEnchantments implements TooltipProvider {
         ItemEnchantments::new
     );
     final Object2IntOpenHashMap<Holder<Enchantment>> enchantments;
-    final boolean showInTooltip;
+    public final boolean showInTooltip;
 
     ItemEnchantments(Object2IntOpenHashMap<Holder<Enchantment>> enchantments, boolean showInTooltip) {
         this.enchantments = enchantments;
@@ -140,7 +140,7 @@ public class ItemEnchantments implements TooltipProvider {
 
     public static class Mutable {
         private final Object2IntOpenHashMap<Holder<Enchantment>> enchantments = new Object2IntOpenHashMap<>();
-        private final boolean showInTooltip;
+        public boolean showInTooltip;
 
         public Mutable(ItemEnchantments enchantments) {
             this.enchantments.putAll(enchantments.enchantments);

@@ -63,7 +63,7 @@ public final class Biome {
     )
     public static final PerlinSimplexNoise BIOME_INFO_NOISE = new PerlinSimplexNoise(new WorldgenRandom(new LegacyRandomSource(2345L)), ImmutableList.of(0));
     private static final int TEMPERATURE_CACHE_SIZE = 1024;
-    private final Biome.ClimateSettings climateSettings;
+    public final Biome.ClimateSettings climateSettings;
     private final BiomeGenerationSettings generationSettings;
     private final MobSpawnSettings mobSettings;
     private final BiomeSpecialEffects specialEffects;
@@ -116,7 +116,7 @@ public final class Biome {
     }
 
     @Deprecated
-    private float getTemperature(BlockPos pos, int seaLevel) {
+    public float getTemperature(BlockPos pos, int seaLevel) {
         long packedBlockPos = pos.asLong();
         Long2FloatLinkedOpenHashMap map = this.temperatureCache.get();
         float f = map.get(packedBlockPos);
@@ -345,7 +345,7 @@ public final class Biome {
         }
     }
 
-    record ClimateSettings(boolean hasPrecipitation, float temperature, Biome.TemperatureModifier temperatureModifier, float downfall) {
+    public record ClimateSettings(boolean hasPrecipitation, float temperature, Biome.TemperatureModifier temperatureModifier, float downfall) {
         public static final MapCodec<Biome.ClimateSettings> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
                     Codec.BOOL.fieldOf("has_precipitation").forGetter(settings -> settings.hasPrecipitation),

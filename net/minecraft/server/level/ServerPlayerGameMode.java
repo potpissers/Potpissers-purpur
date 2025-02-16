@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 
 public class ServerPlayerGameMode {
     private static final Logger LOGGER = LogUtils.getLogger();
-    protected ServerLevel level;
+    public ServerLevel level;
     protected final ServerPlayer player;
     private GameType gameModeForPlayer = GameType.DEFAULT_MODE;
     @Nullable

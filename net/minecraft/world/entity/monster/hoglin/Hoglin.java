@@ -59,8 +59,8 @@ public class Hoglin extends Animal implements Enemy, HoglinBase {
     private static final float BABY_ATTACK_DAMAGE = 0.5F;
     public static final int CONVERSION_TIME = 300;
     private int attackAnimationRemainingTicks;
-    private int timeInOverworld;
-    private boolean cannotBeHunted;
+    public int timeInOverworld;
+    public boolean cannotBeHunted;
     protected static final ImmutableList<? extends SensorType<? extends Sensor<? super Hoglin>>> SENSOR_TYPES = ImmutableList.of(
         SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS, SensorType.NEAREST_ADULT, SensorType.HOGLIN_SPECIFIC_SENSOR
     );
@@ -305,7 +305,7 @@ public class Hoglin extends Animal implements Enemy, HoglinBase {
         this.getEntityData().set(DATA_IMMUNE_TO_ZOMBIFICATION, immuneToZombification);
     }
 
-    private boolean isImmuneToZombification() {
+    public boolean isImmuneToZombification() {
         return this.getEntityData().get(DATA_IMMUNE_TO_ZOMBIFICATION);
     }
 
@@ -353,7 +353,7 @@ public class Hoglin extends Animal implements Enemy, HoglinBase {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.HOGLIN_DEATH;
     }
 

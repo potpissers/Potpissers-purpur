@@ -33,7 +33,7 @@ public class SkeletonHorse extends AbstractHorse {
         .withAttachments(EntityAttachments.builder().attach(EntityAttachment.PASSENGER, 0.0F, EntityType.SKELETON_HORSE.getHeight() - 0.03125F, 0.0F))
         .scale(0.5F);
     private boolean isTrap;
-    private int trapTime;
+    public int trapTime;
 
     public SkeletonHorse(EntityType<? extends SkeletonHorse> entityType, Level level) {
         super(entityType, level);
@@ -66,7 +66,7 @@ public class SkeletonHorse extends AbstractHorse {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.SKELETON_HORSE_DEATH;
     }
 

@@ -138,7 +138,7 @@ public class Sniffer extends Animal {
         return this.position().add(this.getForward().scale(2.25));
     }
 
-    private Sniffer.State getState() {
+    public Sniffer.State getState() {
         return this.entityData.get(DATA_STATE);
     }
 
@@ -234,7 +234,7 @@ public class Sniffer extends Animal {
         return this;
     }
 
-    Optional<BlockPos> calculateDigPosition() {
+    public Optional<BlockPos> calculateDigPosition() {
         return IntStream.range(0, 5)
             .mapToObj(i -> LandRandomPos.getPos(this, 10 + 2 * i, 3))
             .filter(Objects::nonNull)
@@ -245,7 +245,7 @@ public class Sniffer extends Animal {
             .findFirst();
     }
 
-    boolean canDig() {
+    public boolean canDig() {
         return !this.isPanicking()
             && !this.isTempted()
             && !this.isBaby()
@@ -300,14 +300,14 @@ public class Sniffer extends Animal {
         return this;
     }
 
-    private Sniffer storeExploredPosition(BlockPos pos) {
+    public Sniffer storeExploredPosition(BlockPos pos) {
         List<GlobalPos> list = this.getExploredPositions().limit(20L).collect(Collectors.toList());
         list.add(0, GlobalPos.of(this.level().dimension(), pos));
         this.getBrain().setMemory(MemoryModuleType.SNIFFER_EXPLORED_POSITIONS, list);
         return this;
     }
 
-    private Stream<GlobalPos> getExploredPositions() {
+    public Stream<GlobalPos> getExploredPositions() {
         return this.getBrain().getMemory(MemoryModuleType.SNIFFER_EXPLORED_POSITIONS).stream().flatMap(Collection::stream);
     }
 
@@ -391,7 +391,7 @@ public class Sniffer extends Animal {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.SNIFFER_DEATH;
     }
 

@@ -19,7 +19,7 @@ public class BreezeWindCharge extends AbstractWindCharge {
     }
 
     @Override
-    protected void explode(Vec3 pos) {
+    public void explode(Vec3 pos) {
         this.level()
             .explode(
                 this,

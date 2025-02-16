@@ -32,8 +32,8 @@ public class ExperienceOrb extends Entity {
     private static final double ORB_MERGE_DISTANCE = 0.5;
     private int age;
     private int health = 5;
-    private int value;
-    private int count = 1;
+    public int value;
+    public int count = 1;
     private Player followingPlayer;
 
     public ExperienceOrb(Level level, double x, double y, double z, int value) {

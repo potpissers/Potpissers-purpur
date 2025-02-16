@@ -42,7 +42,7 @@ public class AdventureModePredicate {
     public static final Component CAN_BREAK_HEADER = Component.translatable("item.canBreak").withStyle(ChatFormatting.GRAY);
     public static final Component CAN_PLACE_HEADER = Component.translatable("item.canPlace").withStyle(ChatFormatting.GRAY);
     private static final Component UNKNOWN_USE = Component.translatable("item.canUse.unknown").withStyle(ChatFormatting.GRAY);
-    private final List<BlockPredicate> predicates;
+    public final List<BlockPredicate> predicates;
     private final boolean showInTooltip;
     @Nullable
     private List<Component> cachedTooltip;

@@ -50,13 +50,13 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
     private static final int MAX_TICKS_BEFORE_LOGIN = 600;
     private final byte[] challenge;
     final MinecraftServer server;
-    final Connection connection;
-    private volatile ServerLoginPacketListenerImpl.State state = ServerLoginPacketListenerImpl.State.HELLO;
+    public final Connection connection;
+    public volatile ServerLoginPacketListenerImpl.State state = ServerLoginPacketListenerImpl.State.HELLO;
     private int tick;
     @Nullable
     String requestedUsername;
     @Nullable
-    private GameProfile authenticatedProfile;
+    public GameProfile authenticatedProfile;
     private final String serverId = "";
     private final boolean transferred;
 
@@ -255,7 +255,7 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
         this.disconnect(ServerCommonPacketListenerImpl.DISCONNECT_UNEXPECTED_QUERY);
     }
 
-    static enum State {
+    public static enum State {
         HELLO,
         KEY,
         AUTHENTICATING,

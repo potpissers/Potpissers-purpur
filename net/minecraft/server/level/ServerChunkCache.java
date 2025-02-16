@@ -56,14 +56,14 @@ public class ServerChunkCache extends ChunkSource {
     private static final Logger LOGGER = LogUtils.getLogger();
     private final DistanceManager distanceManager;
     private final ServerLevel level;
-    final Thread mainThread;
+    public final Thread mainThread;
     final ThreadedLevelLightEngine lightEngine;
-    private final ServerChunkCache.MainThreadExecutor mainThreadProcessor;
+    public final ServerChunkCache.MainThreadExecutor mainThreadProcessor;
     public final ChunkMap chunkMap;
     private final DimensionDataStorage dataStorage;
     private long lastInhabitedUpdate;
-    private boolean spawnEnemies = true;
-    private boolean spawnFriendlies = true;
+    public boolean spawnEnemies = true;
+    public boolean spawnFriendlies = true;
     private static final int CACHE_SIZE = 4;
     private final long[] lastChunkPos = new long[4];
     private final ChunkStatus[] lastChunkStatus = new ChunkStatus[4];
@@ -565,7 +565,7 @@ public class ServerChunkCache extends ChunkSource {
     record ChunkAndHolder(LevelChunk chunk, ChunkHolder holder) {
     }
 
-    final class MainThreadExecutor extends BlockableEventLoop<Runnable> {
+    public final class MainThreadExecutor extends BlockableEventLoop<Runnable> {
         MainThreadExecutor(final Level level) {
             super("Chunk source main thread executor for " + level.dimension().location());
         }

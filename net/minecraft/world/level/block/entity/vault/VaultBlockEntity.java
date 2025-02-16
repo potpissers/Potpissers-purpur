@@ -44,7 +44,7 @@ import org.slf4j.Logger;
 
 public class VaultBlockEntity extends BlockEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private final VaultServerData serverData = new VaultServerData();
+    public final VaultServerData serverData = new VaultServerData();
     private final VaultSharedData sharedData = new VaultSharedData();
     private final VaultClientData clientData = new VaultClientData();
     private VaultConfig config = VaultConfig.DEFAULT;

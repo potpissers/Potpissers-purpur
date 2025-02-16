@@ -63,7 +63,7 @@ public class VanillaPackResourcesBuilder {
     private BuiltInMetadata metadata = BuiltInMetadata.of();
     private final Set<String> namespaces = new HashSet<>();
 
-    private static Path safeGetPath(URI uri) throws IOException {
+    public static Path safeGetPath(URI uri) throws IOException {
         try {
             return Paths.get(uri);
         } catch (FileSystemNotFoundException var3) {

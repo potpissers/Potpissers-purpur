@@ -71,7 +71,7 @@ public class Squid extends AgeableWaterCreature {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.SQUID_DEATH;
     }
 
@@ -85,7 +85,7 @@ public class Squid extends AgeableWaterCreature {
     }
 
     @Override
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 0.4F;
     }
 

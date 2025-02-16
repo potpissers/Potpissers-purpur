@@ -47,7 +47,7 @@ public class MushroomCow extends Cow implements Shearable, VariantHolder<Mushroo
     private static final int MUTATE_CHANCE = 1024;
     private static final String TAG_STEW_EFFECTS = "stew_effects";
     @Nullable
-    private SuspiciousStewEffects stewEffects;
+    public SuspiciousStewEffects stewEffects;
     @Nullable
     private UUID lastLightningBoltUUID;
 

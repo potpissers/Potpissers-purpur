@@ -70,7 +70,7 @@ public class Cow extends Animal {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.COW_DEATH;
     }
 
@@ -80,7 +80,7 @@ public class Cow extends Animal {
     }
 
     @Override
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 0.4F;
     }
 

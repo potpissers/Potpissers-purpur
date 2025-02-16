@@ -121,7 +121,7 @@ public abstract class BlockEntity {
         return compoundTag;
     }
 
-    private void saveId(CompoundTag tag) {
+    public void saveId(CompoundTag tag) {
         ResourceLocation key = BlockEntityType.getKey(this.getType());
         if (key == null) {
             throw new RuntimeException(this.getClass() + " is missing a mapping! This is a bug!");

@@ -58,7 +58,7 @@ public class GlowSquid extends Squid {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.GLOW_SQUID_DEATH;
     }
 
@@ -95,7 +95,7 @@ public class GlowSquid extends Squid {
         return flag;
     }
 
-    private void setDarkTicks(int darkTicks) {
+    public void setDarkTicks(int darkTicks) {
         this.entityData.set(DATA_DARK_TICKS_REMAINING, darkTicks);
     }
 

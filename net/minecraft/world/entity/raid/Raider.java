@@ -268,7 +268,7 @@ public abstract class Raider extends PatrollingMonster {
 
     public abstract SoundEvent getCelebrateSound();
 
-    protected static class HoldGroundAttackGoal extends Goal {
+    public static class HoldGroundAttackGoal extends Goal {
         private final Raider mob;
         private final float hostileRadiusSqr;
         public final TargetingConditions shoutTargeting = TargetingConditions.forNonCombat().range(8.0).ignoreLineOfSight().ignoreInvisibilityTesting();

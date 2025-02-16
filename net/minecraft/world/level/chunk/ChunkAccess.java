@@ -74,12 +74,12 @@ public abstract class ChunkAccess implements BiomeManager.NoiseBiomeSource, Ligh
     protected final UpgradeData upgradeData;
     @Nullable
     protected BlendingData blendingData;
-    protected final Map<Heightmap.Types, Heightmap> heightmaps = Maps.newEnumMap(Heightmap.Types.class);
+    public final Map<Heightmap.Types, Heightmap> heightmaps = Maps.newEnumMap(Heightmap.Types.class);
     protected ChunkSkyLightSources skyLightSources;
     private final Map<Structure, StructureStart> structureStarts = Maps.newHashMap();
     private final Map<Structure, LongSet> structuresRefences = Maps.newHashMap();
     protected final Map<BlockPos, CompoundTag> pendingBlockEntities = Maps.newHashMap();
-    protected final Map<BlockPos, BlockEntity> blockEntities = new Object2ObjectOpenHashMap<>();
+    public final Map<BlockPos, BlockEntity> blockEntities = new Object2ObjectOpenHashMap<>();
     protected final LevelHeightAccessor levelHeightAccessor;
     protected final LevelChunkSection[] sections;
 

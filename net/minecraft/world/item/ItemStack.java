@@ -181,8 +181,8 @@ public final class ItemStack implements DataComponentHolder {
     private int popTime;
     @Deprecated
     @Nullable
-    private final Item item;
-    final PatchedDataComponentMap components;
+    private Item item;
+    PatchedDataComponentMap components;
     @Nullable
     private Entity entityRepresentation;
 

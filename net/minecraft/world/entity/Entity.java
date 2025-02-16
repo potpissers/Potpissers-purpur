@@ -159,7 +159,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     private final EntityType<?> type;
     private int id = ENTITY_COUNTER.incrementAndGet();
     public boolean blocksBuilding;
-    private ImmutableList<Entity> passengers = ImmutableList.of();
+    public ImmutableList<Entity> passengers = ImmutableList.of();
     protected int boardingCooldown;
     @Nullable
     private Entity vehicle;
@@ -176,7 +176,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     public float yRotO;
     public float xRotO;
     private AABB bb = INITIAL_AABB;
-    private boolean onGround;
+    public boolean onGround;
     public boolean horizontalCollision;
     public boolean verticalCollision;
     public boolean verticalCollisionBelow;
@@ -196,10 +196,10 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     public double zOld;
     public boolean noPhysics;
     private boolean wasOnFire;
-    protected final RandomSource random = RandomSource.create();
+    public final RandomSource random = RandomSource.create();
     public int tickCount;
     private int remainingFireTicks = -this.getFireImmuneTicks();
-    protected boolean wasTouchingWater;
+    public boolean wasTouchingWater;
     protected Object2DoubleMap<TagKey<Fluid>> fluidHeight = new Object2DoubleArrayMap<>(2);
     protected boolean wasEyeInWater;
     private final Set<TagKey<Fluid>> fluidOnEyes = new HashSet<>();
@@ -211,7 +211,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     private static final int FLAG_SHIFT_KEY_DOWN = 1;
     private static final int FLAG_SPRINTING = 3;
     private static final int FLAG_SWIMMING = 4;
-    private static final int FLAG_INVISIBLE = 5;
+    public static final int FLAG_INVISIBLE = 5;
     protected static final int FLAG_GLOWING = 6;
     protected static final int FLAG_FALL_FLYING = 7;
     private static final EntityDataAccessor<Integer> DATA_AIR_SUPPLY_ID = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.INT);
@@ -228,7 +228,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     public boolean hasImpulse;
     @Nullable
     public PortalProcessor portalProcess;
-    private int portalCooldown;
+    public int portalCooldown;
     private boolean invulnerable;
     protected UUID uuid = Mth.createInsecureUUID(this.random);
     protected String stringUUID = this.uuid.toString();
@@ -244,7 +244,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     private boolean onGroundNoBlocks = false;
     private float crystalSoundIntensity;
     private int lastCrystalSoundPlayTick;
-    private boolean hasVisualFire;
+    public boolean hasVisualFire;
     @Nullable
     private BlockState inBlockState = null;
     private final List<Entity.Movement> movementThisTick = new ArrayList<>();
@@ -389,7 +389,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return Mth.lengthSquared(d, d2) < Mth.square(horizontalDistance) && Mth.square(d1) < Mth.square(verticalDistance);
     }
 
-    protected void setRot(float yRot, float xRot) {
+    public void setRot(float yRot, float xRot) {
         this.setYRot(yRot % 360.0F);
         this.setXRot(xRot % 360.0F);
     }
@@ -782,7 +782,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         }
     }
 
-    protected boolean isAffectedByBlocks() {
+    public boolean isAffectedByBlocks() {
         return !this.isRemoved() && !this.noPhysics;
     }
 
@@ -1285,13 +1285,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return this.wasTouchingWater;
     }
 
-    private boolean isInRain() {
+    public boolean isInRain() {
         BlockPos blockPos = this.blockPosition();
         return this.level().isRainingAt(blockPos)
             || this.level().isRainingAt(BlockPos.containing(blockPos.getX(), this.getBoundingBox().maxY, blockPos.getZ()));
     }
 
-    private boolean isInBubbleColumn() {
+    public boolean isInBubbleColumn() {
         return this.getInBlockState().is(Blocks.BUBBLE_COLUMN);
     }
 
@@ -1943,7 +1943,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
     }
 
     @Nullable
-    protected final String getEncodeId() {
+    public final String getEncodeId() {
         EntityType<?> type = this.getType();
         ResourceLocation key = EntityType.getKey(type);
         return type.canSerialize() && key != null ? key.toString() : null;
@@ -2458,11 +2458,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         this.setSharedFlag(5, invisible);
     }
 
-    protected boolean getSharedFlag(int flag) {
+    public boolean getSharedFlag(int flag) {
         return (this.entityData.get(DATA_SHARED_FLAGS_ID) & 1 << flag) != 0;
     }
 
-    protected void setSharedFlag(int flag, boolean set) {
+    public void setSharedFlag(int flag, boolean set) {
         byte b = this.entityData.get(DATA_SHARED_FLAGS_ID);
         if (set) {
             this.entityData.set(DATA_SHARED_FLAGS_ID, (byte)(b | 1 << flag));
@@ -2659,7 +2659,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
             );
     }
 
-    protected final boolean isInvulnerableToBase(DamageSource damageSource) {
+    public final boolean isInvulnerableToBase(DamageSource damageSource) {
         return this.isRemoved()
             || this.invulnerable && !damageSource.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !damageSource.isCreativePlayer()
             || damageSource.is(DamageTypeTags.IS_FIRE) && this.fireImmune()
@@ -2953,7 +2953,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         }
     }
 
-    private void teleportPassengers() {
+    public void teleportPassengers() {
         this.getSelfAndPassengers().forEach(entity -> {
             for (Entity entity1 : entity.passengers) {
                 entity.positionRider(entity1, Entity::moveTo);
@@ -3256,7 +3256,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return SoundSource.NEUTRAL;
     }
 
-    protected int getFireImmuneTicks() {
+    public int getFireImmuneTicks() {
         return 1;
     }
 
@@ -3596,7 +3596,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         this.onRemoval(removalReason);
     }
 
-    protected void unsetRemoved() {
+    public void unsetRemoved() {
         this.removalReason = null;
     }
 
@@ -3625,7 +3625,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
         return this.level;
     }
 
-    protected void setLevel(Level level) {
+    public void setLevel(Level level) {
         this.level = level;
     }
 

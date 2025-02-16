@@ -26,7 +26,7 @@ public abstract class AbstractGolem extends PathfinderMob {
 
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return null;
     }
 

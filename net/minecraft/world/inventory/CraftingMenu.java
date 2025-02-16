@@ -27,7 +27,7 @@ public class CraftingMenu extends AbstractCraftingMenu {
     private static final int INV_SLOT_END = 37;
     private static final int USE_ROW_SLOT_START = 37;
     private static final int USE_ROW_SLOT_END = 46;
-    private final ContainerLevelAccess access;
+    public final ContainerLevelAccess access;
     private final Player player;
     private boolean placingRecipe;
 

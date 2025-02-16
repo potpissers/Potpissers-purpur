@@ -27,7 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class Endermite extends Monster {
     private static final int MAX_LIFE = 2400;
-    private int life;
+    public int life;
 
     public Endermite(EntityType<? extends Endermite> entityType, Level level) {
         super(entityType, level);
@@ -66,7 +66,7 @@ public class Endermite extends Monster {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.ENDERMITE_DEATH;
     }
 

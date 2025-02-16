@@ -98,7 +98,7 @@ public class Spider extends Monster {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.SPIDER_DEATH;
     }
 

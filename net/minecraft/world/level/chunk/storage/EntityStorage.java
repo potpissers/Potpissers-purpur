@@ -28,10 +28,10 @@ public class EntityStorage implements EntityPersistentStorage<Entity> {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ENTITIES_TAG = "Entities";
     private static final String POSITION_TAG = "Position";
-    private final ServerLevel level;
+    public final ServerLevel level;
     private final SimpleRegionStorage simpleRegionStorage;
     private final LongSet emptyChunks = new LongOpenHashSet();
-    private final ConsecutiveExecutor entityDeserializerQueue;
+    public final ConsecutiveExecutor entityDeserializerQueue;
 
     public EntityStorage(SimpleRegionStorage simpleRegionStorage, ServerLevel level, Executor executor) {
         this.simpleRegionStorage = simpleRegionStorage;

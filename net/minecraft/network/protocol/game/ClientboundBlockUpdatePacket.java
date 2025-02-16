@@ -19,7 +19,7 @@ public class ClientboundBlockUpdatePacket implements Packet<ClientGamePacketList
         ClientboundBlockUpdatePacket::new
     );
     private final BlockPos pos;
-    private final BlockState blockState;
+    public final BlockState blockState;
 
     public ClientboundBlockUpdatePacket(BlockPos pos, BlockState blockState) {
         this.pos = pos;

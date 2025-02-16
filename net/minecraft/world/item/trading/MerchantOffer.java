@@ -27,16 +27,16 @@ public class MerchantOffer {
     public static final StreamCodec<RegistryFriendlyByteBuf, MerchantOffer> STREAM_CODEC = StreamCodec.of(
         MerchantOffer::writeToStream, MerchantOffer::createFromStream
     );
-    private final ItemCost baseCostA;
-    private final Optional<ItemCost> costB;
-    private final ItemStack result;
-    private int uses;
-    private final int maxUses;
-    private final boolean rewardExp;
-    private int specialPriceDiff;
-    private int demand;
-    private final float priceMultiplier;
-    private final int xp;
+    public ItemCost baseCostA;
+    public Optional<ItemCost> costB;
+    public final ItemStack result;
+    public int uses;
+    public int maxUses;
+    public boolean rewardExp;
+    public int specialPriceDiff;
+    public int demand;
+    public float priceMultiplier;
+    public int xp;
 
     private MerchantOffer(
         ItemCost baseCostA,

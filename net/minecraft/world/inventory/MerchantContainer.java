@@ -15,7 +15,7 @@ public class MerchantContainer implements Container {
     private final NonNullList<ItemStack> itemStacks = NonNullList.withSize(3, ItemStack.EMPTY);
     @Nullable
     private MerchantOffer activeOffer;
-    private int selectionHint;
+    public int selectionHint;
     private int futureXp;
 
     public MerchantContainer(Merchant merchant) {

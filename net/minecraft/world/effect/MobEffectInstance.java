@@ -47,7 +47,7 @@ public class MobEffectInstance implements Comparable<MobEffectInstance> {
     private boolean visible;
     private boolean showIcon;
     @Nullable
-    private MobEffectInstance hiddenEffect;
+    public MobEffectInstance hiddenEffect;
     private final MobEffectInstance.BlendState blendState = new MobEffectInstance.BlendState();
 
     public MobEffectInstance(Holder<MobEffect> effect) {

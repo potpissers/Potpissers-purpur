@@ -45,7 +45,7 @@ public class Tadpole extends AbstractFish {
     public static int ticksToBeFrog = Math.abs(-24000);
     public static final float HITBOX_WIDTH = 0.4F;
     public static final float HITBOX_HEIGHT = 0.3F;
-    private int age;
+    public int age;
     protected static final ImmutableList<SensorType<? extends Sensor<? super Tadpole>>> SENSOR_TYPES = ImmutableList.of(
         SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS, SensorType.HURT_BY, SensorType.FROG_TEMPTATIONS
     );
@@ -144,7 +144,7 @@ public class Tadpole extends AbstractFish {
 
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.TADPOLE_DEATH;
     }
 

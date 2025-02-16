@@ -27,10 +27,10 @@ public class AnvilMenu extends ItemCombinerMenu {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final boolean DEBUG_COST = false;
     public static final int MAX_NAME_LENGTH = 50;
-    private int repairItemCountCost;
+    public int repairItemCountCost;
     @Nullable
-    private String itemName;
-    private final DataSlot cost = DataSlot.standalone();
+    public String itemName;
+    public final DataSlot cost = DataSlot.standalone();
     private boolean onlyRenaming = false;
     private static final int COST_FAIL = 0;
     private static final int COST_BASE = 1;

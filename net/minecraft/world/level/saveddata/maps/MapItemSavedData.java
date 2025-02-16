@@ -53,18 +53,18 @@ public class MapItemSavedData extends SavedData {
     public static final int MAX_SCALE = 4;
     public static final int TRACKED_DECORATION_LIMIT = 256;
     private static final String FRAME_PREFIX = "frame-";
-    public final int centerX;
-    public final int centerZ;
-    public final ResourceKey<Level> dimension;
-    private final boolean trackingPosition;
-    private final boolean unlimitedTracking;
-    public final byte scale;
+    public int centerX;
+    public int centerZ;
+    public ResourceKey<Level> dimension;
+    public boolean trackingPosition;
+    public boolean unlimitedTracking;
+    public byte scale;
     public byte[] colors = new byte[16384];
-    public final boolean locked;
-    private final List<MapItemSavedData.HoldingPlayer> carriedBy = Lists.newArrayList();
-    private final Map<Player, MapItemSavedData.HoldingPlayer> carriedByPlayers = Maps.newHashMap();
+    public boolean locked;
+    public final List<MapItemSavedData.HoldingPlayer> carriedBy = Lists.newArrayList();
+    public final Map<Player, MapItemSavedData.HoldingPlayer> carriedByPlayers = Maps.newHashMap();
     private final Map<String, MapBanner> bannerMarkers = Maps.newHashMap();
-    final Map<String, MapDecoration> decorations = Maps.newLinkedHashMap();
+    public final Map<String, MapDecoration> decorations = Maps.newLinkedHashMap();
     private final Map<String, MapFrame> frameMarkers = Maps.newHashMap();
     private int trackedDecorationCount;
 
@@ -379,7 +379,7 @@ public class MapItemSavedData extends SavedData {
         return holdingPlayer == null ? null : holdingPlayer.nextUpdatePacket(mapId);
     }
 
-    private void setColorsDirty(int x, int z) {
+    public void setColorsDirty(int x, int z) {
         this.setDirty();
 
         for (MapItemSavedData.HoldingPlayer holdingPlayer : this.carriedBy) {
@@ -387,7 +387,7 @@ public class MapItemSavedData extends SavedData {
         }
     }
 
-    private void setDecorationsDirty() {
+    public void setDecorationsDirty() {
         this.setDirty();
         this.carriedBy.forEach(MapItemSavedData.HoldingPlayer::markDecorationsDirty);
     }

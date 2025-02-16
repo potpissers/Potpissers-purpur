@@ -39,15 +39,15 @@ public class ItemEntity extends Entity implements TraceableEntity {
     private static final int LIFETIME = 6000;
     private static final int INFINITE_PICKUP_DELAY = 32767;
     private static final int INFINITE_LIFETIME = -32768;
-    private int age;
-    private int pickupDelay;
-    private int health = 5;
+    public int age;
+    public int pickupDelay;
+    public int health = 5;
     @Nullable
-    private UUID thrower;
+    public UUID thrower;
     @Nullable
     private Entity cachedThrower;
     @Nullable
-    private UUID target;
+    public UUID target;
     public final float bobOffs;
 
     public ItemEntity(EntityType<? extends ItemEntity> entityType, Level level) {

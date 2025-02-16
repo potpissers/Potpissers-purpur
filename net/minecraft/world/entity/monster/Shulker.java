@@ -62,7 +62,7 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
     );
     protected static final EntityDataAccessor<Direction> DATA_ATTACH_FACE_ID = SynchedEntityData.defineId(Shulker.class, EntityDataSerializers.DIRECTION);
     protected static final EntityDataAccessor<Byte> DATA_PEEK_ID = SynchedEntityData.defineId(Shulker.class, EntityDataSerializers.BYTE);
-    protected static final EntityDataAccessor<Byte> DATA_COLOR_ID = SynchedEntityData.defineId(Shulker.class, EntityDataSerializers.BYTE);
+    public static final EntityDataAccessor<Byte> DATA_COLOR_ID = SynchedEntityData.defineId(Shulker.class, EntityDataSerializers.BYTE);
     private static final int TELEPORT_STEPS = 6;
     private static final byte NO_COLOR = 16;
     private static final byte DEFAULT_COLOR = 16;
@@ -122,7 +122,7 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.SHULKER_DEATH;
     }
 
@@ -468,7 +468,7 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
         return this.entityData.get(DATA_ATTACH_FACE_ID);
     }
 
-    private void setAttachFace(Direction attachFace) {
+    public void setAttachFace(Direction attachFace) {
         this.entityData.set(DATA_ATTACH_FACE_ID, attachFace);
     }
 
@@ -481,11 +481,11 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
         super.onSyncedDataUpdated(key);
     }
 
-    private int getRawPeekAmount() {
+    public int getRawPeekAmount() {
         return this.entityData.get(DATA_PEEK_ID);
     }
 
-    void setRawPeekAmount(int peekAmount) {
+    public void setRawPeekAmount(int peekAmount) {
         if (!this.level().isClientSide) {
             this.getAttribute(Attributes.ARMOR).removeModifier(COVERED_ARMOR_MODIFIER_ID);
             if (peekAmount == 0) {

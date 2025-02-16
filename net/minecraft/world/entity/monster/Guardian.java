@@ -58,7 +58,7 @@ public class Guardian extends Monster {
     private int clientSideAttackTime;
     private boolean clientSideTouchedGround;
     @Nullable
-    protected RandomStrollGoal randomStrollGoal;
+    public RandomStrollGoal randomStrollGoal;
 
     public Guardian(EntityType<? extends Guardian> entityType, Level level) {
         super(entityType, level);
@@ -112,7 +112,7 @@ public class Guardian extends Monster {
         return 80;
     }
 
-    void setActiveAttackTarget(int activeAttackTargetId) {
+    public void setActiveAttackTarget(int activeAttackTargetId) {
         this.entityData.set(DATA_ID_ATTACK_TARGET, activeAttackTargetId);
     }
 
@@ -166,7 +166,7 @@ public class Guardian extends Monster {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return this.isInWaterOrBubble() ? SoundEvents.GUARDIAN_DEATH : SoundEvents.GUARDIAN_DEATH_LAND;
     }
 
@@ -354,9 +354,9 @@ public class Guardian extends Monster {
         }
     }
 
-    static class GuardianAttackGoal extends Goal {
+    public static class GuardianAttackGoal extends Goal {
         private final Guardian guardian;
-        private int attackTime;
+        public int attackTime;
         private final boolean elder;
 
         public GuardianAttackGoal(Guardian guardian) {

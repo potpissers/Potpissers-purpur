@@ -112,7 +112,7 @@ public abstract class AbstractHorse extends Animal implements ContainerListener,
     public int tailCounter;
     public int sprintCounter;
     protected boolean isJumping;
-    protected SimpleContainer inventory;
+    public SimpleContainer inventory;
     protected int temper;
     protected float playerJumpPendingScale;
     protected boolean allowStandSliding;
@@ -338,7 +338,7 @@ public abstract class AbstractHorse extends Animal implements ContainerListener,
         return columns * 3 + 1;
     }
 
-    protected void createInventory() {
+    public void createInventory() {
         SimpleContainer simpleContainer = this.inventory;
         this.inventory = new SimpleContainer(this.getInventorySize());
         if (simpleContainer != null) {
@@ -452,7 +452,7 @@ public abstract class AbstractHorse extends Animal implements ContainerListener,
     }
 
     @Override
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 0.8F;
     }
 

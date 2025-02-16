@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 
 public class TrialSpawnerBlockEntity extends BlockEntity implements Spawner, TrialSpawner.StateAccessor {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private TrialSpawner trialSpawner;
+    public TrialSpawner trialSpawner;
 
     public TrialSpawnerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntityType.TRIAL_SPAWNER, pos, state);

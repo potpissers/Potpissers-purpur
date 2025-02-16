@@ -124,9 +124,9 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
     private float rollAmount;
     private float rollAmountO;
     private int timeSinceSting;
-    int ticksWithoutNectarSinceExitingHive;
-    private int stayOutOfHiveCountdown;
-    private int numCropsGrownSincePollination;
+    public int ticksWithoutNectarSinceExitingHive;
+    public int stayOutOfHiveCountdown;
+    public int numCropsGrownSincePollination;
     private static final int COOLDOWN_BEFORE_LOCATING_NEW_HIVE = 200;
     int remainingCooldownBeforeLocatingNewHive;
     private static final int COOLDOWN_BEFORE_LOCATING_NEW_FLOWER = 200;
@@ -136,7 +136,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
     @Nullable
     BlockPos savedFlowerPos;
     @Nullable
-    BlockPos hivePos;
+    public BlockPos hivePos;
     Bee.BeePollinateGoal beePollinateGoal;
     Bee.BeeGoToHiveGoal goToHiveGoal;
     private Bee.BeeGoToKnownFlowerGoal goToKnownFlowerGoal;
@@ -504,7 +504,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
         return this.getFlag(8);
     }
 
-    void setHasNectar(boolean hasNectar) {
+    public void setHasNectar(boolean hasNectar) {
         if (hasNectar) {
             this.resetTicksWithoutNectarSinceExitingHive();
         }
@@ -516,15 +516,15 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
         return this.getFlag(4);
     }
 
-    private void setHasStung(boolean hasStung) {
+    public void setHasStung(boolean hasStung) {
         this.setFlag(4, hasStung);
     }
 
-    private boolean isRolling() {
+    public boolean isRolling() {
         return this.getFlag(2);
     }
 
-    private void setRolling(boolean isRolling) {
+    public void setRolling(boolean isRolling) {
         this.setFlag(2, isRolling);
     }
 
@@ -611,12 +611,12 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.BEE_DEATH;
     }
 
     @Override
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 0.4F;
     }
 

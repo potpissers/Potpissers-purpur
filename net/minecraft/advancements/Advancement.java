@@ -67,7 +67,7 @@ public record Advancement(
         return advancement.requirements().validate(advancement.criteria().keySet()).map(requirements -> advancement);
     }
 
-    private static Component decorateName(DisplayInfo display) {
+    public static Component decorateName(DisplayInfo display) {
         Component title = display.getTitle();
         ChatFormatting chatColor = display.getType().getChatColor();
         Component component = ComponentUtils.mergeStyles(title.copy(), Style.EMPTY.withColor(chatColor)).append("\n").append(display.getDescription());

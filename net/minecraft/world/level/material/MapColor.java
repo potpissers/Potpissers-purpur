@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import net.minecraft.util.ARGB;
 
 public class MapColor {
-    private static final MapColor[] MATERIAL_COLORS = new MapColor[64];
+    public static final MapColor[] MATERIAL_COLORS = new MapColor[64];
     public static final MapColor NONE = new MapColor(0, 0);
     public static final MapColor GRASS = new MapColor(1, 8368696);
     public static final MapColor SAND = new MapColor(2, 16247203);

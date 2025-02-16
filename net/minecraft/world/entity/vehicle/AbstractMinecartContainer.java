@@ -23,8 +23,8 @@ import net.minecraft.world.phys.Vec3;
 public abstract class AbstractMinecartContainer extends AbstractMinecart implements ContainerEntity {
     private NonNullList<ItemStack> itemStacks = NonNullList.withSize(36, ItemStack.EMPTY);
     @Nullable
-    private ResourceKey<LootTable> lootTable;
-    private long lootTableSeed;
+    public ResourceKey<LootTable> lootTable;
+    public long lootTableSeed;
 
     protected AbstractMinecartContainer(EntityType<?> entityType, Level level) {
         super(entityType, level);

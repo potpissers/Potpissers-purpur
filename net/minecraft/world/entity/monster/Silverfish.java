@@ -71,7 +71,7 @@ public class Silverfish extends Monster {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.SILVERFISH_DEATH;
     }
 

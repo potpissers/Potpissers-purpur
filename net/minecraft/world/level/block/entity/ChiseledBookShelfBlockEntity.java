@@ -25,7 +25,7 @@ public class ChiseledBookShelfBlockEntity extends BlockEntity implements Contain
     public static final int MAX_BOOKS_IN_STORAGE = 6;
     private static final Logger LOGGER = LogUtils.getLogger();
     private final NonNullList<ItemStack> items = NonNullList.withSize(6, ItemStack.EMPTY);
-    private int lastInteractedSlot = -1;
+    public int lastInteractedSlot = -1;
 
     public ChiseledBookShelfBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntityType.CHISELED_BOOKSHELF, pos, state);

@@ -57,7 +57,7 @@ public class FireBlock extends BaseFireBlock {
     private static final int BURN_EASY = 60;
     private static final int BURN_MEDIUM = 20;
     private static final int BURN_HARD = 5;
-    private final Object2IntMap<Block> igniteOdds = new Object2IntOpenHashMap<>();
+    public final Object2IntMap<Block> igniteOdds = new Object2IntOpenHashMap<>();
     private final Object2IntMap<Block> burnOdds = new Object2IntOpenHashMap<>();
 
     @Override

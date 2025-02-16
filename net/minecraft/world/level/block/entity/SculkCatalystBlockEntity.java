@@ -110,7 +110,7 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
             return this.sculkSpreader;
         }
 
-        private void bloom(ServerLevel level, BlockPos pos, BlockState state, RandomSource random) {
+        public void bloom(ServerLevel level, BlockPos pos, BlockState state, RandomSource random) {
             level.setBlock(pos, state.setValue(SculkCatalystBlock.PULSE, Boolean.valueOf(true)), 3);
             level.scheduleTick(pos, state.getBlock(), 8);
             level.sendParticles(ParticleTypes.SCULK_SOUL, pos.getX() + 0.5, pos.getY() + 1.15, pos.getZ() + 0.5, 2, 0.2, 0.0, 0.2, 0.0);

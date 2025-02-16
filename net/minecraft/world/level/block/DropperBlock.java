@@ -45,7 +45,7 @@ public class DropperBlock extends DispenserBlock {
     }
 
     @Override
-    protected void dispenseFrom(ServerLevel level, BlockState state, BlockPos pos) {
+    public void dispenseFrom(ServerLevel level, BlockState state, BlockPos pos) {
         DispenserBlockEntity dispenserBlockEntity = level.getBlockEntity(pos, BlockEntityType.DROPPER).orElse(null);
         if (dispenserBlockEntity == null) {
             LOGGER.warn("Ignoring dispensing attempt for Dropper without matching block entity at {}", pos);

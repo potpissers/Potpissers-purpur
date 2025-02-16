@@ -23,7 +23,7 @@ public final class TextColor {
         .collect(ImmutableMap.toImmutableMap(textColor -> textColor.name, Function.identity()));
     private final int value;
     @Nullable
-    private final String name;
+    public final String name;
 
     private TextColor(int value, String name) {
         this.value = value & 16777215;

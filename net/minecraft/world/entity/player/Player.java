@@ -152,7 +152,7 @@ public abstract class Player extends LivingEntity {
         .build();
     private static final EntityDataAccessor<Float> DATA_PLAYER_ABSORPTION_ID = SynchedEntityData.defineId(Player.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> DATA_SCORE_ID = SynchedEntityData.defineId(Player.class, EntityDataSerializers.INT);
-    protected static final EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION = SynchedEntityData.defineId(Player.class, EntityDataSerializers.BYTE);
+    public static final EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION = SynchedEntityData.defineId(Player.class, EntityDataSerializers.BYTE);
     protected static final EntityDataAccessor<Byte> DATA_PLAYER_MAIN_HAND = SynchedEntityData.defineId(Player.class, EntityDataSerializers.BYTE);
     protected static final EntityDataAccessor<CompoundTag> DATA_SHOULDER_LEFT = SynchedEntityData.defineId(Player.class, EntityDataSerializers.COMPOUND_TAG);
     protected static final EntityDataAccessor<CompoundTag> DATA_SHOULDER_RIGHT = SynchedEntityData.defineId(Player.class, EntityDataSerializers.COMPOUND_TAG);
@@ -175,16 +175,16 @@ public abstract class Player extends LivingEntity {
     public double xCloak;
     public double yCloak;
     public double zCloak;
-    private int sleepCounter;
+    public int sleepCounter;
     protected boolean wasUnderwater;
     private final Abilities abilities = new Abilities();
     public int experienceLevel;
     public int totalExperience;
     public float experienceProgress;
-    protected int enchantmentSeed;
+    public int enchantmentSeed;
     protected final float defaultFlySpeed = 0.02F;
     private int lastLevelUpTime;
-    private final GameProfile gameProfile;
+    public GameProfile gameProfile;
     private boolean reducedDebugInfo;
     private ItemStack lastItemInMainHand = ItemStack.EMPTY;
     private final ItemCooldowns cooldowns = this.createItemCooldowns();
@@ -495,7 +495,7 @@ public abstract class Player extends LivingEntity {
     }
 
     @Override
-    protected int getFireImmuneTicks() {
+    public int getFireImmuneTicks() {
         return 20;
     }
 
@@ -512,7 +512,7 @@ public abstract class Player extends LivingEntity {
         }
     }
 
-    protected void closeContainer() {
+    public void closeContainer() {
         this.containerMenu = this.inventoryMenu;
     }
 
@@ -703,7 +703,7 @@ public abstract class Player extends LivingEntity {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.PLAYER_DEATH;
     }
 
@@ -1781,7 +1781,7 @@ public abstract class Player extends LivingEntity {
         }
     }
 
-    protected void removeEntitiesOnShoulder() {
+    public void removeEntitiesOnShoulder() {
         if (this.timeEntitySatOnShoulder + 20L < this.level().getGameTime()) {
             this.respawnEntityOnShoulder(this.getShoulderEntityLeft());
             this.setShoulderEntityLeft(new CompoundTag());
@@ -1929,7 +1929,7 @@ public abstract class Player extends LivingEntity {
         return this.entityData.get(DATA_SHOULDER_LEFT);
     }
 
-    protected void setShoulderEntityLeft(CompoundTag entityCompound) {
+    public void setShoulderEntityLeft(CompoundTag entityCompound) {
         this.entityData.set(DATA_SHOULDER_LEFT, entityCompound);
     }
 
@@ -1937,7 +1937,7 @@ public abstract class Player extends LivingEntity {
         return this.entityData.get(DATA_SHOULDER_RIGHT);
     }
 
-    protected void setShoulderEntityRight(CompoundTag entityCompound) {
+    public void setShoulderEntityRight(CompoundTag entityCompound) {
         this.entityData.set(DATA_SHOULDER_RIGHT, entityCompound);
     }
 

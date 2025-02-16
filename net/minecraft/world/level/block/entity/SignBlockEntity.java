@@ -37,7 +37,7 @@ public class SignBlockEntity extends BlockEntity {
     private static final int MAX_TEXT_LINE_WIDTH = 90;
     private static final int TEXT_LINE_HEIGHT = 10;
     @Nullable
-    private UUID playerWhoMayEdit;
+    public UUID playerWhoMayEdit;
     private SignText frontText = this.createDefaultSignText();
     private SignText backText = this.createDefaultSignText();
     private boolean isWaxed;

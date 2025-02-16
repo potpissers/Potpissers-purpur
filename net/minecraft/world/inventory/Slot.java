@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public class Slot {
-    private final int slot;
+    public final int slot;
     public final Container container;
     public int index;
     public final int x;

@@ -16,7 +16,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.util.ExtraCodecs;
 
 public class RegistryOps<T> extends DelegatingOps<T> {
-    private final RegistryOps.RegistryInfoLookup lookupProvider;
+    public final RegistryOps.RegistryInfoLookup lookupProvider;
 
     public static <T> RegistryOps<T> create(DynamicOps<T> delegate, HolderLookup.Provider registries) {
         return create(delegate, new RegistryOps.HolderLookupAdapter(registries));
@@ -90,7 +90,7 @@ public class RegistryOps<T> extends DelegatingOps<T> {
             .forGetter(object -> null);
     }
 
-    static final class HolderLookupAdapter implements RegistryOps.RegistryInfoLookup {
+    public static final class HolderLookupAdapter implements RegistryOps.RegistryInfoLookup {
         private final HolderLookup.Provider lookupProvider;
         private final Map<ResourceKey<? extends Registry<?>>, Optional<? extends RegistryOps.RegistryInfo<?>>> lookups = new ConcurrentHashMap<>();
 

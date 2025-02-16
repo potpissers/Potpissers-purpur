@@ -27,7 +27,7 @@ import net.minecraft.util.ZeroBitStorage;
 public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainerRO<T> {
     private static final int MIN_PALETTE_BITS = 0;
     private final PaletteResize<T> dummyPaletteResize = (bits, objectAdded) -> 0;
-    private final IdMap<T> registry;
+    public final IdMap<T> registry;
     private volatile PalettedContainer.Data<T> data;
     private final PalettedContainer.Strategy strategy;
     private final ThreadingDetector threadingDetector = new ThreadingDetector("PalettedContainer");

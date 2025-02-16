@@ -42,7 +42,7 @@ public class ShulkerBoxBlockEntity extends RandomizableContainerBlockEntity impl
     public static final float MAX_LID_ROTATION = 270.0F;
     private static final int[] SLOTS = IntStream.range(0, 27).toArray();
     private NonNullList<ItemStack> itemStacks = NonNullList.withSize(27, ItemStack.EMPTY);
-    private int openCount;
+    public int openCount;
     private ShulkerBoxBlockEntity.AnimationStatus animationStatus = ShulkerBoxBlockEntity.AnimationStatus.CLOSED;
     private float progress;
     private float progressOld;

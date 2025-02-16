@@ -106,7 +106,7 @@ public class Evoker extends SpellcasterIllager {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.EVOKER_DEATH;
     }
 
@@ -115,12 +115,12 @@ public class Evoker extends SpellcasterIllager {
         return SoundEvents.EVOKER_HURT;
     }
 
-    void setWololoTarget(@Nullable Sheep wololoTarget) {
+    public void setWololoTarget(@Nullable Sheep wololoTarget) {
         this.wololoTarget = wololoTarget;
     }
 
     @Nullable
-    Sheep getWololoTarget() {
+    public Sheep getWololoTarget() {
         return this.wololoTarget;
     }
 

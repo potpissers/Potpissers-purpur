@@ -136,7 +136,7 @@ public class ListTag extends CollectionTag<Tag> {
     private final List<Tag> list;
     private byte type;
 
-    ListTag(List<Tag> list, byte type) {
+    public ListTag(List<Tag> list, byte type) {
         this.list = list;
         this.type = type;
     }

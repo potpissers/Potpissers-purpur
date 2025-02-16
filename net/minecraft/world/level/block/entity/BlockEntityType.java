@@ -230,7 +230,7 @@ public class BlockEntityType<T extends BlockEntity> {
     public static final BlockEntityType<VaultBlockEntity> VAULT = register("vault", VaultBlockEntity::new, Blocks.VAULT);
     private static final Set<BlockEntityType<?>> OP_ONLY_CUSTOM_DATA = Set.of(COMMAND_BLOCK, LECTERN, SIGN, HANGING_SIGN, MOB_SPAWNER, TRIAL_SPAWNER);
     private final BlockEntityType.BlockEntitySupplier<? extends T> factory;
-    private final Set<Block> validBlocks;
+    public final Set<Block> validBlocks;
     private final Holder.Reference<BlockEntityType<?>> builtInRegistryHolder = BuiltInRegistries.BLOCK_ENTITY_TYPE.createIntrusiveHolder(this);
 
     @Nullable

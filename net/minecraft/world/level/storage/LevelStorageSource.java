@@ -84,7 +84,7 @@ public class LevelStorageSource {
     public static final String ALLOWED_SYMLINKS_CONFIG_NAME = "allowed_symlinks.txt";
     private static final int UNCOMPRESSED_NBT_QUOTA = 104857600;
     private static final int DISK_SPACE_WARNING_THRESHOLD = 67108864;
-    private final Path baseDir;
+    public final Path baseDir;
     private final Path backupDir;
     final DataFixer fixerUpper;
     private final DirectoryValidator worldDirValidator;
@@ -406,7 +406,7 @@ public class LevelStorageSource {
 
     public class LevelStorageAccess implements AutoCloseable {
         final DirectoryLock lock;
-        final LevelStorageSource.LevelDirectory levelDirectory;
+        public final LevelStorageSource.LevelDirectory levelDirectory;
         private final String levelId;
         private final Map<LevelResource, Path> resources = Maps.newHashMap();
 

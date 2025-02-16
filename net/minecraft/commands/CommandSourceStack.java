@@ -48,7 +48,7 @@ import net.minecraft.world.phys.Vec3;
 public class CommandSourceStack implements ExecutionCommandSource<CommandSourceStack>, SharedSuggestionProvider {
     public static final SimpleCommandExceptionType ERROR_NOT_PLAYER = new SimpleCommandExceptionType(Component.translatable("permissions.requires.player"));
     public static final SimpleCommandExceptionType ERROR_NOT_ENTITY = new SimpleCommandExceptionType(Component.translatable("permissions.requires.entity"));
-    private final CommandSource source;
+    public final CommandSource source;
     private final Vec3 worldPosition;
     private final ServerLevel level;
     private final int permissionLevel;

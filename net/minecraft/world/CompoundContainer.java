@@ -4,8 +4,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public class CompoundContainer implements Container {
-    private final Container container1;
-    private final Container container2;
+    public final Container container1;
+    public final Container container2;
 
     public CompoundContainer(Container container1, Container container2) {
         this.container1 = container1;

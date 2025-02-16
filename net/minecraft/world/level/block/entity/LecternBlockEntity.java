@@ -32,7 +32,7 @@ public class LecternBlockEntity extends BlockEntity implements Clearable, MenuPr
     public static final int NUM_DATA = 1;
     public static final int SLOT_BOOK = 0;
     public static final int NUM_SLOTS = 1;
-    private final Container bookAccess = new Container() {
+    public final Container bookAccess = new Container() {
         @Override
         public int getContainerSize() {
             return 1;
@@ -153,7 +153,7 @@ public class LecternBlockEntity extends BlockEntity implements Clearable, MenuPr
         this.setChanged();
     }
 
-    void setPage(int page) {
+    public void setPage(int page) {
         int i = Mth.clamp(page, 0, this.pageCount - 1);
         if (i != this.page) {
             this.page = i;

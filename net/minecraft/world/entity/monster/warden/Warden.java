@@ -194,7 +194,7 @@ public class Warden extends Monster implements VibrationSystem {
     }
 
     @Override
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 4.0F;
     }
 
@@ -210,7 +210,7 @@ public class Warden extends Monster implements VibrationSystem {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.WARDEN_DEATH;
     }
 

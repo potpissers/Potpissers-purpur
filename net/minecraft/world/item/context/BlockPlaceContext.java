@@ -22,7 +22,7 @@ public class BlockPlaceContext extends UseOnContext {
         this(context.getLevel(), context.getPlayer(), context.getHand(), context.getItemInHand(), context.getHitResult());
     }
 
-    protected BlockPlaceContext(Level level, @Nullable Player player, InteractionHand hand, ItemStack itemStack, BlockHitResult hitResult) {
+    public BlockPlaceContext(Level level, @Nullable Player player, InteractionHand hand, ItemStack itemStack, BlockHitResult hitResult) {
         super(level, player, hand, itemStack, hitResult);
         this.relativePos = hitResult.getBlockPos().relative(hitResult.getDirection());
         this.replaceClicked = level.getBlockState(hitResult.getBlockPos()).canBeReplaced(this);

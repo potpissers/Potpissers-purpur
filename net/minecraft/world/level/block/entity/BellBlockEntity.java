@@ -32,8 +32,8 @@ public class BellBlockEntity extends BlockEntity {
     public boolean shaking;
     public Direction clickDirection;
     private List<LivingEntity> nearbyEntities;
-    private boolean resonating;
-    private int resonationTicks;
+    public boolean resonating;
+    public int resonationTicks;
 
     public BellBlockEntity(BlockPos pos, BlockState blockState) {
         super(BlockEntityType.BELL, pos, blockState);

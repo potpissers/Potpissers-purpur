@@ -121,7 +121,7 @@ public class Chicken extends Animal {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.CHICKEN_DEATH;
     }
 

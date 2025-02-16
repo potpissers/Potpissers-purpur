@@ -6,10 +6,10 @@ import net.minecraft.network.chat.Component;
 
 public abstract class BossEvent {
     private final UUID id;
-    protected Component name;
+    public Component name;
     protected float progress;
-    protected BossEvent.BossBarColor color;
-    protected BossEvent.BossBarOverlay overlay;
+    public BossEvent.BossBarColor color;
+    public BossEvent.BossBarOverlay overlay;
     protected boolean darkenScreen;
     protected boolean playBossMusic;
     protected boolean createWorldFog;

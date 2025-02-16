@@ -9,7 +9,7 @@ import net.minecraft.world.level.ChunkPos;
 public class TicketType<T> {
     private final String name;
     private final Comparator<T> comparator;
-    private final long timeout;
+    public long timeout;
     public static final TicketType<Unit> START = create("start", (unit1, unit2) -> 0);
     public static final TicketType<Unit> DRAGON = create("dragon", (unit1, unit2) -> 0);
     public static final TicketType<ChunkPos> PLAYER = create("player", Comparator.comparingLong(ChunkPos::toLong));

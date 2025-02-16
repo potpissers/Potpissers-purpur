@@ -49,9 +49,9 @@ public class SkullBlockEntity extends BlockEntity {
         }
     };
     @Nullable
-    private ResolvableProfile owner;
+    public ResolvableProfile owner;
     @Nullable
-    private ResourceLocation noteBlockSound;
+    public ResourceLocation noteBlockSound;
     private int animationTickCount;
     private boolean isAnimating;
     @Nullable

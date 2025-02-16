@@ -175,7 +175,7 @@ public class ThrownPotion extends ThrowableItemProjectile {
         this.level().addFreshEntity(areaEffectCloud);
     }
 
-    private boolean isLingering() {
+    public boolean isLingering() {
         return this.getItem().is(Items.LINGERING_POTION);
     }
 

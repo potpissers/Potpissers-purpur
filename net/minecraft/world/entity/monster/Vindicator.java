@@ -48,8 +48,8 @@ import net.minecraft.world.level.ServerLevelAccessor;
 
 public class Vindicator extends AbstractIllager {
     private static final String TAG_JOHNNY = "Johnny";
-    static final Predicate<Difficulty> DOOR_BREAKING_PREDICATE = difficulty -> difficulty == Difficulty.NORMAL || difficulty == Difficulty.HARD;
-    boolean isJohnny;
+    public static final Predicate<Difficulty> DOOR_BREAKING_PREDICATE = difficulty -> difficulty == Difficulty.NORMAL || difficulty == Difficulty.HARD;
+    public boolean isJohnny;
 
     public Vindicator(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
@@ -156,7 +156,7 @@ public class Vindicator extends AbstractIllager {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.VINDICATOR_DEATH;
     }
 

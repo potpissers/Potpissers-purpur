@@ -152,7 +152,7 @@ public class Illusioner extends SpellcasterIllager implements RangedAttackMob {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.ILLUSIONER_DEATH;
     }
 

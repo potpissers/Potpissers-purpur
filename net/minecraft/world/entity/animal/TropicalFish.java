@@ -105,7 +105,7 @@ public class TropicalFish extends AbstractSchoolingFish implements VariantHolder
         this.setPackedVariant(compound.getInt("Variant"));
     }
 
-    private void setPackedVariant(int packedVariant) {
+    public void setPackedVariant(int packedVariant) {
         this.entityData.set(DATA_ID_TYPE_VARIANT, packedVariant);
     }
 
@@ -114,7 +114,7 @@ public class TropicalFish extends AbstractSchoolingFish implements VariantHolder
         return !this.isSchool;
     }
 
-    private int getPackedVariant() {
+    public int getPackedVariant() {
         return this.entityData.get(DATA_ID_TYPE_VARIANT);
     }
 
@@ -156,7 +156,7 @@ public class TropicalFish extends AbstractSchoolingFish implements VariantHolder
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.TROPICAL_FISH_DEATH;
     }
 

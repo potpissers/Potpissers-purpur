@@ -34,7 +34,7 @@ public class DamageSource {
         return this.causingEntity == this.directEntity;
     }
 
-    private DamageSource(Holder<DamageType> type, @Nullable Entity directEntity, @Nullable Entity causingEntity, @Nullable Vec3 damageSourcePosition) {
+    public DamageSource(Holder<DamageType> type, @Nullable Entity directEntity, @Nullable Entity causingEntity, @Nullable Vec3 damageSourcePosition) {
         this.type = type;
         this.causingEntity = causingEntity;
         this.directEntity = directEntity;

@@ -22,7 +22,7 @@ public class UseOnContext {
         this(player.level(), player, hand, player.getItemInHand(hand), hitResult);
     }
 
-    protected UseOnContext(Level level, @Nullable Player player, InteractionHand hand, ItemStack itemStack, BlockHitResult hitResult) {
+    public UseOnContext(Level level, @Nullable Player player, InteractionHand hand, ItemStack itemStack, BlockHitResult hitResult) {
         this.player = player;
         this.hand = hand;
         this.hitResult = hitResult;

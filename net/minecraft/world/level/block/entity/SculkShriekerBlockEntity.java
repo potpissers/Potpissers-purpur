@@ -57,7 +57,7 @@ public class SculkShriekerBlockEntity extends BlockEntity implements GameEventLi
         map.put(3, SoundEvents.WARDEN_NEARBY_CLOSEST);
         map.put(4, SoundEvents.WARDEN_LISTENING_ANGRY);
     });
-    private int warningLevel;
+    public int warningLevel;
     private final VibrationSystem.User vibrationUser = new SculkShriekerBlockEntity.VibrationUser();
     private VibrationSystem.Data vibrationData = new VibrationSystem.Data();
     private final VibrationSystem.Listener vibrationListener = new VibrationSystem.Listener(this);

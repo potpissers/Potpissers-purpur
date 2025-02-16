@@ -290,7 +290,7 @@ public class LecternBlock extends BaseEntityBlock {
 
     @Nullable
     @Override
-    protected MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         return !state.getValue(HAS_BOOK) ? null : super.getMenuProvider(state, level, pos);
     }
 

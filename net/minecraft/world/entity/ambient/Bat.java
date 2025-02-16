@@ -38,7 +38,7 @@ public class Bat extends AmbientCreature {
     public final AnimationState flyAnimationState = new AnimationState();
     public final AnimationState restAnimationState = new AnimationState();
     @Nullable
-    private BlockPos targetPosition;
+    public BlockPos targetPosition;
 
     public Bat(EntityType<? extends Bat> entityType, Level level) {
         super(entityType, level);
@@ -59,7 +59,7 @@ public class Bat extends AmbientCreature {
     }
 
     @Override
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 0.1F;
     }
 
@@ -80,7 +80,7 @@ public class Bat extends AmbientCreature {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.BAT_DEATH;
     }
 

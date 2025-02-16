@@ -63,15 +63,15 @@ public class BeaconBlockEntity extends BlockEntity implements MenuProvider, Name
     private static final String TAG_SECONDARY = "secondary_effect";
     List<BeaconBlockEntity.BeaconBeamSection> beamSections = Lists.newArrayList();
     private List<BeaconBlockEntity.BeaconBeamSection> checkingBeamSections = Lists.newArrayList();
-    int levels;
+    public int levels;
     private int lastCheckY;
     @Nullable
-    Holder<MobEffect> primaryPower;
+    public Holder<MobEffect> primaryPower;
     @Nullable
-    Holder<MobEffect> secondaryPower;
+    public Holder<MobEffect> secondaryPower;
     @Nullable
-    private Component name;
-    private LockCode lockKey = LockCode.NO_LOCK;
+    public Component name;
+    public LockCode lockKey = LockCode.NO_LOCK;
     private final ContainerData dataAccess = new ContainerData() {
         @Override
         public int get(int index) {

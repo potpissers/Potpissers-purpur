@@ -23,9 +23,9 @@ public class TagEntry {
             either -> either.map(location -> new TagEntry(location, true), either1 -> (TagEntry)either1),
             tagEntry -> tagEntry.required ? Either.left(tagEntry.elementOrTag()) : Either.right(tagEntry)
         );
-    private final ResourceLocation id;
-    private final boolean tag;
-    private final boolean required;
+    public final ResourceLocation id;
+    public final boolean tag;
+    public final boolean required;
 
     private TagEntry(ResourceLocation id, boolean tag, boolean required) {
         this.id = id;

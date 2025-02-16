@@ -21,7 +21,7 @@ public class LevelChunkSection {
     private short nonEmptyBlockCount;
     private short tickingBlockCount;
     private short tickingFluidCount;
-    private final PalettedContainer<BlockState> states;
+    public final PalettedContainer<BlockState> states;
     private PalettedContainerRO<Holder<Biome>> biomes;
 
     private LevelChunkSection(LevelChunkSection section) {

@@ -5,7 +5,7 @@ import java.util.Objects;
 public final class Ticket<T> implements Comparable<Ticket<?>> {
     private final TicketType<T> type;
     private final int ticketLevel;
-    private final T key;
+    public final T key;
     private long createdTick;
 
     protected Ticket(TicketType<T> type, int ticketLevel, T key) {

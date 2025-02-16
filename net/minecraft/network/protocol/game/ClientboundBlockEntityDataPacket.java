@@ -36,7 +36,7 @@ public class ClientboundBlockEntityDataPacket implements Packet<ClientGamePacket
         return create(blockEntity, BlockEntity::getUpdateTag);
     }
 
-    private ClientboundBlockEntityDataPacket(BlockPos pos, BlockEntityType<?> type, CompoundTag tag) {
+    public ClientboundBlockEntityDataPacket(BlockPos pos, BlockEntityType<?> type, CompoundTag tag) {
         this.pos = pos;
         this.type = type;
         this.tag = tag;

@@ -56,7 +56,7 @@ public class RecipeManager extends SimplePreparableReloadListener<RecipeMap> imp
     );
     private static final FileToIdConverter RECIPE_LISTER = FileToIdConverter.registry(Registries.RECIPE);
     private final HolderLookup.Provider registries;
-    private RecipeMap recipes = RecipeMap.EMPTY;
+    public RecipeMap recipes = RecipeMap.EMPTY;
     private Map<ResourceKey<RecipePropertySet>, RecipePropertySet> propertySets = Map.of();
     private SelectableRecipe.SingleInputSet<StonecutterRecipe> stonecutterRecipes = SelectableRecipe.SingleInputSet.empty();
     private List<RecipeManager.ServerDisplayInfo> allDisplays = List.of();

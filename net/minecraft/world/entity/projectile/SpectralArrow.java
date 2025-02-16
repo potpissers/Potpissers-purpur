@@ -12,7 +12,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
 public class SpectralArrow extends AbstractArrow {
-    private int duration = 200;
+    public int duration = 200;
 
     public SpectralArrow(EntityType<? extends SpectralArrow> entityType, Level level) {
         super(entityType, level);

@@ -57,7 +57,7 @@ public class Pillager extends AbstractIllager implements CrossbowAttackMob, Inve
     private static final EntityDataAccessor<Boolean> IS_CHARGING_CROSSBOW = SynchedEntityData.defineId(Pillager.class, EntityDataSerializers.BOOLEAN);
     private static final int INVENTORY_SIZE = 5;
     private static final int SLOT_OFFSET = 300;
-    private final SimpleContainer inventory = new SimpleContainer(5);
+    public final SimpleContainer inventory = new SimpleContainer(5);
 
     public Pillager(EntityType<? extends Pillager> entityType, Level level) {
         super(entityType, level);
@@ -186,7 +186,7 @@ public class Pillager extends AbstractIllager implements CrossbowAttackMob, Inve
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.PILLAGER_DEATH;
     }
 

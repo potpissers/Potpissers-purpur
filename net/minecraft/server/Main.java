@@ -308,7 +308,7 @@ public class Main {
         return new WorldLoader.InitConfig(packConfig, Commands.CommandSelection.DEDICATED, dedicatedServerProperties.functionPermissionLevel);
     }
 
-    private static void forceUpgrade(
+    public static void forceUpgrade(
         LevelStorageSource.LevelStorageAccess levelStorage,
         DataFixer dataFixer,
         boolean eraseCache,

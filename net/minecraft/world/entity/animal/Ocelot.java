@@ -62,11 +62,11 @@ public class Ocelot extends Animal {
         this.reassessTrustingGoals();
     }
 
-    boolean isTrusting() {
+    public boolean isTrusting() {
         return this.entityData.get(DATA_TRUSTING);
     }
 
-    private void setTrusting(boolean trusting) {
+    public void setTrusting(boolean trusting) {
         this.entityData.set(DATA_TRUSTING, trusting);
         this.reassessTrustingGoals();
     }
@@ -149,7 +149,7 @@ public class Ocelot extends Animal {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.OCELOT_DEATH;
     }
 

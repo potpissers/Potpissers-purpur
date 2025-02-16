@@ -79,18 +79,18 @@ public class Zombie extends Monster {
     private static final ResourceLocation ZOMBIE_RANDOM_SPAWN_BONUS_ID = ResourceLocation.withDefaultNamespace("zombie_random_spawn_bonus");
     private static final EntityDataAccessor<Boolean> DATA_BABY_ID = SynchedEntityData.defineId(Zombie.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_SPECIAL_TYPE_ID = SynchedEntityData.defineId(Zombie.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> DATA_DROWNED_CONVERSION_ID = SynchedEntityData.defineId(Zombie.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> DATA_DROWNED_CONVERSION_ID = SynchedEntityData.defineId(Zombie.class, EntityDataSerializers.BOOLEAN);
     public static final float ZOMBIE_LEADER_CHANCE = 0.05F;
     public static final int REINFORCEMENT_ATTEMPTS = 50;
     public static final int REINFORCEMENT_RANGE_MAX = 40;
     public static final int REINFORCEMENT_RANGE_MIN = 7;
     private static final EntityDimensions BABY_DIMENSIONS = EntityType.ZOMBIE.getDimensions().scale(0.5F).withEyeHeight(0.93F);
     private static final float BREAK_DOOR_CHANCE = 0.1F;
-    private static final Predicate<Difficulty> DOOR_BREAKING_PREDICATE = difficulty -> difficulty == Difficulty.HARD;
+    public static final Predicate<Difficulty> DOOR_BREAKING_PREDICATE = difficulty -> difficulty == Difficulty.HARD;
     private final BreakDoorGoal breakDoorGoal = new BreakDoorGoal(this, DOOR_BREAKING_PREDICATE);
     private boolean canBreakDoors;
     private int inWaterTime;
-    private int conversionTime;
+    public int conversionTime;
 
     public Zombie(EntityType<? extends Zombie> entityType, Level level) {
         super(entityType, level);
@@ -251,7 +251,7 @@ public class Zombie extends Monster {
         super.aiStep();
     }
 
-    private void startUnderWaterConversion(int conversionTime) {
+    public void startUnderWaterConversion(int conversionTime) {
         this.conversionTime = conversionTime;
         this.getEntityData().set(DATA_DROWNED_CONVERSION_ID, true);
     }
@@ -286,7 +286,7 @@ public class Zombie extends Monster {
         return zombieVillager != null;
     }
 
-    protected boolean isSunSensitive() {
+    public boolean isSunSensitive() {
         return true;
     }
 
@@ -370,7 +370,7 @@ public class Zombie extends Monster {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.ZOMBIE_DEATH;
     }
 

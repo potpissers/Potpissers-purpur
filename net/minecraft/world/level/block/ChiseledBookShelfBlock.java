@@ -101,7 +101,7 @@ public class ChiseledBookShelfBlock extends BaseEntityBlock {
         }
     }
 
-    private OptionalInt getHitSlot(BlockHitResult hitReselt, BlockState state) {
+    public OptionalInt getHitSlot(BlockHitResult hitReselt, BlockState state) {
         return getRelativeHitCoordinatesForBlockFace(hitReselt, state.getValue(HorizontalDirectionalBlock.FACING)).map(vec2 -> {
             int i = vec2.y >= 0.5F ? 0 : 1;
             int section = getSection(vec2.x);
@@ -130,7 +130,7 @@ public class ChiseledBookShelfBlock extends BaseEntityBlock {
         }
     }
 
-    private static int getSection(float x) {
+    public static int getSection(float x) {
         float f = 0.0625F;
         float f1 = 0.375F;
         if (x < 0.375F) {

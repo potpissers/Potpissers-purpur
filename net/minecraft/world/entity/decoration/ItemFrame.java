@@ -41,14 +41,14 @@ import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.Validate;
 
 public class ItemFrame extends HangingEntity {
-    private static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(ItemFrame.class, EntityDataSerializers.ITEM_STACK);
-    private static final EntityDataAccessor<Integer> DATA_ROTATION = SynchedEntityData.defineId(ItemFrame.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(ItemFrame.class, EntityDataSerializers.ITEM_STACK);
+    public static final EntityDataAccessor<Integer> DATA_ROTATION = SynchedEntityData.defineId(ItemFrame.class, EntityDataSerializers.INT);
     public static final int NUM_ROTATIONS = 8;
     private static final float DEPTH = 0.0625F;
     private static final float WIDTH = 0.75F;
     private static final float HEIGHT = 0.75F;
-    private float dropChance = 1.0F;
-    private boolean fixed;
+    public float dropChance = 1.0F;
+    public boolean fixed;
 
     public ItemFrame(EntityType<? extends ItemFrame> entityType, Level level) {
         super(entityType, level);
@@ -70,7 +70,7 @@ public class ItemFrame extends HangingEntity {
     }
 
     @Override
-    protected void setDirection(Direction facingDirection) {
+    public void setDirection(Direction facingDirection) {
         Validate.notNull(facingDirection);
         this.direction = facingDirection;
         if (facingDirection.getAxis().isHorizontal()) {

@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class EnderChestBlockEntity extends BlockEntity implements LidBlockEntity {
     private final ChestLidController chestLidController = new ChestLidController();
-    private final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
+    public final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
         @Override
         protected void onOpen(Level level, BlockPos pos, BlockState state) {
             level.playSound(

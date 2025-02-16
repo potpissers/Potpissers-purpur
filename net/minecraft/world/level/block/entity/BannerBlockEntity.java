@@ -24,7 +24,7 @@ public class BannerBlockEntity extends BlockEntity implements Nameable {
     private static final String TAG_PATTERNS = "patterns";
     @Nullable
     private Component name;
-    private final DyeColor baseColor;
+    public DyeColor baseColor;
     private BannerPatternLayers patterns = BannerPatternLayers.EMPTY;
 
     public BannerBlockEntity(BlockPos pos, BlockState blockState) {

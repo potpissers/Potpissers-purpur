@@ -131,11 +131,11 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
         return this.entityData.get(IS_LYING);
     }
 
-    void setRelaxStateOne(boolean relaxStateOne) {
+    public void setRelaxStateOne(boolean relaxStateOne) {
         this.entityData.set(RELAX_STATE_ONE, relaxStateOne);
     }
 
-    boolean isRelaxStateOne() {
+    public boolean isRelaxStateOne() {
         return this.entityData.get(RELAX_STATE_ONE);
     }
 
@@ -143,7 +143,7 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
         return DyeColor.byId(this.entityData.get(DATA_COLLAR_COLOR));
     }
 
-    private void setCollarColor(DyeColor color) {
+    public void setCollarColor(DyeColor color) {
         this.entityData.set(DATA_COLLAR_COLOR, color.getId());
     }
 
@@ -224,7 +224,7 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.CAT_DEATH;
     }
 

@@ -100,8 +100,8 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
     private static final int FLAG_SLEEPING = 32;
     private static final int FLAG_FACEPLANTED = 64;
     private static final int FLAG_DEFENDING = 128;
-    private static final EntityDataAccessor<Optional<UUID>> DATA_TRUSTED_ID_0 = SynchedEntityData.defineId(Fox.class, EntityDataSerializers.OPTIONAL_UUID);
-    private static final EntityDataAccessor<Optional<UUID>> DATA_TRUSTED_ID_1 = SynchedEntityData.defineId(Fox.class, EntityDataSerializers.OPTIONAL_UUID);
+    public static final EntityDataAccessor<Optional<UUID>> DATA_TRUSTED_ID_0 = SynchedEntityData.defineId(Fox.class, EntityDataSerializers.OPTIONAL_UUID);
+    public static final EntityDataAccessor<Optional<UUID>> DATA_TRUSTED_ID_1 = SynchedEntityData.defineId(Fox.class, EntityDataSerializers.OPTIONAL_UUID);
     static final Predicate<ItemEntity> ALLOWED_ITEMS = item -> !item.hasPickUpDelay() && item.isAlive();
     private static final Predicate<Entity> TRUSTED_TARGET_SELECTOR = entity -> entity instanceof LivingEntity livingEntity
         && livingEntity.getLastHurtMob() != null
@@ -432,15 +432,15 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
         return this.getFlag(64);
     }
 
-    void setFaceplanted(boolean faceplanted) {
+    public void setFaceplanted(boolean faceplanted) {
         this.setFlag(64, faceplanted);
     }
 
-    boolean isDefending() {
+    public boolean isDefending() {
         return this.getFlag(128);
     }
 
-    void setDefending(boolean defending) {
+    public void setDefending(boolean defending) {
         this.setFlag(128, defending);
     }
 
@@ -449,7 +449,7 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
         return this.getFlag(32);
     }
 
-    void setSleeping(boolean sleeping) {
+    public void setSleeping(boolean sleeping) {
         this.setFlag(32, sleeping);
     }
 
@@ -663,7 +663,7 @@ public class Fox extends Animal implements VariantHolder<Fox.Variant> {
 
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.FOX_DEATH;
     }
 

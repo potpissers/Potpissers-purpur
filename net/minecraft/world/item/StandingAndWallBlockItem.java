@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 
 public class StandingAndWallBlockItem extends BlockItem {
-    protected final Block wallBlock;
+    public final Block wallBlock;
     private final Direction attachmentDirection;
 
     public StandingAndWallBlockItem(Block block, Block wallBlock, Direction attachmentDirection, Item.Properties properties) {

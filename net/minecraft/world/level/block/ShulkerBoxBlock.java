@@ -72,7 +72,7 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
     public static final EnumProperty<Direction> FACING = DirectionalBlock.FACING;
     public static final ResourceLocation CONTENTS = ResourceLocation.withDefaultNamespace("contents");
     @Nullable
-    private final DyeColor color;
+    public final DyeColor color;
 
     @Override
     public MapCodec<ShulkerBoxBlock> codec() {

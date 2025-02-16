@@ -13,8 +13,8 @@ import net.minecraft.world.level.Level;
 
 public class RecipeMap {
     public static final RecipeMap EMPTY = new RecipeMap(ImmutableMultimap.of(), Map.of());
-    private final Multimap<RecipeType<?>, RecipeHolder<?>> byType;
-    private final Map<ResourceKey<Recipe<?>>, RecipeHolder<?>> byKey;
+    public final Multimap<RecipeType<?>, RecipeHolder<?>> byType;
+    public final Map<ResourceKey<Recipe<?>>, RecipeHolder<?>> byKey;
 
     private RecipeMap(Multimap<RecipeType<?>, RecipeHolder<?>> byType, Map<ResourceKey<Recipe<?>>, RecipeHolder<?>> byKey) {
         this.byType = byType;

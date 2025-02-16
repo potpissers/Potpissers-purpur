@@ -56,7 +56,7 @@ public class TranslatableContents implements ComponentContents {
     private List<FormattedText> decomposedParts = ImmutableList.of();
     private static final Pattern FORMAT_PATTERN = Pattern.compile("%(?:(\\d+)\\$)?([A-Za-z%]|$)");
 
-    private static DataResult<Object> filterAllowedArguments(@Nullable Object input) {
+    public static DataResult<Object> filterAllowedArguments(@Nullable Object input) {
         return !isAllowedPrimitiveArgument(input) ? DataResult.error(() -> "This value needs to be parsed as component") : DataResult.success(input);
     }
 

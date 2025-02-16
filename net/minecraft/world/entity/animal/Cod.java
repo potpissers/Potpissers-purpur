@@ -24,7 +24,7 @@ public class Cod extends AbstractSchoolingFish {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.COD_DEATH;
     }
 

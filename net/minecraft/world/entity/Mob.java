@@ -111,22 +111,22 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
     protected JumpControl jumpControl;
     private final BodyRotationControl bodyRotationControl;
     protected PathNavigation navigation;
-    protected final GoalSelector goalSelector;
-    protected final GoalSelector targetSelector;
+    public GoalSelector goalSelector;
+    public GoalSelector targetSelector;
     @Nullable
     private LivingEntity target;
     private final Sensing sensing;
     private final NonNullList<ItemStack> handItems = NonNullList.withSize(2, ItemStack.EMPTY);
-    protected final float[] handDropChances = new float[2];
+    public final float[] handDropChances = new float[2];
     private final NonNullList<ItemStack> armorItems = NonNullList.withSize(4, ItemStack.EMPTY);
-    protected final float[] armorDropChances = new float[4];
+    public final float[] armorDropChances = new float[4];
     private ItemStack bodyArmorItem = ItemStack.EMPTY;
     protected float bodyArmorDropChance;
     private boolean canPickUpLoot;
     private boolean persistenceRequired;
     private final Map<PathType, Float> pathfindingMalus = Maps.newEnumMap(PathType.class);
-    private Optional<ResourceKey<LootTable>> lootTable = Optional.empty();
-    private long lootTableSeed;
+    public Optional<ResourceKey<LootTable>> lootTable = Optional.empty();
+    public long lootTableSeed;
     @Nullable
     private Leashable.LeashData leashData;
     private BlockPos restrictCenter = BlockPos.ZERO;
@@ -957,7 +957,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
         }
     }
 
-    protected float getEquipmentDropChance(EquipmentSlot slot) {
+    public float getEquipmentDropChance(EquipmentSlot slot) {
         return switch (slot.getType()) {
             case HAND -> this.handDropChances[slot.getIndex()];
             case HUMANOID_ARMOR -> this.armorDropChances[slot.getIndex()];
@@ -1432,7 +1432,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
     protected void playAttackSound() {
     }
 
-    protected boolean isSunBurnTick() {
+    public boolean isSunBurnTick() {
         if (this.level().isDay() && !this.level().isClientSide) {
             float lightLevelDependentMagicValue = this.getLightLevelDependentMagicValue();
             BlockPos blockPos = BlockPos.containing(this.getX(), this.getEyeY(), this.getZ());

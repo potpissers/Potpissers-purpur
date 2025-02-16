@@ -30,9 +30,9 @@ public class MinecartTNT extends AbstractMinecart {
     private static final String TAG_FUSE = "fuse";
     private static final float DEFAULT_EXPLOSION_POWER_BASE = 4.0F;
     private static final float DEFAULT_EXPLOSION_SPEED_FACTOR = 1.0F;
-    private int fuse = -1;
-    private float explosionPowerBase = 4.0F;
-    private float explosionSpeedFactor = 1.0F;
+    public int fuse = -1;
+    public float explosionPowerBase = 4.0F;
+    public float explosionSpeedFactor = 1.0F;
 
     public MinecartTNT(EntityType<? extends MinecartTNT> entityType, Level level) {
         super(entityType, level);
@@ -94,7 +94,7 @@ public class MinecartTNT extends AbstractMinecart {
         return new ItemStack(Items.TNT_MINECART);
     }
 
-    protected void explode(double radiusModifier) {
+    public void explode(double radiusModifier) {
         this.explode(null, radiusModifier);
     }
 

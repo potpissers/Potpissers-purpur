@@ -12,7 +12,7 @@ import java.util.zip.Inflater;
 public class CompressionDecoder extends ByteToMessageDecoder {
     public static final int MAXIMUM_COMPRESSED_LENGTH = 2097152;
     public static final int MAXIMUM_UNCOMPRESSED_LENGTH = 8388608;
-    private final Inflater inflater;
+    private Inflater inflater;
     private int threshold;
     private boolean validateDecompressed;
 

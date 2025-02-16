@@ -161,7 +161,7 @@ public class Pufferfish extends AbstractFish {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.PUFFER_FISH_DEATH;
     }
 

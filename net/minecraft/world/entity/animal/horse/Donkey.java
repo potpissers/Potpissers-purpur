@@ -27,7 +27,7 @@ public class Donkey extends AbstractChestedHorse {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.DONKEY_DEATH;
     }
 

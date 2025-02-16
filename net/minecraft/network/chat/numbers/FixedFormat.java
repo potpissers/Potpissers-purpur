@@ -24,7 +24,7 @@ public class FixedFormat implements NumberFormat {
             return STREAM_CODEC;
         }
     };
-    final Component value;
+    public final Component value;
 
     public FixedFormat(Component value) {
         this.value = value;

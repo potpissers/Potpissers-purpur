@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
 
 public class Arrow extends AbstractArrow {
     private static final int EXPOSED_POTION_DECAY_TIME = 600;
-    private static final int NO_EFFECT_COLOR = -1;
+    public static final int NO_EFFECT_COLOR = -1;
     private static final EntityDataAccessor<Integer> ID_EFFECT_COLOR = SynchedEntityData.defineId(Arrow.class, EntityDataSerializers.INT);
     private static final byte EVENT_POTION_PUFF = 0;
 
@@ -36,11 +36,11 @@ public class Arrow extends AbstractArrow {
         this.updateColor();
     }
 
-    private PotionContents getPotionContents() {
+    public PotionContents getPotionContents() {
         return this.getPickupItemStackOrigin().getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
     }
 
-    private void setPotionContents(PotionContents potionContents) {
+    public void setPotionContents(PotionContents potionContents) {
         this.getPickupItemStackOrigin().set(DataComponents.POTION_CONTENTS, potionContents);
         this.updateColor();
     }
@@ -51,7 +51,7 @@ public class Arrow extends AbstractArrow {
         this.updateColor();
     }
 
-    private void updateColor() {
+    public void updateColor() {
         PotionContents potionContents = this.getPotionContents();
         this.entityData.set(ID_EFFECT_COLOR, potionContents.equals(PotionContents.EMPTY) ? -1 : potionContents.getColor());
     }

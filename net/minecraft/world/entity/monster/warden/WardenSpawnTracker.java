@@ -31,9 +31,9 @@ public class WardenSpawnTracker {
     private static final int WARNING_CHECK_DIAMETER = 48;
     private static final int DECREASE_WARNING_LEVEL_EVERY_INTERVAL = 12000;
     private static final int WARNING_LEVEL_INCREASE_COOLDOWN = 200;
-    private int ticksSinceLastWarning;
+    public int ticksSinceLastWarning;
     private int warningLevel;
-    private int cooldownTicks;
+    public int cooldownTicks;
 
     public WardenSpawnTracker(int ticksSinceLastWarning, int warningLevel, int cooldownTicks) {
         this.ticksSinceLastWarning = ticksSinceLastWarning;
@@ -103,7 +103,7 @@ public class WardenSpawnTracker {
         return level.getPlayers(serverPlayer -> !serverPlayer.isSpectator() && serverPlayer.position().closerThan(vec3, 16.0) && serverPlayer.isAlive());
     }
 
-    private void increaseWarningLevel() {
+    public void increaseWarningLevel() {
         if (!this.onCooldown()) {
             this.ticksSinceLastWarning = 0;
             this.cooldownTicks = 200;

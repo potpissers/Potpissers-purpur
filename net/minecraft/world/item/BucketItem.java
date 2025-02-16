@@ -29,7 +29,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
 public class BucketItem extends Item implements DispensibleContainerItem {
-    private final Fluid content;
+    public final Fluid content;
 
     public BucketItem(Fluid content, Item.Properties properties) {
         super(properties);

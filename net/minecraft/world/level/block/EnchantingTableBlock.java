@@ -102,7 +102,7 @@ public class EnchantingTableBlock extends BaseEntityBlock {
 
     @Nullable
     @Override
-    protected MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof EnchantingTableBlockEntity) {
             Component displayName = ((Nameable)blockEntity).getDisplayName();

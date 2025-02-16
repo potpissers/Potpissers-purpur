@@ -36,9 +36,9 @@ public class Interaction extends Entity implements Attackable, Targeting {
     private static final String TAG_INTERACTION = "interaction";
     private static final String TAG_RESPONSE = "response";
     @Nullable
-    private Interaction.PlayerAction attack;
+    public Interaction.PlayerAction attack;
     @Nullable
-    private Interaction.PlayerAction interaction;
+    public Interaction.PlayerAction interaction;
 
     public Interaction(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -172,27 +172,27 @@ public class Interaction extends Entity implements Attackable, Targeting {
         return this.interaction != null ? this.level().getPlayerByUUID(this.interaction.player()) : null;
     }
 
-    private void setWidth(float width) {
+    public void setWidth(float width) {
         this.entityData.set(DATA_WIDTH_ID, width);
     }
 
-    private float getWidth() {
+    public float getWidth() {
         return this.entityData.get(DATA_WIDTH_ID);
     }
 
-    private void setHeight(float height) {
+    public void setHeight(float height) {
         this.entityData.set(DATA_HEIGHT_ID, height);
     }
 
-    private float getHeight() {
+    public float getHeight() {
         return this.entityData.get(DATA_HEIGHT_ID);
     }
 
-    private void setResponse(boolean response) {
+    public void setResponse(boolean response) {
         this.entityData.set(DATA_RESPONSE_ID, response);
     }
 
-    private boolean getResponse() {
+    public boolean getResponse() {
         return this.entityData.get(DATA_RESPONSE_ID);
     }
 
@@ -210,7 +210,7 @@ public class Interaction extends Entity implements Attackable, Targeting {
         return this.getDimensions().makeBoundingBox(position);
     }
 
-    record PlayerAction(UUID player, long timestamp) {
+    public record PlayerAction(UUID player, long timestamp) {
         public static final Codec<Interaction.PlayerAction> CODEC = RecordCodecBuilder.create(
             istance -> istance.group(
                     UUIDUtil.CODEC.fieldOf("player").forGetter(Interaction.PlayerAction::player),

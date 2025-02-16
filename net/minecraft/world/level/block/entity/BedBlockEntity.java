@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class BedBlockEntity extends BlockEntity {
-    private final DyeColor color;
+    public final DyeColor color;
 
     public BedBlockEntity(BlockPos pos, BlockState blockState) {
         this(pos, blockState, ((BedBlock)blockState.getBlock()).getColor());

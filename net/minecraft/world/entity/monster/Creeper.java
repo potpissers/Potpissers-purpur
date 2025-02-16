@@ -45,9 +45,9 @@ public class Creeper extends Monster {
     private static final EntityDataAccessor<Boolean> DATA_IS_POWERED = SynchedEntityData.defineId(Creeper.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(Creeper.class, EntityDataSerializers.BOOLEAN);
     private int oldSwell;
-    private int swell;
-    private int maxSwell = 30;
-    private int explosionRadius = 3;
+    public int swell;
+    public int maxSwell = 30;
+    public int explosionRadius = 3;
     private int droppedSkulls;
 
     public Creeper(EntityType<? extends Creeper> entityType, Level level) {
@@ -166,7 +166,7 @@ public class Creeper extends Monster {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.CREEPER_DEATH;
     }
 
@@ -229,7 +229,7 @@ public class Creeper extends Monster {
         }
     }
 
-    private void explodeCreeper() {
+    public void explodeCreeper() {
         if (this.level() instanceof ServerLevel serverLevel) {
             float f = this.isPowered() ? 2.0F : 1.0F;
             this.dead = true;

@@ -15,7 +15,7 @@ import net.minecraft.world.BossEvent;
 public class ServerBossEvent extends BossEvent {
     private final Set<ServerPlayer> players = Sets.newHashSet();
     private final Set<ServerPlayer> unmodifiablePlayers = Collections.unmodifiableSet(this.players);
-    private boolean visible = true;
+    public boolean visible = true;
 
     public ServerBossEvent(Component name, BossEvent.BossBarColor color, BossEvent.BossBarOverlay overlay) {
         super(Mth.createInsecureUUID(), name, color, overlay);
@@ -83,7 +83,7 @@ public class ServerBossEvent extends BossEvent {
         }
     }
 
-    private void broadcast(Function<BossEvent, ClientboundBossEventPacket> packetGetter) {
+    public void broadcast(Function<BossEvent, ClientboundBossEventPacket> packetGetter) {
         if (this.visible) {
             ClientboundBossEventPacket clientboundBossEventPacket = packetGetter.apply(this);
 

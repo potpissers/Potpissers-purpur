@@ -95,20 +95,20 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
     protected final NeighborUpdater neighborUpdater;
     private final List<TickingBlockEntity> pendingBlockEntityTickers = Lists.newArrayList();
     private boolean tickingBlockEntities;
-    private final Thread thread;
+    public final Thread thread;
     private final boolean isDebug;
     private int skyDarken;
     protected int randValue = RandomSource.create().nextInt();
     protected final int addend = 1013904223;
     protected float oRainLevel;
-    protected float rainLevel;
+    public float rainLevel;
     protected float oThunderLevel;
-    protected float thunderLevel;
+    public float thunderLevel;
     public final RandomSource random = RandomSource.create();
     @Deprecated
     private final RandomSource threadSafeRandom = RandomSource.createThreadSafe();
     private final Holder<DimensionType> dimensionTypeRegistration;
-    protected final WritableLevelData levelData;
+    public final WritableLevelData levelData;
     public final boolean isClientSide;
     private final WorldBorder worldBorder;
     private final BiomeManager biomeManager;
@@ -962,7 +962,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
         return this.isDebug;
     }
 
-    protected abstract LevelEntityGetter<Entity> getEntities();
+    public abstract LevelEntityGetter<Entity> getEntities();
 
     @Override
     public long nextSubTickCount() {

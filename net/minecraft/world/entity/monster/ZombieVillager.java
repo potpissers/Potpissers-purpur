@@ -52,7 +52,7 @@ import org.slf4j.Logger;
 
 public class ZombieVillager extends Zombie implements VillagerDataHolder {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final EntityDataAccessor<Boolean> DATA_CONVERTING_ID = SynchedEntityData.defineId(ZombieVillager.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> DATA_CONVERTING_ID = SynchedEntityData.defineId(ZombieVillager.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<VillagerData> DATA_VILLAGER_DATA = SynchedEntityData.defineId(
         ZombieVillager.class, EntityDataSerializers.VILLAGER_DATA
     );
@@ -60,9 +60,9 @@ public class ZombieVillager extends Zombie implements VillagerDataHolder {
     private static final int VILLAGER_CONVERSION_WAIT_MAX = 6000;
     private static final int MAX_SPECIAL_BLOCKS_COUNT = 14;
     private static final int SPECIAL_BLOCK_RADIUS = 4;
-    private int villagerConversionTime;
+    public int villagerConversionTime;
     @Nullable
-    private UUID conversionStarter;
+    public UUID conversionStarter;
     @Nullable
     private Tag gossips;
     @Nullable
@@ -182,7 +182,7 @@ public class ZombieVillager extends Zombie implements VillagerDataHolder {
         return this.getEntityData().get(DATA_CONVERTING_ID);
     }
 
-    private void startConverting(@Nullable UUID conversionStarter, int villagerConversionTime) {
+    public void startConverting(@Nullable UUID conversionStarter, int villagerConversionTime) {
         this.conversionStarter = conversionStarter;
         this.villagerConversionTime = villagerConversionTime;
         this.getEntityData().set(DATA_CONVERTING_ID, true);

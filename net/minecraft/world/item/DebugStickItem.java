@@ -48,7 +48,7 @@ public class DebugStickItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    private boolean handleInteraction(
+    public boolean handleInteraction(
         Player player, BlockState stateClicked, LevelAccessor accessor, BlockPos pos, boolean shouldCycleState, ItemStack debugStack
     ) {
         if (!player.canUseGameMasterBlocks()) {

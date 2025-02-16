@@ -22,7 +22,7 @@ public class PathFinder {
     private static final float FUDGING = 1.5F;
     private final Node[] neighbors = new Node[32];
     private int maxVisitedNodes;
-    private final NodeEvaluator nodeEvaluator;
+    public final NodeEvaluator nodeEvaluator;
     private static final boolean DEBUG = false;
     private final BinaryHeap openSet = new BinaryHeap();
 

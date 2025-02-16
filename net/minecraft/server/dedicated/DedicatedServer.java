@@ -69,7 +69,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
     private final RconConsoleSource rconConsoleSource;
     @Nullable
     private RconThread rconThread;
-    private final DedicatedServerSettings settings;
+    public DedicatedServerSettings settings;
     @Nullable
     private MinecraftServerGui gui;
     @Nullable
@@ -78,7 +78,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface 
     private RemoteSampleLogger tickTimeLogger;
     @Nullable
     private DebugSampleSubscriptionTracker debugSampleSubscriptionTracker;
-    private final ServerLinks serverLinks;
+    public ServerLinks serverLinks;
 
     public DedicatedServer(
         Thread serverThread,

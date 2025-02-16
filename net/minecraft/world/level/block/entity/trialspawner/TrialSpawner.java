@@ -52,16 +52,16 @@ public final class TrialSpawner {
     private static final int MAX_MOB_TRACKING_DISTANCE = 47;
     private static final int MAX_MOB_TRACKING_DISTANCE_SQR = Mth.square(47);
     private static final float SPAWNING_AMBIENT_SOUND_CHANCE = 0.02F;
-    private Holder<TrialSpawnerConfig> normalConfig;
-    private Holder<TrialSpawnerConfig> ominousConfig;
+    public Holder<TrialSpawnerConfig> normalConfig;
+    public Holder<TrialSpawnerConfig> ominousConfig;
     private final TrialSpawnerData data;
-    private final int requiredPlayerRange;
-    private final int targetCooldownLength;
-    private final TrialSpawner.StateAccessor stateAccessor;
+    public int requiredPlayerRange;
+    public int targetCooldownLength;
+    public final TrialSpawner.StateAccessor stateAccessor;
     private PlayerDetector playerDetector;
     private final PlayerDetector.EntitySelector entitySelector;
     private boolean overridePeacefulAndMobSpawnRule;
-    private boolean isOminous;
+    public boolean isOminous;
 
     public Codec<TrialSpawner> codec() {
         return RecordCodecBuilder.create(

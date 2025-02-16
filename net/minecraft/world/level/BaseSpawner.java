@@ -30,26 +30,26 @@ public abstract class BaseSpawner {
     public static final String SPAWN_DATA_TAG = "SpawnData";
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int EVENT_SPAWN = 1;
-    private int spawnDelay = 20;
-    private SimpleWeightedRandomList<SpawnData> spawnPotentials = SimpleWeightedRandomList.empty();
+    public int spawnDelay = 20;
+    public SimpleWeightedRandomList<SpawnData> spawnPotentials = SimpleWeightedRandomList.empty();
     @Nullable
-    private SpawnData nextSpawnData;
+    public SpawnData nextSpawnData;
     private double spin;
     private double oSpin;
-    private int minSpawnDelay = 200;
-    private int maxSpawnDelay = 800;
-    private int spawnCount = 4;
+    public int minSpawnDelay = 200;
+    public int maxSpawnDelay = 800;
+    public int spawnCount = 4;
     @Nullable
     private Entity displayEntity;
-    private int maxNearbyEntities = 6;
-    private int requiredPlayerRange = 16;
-    private int spawnRange = 4;
+    public int maxNearbyEntities = 6;
+    public int requiredPlayerRange = 16;
+    public int spawnRange = 4;
 
     public void setEntityId(EntityType<?> type, @Nullable Level level, RandomSource random, BlockPos pos) {
         this.getOrCreateNextSpawnData(level, random, pos).getEntityToSpawn().putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(type).toString());
     }
 
-    private boolean isNearPlayer(Level level, BlockPos pos) {
+    public boolean isNearPlayer(Level level, BlockPos pos) {
         return level.hasNearbyAlivePlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.requiredPlayerRange);
     }
 
@@ -171,7 +171,7 @@ public abstract class BaseSpawner {
         }
     }
 
-    private void delay(Level level, BlockPos pos) {
+    public void delay(Level level, BlockPos pos) {
         RandomSource randomSource = level.random;
         if (this.maxSpawnDelay <= this.minSpawnDelay) {
             this.spawnDelay = this.minSpawnDelay;
@@ -272,7 +272,7 @@ public abstract class BaseSpawner {
         }
     }
 
-    protected void setNextSpawnData(@Nullable Level level, BlockPos pos, SpawnData nextSpawnData) {
+    public void setNextSpawnData(@Nullable Level level, BlockPos pos, SpawnData nextSpawnData) {
         this.nextSpawnData = nextSpawnData;
     }
 

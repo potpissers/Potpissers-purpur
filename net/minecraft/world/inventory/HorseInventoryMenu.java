@@ -17,7 +17,7 @@ public class HorseInventoryMenu extends AbstractContainerMenu {
     private final Container horseContainer;
     private final Container armorContainer;
     private final AbstractHorse horse;
-    private static final int SLOT_BODY_ARMOR = 1;
+    public static final int SLOT_BODY_ARMOR = 1;
     private static final int SLOT_HORSE_INVENTORY_START = 2;
 
     public HorseInventoryMenu(int containerId, Inventory inventory, Container horseContainer, final AbstractHorse horse, int columns) {

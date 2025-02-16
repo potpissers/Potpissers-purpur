@@ -158,7 +158,7 @@ public class PolarBear extends Animal implements NeutralMob {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.POLAR_BEAR_DEATH;
     }
 

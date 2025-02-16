@@ -56,9 +56,9 @@ public class Ravager extends Raider {
     private static final float STUNNED_COLOR_RED = 0.49803922F;
     public static final int ATTACK_DURATION = 10;
     public static final int STUN_DURATION = 40;
-    private int attackTick;
-    private int stunnedTick;
-    private int roarTick;
+    public int attackTick;
+    public int stunnedTick;
+    public int roarTick;
 
     public Ravager(EntityType<? extends Ravager> entityType, Level level) {
         super(entityType, level);
@@ -304,7 +304,7 @@ public class Ravager extends Raider {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.RAVAGER_DEATH;
     }
 

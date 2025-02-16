@@ -99,7 +99,7 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
     public final Settings<DedicatedServerProperties>.MutableValue<Boolean> whiteList = this.getMutable("white-list", false);
     public final boolean enforceSecureProfile = this.get("enforce-secure-profile", true);
     public final boolean logIPs = this.get("log-ips", true);
-    public final int pauseWhenEmptySeconds = this.get("pause-when-empty-seconds", 60);
+    public int pauseWhenEmptySeconds = this.get("pause-when-empty-seconds", 60);
     private final DedicatedServerProperties.WorldDimensionData worldDimensionData;
     public final WorldOptions worldOptions;
     public boolean acceptsTransfers = this.get("accepts-transfers", false);
@@ -205,7 +205,7 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
         return this.worldDimensionData.create(registries);
     }
 
-    record WorldDimensionData(JsonObject generatorSettings, String levelType) {
+    public record WorldDimensionData(JsonObject generatorSettings, String levelType) {
         private static final Map<String, ResourceKey<WorldPreset>> LEGACY_PRESET_NAMES = Map.of(
             "default", WorldPresets.NORMAL, "largebiomes", WorldPresets.LARGE_BIOMES
         );

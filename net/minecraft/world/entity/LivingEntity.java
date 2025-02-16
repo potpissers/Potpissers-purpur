@@ -161,14 +161,14 @@ public abstract class LivingEntity extends Entity implements Attackable {
     private static final double MAX_LINE_OF_SIGHT_TEST_RANGE = 128.0;
     protected static final int LIVING_ENTITY_FLAG_IS_USING = 1;
     protected static final int LIVING_ENTITY_FLAG_OFF_HAND = 2;
-    protected static final int LIVING_ENTITY_FLAG_SPIN_ATTACK = 4;
+    public static final int LIVING_ENTITY_FLAG_SPIN_ATTACK = 4;
     protected static final EntityDataAccessor<Byte> DATA_LIVING_ENTITY_FLAGS = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.BYTE);
-    private static final EntityDataAccessor<Float> DATA_HEALTH_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.FLOAT);
+    public static final EntityDataAccessor<Float> DATA_HEALTH_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<List<ParticleOptions>> DATA_EFFECT_PARTICLES = SynchedEntityData.defineId(
         LivingEntity.class, EntityDataSerializers.PARTICLES
     );
     private static final EntityDataAccessor<Boolean> DATA_EFFECT_AMBIENCE_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Integer> DATA_ARROW_COUNT_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> DATA_ARROW_COUNT_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_STINGER_COUNT_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Optional<BlockPos>> SLEEPING_POS_ID = SynchedEntityData.defineId(
         LivingEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_POS
@@ -187,8 +187,8 @@ public abstract class LivingEntity extends Entity implements Attackable {
         }
     };
     private final AttributeMap attributes;
-    private final CombatTracker combatTracker = new CombatTracker(this);
-    private final Map<Holder<MobEffect>, MobEffectInstance> activeEffects = Maps.newHashMap();
+    public CombatTracker combatTracker = new CombatTracker(this);
+    public final Map<Holder<MobEffect>, MobEffectInstance> activeEffects = Maps.newHashMap();
     private final NonNullList<ItemStack> lastHandItemStacks = NonNullList.withSize(2, ItemStack.EMPTY);
     private final NonNullList<ItemStack> lastArmorItemStacks = NonNullList.withSize(4, ItemStack.EMPTY);
     private ItemStack lastBodyItemStack = ItemStack.EMPTY;
@@ -205,7 +205,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
     public float attackAnim;
     protected int attackStrengthTicker;
     public final WalkAnimationState walkAnimation = new WalkAnimationState();
-    public final int invulnerableDuration = 20;
+    public int invulnerableDuration = 20;
     public final float timeOffs;
     public final float rotA;
     public float yBodyRot;
@@ -214,8 +214,8 @@ public abstract class LivingEntity extends Entity implements Attackable {
     public float yHeadRotO;
     public final ElytraAnimationState elytraAnimationState = new ElytraAnimationState(this);
     @Nullable
-    protected Player lastHurtByPlayer;
-    protected int lastHurtByPlayerTime;
+    public Player lastHurtByPlayer;
+    public int lastHurtByPlayerTime;
     protected boolean dead;
     protected int noActionTime;
     protected float oRun;
@@ -223,8 +223,8 @@ public abstract class LivingEntity extends Entity implements Attackable {
     protected float animStep;
     protected float animStepO;
     protected float rotOffs;
-    protected float lastHurt;
-    protected boolean jumping;
+    public float lastHurt;
+    public boolean jumping;
     public float xxa;
     public float yya;
     public float zza;
@@ -236,10 +236,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
     protected double lerpXRot;
     protected double lerpYHeadRot;
     protected int lerpHeadSteps;
-    private boolean effectsDirty = true;
+    public boolean effectsDirty = true;
     @Nullable
-    private LivingEntity lastHurtByMob;
-    private int lastHurtByMobTimestamp;
+    public LivingEntity lastHurtByMob;
+    public int lastHurtByMobTimestamp;
     @Nullable
     private LivingEntity lastHurtMob;
     private int lastHurtMobTimestamp;
@@ -247,7 +247,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
     private int noJumpDelay;
     private float absorptionAmount;
     protected ItemStack useItem = ItemStack.EMPTY;
-    protected int useItemRemaining;
+    public int useItemRemaining;
     protected int fallFlyTicks;
     private BlockPos lastPos;
     private Optional<BlockPos> lastClimbablePos = Optional.empty();
@@ -261,7 +261,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
     private float swimAmount;
     private float swimAmountO;
     protected Brain<?> brain;
-    private boolean skipDropExperience;
+    protected boolean skipDropExperience;
     private final EnumMap<EquipmentSlot, Reference2ObjectMap<Enchantment, Set<EnchantmentLocationBasedEffect>>> activeLocationDependentEnchantments = new EnumMap<>(
         EquipmentSlot.class
     );
@@ -1541,7 +1541,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
     }
 
     @Nullable
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.GENERIC_DEATH;
     }
 
@@ -2096,7 +2096,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
         }
     }
 
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 1.0F;
     }
 
@@ -2573,7 +2573,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
         this.elytraAnimationState.tick();
     }
 
-    private void detectEquipmentUpdates() {
+    public void detectEquipmentUpdates() {
         Map<EquipmentSlot, ItemStack> map = this.collectEquipmentChanges();
         if (map != null) {
             this.handleHandSwap(map);
@@ -3142,7 +3142,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
         }
     }
 
-    protected void setLivingEntityFlag(int key, boolean value) {
+    public void setLivingEntityFlag(int key, boolean value) {
         int i = this.entityData.get(DATA_LIVING_ENTITY_FLAGS);
         if (value) {
             i |= key;
@@ -3213,7 +3213,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
         }
     }
 
-    protected void completeUsingItem() {
+    public void completeUsingItem() {
         if (!this.level().isClientSide || this.isUsingItem()) {
             InteractionHand usedItemHand = this.getUsedItemHand();
             if (!this.useItem.equals(this.getItemInHand(usedItemHand))) {
@@ -3473,7 +3473,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
         return ItemStack.EMPTY;
     }
 
-    private static byte entityEventForEquipmentBreak(EquipmentSlot slot) {
+    public static byte entityEventForEquipmentBreak(EquipmentSlot slot) {
         return switch (slot) {
             case MAINHAND -> 47;
             case OFFHAND -> 48;

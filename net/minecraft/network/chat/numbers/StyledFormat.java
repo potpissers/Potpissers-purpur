@@ -28,7 +28,7 @@ public class StyledFormat implements NumberFormat {
     public static final StyledFormat NO_STYLE = new StyledFormat(Style.EMPTY);
     public static final StyledFormat SIDEBAR_DEFAULT = new StyledFormat(Style.EMPTY.withColor(ChatFormatting.RED));
     public static final StyledFormat PLAYER_LIST_DEFAULT = new StyledFormat(Style.EMPTY.withColor(ChatFormatting.YELLOW));
-    final Style style;
+    public final Style style;
 
     public StyledFormat(Style style) {
         this.style = style;

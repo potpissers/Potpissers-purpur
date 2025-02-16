@@ -33,7 +33,7 @@ public class ServerRecipeBook extends RecipeBook {
     private static final Logger LOGGER = LogUtils.getLogger();
     private final ServerRecipeBook.DisplayResolver displayResolver;
     @VisibleForTesting
-    protected final Set<ResourceKey<Recipe<?>>> known = Sets.newIdentityHashSet();
+    public final Set<ResourceKey<Recipe<?>>> known = Sets.newIdentityHashSet();
     @VisibleForTesting
     protected final Set<ResourceKey<Recipe<?>>> highlight = Sets.newIdentityHashSet();
 

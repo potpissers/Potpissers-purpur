@@ -248,7 +248,7 @@ public class IronGolem extends AbstractGolem implements NeutralMob {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.IRON_GOLEM_DEATH;
     }
 

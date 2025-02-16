@@ -66,36 +66,36 @@ public class EndDragonFight {
     public static final int TIME_BETWEEN_PLAYER_SCANS = 20;
     private static final int ARENA_SIZE_CHUNKS = 8;
     public static final int ARENA_TICKET_LEVEL = 9;
-    private static final int GATEWAY_COUNT = 20;
+    public static final int GATEWAY_COUNT = 20;
     private static final int GATEWAY_DISTANCE = 96;
     public static final int DRAGON_SPAWN_Y = 128;
     private final Predicate<Entity> validPlayer;
-    private final ServerBossEvent dragonEvent = (ServerBossEvent)new ServerBossEvent(
+    public final ServerBossEvent dragonEvent = (ServerBossEvent)new ServerBossEvent(
             Component.translatable("entity.minecraft.ender_dragon"), BossEvent.BossBarColor.PINK, BossEvent.BossBarOverlay.PROGRESS
         )
         .setPlayBossMusic(true)
         .setCreateWorldFog(true);
-    private final ServerLevel level;
+    public final ServerLevel level;
     private final BlockPos origin;
-    private final ObjectArrayList<Integer> gateways = new ObjectArrayList<>();
+    public final ObjectArrayList<Integer> gateways = new ObjectArrayList<>();
     private final BlockPattern exitPortalPattern;
     private int ticksSinceDragonSeen;
     private int crystalsAlive;
     private int ticksSinceCrystalsScanned;
     private int ticksSinceLastPlayerScan = 21;
     private boolean dragonKilled;
-    private boolean previouslyKilled;
+    public boolean previouslyKilled;
     private boolean skipArenaLoadedCheck = false;
     @Nullable
-    private UUID dragonUUID;
+    public UUID dragonUUID;
     private boolean needsStateScanning = true;
     @Nullable
-    private BlockPos portalLocation;
+    public BlockPos portalLocation;
     @Nullable
-    private DragonRespawnAnimation respawnStage;
+    public DragonRespawnAnimation respawnStage;
     private int respawnTime;
     @Nullable
-    private List<EndCrystal> respawnCrystals;
+    public List<EndCrystal> respawnCrystals;
 
     public EndDragonFight(ServerLevel level, long seed, EndDragonFight.Data data) {
         this(level, seed, data, BlockPos.ZERO);
@@ -232,7 +232,7 @@ public class EndDragonFight {
         }
     }
 
-    protected void setRespawnStage(DragonRespawnAnimation state) {
+    public void setRespawnStage(DragonRespawnAnimation state) {
         if (this.respawnStage == null) {
             throw new IllegalStateException("Dragon respawn isn't in progress, can't skip ahead in the animation.");
         } else {
@@ -269,7 +269,7 @@ public class EndDragonFight {
     }
 
     @Nullable
-    private BlockPattern.BlockPatternMatch findExitPortal() {
+    public BlockPattern.BlockPatternMatch findExitPortal() {
         ChunkPos chunkPos = new ChunkPos(this.origin);
 
         for (int i = -8 + chunkPos.x; i <= 8 + chunkPos.x; i++) {
@@ -394,7 +394,7 @@ public class EndDragonFight {
         }
     }
 
-    private void spawnNewGateway(BlockPos pos) {
+    public void spawnNewGateway(BlockPos pos) {
         this.level.levelEvent(3000, pos, 0);
         this.level
             .registryAccess()
@@ -403,7 +403,7 @@ public class EndDragonFight {
             .ifPresent(endGatewayFeature -> endGatewayFeature.value().place(this.level, this.level.getChunkSource().getGenerator(), RandomSource.create(), pos));
     }
 
-    private void spawnExitPortal(boolean active) {
+    public void spawnExitPortal(boolean active) {
         EndPodiumFeature endPodiumFeature = new EndPodiumFeature(active);
         if (this.portalLocation == null) {
             this.portalLocation = this.level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EndPodiumFeature.getLocation(this.origin)).below();
@@ -503,7 +503,7 @@ public class EndDragonFight {
         }
     }
 
-    private void respawnDragon(List<EndCrystal> crystals) {
+    public void respawnDragon(List<EndCrystal> crystals) {
         if (this.dragonKilled && this.respawnStage == null) {
             for (BlockPattern.BlockPatternMatch blockPatternMatch = this.findExitPortal(); blockPatternMatch != null; blockPatternMatch = this.findExitPortal()) {
                 for (int i = 0; i < this.exitPortalPattern.getWidth(); i++) {

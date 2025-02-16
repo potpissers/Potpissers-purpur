@@ -78,7 +78,7 @@ public class TurtleEggBlock extends Block {
         }
     }
 
-    private void decreaseEggs(Level level, BlockPos pos, BlockState state) {
+    public void decreaseEggs(Level level, BlockPos pos, BlockState state) {
         level.playSound(null, pos, SoundEvents.TURTLE_EGG_BREAK, SoundSource.BLOCKS, 0.7F, 0.9F + level.random.nextFloat() * 0.2F);
         int eggsValue = state.getValue(EGGS);
         if (eggsValue <= 1) {

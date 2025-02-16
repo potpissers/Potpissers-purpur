@@ -17,7 +17,7 @@ public class BlockStateData {
     private static final Object2IntMap<String> ID_BY_OLD_NAME = DataFixUtils.make(new Object2IntOpenHashMap<>(), map -> map.defaultReturnValue(-1));
     static final String FILTER_ME = "%%FILTER_ME%%";
 
-    private static void register(int id, String fixedNBT, String... sourceNBTs) {
+    public static void register(int id, String fixedNBT, String... sourceNBTs) {
         Dynamic<?> dynamic = parse(fixedNBT);
         MAP[id] = dynamic;
         int i = id >> 4;

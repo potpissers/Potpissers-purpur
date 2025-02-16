@@ -237,7 +237,7 @@ public class Util {
         throw throwable instanceof RuntimeException ? (RuntimeException)throwable : new RuntimeException(throwable);
     }
 
-    private static void onThreadException(Thread thread, Throwable throwable) {
+    public static void onThreadException(Thread thread, Throwable throwable) {
         pauseInIde(throwable);
         if (throwable instanceof CompletionException) {
             throwable = throwable.getCause();

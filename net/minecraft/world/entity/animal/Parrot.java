@@ -338,7 +338,7 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.PARROT_DEATH;
     }
 

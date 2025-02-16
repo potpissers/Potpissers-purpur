@@ -25,7 +25,7 @@ public class SculkSensorBlockEntity extends BlockEntity implements GameEventList
     private VibrationSystem.Data vibrationData;
     private final VibrationSystem.Listener vibrationListener;
     private final VibrationSystem.User vibrationUser = this.createVibrationUser();
-    private int lastVibrationFrequency;
+    public int lastVibrationFrequency;
 
     protected SculkSensorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);

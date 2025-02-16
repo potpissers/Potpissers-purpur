@@ -10,7 +10,7 @@ public class ClientboundSetDefaultSpawnPositionPacket implements Packet<ClientGa
     public static final StreamCodec<FriendlyByteBuf, ClientboundSetDefaultSpawnPositionPacket> STREAM_CODEC = Packet.codec(
         ClientboundSetDefaultSpawnPositionPacket::write, ClientboundSetDefaultSpawnPositionPacket::new
     );
-    private final BlockPos pos;
+    public final BlockPos pos;
     private final float angle;
 
     public ClientboundSetDefaultSpawnPositionPacket(BlockPos pos, float angle) {

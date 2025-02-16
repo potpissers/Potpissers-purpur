@@ -94,7 +94,7 @@ public class Bogged extends AbstractSkeleton implements Shearable {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.BOGGED_DEATH;
     }
 

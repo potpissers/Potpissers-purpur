@@ -38,18 +38,18 @@ public class AreaEffectCloud extends Entity implements TraceableEntity {
     private static final float DEFAULT_RADIUS = 3.0F;
     public static final float DEFAULT_WIDTH = 6.0F;
     public static final float HEIGHT = 0.5F;
-    private PotionContents potionContents = PotionContents.EMPTY;
+    public PotionContents potionContents = PotionContents.EMPTY;
     private final Map<Entity, Integer> victims = Maps.newHashMap();
     private int duration = 600;
-    private int waitTime = 20;
-    private int reapplicationDelay = 20;
-    private int durationOnUse;
-    private float radiusOnUse;
-    private float radiusPerTick;
+    public int waitTime = 20;
+    public int reapplicationDelay = 20;
+    public int durationOnUse;
+    public float radiusOnUse;
+    public float radiusPerTick;
     @Nullable
     private LivingEntity owner;
     @Nullable
-    private UUID ownerUUID;
+    public UUID ownerUUID;
 
     public AreaEffectCloud(EntityType<? extends AreaEffectCloud> entityType, Level level) {
         super(entityType, level);
@@ -92,7 +92,7 @@ public class AreaEffectCloud extends Entity implements TraceableEntity {
         this.updateColor();
     }
 
-    private void updateColor() {
+    public void updateColor() {
         ParticleOptions particleOptions = this.entityData.get(DATA_PARTICLE);
         if (particleOptions instanceof ColorParticleOption colorParticleOption) {
             int i = this.potionContents.equals(PotionContents.EMPTY) ? 0 : this.potionContents.getColor();

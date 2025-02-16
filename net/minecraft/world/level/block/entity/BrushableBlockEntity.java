@@ -43,12 +43,12 @@ public class BrushableBlockEntity extends BlockEntity {
     private int brushCount;
     private long brushCountResetsAtTick;
     private long coolDownEndsAtTick;
-    private ItemStack item = ItemStack.EMPTY;
+    public ItemStack item = ItemStack.EMPTY;
     @Nullable
     private Direction hitDirection;
     @Nullable
-    private ResourceKey<LootTable> lootTable;
-    private long lootTableSeed;
+    public ResourceKey<LootTable> lootTable;
+    public long lootTableSeed;
 
     public BrushableBlockEntity(BlockPos pos, BlockState blockState) {
         super(BlockEntityType.BRUSHABLE_BLOCK, pos, blockState);

@@ -32,7 +32,7 @@ public abstract class HangingEntity extends BlockAttachedEntity {
         this.pos = pos;
     }
 
-    protected void setDirection(Direction facingDirection) {
+    public void setDirection(Direction facingDirection) {
         Objects.requireNonNull(facingDirection);
         Validate.isTrue(facingDirection.getAxis().isHorizontal());
         this.direction = facingDirection;

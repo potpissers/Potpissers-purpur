@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 public class FeatureFlagRegistry {
     private static final Logger LOGGER = LogUtils.getLogger();
     private final FeatureFlagUniverse universe;
-    private final Map<ResourceLocation, FeatureFlag> names;
+    public final Map<ResourceLocation, FeatureFlag> names;
     private final FeatureFlagSet allFlags;
 
     FeatureFlagRegistry(FeatureFlagUniverse universe, FeatureFlagSet allFlags, Map<ResourceLocation, FeatureFlag> names) {

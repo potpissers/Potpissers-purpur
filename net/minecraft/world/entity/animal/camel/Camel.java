@@ -321,7 +321,7 @@ public class Camel extends AbstractHorse {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.CAMEL_DEATH;
     }
 

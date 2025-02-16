@@ -112,7 +112,7 @@ public abstract class PlayerList {
     private static final int SEND_PLAYER_INFO_INTERVAL = 600;
     private static final SimpleDateFormat BAN_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
     private final MinecraftServer server;
-    private final List<ServerPlayer> players = Lists.newArrayList();
+    public final List<ServerPlayer> players = Lists.newArrayList();
     private final Map<UUID, ServerPlayer> playersByUUID = Maps.newHashMap();
     private final UserBanList bans = new UserBanList(USERBANLIST_FILE);
     private final IpBanList ipBans = new IpBanList(IPBANLIST_FILE);
@@ -120,10 +120,10 @@ public abstract class PlayerList {
     private final UserWhiteList whitelist = new UserWhiteList(WHITELIST_FILE);
     private final Map<UUID, ServerStatsCounter> stats = Maps.newHashMap();
     private final Map<UUID, PlayerAdvancements> advancements = Maps.newHashMap();
-    private final PlayerDataStorage playerIo;
+    public final PlayerDataStorage playerIo;
     private boolean doWhiteList;
     private final LayeredRegistryAccess<RegistryLayer> registries;
-    protected final int maxPlayers;
+    public int maxPlayers;
     private int viewDistance;
     private int simulationDistance;
     private boolean allowCommandsForAllPlayers;
@@ -238,7 +238,7 @@ public abstract class PlayerList {
         player.initInventoryMenu();
     }
 
-    protected void updateEntireScoreboard(ServerScoreboard scoreboard, ServerPlayer player) {
+    public void updateEntireScoreboard(ServerScoreboard scoreboard, ServerPlayer player) {
         Set<Objective> set = Sets.newHashSet();
 
         for (PlayerTeam playerTeam : scoreboard.getPlayerTeams()) {

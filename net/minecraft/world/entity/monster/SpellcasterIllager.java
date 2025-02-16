@@ -63,7 +63,7 @@ public abstract class SpellcasterIllager extends AbstractIllager {
         this.entityData.set(DATA_SPELL_CASTING_ID, (byte)currentSpell.id);
     }
 
-    protected SpellcasterIllager.IllagerSpell getCurrentSpell() {
+    public SpellcasterIllager.IllagerSpell getCurrentSpell() {
         return !this.level().isClientSide ? this.currentSpell : SpellcasterIllager.IllagerSpell.byId(this.entityData.get(DATA_SPELL_CASTING_ID));
     }
 
@@ -117,7 +117,7 @@ public abstract class SpellcasterIllager extends AbstractIllager {
 
     protected abstract SoundEvent getCastingSoundEvent();
 
-    protected static enum IllagerSpell {
+    public static enum IllagerSpell {
         NONE(0, 0.0, 0.0, 0.0),
         SUMMON_VEX(1, 0.7, 0.7, 0.8),
         FANGS(2, 0.4, 0.3, 0.35),

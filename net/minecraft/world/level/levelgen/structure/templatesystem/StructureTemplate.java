@@ -67,8 +67,8 @@ public class StructureTemplate {
     public static final String ENTITY_TAG_BLOCKPOS = "blockPos";
     public static final String ENTITY_TAG_NBT = "nbt";
     public static final String SIZE_TAG = "size";
-    private final List<StructureTemplate.Palette> palettes = Lists.newArrayList();
-    private final List<StructureTemplate.StructureEntityInfo> entityInfoList = Lists.newArrayList();
+    public final List<StructureTemplate.Palette> palettes = Lists.newArrayList();
+    public final List<StructureTemplate.StructureEntityInfo> entityInfoList = Lists.newArrayList();
     private Vec3i size = Vec3i.ZERO;
     private String author = "?";
 

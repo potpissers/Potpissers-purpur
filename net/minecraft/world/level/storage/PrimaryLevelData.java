@@ -43,7 +43,7 @@ public class PrimaryLevelData implements ServerLevelData, WorldData {
     public static final String LEVEL_NAME = "LevelName";
     protected static final String PLAYER = "Player";
     protected static final String WORLD_GEN_SETTINGS = "WorldGenSettings";
-    private LevelSettings settings;
+    public LevelSettings settings;
     private final WorldOptions worldOptions;
     private final PrimaryLevelData.SpecialWorldProperty specialWorldProperty;
     private final Lifecycle worldGenSettingsLifecycle;

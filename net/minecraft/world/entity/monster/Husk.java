@@ -28,7 +28,7 @@ public class Husk extends Zombie {
     }
 
     @Override
-    protected boolean isSunSensitive() {
+    public boolean isSunSensitive() {
         return false;
     }
 
@@ -43,7 +43,7 @@ public class Husk extends Zombie {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.HUSK_DEATH;
     }
 

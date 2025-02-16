@@ -52,7 +52,7 @@ public abstract class PathNavigation {
     private BlockPos targetPos;
     private int reachRange;
     private float maxVisitedNodesMultiplier = 1.0F;
-    private final PathFinder pathFinder;
+    public final PathFinder pathFinder;
     private boolean isStuck;
     private float requiredPathLength = 16.0F;
 

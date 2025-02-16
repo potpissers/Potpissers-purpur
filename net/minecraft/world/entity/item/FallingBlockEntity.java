@@ -51,13 +51,13 @@ import org.slf4j.Logger;
 
 public class FallingBlockEntity extends Entity {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private BlockState blockState = Blocks.SAND.defaultBlockState();
+    public BlockState blockState = Blocks.SAND.defaultBlockState();
     public int time;
     public boolean dropItem = true;
-    private boolean cancelDrop;
-    private boolean hurtEntities;
-    private int fallDamageMax = 40;
-    private float fallDamagePerDistance;
+    public boolean cancelDrop;
+    public boolean hurtEntities;
+    public int fallDamageMax = 40;
+    public float fallDamagePerDistance;
     @Nullable
     public CompoundTag blockData;
     public boolean forceTickAfterTeleportToDuplicate;
@@ -67,7 +67,7 @@ public class FallingBlockEntity extends Entity {
         super(entityType, level);
     }
 
-    private FallingBlockEntity(Level level, double x, double y, double z, BlockState state) {
+    public FallingBlockEntity(Level level, double x, double y, double z, BlockState state) {
         this(EntityType.FALLING_BLOCK, level);
         this.blockState = state;
         this.blocksBuilding = true;

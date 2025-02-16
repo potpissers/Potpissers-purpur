@@ -23,9 +23,9 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class BaseContainerBlockEntity extends BlockEntity implements Container, MenuProvider, Nameable {
-    private LockCode lockKey = LockCode.NO_LOCK;
+    public LockCode lockKey = LockCode.NO_LOCK;
     @Nullable
-    private Component name;
+    public Component name;
 
     protected BaseContainerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);

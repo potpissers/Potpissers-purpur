@@ -56,7 +56,7 @@ public class VaultServerData {
         return this.lastInsertFailTimestamp;
     }
 
-    Set<UUID> getRewardedPlayers() {
+    public Set<UUID> getRewardedPlayers() {
         return this.rewardedPlayers;
     }
 
@@ -78,11 +78,11 @@ public class VaultServerData {
         this.markChanged();
     }
 
-    long stateUpdatingResumesAt() {
+    public long stateUpdatingResumesAt() {
         return this.stateUpdatingResumesAt;
     }
 
-    void pauseStateUpdatingUntil(long time) {
+    public void pauseStateUpdatingUntil(long time) {
         this.stateUpdatingResumesAt = time;
         this.markChanged();
     }

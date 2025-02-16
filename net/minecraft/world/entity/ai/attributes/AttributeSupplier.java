@@ -14,7 +14,7 @@ public class AttributeSupplier {
         this.instances = instances;
     }
 
-    private AttributeInstance getAttributeInstance(Holder<Attribute> attribute) {
+    public AttributeInstance getAttributeInstance(Holder<Attribute> attribute) {
         AttributeInstance attributeInstance = this.instances.get(attribute);
         if (attributeInstance == null) {
             throw new IllegalArgumentException("Can't find attribute " + attribute.getRegisteredName());

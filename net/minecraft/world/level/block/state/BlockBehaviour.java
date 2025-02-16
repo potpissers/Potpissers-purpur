@@ -88,7 +88,7 @@ public abstract class BlockBehaviour implements FeatureElement {
     protected static final Direction[] UPDATE_SHAPE_ORDER = new Direction[]{
         Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH, Direction.DOWN, Direction.UP
     };
-    protected final boolean hasCollision;
+    public final boolean hasCollision;
     protected final float explosionResistance;
     protected final boolean isRandomlyTicking;
     protected final SoundType soundType;
@@ -298,7 +298,7 @@ public abstract class BlockBehaviour implements FeatureElement {
     }
 
     @Nullable
-    protected MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         return null;
     }
 
@@ -422,7 +422,7 @@ public abstract class BlockBehaviour implements FeatureElement {
         private boolean legacySolid;
         private final PushReaction pushReaction;
         private final MapColor mapColor;
-        private final float destroySpeed;
+        public final float destroySpeed;
         private final boolean requiresCorrectToolForDrops;
         private final boolean canOcclude;
         private final BlockBehaviour.StatePredicate isRedstoneConductor;

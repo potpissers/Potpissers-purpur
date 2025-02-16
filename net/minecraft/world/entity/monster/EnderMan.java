@@ -260,7 +260,7 @@ public class EnderMan extends Monster implements NeutralMob {
         super.customServerAiStep(level);
     }
 
-    protected boolean teleport() {
+    public boolean teleport() {
         if (!this.level().isClientSide() && this.isAlive()) {
             double d = this.getX() + (this.random.nextDouble() - 0.5) * 64.0;
             double d1 = this.getY() + (this.random.nextInt(64) - 32);
@@ -271,7 +271,7 @@ public class EnderMan extends Monster implements NeutralMob {
         }
     }
 
-    boolean teleportTowards(Entity target) {
+    public boolean teleportTowards(Entity target) {
         Vec3 vec3 = new Vec3(this.getX() - target.getX(), this.getY(0.5) - target.getEyeY(), this.getZ() - target.getZ());
         vec3 = vec3.normalize();
         double d = 16.0;
@@ -319,7 +319,7 @@ public class EnderMan extends Monster implements NeutralMob {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.ENDERMAN_DEATH;
     }
 

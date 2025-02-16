@@ -61,7 +61,7 @@ public class EnderDragon extends Mob implements Enemy {
     private static final String DRAGON_DEATH_TIME_KEY = "DragonDeathTime";
     private static final String DRAGON_PHASE_KEY = "DragonPhase";
     public final DragonFlightHistory flightHistory = new DragonFlightHistory();
-    private final EnderDragonPart[] subEntities;
+    public final EnderDragonPart[] subEntities;
     public final EnderDragonPart head;
     private final EnderDragonPart neck;
     private final EnderDragonPart body;
@@ -786,7 +786,7 @@ public class EnderDragon extends Mob implements Enemy {
     }
 
     @Override
-    protected float getSoundVolume() {
+    public float getSoundVolume() {
         return 5.0F;
     }
 

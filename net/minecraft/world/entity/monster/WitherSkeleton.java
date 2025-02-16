@@ -51,7 +51,7 @@ public class WitherSkeleton extends AbstractSkeleton {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.WITHER_SKELETON_DEATH;
     }
 

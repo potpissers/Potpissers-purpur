@@ -43,7 +43,7 @@ public enum ChatFormatting implements StringRepresentable {
         .collect(Collectors.toMap(formatting -> cleanName(formatting.name), chatFormatter -> (ChatFormatting)chatFormatter));
     private static final Pattern STRIP_FORMATTING_PATTERN = Pattern.compile("(?i)§[0-9A-FK-OR]");
     private final String name;
-    private final char code;
+    public final char code;
     private final boolean isFormat;
     private final String toString;
     private final int id;

@@ -32,17 +32,17 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class FireworkRocketEntity extends Projectile implements ItemSupplier {
-    private static final EntityDataAccessor<ItemStack> DATA_ID_FIREWORKS_ITEM = SynchedEntityData.defineId(
+    public static final EntityDataAccessor<ItemStack> DATA_ID_FIREWORKS_ITEM = SynchedEntityData.defineId(
         FireworkRocketEntity.class, EntityDataSerializers.ITEM_STACK
     );
-    private static final EntityDataAccessor<OptionalInt> DATA_ATTACHED_TO_TARGET = SynchedEntityData.defineId(
+    public static final EntityDataAccessor<OptionalInt> DATA_ATTACHED_TO_TARGET = SynchedEntityData.defineId(
         FireworkRocketEntity.class, EntityDataSerializers.OPTIONAL_UNSIGNED_INT
     );
-    private static final EntityDataAccessor<Boolean> DATA_SHOT_AT_ANGLE = SynchedEntityData.defineId(FireworkRocketEntity.class, EntityDataSerializers.BOOLEAN);
-    private int life;
-    private int lifetime;
+    public static final EntityDataAccessor<Boolean> DATA_SHOT_AT_ANGLE = SynchedEntityData.defineId(FireworkRocketEntity.class, EntityDataSerializers.BOOLEAN);
+    public int life;
+    public int lifetime;
     @Nullable
-    private LivingEntity attachedToEntity;
+    public LivingEntity attachedToEntity;
 
     public FireworkRocketEntity(EntityType<? extends FireworkRocketEntity> entityType, Level level) {
         super(entityType, level);
@@ -316,7 +316,7 @@ public class FireworkRocketEntity extends Projectile implements ItemSupplier {
         return false;
     }
 
-    private static ItemStack getDefaultItem() {
+    public static ItemStack getDefaultItem() {
         return new ItemStack(Items.FIREWORK_ROCKET);
     }
 

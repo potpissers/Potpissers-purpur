@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class BarrelBlockEntity extends RandomizableContainerBlockEntity {
     private NonNullList<ItemStack> items = NonNullList.withSize(27, ItemStack.EMPTY);
-    private final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
+    public final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
         @Override
         protected void onOpen(Level level, BlockPos pos, BlockState state) {
             BarrelBlockEntity.this.playSound(state, SoundEvents.BARREL_OPEN);
@@ -116,11 +116,11 @@ public class BarrelBlockEntity extends RandomizableContainerBlockEntity {
         }
     }
 
-    void updateBlockState(BlockState state, boolean _open) {
+    public void updateBlockState(BlockState state, boolean _open) {
         this.level.setBlock(this.getBlockPos(), state.setValue(BarrelBlock.OPEN, Boolean.valueOf(_open)), 3);
     }
 
-    void playSound(BlockState state, SoundEvent sound) {
+    public void playSound(BlockState state, SoundEvent sound) {
         Vec3i unitVec3i = state.getValue(BarrelBlock.FACING).getUnitVec3i();
         double d = this.worldPosition.getX() + 0.5 + unitVec3i.getX() / 2.0;
         double d1 = this.worldPosition.getY() + 0.5 + unitVec3i.getY() / 2.0;

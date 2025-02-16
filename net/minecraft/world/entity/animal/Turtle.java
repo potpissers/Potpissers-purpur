@@ -88,7 +88,7 @@ public class Turtle extends Animal {
         this.entityData.set(HOME_POS, homePos);
     }
 
-    BlockPos getHomePos() {
+    public BlockPos getHomePos() {
         return this.entityData.get(HOME_POS);
     }
 
@@ -104,7 +104,7 @@ public class Turtle extends Animal {
         return this.entityData.get(HAS_EGG);
     }
 
-    void setHasEgg(boolean hasEgg) {
+    public void setHasEgg(boolean hasEgg) {
         this.entityData.set(HAS_EGG, hasEgg);
     }
 
@@ -117,19 +117,19 @@ public class Turtle extends Animal {
         this.entityData.set(LAYING_EGG, isLayingEgg);
     }
 
-    boolean isGoingHome() {
+    public boolean isGoingHome() {
         return this.entityData.get(GOING_HOME);
     }
 
-    void setGoingHome(boolean isGoingHome) {
+    public void setGoingHome(boolean isGoingHome) {
         this.entityData.set(GOING_HOME, isGoingHome);
     }
 
-    boolean isTravelling() {
+    public boolean isTravelling() {
         return this.entityData.get(TRAVELLING);
     }
 
-    void setTravelling(boolean isTravelling) {
+    public void setTravelling(boolean isTravelling) {
         this.entityData.set(TRAVELLING, isTravelling);
     }
 
@@ -237,7 +237,7 @@ public class Turtle extends Animal {
 
     @Nullable
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return this.isBaby() ? SoundEvents.TURTLE_DEATH_BABY : SoundEvents.TURTLE_DEATH;
     }
 

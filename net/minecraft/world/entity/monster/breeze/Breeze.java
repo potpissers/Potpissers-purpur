@@ -203,7 +203,7 @@ public class Breeze extends Monster {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.BREEZE_DEATH;
     }
 

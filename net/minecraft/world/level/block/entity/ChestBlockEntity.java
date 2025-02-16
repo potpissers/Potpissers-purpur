@@ -27,7 +27,7 @@ import net.minecraft.world.level.block.state.properties.ChestType;
 public class ChestBlockEntity extends RandomizableContainerBlockEntity implements LidBlockEntity {
     private static final int EVENT_SET_OPEN_COUNT = 1;
     private NonNullList<ItemStack> items = NonNullList.withSize(27, ItemStack.EMPTY);
-    private final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
+    public final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
         @Override
         protected void onOpen(Level level, BlockPos pos, BlockState state) {
             ChestBlockEntity.playSound(level, pos, state, SoundEvents.CHEST_OPEN);
@@ -95,7 +95,7 @@ public class ChestBlockEntity extends RandomizableContainerBlockEntity implement
         blockEntity.chestLidController.tickLid();
     }
 
-    static void playSound(Level level, BlockPos pos, BlockState state, SoundEvent sound) {
+    public static void playSound(Level level, BlockPos pos, BlockState state, SoundEvent sound) {
         ChestType chestType = state.getValue(ChestBlock.TYPE);
         if (chestType != ChestType.LEFT) {
             double d = pos.getX() + 0.5;

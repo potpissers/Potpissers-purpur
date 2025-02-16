@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 
 public class ServerAdvancementManager extends SimpleJsonResourceReloadListener<Advancement> {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private Map<ResourceLocation, AdvancementHolder> advancements = Map.of();
+    public Map<ResourceLocation, AdvancementHolder> advancements = Map.of();
     private AdvancementTree tree = new AdvancementTree();
     private final HolderLookup.Provider registries;
 

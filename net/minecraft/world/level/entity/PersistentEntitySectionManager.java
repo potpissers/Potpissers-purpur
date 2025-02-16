@@ -33,7 +33,7 @@ public class PersistentEntitySectionManager<T extends EntityAccess> implements A
     static final Logger LOGGER = LogUtils.getLogger();
     final Set<UUID> knownUuids = Sets.newHashSet();
     final LevelCallback<T> callbacks;
-    private final EntityPersistentStorage<T> permanentStorage;
+    public final EntityPersistentStorage<T> permanentStorage;
     private final EntityLookup<T> visibleEntityStorage;
     final EntitySectionStorage<T> sectionStorage;
     private final LevelEntityGetter<T> entityGetter;
@@ -164,7 +164,7 @@ public class PersistentEntitySectionManager<T extends EntityAccess> implements A
         });
     }
 
-    private void ensureChunkQueuedForLoad(long chunkPosValue) {
+    public void ensureChunkQueuedForLoad(long chunkPosValue) {
         PersistentEntitySectionManager.ChunkLoadStatus chunkLoadStatus = this.chunkLoadStatuses.get(chunkPosValue);
         if (chunkLoadStatus == PersistentEntitySectionManager.ChunkLoadStatus.FRESH) {
             this.requestChunkLoad(chunkPosValue);

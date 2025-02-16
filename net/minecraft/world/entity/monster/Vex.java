@@ -49,8 +49,8 @@ public class Vex extends Monster implements TraceableEntity {
     Mob owner;
     @Nullable
     private BlockPos boundOrigin;
-    private boolean hasLimitedLife;
-    private int limitedLifeTicks;
+    public boolean hasLimitedLife;
+    public int limitedLifeTicks;
 
     public Vex(EntityType<? extends Vex> entityType, Level level) {
         super(entityType, level);
@@ -64,7 +64,7 @@ public class Vex extends Monster implements TraceableEntity {
     }
 
     @Override
-    protected boolean isAffectedByBlocks() {
+    public boolean isAffectedByBlocks() {
         return !this.isRemoved();
     }
 
@@ -191,7 +191,7 @@ public class Vex extends Monster implements TraceableEntity {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.VEX_DEATH;
     }
 

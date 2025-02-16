@@ -60,8 +60,8 @@ import net.minecraft.world.phys.Vec3;
 public class Drowned extends Zombie implements RangedAttackMob {
     public static final float NAUTILUS_SHELL_CHANCE = 0.03F;
     boolean searchingForLand;
-    protected final WaterBoundPathNavigation waterNavigation;
-    protected final GroundPathNavigation groundNavigation;
+    public final WaterBoundPathNavigation waterNavigation;
+    public final GroundPathNavigation groundNavigation;
 
     public Drowned(EntityType<? extends Drowned> entityType, Level level) {
         super(entityType, level);
@@ -139,7 +139,7 @@ public class Drowned extends Zombie implements RangedAttackMob {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return this.isInWater() ? SoundEvents.DROWNED_DEATH_WATER : SoundEvents.DROWNED_DEATH;
     }
 

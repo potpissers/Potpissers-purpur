@@ -76,8 +76,8 @@ public class Piglin extends AbstractPiglin implements CrossbowAttackMob, Invento
     private static final float PROBABILITY_OF_SPAWNING_AS_BABY = 0.2F;
     private static final EntityDimensions BABY_DIMENSIONS = EntityType.PIGLIN.getDimensions().scale(0.5F).withEyeHeight(0.97F);
     private static final double PROBABILITY_OF_SPAWNING_WITH_CROSSBOW_INSTEAD_OF_SWORD = 0.5;
-    private final SimpleContainer inventory = new SimpleContainer(8);
-    private boolean cannotHunt;
+    public final SimpleContainer inventory = new SimpleContainer(8);
+    public boolean cannotHunt;
     protected static final ImmutableList<SensorType<? extends Sensor<? super Piglin>>> SENSOR_TYPES = ImmutableList.of(
         SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS, SensorType.NEAREST_ITEMS, SensorType.HURT_BY, SensorType.PIGLIN_SPECIFIC_SENSOR
     );
@@ -338,7 +338,7 @@ public class Piglin extends AbstractPiglin implements CrossbowAttackMob, Invento
         return this.isBaby() ? null : ItemTags.PIGLIN_PREFERRED_WEAPONS;
     }
 
-    private boolean isChargingCrossbow() {
+    public boolean isChargingCrossbow() {
         return this.entityData.get(DATA_IS_CHARGING_CROSSBOW);
     }
 
@@ -462,7 +462,7 @@ public class Piglin extends AbstractPiglin implements CrossbowAttackMob, Invento
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.PIGLIN_DEATH;
     }
 

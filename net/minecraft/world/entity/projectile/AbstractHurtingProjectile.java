@@ -173,7 +173,7 @@ public abstract class AbstractHurtingProjectile extends Projectile {
         return 1.0F;
     }
 
-    private void assignDirectionalMovement(Vec3 movement, double accelerationPower) {
+    public void assignDirectionalMovement(Vec3 movement, double accelerationPower) {
         this.setDeltaMovement(movement.normalize().scale(accelerationPower));
         this.hasImpulse = true;
     }

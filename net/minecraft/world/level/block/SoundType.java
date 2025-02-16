@@ -795,10 +795,10 @@ public class SoundType {
     );
     public final float volume;
     public final float pitch;
-    private final SoundEvent breakSound;
+    public final SoundEvent breakSound;
     private final SoundEvent stepSound;
     private final SoundEvent placeSound;
-    private final SoundEvent hitSound;
+    public final SoundEvent hitSound;
     private final SoundEvent fallSound;
 
     public SoundType(float volume, float pitch, SoundEvent breakSound, SoundEvent stepSound, SoundEvent placeSound, SoundEvent hitSound, SoundEvent fallSound) {

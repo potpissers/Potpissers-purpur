@@ -24,7 +24,7 @@ public class DimensionArgument implements ArgumentType<ResourceLocation> {
     private static final Collection<String> EXAMPLES = Stream.of(Level.OVERWORLD, Level.NETHER)
         .map(key -> key.location().toString())
         .collect(Collectors.toList());
-    private static final DynamicCommandExceptionType ERROR_INVALID_VALUE = new DynamicCommandExceptionType(
+    public static final DynamicCommandExceptionType ERROR_INVALID_VALUE = new DynamicCommandExceptionType(
         dimension -> Component.translatableEscape("argument.dimension.invalid", dimension)
     );
 

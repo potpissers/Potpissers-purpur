@@ -180,12 +180,12 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
     private static final int EMPTY_TIME_NO_TICK = 300;
     private static final int MAX_SCHEDULED_TICKS_PER_TICK = 65536;
     final List<ServerPlayer> players = Lists.newArrayList();
-    private final ServerChunkCache chunkSource;
+    public final ServerChunkCache chunkSource;
     private final MinecraftServer server;
-    private final ServerLevelData serverLevelData;
+    public final ServerLevelData serverLevelData;
     private int lastSpawnChunkRadius;
     final EntityTickList entityTickList = new EntityTickList();
-    private final PersistentEntitySectionManager<Entity> entityManager;
+    public final PersistentEntitySectionManager<Entity> entityManager;
     private final GameEventDispatcher gameEventDispatcher;
     public boolean noSave;
     private final SleepStatus sleepStatus;
@@ -562,7 +562,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
         }
     }
 
-    private Optional<BlockPos> findLightningRod(BlockPos pos) {
+    public Optional<BlockPos> findLightningRod(BlockPos pos) {
         Optional<BlockPos> optional = this.getPoiManager()
             .findClosest(
                 pointOfInterestType -> pointOfInterestType.is(PoiTypes.LIGHTNING_ROD),
@@ -1617,7 +1617,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
     }
 
     @Override
-    protected LevelEntityGetter<Entity> getEntities() {
+    public LevelEntityGetter<Entity> getEntities() {
         return this.entityManager.getEntityGetter();
     }
 

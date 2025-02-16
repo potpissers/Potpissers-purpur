@@ -31,10 +31,10 @@ public class LightningBolt extends Entity {
     private static final int START_LIFE = 2;
     private static final double DAMAGE_RADIUS = 3.0;
     private static final double DETECTION_RADIUS = 15.0;
-    private int life;
+    public int life;
     public long seed;
-    private int flashes;
-    private boolean visualOnly;
+    public int flashes;
+    public boolean visualOnly;
     @Nullable
     private ServerPlayer cause;
     private final Set<Entity> hitEntities = Sets.newHashSet();

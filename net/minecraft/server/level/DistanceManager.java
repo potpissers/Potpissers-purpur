@@ -39,7 +39,7 @@ public abstract class DistanceManager {
     static final int PLAYER_TICKET_LEVEL = ChunkLevel.byStatus(FullChunkStatus.ENTITY_TICKING);
     private static final int INITIAL_TICKET_LIST_CAPACITY = 4;
     final Long2ObjectMap<ObjectSet<ServerPlayer>> playersPerChunk = new Long2ObjectOpenHashMap<>();
-    final Long2ObjectOpenHashMap<SortedArraySet<Ticket<?>>> tickets = new Long2ObjectOpenHashMap<>();
+    public final Long2ObjectOpenHashMap<SortedArraySet<Ticket<?>>> tickets = new Long2ObjectOpenHashMap<>();
     private final DistanceManager.ChunkTicketTracker ticketTracker = new DistanceManager.ChunkTicketTracker();
     private final DistanceManager.FixedPlayerDistanceChunkTracker naturalSpawnChunkCounter = new DistanceManager.FixedPlayerDistanceChunkTracker(8);
     private final TickingTracker tickingTicketsTracker = new TickingTracker();
@@ -49,7 +49,7 @@ public abstract class DistanceManager {
     final LongSet ticketsToRelease = new LongOpenHashSet();
     final Executor mainThreadExecutor;
     private long ticketTickCounter;
-    private int simulationDistance = 10;
+    public int simulationDistance = 10;
 
     protected DistanceManager(Executor dispatcher, Executor mainThreadExecutor) {
         TaskScheduler<Runnable> taskScheduler = TaskScheduler.wrapExecutor("player ticket throttler", mainThreadExecutor);

@@ -342,7 +342,7 @@ public class Armadillo extends Animal {
     }
 
     @Override
-    protected SoundEvent getDeathSound() {
+    public SoundEvent getDeathSound() {
         return SoundEvents.ARMADILLO_DEATH;
     }
 

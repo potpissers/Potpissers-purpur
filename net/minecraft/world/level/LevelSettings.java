@@ -4,9 +4,9 @@ import com.mojang.serialization.Dynamic;
 import net.minecraft.world.Difficulty;
 
 public final class LevelSettings {
-    private final String levelName;
+    public String levelName;
     private final GameType gameType;
-    private final boolean hardcore;
+    public boolean hardcore;
     private final Difficulty difficulty;
     private final boolean allowCommands;
     private final GameRules gameRules;
