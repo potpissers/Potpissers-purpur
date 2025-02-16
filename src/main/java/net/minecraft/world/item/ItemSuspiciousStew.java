@@ -53,4 +53,15 @@ public class ItemSuspiciousStew extends Item {
 
         return super.finishUsingItem(itemstack, world, entityliving);
     }
+
+    // CraftBukkit start
+    public void cancelUsingItem(net.minecraft.server.level.EntityPlayer entityplayer, ItemStack itemstack) {
+        SuspiciousStewEffects suspicioussteweffects = (SuspiciousStewEffects) itemstack.getOrDefault(DataComponents.SUSPICIOUS_STEW_EFFECTS, SuspiciousStewEffects.EMPTY);
+
+        for (SuspiciousStewEffects.a suspicioussteweffects_a : suspicioussteweffects.effects()) {
+            entityplayer.connection.send(new net.minecraft.network.protocol.game.PacketPlayOutRemoveEntityEffect(entityplayer.getId(), suspicioussteweffects_a.effect()));
+        }
+        entityplayer.server.getPlayerList().sendActivePlayerEffects(entityplayer);
+    }
+    // CraftBukkit end
 }
