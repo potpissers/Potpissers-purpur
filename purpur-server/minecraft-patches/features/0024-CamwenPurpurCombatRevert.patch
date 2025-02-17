@@ -1,0 +1,223 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: cameron <cuckmeron@gmail.com>
+Date: Thu, 20 Jun 2024 12:43:17 -0400
+Subject: [PATCH] CamwenPurpurCombatRevert
+
+(cherry picked from commit 80f68109b9bfc574622736184b4be288b203318d)
+
+(cherry picked from commit 64e2e65ba31c3e562a5b3878d4ccff0fdfb0f57e)
+
+diff --git a/net/minecraft/world/damagesource/CombatRules.java b/net/minecraft/world/damagesource/CombatRules.java
+index bf82de45bf98e8605a1fdb69803f75f471c4af43..dc09819eb416afe709a6dbd45c062c5c3883c506 100644
+--- a/net/minecraft/world/damagesource/CombatRules.java
++++ b/net/minecraft/world/damagesource/CombatRules.java
+@@ -33,4 +33,13 @@ public class CombatRules {
+         float f = Mth.clamp(enchantModifiers, 0.0F, org.purpurmc.purpur.PurpurConfig.limitArmor ? 20F : Float.MAX_VALUE); // Purpur - Add attribute clamping and armor limit config
+         return damage * (1.0F - f / 25.0F);
+     }
++
++    public static float getCubecoreDamageAfterMagicAbsorb(float damageDealt, float protection) {
++        float f = Mth.clamp(protection, 0.0F, org.purpurmc.purpur.PurpurConfig.limitArmor ? 20F : Float.MAX_VALUE); // Purpur
++        return damageDealt * (1.0F - (f * 0.75F) / 25.0F);
++    }
++
++    public static float getCubecoreDamageAfterAbsorb(float damage, DamageSource source, float armor, float armorToughnesss) {
++        return damage * (1.0F - (armor * 0.04F) - (armorToughnesss * 0.01F));
++    }
+ }
+diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
+index 8f36a2e043115ed3a3ab71efccc6199389ba1afb..a1455c2b9c2696db8305905690f4fa3e6bb12676 100644
+--- a/net/minecraft/world/entity/LivingEntity.java
++++ b/net/minecraft/world/entity/LivingEntity.java
+@@ -2246,13 +2246,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
+             // CamwenPurpur start
+             if (this instanceof ServerPlayer serverPlayer && damageSource.getEntity() instanceof ServerPlayer serverPlayer1) {
+                 if (!damageSource.isDirect() || NETHERITE_WEAPONS.contains(serverPlayer1.getMainHandItem().getBukkitStack().getType()))
+-                    damageAmount = CombatRules.getDamageAfterAbsorb(this, damageAmount, damageSource, (float) this.getArmorValue(), 0);
++                    damageAmount = CombatRules.getCubecoreDamageAfterAbsorb(damageAmount, damageSource, (float) this.getArmorValue(), 0); // CombatRevert
+                 else {
+                     int pvpToughness = 0;
+                     for (org.bukkit.inventory.ItemStack is : serverPlayer.getBukkitEntity().getInventory().getArmorContents())
+                         if (is != null && NETHERITE_ARMOR.contains(is.getType()))
+                             pvpToughness++;
+-                    damageAmount = CombatRules.getDamageAfterAbsorb(this, damageAmount, damageSource, (float) this.getArmorValue(), pvpToughness);
++                    damageAmount = CombatRules.getCubecoreDamageAfterAbsorb(damageAmount, damageSource, (float) this.getArmorValue(), pvpToughness); // CombatRevert
+                 }
+             }
+             else
+@@ -2303,6 +2303,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
+                     damageProtection = 0.0F;
+                 // CamwenPurpur end
+                 if (damageProtection > 0.0F) {
++
++                    // CombatRevert start
++                    if (this instanceof ServerPlayer && damageSource.getEntity() instanceof ServerPlayer)
++                        damageAmount = CombatRules.getCubecoreDamageAfterMagicAbsorb(damageAmount, damageProtection);
++                    else
++                    // CombatRevert end
+                     damageAmount = CombatRules.getDamageAfterMagicAbsorb(damageAmount, damageProtection);
+                 }
+ 
+diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
+index f8d33b5998913479436b8a1c9e9fda05b9fb44a5..e7404d65796a8a07488d73fa879b4a2ee8749876 100644
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -358,7 +358,7 @@ public abstract class Player extends LivingEntity {
+ 
+         this.attackStrengthTicker++;
+         ItemStack mainHandItem = this.getMainHandItem();
+-        if (!ItemStack.matches(this.lastItemInMainHand, mainHandItem)) {
++        if (false && !ItemStack.matches(this.lastItemInMainHand, mainHandItem)) { // CombatRevert
+             if (!ItemStack.isSameItem(this.lastItemInMainHand, mainHandItem)) {
+                 this.resetAttackStrengthTicker();
+             }
+@@ -1290,7 +1290,15 @@ public abstract class Player extends LivingEntity {
+                     if (f > 0.0F || f1 > 0.0F) {
+                         boolean flag = attackStrengthScale > 0.9F;
+                         boolean flag1;
++
++                        // CombatRevert start
++                        boolean isPvp = this instanceof ServerPlayer && target instanceof ServerPlayer;
++                        // CombatRevert end
+                         if (this.isSprinting() && flag) {
++
++                            // CombatRevert start
++                                if (!isPvp)
++                                // CombatRevert end
+                             this.sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
+                             flag1 = true;
+                         } else {
+@@ -1306,7 +1314,7 @@ public abstract class Player extends LivingEntity {
+                             && !this.hasEffect(MobEffects.BLINDNESS)
+                             && !this.isPassenger()
+                             && target instanceof LivingEntity
+-                            && !this.isSprinting();
++                            && (isPvp || !this.isSprinting()); // CombatRevert
+                         flag2 = flag2 && !this.level().paperConfig().entities.behavior.disablePlayerCrits; // Paper - Toggleable player crits
+                         if (flag2) {
+                             damageSource = damageSource.critical(true); // Paper start - critical damage API
+@@ -1334,15 +1342,33 @@ public abstract class Player extends LivingEntity {
+                             float f4 = this.getKnockback(target, damageSource) + (flag1 ? 1.0F : 0.0F);
+ 
+                             // CamwenPurpur start
++
++                            // CombatRevert start
++                            boolean isSprintHit = false;
++                            // CombatRevert end
+                             if (flag1 && this instanceof ServerPlayer serverPlayer) {
+                                 if (serverPlayer.hasSprintHit)
+                                     f4--;
+-                                else
++                                else { // CombatRevert
+                                     serverPlayer.hasSprintHit = true;
++
++                                    // CombatRevert start
++                                isSprintHit = true;
++                                // CombatRevert end
++                                } // CombatRevert
+                             }
+                             // CamwenPurpur end
+                             if (f4 > 0.0F) {
+                                 if (target instanceof LivingEntity livingEntity1) {
++
++                                    // CombatRevert start
++                                            if (isPvp && isSprintHit)
++                                        livingEntity1.knockback(
++                                            f4 * 0.75F, Mth.sin(this.getYRot() * (float) (Math.PI / 180.0)), -Mth.cos(this.getYRot() * (float) (Math.PI / 180.0))
++                                            , this, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK // Paper - knockback events
++                                        );
++                                    else
++                                            // CombatRevert end
+                                     livingEntity1.knockback(
+                                         f4 * 0.5F, Mth.sin(this.getYRot() * (float) (Math.PI / 180.0)), -Mth.cos(this.getYRot() * (float) (Math.PI / 180.0))
+                                         , this, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK // Paper - knockback events
+@@ -1391,6 +1417,9 @@ public abstract class Player extends LivingEntity {
+                                     }
+                                 }
+ 
++                                // CombatRevert start
++                                if (!isPvp)
++                                // CombatRevert end
+                                 this.sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
+                                 this.sweepAttack();
+                             }
+@@ -1419,11 +1448,15 @@ public abstract class Player extends LivingEntity {
+                             }
+ 
+                             if (flag2) {
++
++                                // CombatRevert start
++                                if (!isPvp)
++                                // CombatRevert end
+                                 this.sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
+                                 this.crit(target);
+                             }
+ 
+-                            if (!flag2 && !flag3) {
++                            if (!flag2 && !flag3 && !isPvp) { // CombatRevert
+                                 if (flag) {
+                                     this.sendSoundEffect(
+                                             this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, this.getSoundSource(), 1.0F, 1.0F // Paper - send while respecting visibility
+@@ -1483,6 +1516,10 @@ public abstract class Player extends LivingEntity {
+ 
+                             this.causeFoodExhaustion(this.level().spigotConfig.combatExhaustion, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.ATTACK); // CraftBukkit - EntityExhaustionEvent // Spigot - Change to use configurable value
+                         } else {
++
++                            // CombatRevert start
++                            if (!isPvp)
++                            // CombatRevert end
+                             this.sendSoundEffect(this, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, this.getSoundSource(), 1.0F, 1.0F); // Paper - send while respecting visibility
+                             // CraftBukkit start - resync on cancelled event
+                             if (this instanceof ServerPlayer) {
+diff --git a/net/minecraft/world/item/DiggerItem.java b/net/minecraft/world/item/DiggerItem.java
+index 5c95bc35877d037fb6d12f42977dfd2100128ae0..502be0232bdc7e6fd2e4a38f5a1aa93975f261d5 100644
+--- a/net/minecraft/world/item/DiggerItem.java
++++ b/net/minecraft/world/item/DiggerItem.java
+@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.Block;
+ 
+ public class DiggerItem extends Item {
+     protected DiggerItem(ToolMaterial properties, TagKey<Block> mineableBlocks, float attackDamage, float attackSpeed, Item.Properties properties1) {
+-        super(properties.applyToolProperties(properties1, mineableBlocks, attackDamage, attackSpeed));
++        super(properties.applyToolProperties(properties1, mineableBlocks, attackDamage, 0)); // CombatRevert
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/item/MaceItem.java b/net/minecraft/world/item/MaceItem.java
+index 57c6e5213ee5c450e71489a3d806801dd9dc23b6..acb605eebdec431482cb49e525f21be0a3a0f561 100644
+--- a/net/minecraft/world/item/MaceItem.java
++++ b/net/minecraft/world/item/MaceItem.java
+@@ -45,7 +45,7 @@ public class MaceItem extends Item {
+                 Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, 5.0, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND
+             )
+             .add(
+-                Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, -3.4F, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND
++                Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, 0.0F, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND
+             )
+             .build();
+     }
+diff --git a/net/minecraft/world/item/SwordItem.java b/net/minecraft/world/item/SwordItem.java
+index 65fdb3a4c3627da820d2525ede898599e473fda9..fe03ed6c6f28f2747784c5ca1032e7680d45fa65 100644
+--- a/net/minecraft/world/item/SwordItem.java
++++ b/net/minecraft/world/item/SwordItem.java
+@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
+ 
+ public class SwordItem extends Item {
+     public SwordItem(ToolMaterial properties, float attackDamage, float attackSpeed, Item.Properties properties1) {
+-        super(properties.applySwordProperties(properties1, attackDamage, attackSpeed));
++        super(properties.applySwordProperties(properties1, attackDamage, 0)); // CombatRevert
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/item/TridentItem.java b/net/minecraft/world/item/TridentItem.java
+index 588239656b9ce81c8e6589c664f65da297484a44..ecdfa7e01e8dd5c2b84d53ebe110d0785525fc73 100644
+--- a/net/minecraft/world/item/TridentItem.java
++++ b/net/minecraft/world/item/TridentItem.java
+@@ -46,7 +46,7 @@ public class TridentItem extends Item implements ProjectileItem {
+                 Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, 8.0, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND
+             )
+             .add(
+-                Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, -2.9F, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND
++                Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, 0, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND // CombatRevert
+             )
+             .build();
+     }

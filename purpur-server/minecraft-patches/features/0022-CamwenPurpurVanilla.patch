@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: cameron <cuckmeron@gmail.com>
+Date: Thu, 1 Aug 2024 10:26:10 -0400
+Subject: [PATCH] CamwenPurpurVanilla
+
+
+diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
+index db5a2227009bc4d655fc781d5850221f36f2d112..d8243a365a070c57b273d1ae8c3c0871fce7b27b 100644
+--- a/net/minecraft/world/entity/LivingEntity.java
++++ b/net/minecraft/world/entity/LivingEntity.java
+@@ -1479,7 +1479,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+                 if (!this.actuallyHurt(level, damageSource, (float) event.getFinalDamage(), event)) { // Paper - fix invulnerability reduction in EntityDamageEvent - no longer subtract lastHurt, that is part of the damage event calc now
+                     return false;
+                 }
+-                if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event.
++                // if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event. // CamwenPurpurVanilla
+                 // CraftBukkit end
+                 this.lastHurt = amount;
+                 flag1 = false;
+@@ -1492,7 +1492,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+                 if (!this.actuallyHurt(level, damageSource, (float) event.getFinalDamage(), event)) {
+                     return false;
+                 }
+-                if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event.
++                // if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event. // CamwenPurpurVanilla
+                 this.lastHurt = amount;
+                 this.invulnerableTime = this.invulnerableDuration; // CraftBukkit - restore use of maxNoDamageTicks
+                 // this.actuallyHurt(level, damageSource, amount);
+@@ -2001,11 +2001,11 @@ public abstract class LivingEntity extends Entity implements Attackable {
+ 
+             Vec3 vec3 = new Vec3(x, 0.0, z).normalize().scale(strength);
+             // Paper start - knockback events
+-            Vec3 finalVelocity = new Vec3(
++            Vec3 finalVelocity = !(this instanceof ServerPlayer && attacker instanceof ServerPlayer) ? new Vec3( // CamwenPurpurVanilla
+                 deltaMovement.x / 2.0 - vec3.x,
+                 this.onGround() ? Math.min(0.4, deltaMovement.y / 2.0 + strength) : deltaMovement.y,
+                 deltaMovement.z / 2.0 - vec3.z
+-            );
++            ) : new Vec3(deltaMovement.x / 2.0D - vec3.x, Math.min(0.4D, deltaMovement.y / 2.0D + d0), deltaMovement.z / 2.0D - vec3.z); // CamwenPurpurVanilla
+             Vec3 diff = finalVelocity.subtract(deltaMovement);
+             io.papermc.paper.event.entity.EntityKnockbackEvent event = CraftEventFactory.callEntityKnockbackEvent((org.bukkit.craftbukkit.entity.CraftLivingEntity) this.getBukkitEntity(), attacker, attacker, eventCause, strength, diff);
+             // Paper end - knockback events
+diff --git a/net/minecraft/world/entity/projectile/FishingHook.java b/net/minecraft/world/entity/projectile/FishingHook.java
+index 1e012c7ef699a64ff3f1b00f897bb893ab25ecbd..f99d5368a822b0b29362d4c3775e52caa69e8447 100644
+--- a/net/minecraft/world/entity/projectile/FishingHook.java
++++ b/net/minecraft/world/entity/projectile/FishingHook.java
+@@ -288,6 +288,10 @@ public class FishingHook extends Projectile {
+         if (!this.level().isClientSide) {
+             this.setHookedEntity(result.getEntity());
+         }
++
++        // CamwenPurpurVanilla start
++        result.getEntity().hurtOrSimulate(this.damageSources().thrown(this, this.getOwner()), 0); // this being stolen from snowball, which extends throwableProjectile, might be problematic since this extends Projectile
++        // CamwenPurpurVanilla end
+     }
+ 
+     @Override

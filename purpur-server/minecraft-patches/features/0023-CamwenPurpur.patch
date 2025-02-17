@@ -1,0 +1,445 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: cameron <cuckmeron@gmail.com>
+Date: Thu, 1 Aug 2024 10:50:33 -0400
+Subject: [PATCH] CamwenPurpur
+
+(cherry picked from commit 475303d24f9e0bf5c28f3bb5463c507d3908d93a)
+
+diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
+index 9a88ca440fad04b5941cda125c6a39d24adf6d37..2d2c0f83f1541c527342c3653d2a9436b9fe9be8 100644
+--- a/net/minecraft/server/level/ServerPlayer.java
++++ b/net/minecraft/server/level/ServerPlayer.java
+@@ -179,6 +179,10 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
+ import org.slf4j.Logger;
+ 
+ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patches.chunk_system.player.ChunkSystemServerPlayer { // Paper - rewrite chunk system
++
++    // CamwenPurpur start
++    public boolean hasSprintHit = false;
++    // CamwenPurpur end
+     private static final Logger LOGGER = LogUtils.getLogger();
+     public long lastSave = MinecraftServer.currentTick; // Paper - Incremental chunk and player saving
+     private static final int NEUTRAL_MOB_DEATH_NOTIFICATION_RADII_XZ = 32;
+@@ -815,6 +819,11 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+             this.invulnerableTime--;
+         }
+ 
++        // CamwenPurpur start
++        if (this.knockbackInvulnerableTime > 0)
++            --this.knockbackInvulnerableTime;
++        // CamwenPurpur end
++
+         // Paper start - Configurable container update tick rate
+         if (--this.containerUpdateDelay <= 0) {
+             this.containerMenu.broadcastChanges();
+diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+index 977519c7b65954a7662da7fd68211e61123d595b..77744299bfa4b1142beb69e75fd7af57181611ad 100644
+--- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
++++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+@@ -2692,6 +2692,10 @@ public class ServerGamePacketListenerImpl
+                     break;
+                 case STOP_SPRINTING:
+                     this.player.setSprinting(false);
++
++                    // CamwenPurpur start
++                    this.player.hasSprintHit = false;
++                    // CamwenPurpur end
+                     break;
+                 case STOP_SLEEPING:
+                     if (this.player.isSleeping()) {
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+index 95178c3a1de870709ea9d15a7d00c870d2edebff..679195211e5560f6a430265478cec81bdee5c1c0 100644
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -264,6 +264,10 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     protected boolean wasEyeInWater;
+     private final Set<TagKey<Fluid>> fluidOnEyes = new HashSet<>();
+     public int invulnerableTime;
++
++    // CamwenPurpur start
++    public int knockbackInvulnerableTime = 0;
++    // CamwenPurpur end
+     protected boolean firstTick = true;
+     protected final SynchedEntityData entityData;
+     protected static final EntityDataAccessor<Byte> DATA_SHARED_FLAGS_ID = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BYTE);
+@@ -1354,7 +1358,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     }
+ 
+     protected void playEntityOnFireExtinguishedSound() {
+-        this.playSound(SoundEvents.GENERIC_EXTINGUISH_FIRE, 0.7F, 1.6F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
++        if (!(this instanceof ServerPlayer)) this.playSound(SoundEvents.GENERIC_EXTINGUISH_FIRE, 0.7F, 1.6F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F); // CamwenPurpur
+     }
+ 
+     public void extinguishFire() {
+diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
+index d8243a365a070c57b273d1ae8c3c0871fce7b27b..8f36a2e043115ed3a3ab71efccc6199389ba1afb 100644
+--- a/net/minecraft/world/entity/LivingEntity.java
++++ b/net/minecraft/world/entity/LivingEntity.java
+@@ -136,12 +136,12 @@ import net.minecraft.world.phys.shapes.Shapes;
+ import net.minecraft.world.phys.shapes.VoxelShape;
+ import net.minecraft.world.scores.PlayerTeam;
+ import net.minecraft.world.scores.Scoreboard;
++import org.bukkit.Material;
+ import org.slf4j.Logger;
+ 
+ // CraftBukkit start
+ import java.util.ArrayList;
+ import java.util.HashSet;
+-import java.util.Set;
+ import java.util.LinkedList;
+ import java.util.UUID;
+ import net.minecraft.world.item.component.Consumable;
+@@ -152,7 +152,6 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
+ import org.bukkit.event.entity.ArrowBodyCountChangeEvent;
+ import org.bukkit.event.entity.EntityDamageEvent;
+ import org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
+-import org.bukkit.event.entity.EntityKnockbackEvent;
+ import org.bukkit.event.entity.EntityPotionEffectEvent;
+ import org.bukkit.event.entity.EntityRegainHealthEvent;
+ import org.bukkit.event.entity.EntityRemoveEvent;
+@@ -162,6 +161,11 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
+ // CraftBukkit end
+ 
+ public abstract class LivingEntity extends Entity implements Attackable {
++
++    // CamwenPurpur start
++    Set<Material> NETHERITE_ARMOR = Set.of(Material.NETHERITE_HELMET, Material.NETHERITE_CHESTPLATE, Material.NETHERITE_LEGGINGS, Material.NETHERITE_BOOTS);
++    Set<Material> NETHERITE_WEAPONS = Set.of(Material.NETHERITE_SWORD, Material.NETHERITE_AXE, Material.MACE, Material.TRIDENT);
++    // CamwenPurpur end
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private static final String TAG_ACTIVE_EFFECTS = "active_effects";
+     private static final ResourceLocation SPEED_MODIFIER_POWDER_SNOW_ID = ResourceLocation.withDefaultNamespace("powder_snow");
+@@ -1482,7 +1486,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
+                 // if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event. // CamwenPurpurVanilla
+                 // CraftBukkit end
+                 this.lastHurt = amount;
+-                flag1 = false;
++                if (!(this instanceof ServerPlayer) || this.knockbackInvulnerableTime > 0) flag1 = false;
++                else {
++                    this.invulnerableTime = this.invulnerableDuration;
++                    this.hurtDuration = 10;
++                    this.hurtTime = this.hurtDuration;
++                }
+             } else {
+                 // Paper start - only call damage event when actuallyHurt will be called - move call logic down
+                 event = this.handleEntityDamage(damageSource, amount, 0); // Paper - fix invulnerability reduction in EntityDamageEvent - pass lastDamage reduction (none in this branch)
+@@ -1534,6 +1543,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
+                     }
+                     // Paper end - Check distance in entity interactions
+ 
++                    // CamwenPurpur start
++                    if (this instanceof ServerPlayer)
++                        this.knockbackInvulnerableTime = this.invulnerableDuration / 2 - 1;
++                    // CamwenPurpur end
+                     this.knockback(0.4F, d, d1, damageSource.getDirectEntity(), damageSource.getDirectEntity() == null ? io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.DAMAGE : io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK); // CraftBukkit // Paper - knockback events
+                     if (!flag) {
+                         this.indicateDamage(d, d1);
+@@ -1989,6 +2002,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
+     }
+ 
+     public void knockback(double strength, double x, double z, @Nullable Entity attacker, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause eventCause) { // Paper - knockback events
++
++        // CamwenPurpur start
++ if (!(this instanceof ServerPlayer && attacker instanceof ServerPlayer) )
++        // CamwenPurpur end
+         strength *= 1.0 - this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
+         if (true || !(strength <= 0.0)) { // CraftBukkit - Call event even when force is 0
+             // this.hasImpulse = true; // CraftBukkit - Move down
+@@ -2005,7 +2022,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+                 deltaMovement.x / 2.0 - vec3.x,
+                 this.onGround() ? Math.min(0.4, deltaMovement.y / 2.0 + strength) : deltaMovement.y,
+                 deltaMovement.z / 2.0 - vec3.z
+-            ) : new Vec3(deltaMovement.x / 2.0D - vec3.x, Math.min(0.4D, deltaMovement.y / 2.0D + d0), deltaMovement.z / 2.0D - vec3.z); // CamwenPurpurVanilla
++            ) : new Vec3(deltaMovement.x / 2.0D - vec3.x, Math.max(Math.min(0.4D, deltaMovement.y / 2.0D + strength), 0.3608000051972503), deltaMovement.z / 2.0D - vec3.z); // CamwenPurpurVanilla // CamwenPurpur Math.min(0.4D, deltaMovement.y / 2.0D + d0)
+             Vec3 diff = finalVelocity.subtract(deltaMovement);
+             io.papermc.paper.event.entity.EntityKnockbackEvent event = CraftEventFactory.callEntityKnockbackEvent((org.bukkit.craftbukkit.entity.CraftLivingEntity) this.getBukkitEntity(), attacker, attacker, eventCause, strength, diff);
+             // Paper end - knockback events
+@@ -2225,6 +2242,21 @@ public abstract class LivingEntity extends Entity implements Attackable {
+     protected float getDamageAfterArmorAbsorb(DamageSource damageSource, float damageAmount) {
+         if (!damageSource.is(DamageTypeTags.BYPASSES_ARMOR)) {
+             // this.hurtArmor(damageSource, damageAmount); // CraftBukkit - actuallyHurt(DamageSource, float, EntityDamageEvent) for damage handling
++
++            // CamwenPurpur start
++            if (this instanceof ServerPlayer serverPlayer && damageSource.getEntity() instanceof ServerPlayer serverPlayer1) {
++                if (!damageSource.isDirect() || NETHERITE_WEAPONS.contains(serverPlayer1.getMainHandItem().getBukkitStack().getType()))
++                    damageAmount = CombatRules.getDamageAfterAbsorb(this, damageAmount, damageSource, (float) this.getArmorValue(), 0);
++                else {
++                    int pvpToughness = 0;
++                    for (org.bukkit.inventory.ItemStack is : serverPlayer.getBukkitEntity().getInventory().getArmorContents())
++                        if (is != null && NETHERITE_ARMOR.contains(is.getType()))
++                            pvpToughness++;
++                    damageAmount = CombatRules.getDamageAfterAbsorb(this, damageAmount, damageSource, (float) this.getArmorValue(), pvpToughness);
++                }
++            }
++            else
++            // CamwenPurpur end
+             damageAmount = CombatRules.getDamageAfterAbsorb(
+                 this, damageAmount, damageSource, this.getArmorValue(), (float)this.getAttributeValue(Attributes.ARMOR_TOUGHNESS)
+             );
+@@ -2266,6 +2298,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
+                     damageProtection = 0.0F;
+                 }
+ 
++                // CamwenPurpur start
++                if (damageSource.getDirectEntity() instanceof AbstractArrow aa && aa.getWeaponItem().getBukkitStack().getType().equals(Material.CROSSBOW))
++                    damageProtection = 0.0F;
++                // CamwenPurpur end
+                 if (damageProtection > 0.0F) {
+                     damageAmount = CombatRules.getDamageAfterMagicAbsorb(damageAmount, damageProtection);
+                 }
+diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
+index 43657822f0660613078e9afa512000b5255a1537..f8d33b5998913479436b8a1c9e9fda05b9fb44a5 100644
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -113,6 +113,7 @@ import net.minecraft.world.phys.Vec3;
+ import net.minecraft.world.scores.PlayerTeam;
+ import net.minecraft.world.scores.Scoreboard;
+ import net.minecraft.world.scores.Team;
++import org.bukkit.enchantments.Enchantment;
+ import org.slf4j.Logger;
+ 
+ public abstract class Player extends LivingEntity {
+@@ -1331,6 +1332,15 @@ public abstract class Player extends LivingEntity {
+                         boolean flag4 = target.hurtOrSimulate(damageSource, f2);
+                         if (flag4) {
+                             float f4 = this.getKnockback(target, damageSource) + (flag1 ? 1.0F : 0.0F);
++
++                            // CamwenPurpur start
++                            if (flag1 && this instanceof ServerPlayer serverPlayer) {
++                                if (serverPlayer.hasSprintHit)
++                                    f4--;
++                                else
++                                    serverPlayer.hasSprintHit = true;
++                            }
++                            // CamwenPurpur end
+                             if (f4 > 0.0F) {
+                                 if (target instanceof LivingEntity livingEntity1) {
+                                     livingEntity1.knockback(
+@@ -1425,7 +1435,10 @@ public abstract class Player extends LivingEntity {
+                                 }
+                             }
+ 
+-                            if (f1 > 0.0F) {
++                            // CamwenPurpur start
++                            org.bukkit.inventory.ItemStack itemStack = weaponItem.getBukkitStack();
++                            // CamwenPurpur end
++                            if (f1 > 0.0F || itemStack.hasEnchant(org.bukkit.enchantments.Enchantment.BREACH) || target.isInWater() && itemStack.hasEnchant(org.bukkit.enchantments.Enchantment.IMPALING)) { // CamwenPurpur
+                                 this.magicCrit(target);
+                             }
+ 
+diff --git a/net/minecraft/world/entity/projectile/AbstractArrow.java b/net/minecraft/world/entity/projectile/AbstractArrow.java
+index 7bca1cd398f6406f2b9d284dd4fbc9ef14136e77..8dacf6c0d81659d5ae4839025b25848b87ec2826 100644
+--- a/net/minecraft/world/entity/projectile/AbstractArrow.java
++++ b/net/minecraft/world/entity/projectile/AbstractArrow.java
+@@ -773,7 +773,7 @@ public abstract class AbstractArrow extends Projectile {
+     }
+ 
+     protected float getWaterInertia() {
+-        return 0.6F;
++        return 0.99F;//6F;
+     }
+ 
+     public void setNoPhysics(boolean noPhysics) {
+diff --git a/net/minecraft/world/entity/projectile/FishingHook.java b/net/minecraft/world/entity/projectile/FishingHook.java
+index f99d5368a822b0b29362d4c3775e52caa69e8447..84033217f9d052f0ead955fd03bf15ef5f6b22e7 100644
+--- a/net/minecraft/world/entity/projectile/FishingHook.java
++++ b/net/minecraft/world/entity/projectile/FishingHook.java
+@@ -6,6 +6,7 @@ import java.util.List;
+ import javax.annotation.Nullable;
+ import net.minecraft.advancements.CriteriaTriggers;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.core.Direction;
+ import net.minecraft.core.particles.ParticleTypes;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.network.protocol.Packet;
+@@ -115,6 +116,30 @@ public class FishingHook extends Projectile {
+         this.setDeltaMovement(vec3);
+         this.setYRot((float)(Mth.atan2(vec3.x, vec3.z) * 180.0F / (float)Math.PI));
+         this.setXRot((float)(Mth.atan2(vec3.y, vec3.horizontalDistance()) * 180.0F / (float)Math.PI));
++
++        // CamwenPurpur start
++        // float f = thrower.getXRot();
++        // float f1 = thrower.getYRot();
++        // float f2 = Mth.cos(-f1 * 0.017453292F - 3.1415927F);
++        // float f3 = Mth.sin(-f1 * 0.017453292F - 3.1415927F);
++        // float f4 = -Mth.cos(-f * 0.017453292F);
++        // float f5 = Mth.sin(-f * 0.017453292F);
++        // double d0 = thrower.getX() - (double) f3 * 0.3D;
++        // double d1 = thrower.getEyeY();
++        // double d2 = thrower.getZ() - (double) f2 * 0.3D;
++        //
++        // this.moveTo(d0, d1, d2, f1, f);
++        // Vec3 vec3d = new Vec3((double) (-f3), (double) Mth.clamp(-(f5 / f4), -5.0F, 5.0F), (double) (-f2));
++        // double d3 = vec3d.length();
++        //
++        // double motionY = (double)(-Math.sin(f / 180.0F * (float)Math.PI)); // re-adding the randomness memes for this would be nice
++        //
++        // vec3d = vec3d.multiply(0.6D / d3 + this.random.triangle(0.5D, 0.0103365D), 0.6D / d3 + this.random.triangle(0.5D, 0.0103365D), 0.6D / d3 + this.random.triangle(0.5D, 0.0103365D));
++        // vec3d = vec3d.with(Direction.Axis.Y, motionY);
++        // this.setDeltaMovement(vec3d.add(0, thrower.onGround() ? 0.0D : Math.clamp(vec3d.y, -0.3739040364667261, 0.41999998688697815), 0));
++        // this.setYRot((float) (Mth.atan2(vec3d.x, vec3d.z) * 57.2957763671875D));
++        // this.setXRot((float) (Mth.atan2(vec3d.y, vec3d.horizontalDistance()) * 57.2957763671875D));
++        // CamwenPurpur end
+         this.yRotO = this.getYRot();
+         this.xRotO = this.getXRot();
+     }
+diff --git a/net/minecraft/world/entity/projectile/Projectile.java b/net/minecraft/world/entity/projectile/Projectile.java
+index 843f1396a6567672e5e8002d7e48fb18cf39d5de..bbb0c9c8816146ee7727b51ec0bd1447e6bc01d6 100644
+--- a/net/minecraft/world/entity/projectile/Projectile.java
++++ b/net/minecraft/world/entity/projectile/Projectile.java
+@@ -6,12 +6,15 @@ import java.util.UUID;
+ import java.util.function.Consumer;
+ import javax.annotation.Nullable;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.core.Direction;
++import net.minecraft.core.Holder;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.game.ClientGamePacketListener;
+ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+ import net.minecraft.server.level.ServerEntity;
+ import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.ServerPlayer;
+ import net.minecraft.tags.EntityTypeTags;
+ import net.minecraft.util.Mth;
+ import net.minecraft.world.damagesource.DamageSource;
+@@ -202,7 +205,7 @@ public abstract class Projectile extends Entity implements TraceableEntity {
+         if (Double.isNaN(knownMovement.x) || Double.isNaN(knownMovement.y) || Double.isNaN(knownMovement.z)) {
+             knownMovement = new Vec3(0, 0, 0);
+         }
+-        if (!shooter.level().paperConfig().misc.disableRelativeProjectileVelocity) {
++        if (!shooter.level().paperConfig().misc.disableRelativeProjectileVelocity && !(this instanceof ThrownPotion)) { // CamwenPurpur
+         this.setDeltaMovement(this.getDeltaMovement().add(knownMovement.x, shooter.onGround() ? 0.0 : knownMovement.y, knownMovement.z));
+         }
+         // Paper end - allow disabling relative velocity
+diff --git a/net/minecraft/world/food/FoodData.java b/net/minecraft/world/food/FoodData.java
+index f205401b24cdf0f43d531fb33e58d7183f98e510..5abed4e73114fc4490eaf38a2b8e6fc428a39941 100644
+--- a/net/minecraft/world/food/FoodData.java
++++ b/net/minecraft/world/food/FoodData.java
+@@ -13,7 +13,7 @@ public class FoodData {
+     public float exhaustionLevel;
+     private int tickTimer;
+     // CraftBukkit start
+-    public int saturatedRegenRate = 10;
++    public int saturatedRegenRate = 80; //10; CamwenPurpur
+     public int unsaturatedRegenRate = 80;
+     public int starvationRate = 80;
+     // CraftBukkit end
+@@ -64,7 +64,7 @@ public class FoodData {
+         }
+ 
+         boolean _boolean = serverLevel.getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
+-        if (_boolean && this.saturationLevel > 0.0F && player.isHurt() && this.foodLevel >= 20) {
++        if (false && _boolean && this.saturationLevel > 0.0F && player.isHurt() && this.foodLevel >= 20) { // CamwenPurpur
+             this.tickTimer++;
+             if (this.tickTimer >= this.saturatedRegenRate) { // CraftBukkit
+                 float min = Math.min(this.saturationLevel, 6.0F);
+diff --git a/net/minecraft/world/item/EnderpearlItem.java b/net/minecraft/world/item/EnderpearlItem.java
+index 8a0c32da9e41c4c5ce070b0fcbd3ae2d29a9d35c..c8bf8654b99c74390ce6e092d1728e3005d9cb27 100644
+--- a/net/minecraft/world/item/EnderpearlItem.java
++++ b/net/minecraft/world/item/EnderpearlItem.java
+@@ -44,7 +44,7 @@ public class EnderpearlItem extends Item {
+                     0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F)
+                 );
+                 player.awardStat(Stats.ITEM_USED.get(this));
+-                player.getCooldowns().addCooldown(itemInHand, player.getAbilities().instabuild ? level.purpurConfig.enderPearlCooldownCreative : level.purpurConfig.enderPearlCooldown); // Purpur - Configurable Ender Pearl cooldown
++                // player.getCooldowns().addCooldown(itemInHand, player.getAbilities().instabuild ? level.purpurConfig.enderPearlCooldownCreative : level.purpurConfig.enderPearlCooldown); // Purpur - Configurable Ender Pearl cooldown // CamwenPurpur
+             } else {
+             // Paper end - PlayerLaunchProjectileEvent
+                 player.containerMenu.sendAllDataToRemote();
+diff --git a/net/minecraft/world/item/Items.java b/net/minecraft/world/item/Items.java
+index d55e5e6deca43c7fddb15657fa5ceaeed8f95c67..13efd1a76c67c4e8fc7ab39c3c5b920ff82c13f5 100644
+--- a/net/minecraft/world/item/Items.java
++++ b/net/minecraft/world/item/Items.java
+@@ -1471,7 +1471,7 @@ public class Items {
+     public static final Item CHICKEN = registerItem("chicken", new Item.Properties().food(Foods.CHICKEN, Consumables.CHICKEN));
+     public static final Item COOKED_CHICKEN = registerItem("cooked_chicken", new Item.Properties().food(Foods.COOKED_CHICKEN));
+     public static final Item ROTTEN_FLESH = registerItem("rotten_flesh", new Item.Properties().food(Foods.ROTTEN_FLESH, Consumables.ROTTEN_FLESH));
+-    public static final Item ENDER_PEARL = registerItem("ender_pearl", EnderpearlItem::new, new Item.Properties().stacksTo(16).useCooldown(1.0F));
++    public static final Item ENDER_PEARL = registerItem("ender_pearl", EnderpearlItem::new, new Item.Properties().stacksTo(16).useCooldown(0F)); // CamwenPurpur 1.0F
+     public static final Item BLAZE_ROD = registerItem("blaze_rod");
+     public static final Item GHAST_TEAR = registerItem("ghast_tear");
+     public static final Item GOLD_NUGGET = registerItem("gold_nugget");
+@@ -1605,7 +1605,7 @@ public class Items {
+         new Item.Properties().rarity(Rarity.UNCOMMON).component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
+     );
+     public static final Item FIRE_CHARGE = registerItem("fire_charge", FireChargeItem::new);
+-    public static final Item WIND_CHARGE = registerItem("wind_charge", WindChargeItem::new, new Item.Properties().useCooldown(0.5F));
++    public static final Item WIND_CHARGE = registerItem("wind_charge", WindChargeItem::new, new Item.Properties().useCooldown(0F)); // CamwenPurpur 0.5F
+     public static final Item WRITABLE_BOOK = registerItem(
+         "writable_book", WritableBookItem::new, new Item.Properties().stacksTo(1).component(DataComponents.WRITABLE_BOOK_CONTENT, WritableBookContent.EMPTY)
+     );
+@@ -1813,7 +1813,7 @@ public class Items {
+         "end_crystal", EndCrystalItem::new, new Item.Properties().component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
+     );
+     public static final Item CHORUS_FRUIT = registerItem(
+-        "chorus_fruit", new Item.Properties().food(Foods.CHORUS_FRUIT, Consumables.CHORUS_FRUIT).useCooldown(1.0F)
++        "chorus_fruit", new Item.Properties().food(Foods.CHORUS_FRUIT, Consumables.CHORUS_FRUIT).useCooldown(0F) // CamwenPurpur 1.0F
+     );
+     public static final Item POPPED_CHORUS_FRUIT = registerItem("popped_chorus_fruit");
+     public static final Item TORCHFLOWER_SEEDS = registerItem("torchflower_seeds", createBlockItemWithCustomItemName(Blocks.TORCHFLOWER_CROP));
+diff --git a/net/minecraft/world/item/TridentItem.java b/net/minecraft/world/item/TridentItem.java
+index 7ea7db834e7b627a1d7d37ca87cd43eb61408565..588239656b9ce81c8e6589c664f65da297484a44 100644
+--- a/net/minecraft/world/item/TridentItem.java
++++ b/net/minecraft/world/item/TridentItem.java
+@@ -78,7 +78,7 @@ public class TridentItem extends Item implements ProjectileItem {
+                 return false;
+             } else {
+                 float tridentSpinAttackStrength = EnchantmentHelper.getTridentSpinAttackStrength(stack, player);
+-                if (tridentSpinAttackStrength > 0.0F && !player.isInWaterOrRain()) {
++                if (false && tridentSpinAttackStrength > 0.0F && !player.isInWaterOrRain()) { // CamwenPurpur
+                     return false;
+                 } else if (stack.nextDamageWillBreak()) {
+                     return false;
+@@ -169,8 +169,10 @@ public class TridentItem extends Item implements ProjectileItem {
+         ItemStack itemInHand = player.getItemInHand(hand);
+         if (itemInHand.nextDamageWillBreak()) {
+             return InteractionResult.FAIL;
+-        } else if (EnchantmentHelper.getTridentSpinAttackStrength(itemInHand, player) > 0.0F && !player.isInWaterOrRain()) {
+-            return InteractionResult.FAIL;
++            // CamwenPurpur start
++        // } else if (EnchantmentHelper.getTridentSpinAttackStrength(itemInHand, player) > 0.0F && !player.isInWaterOrRain()) {
++        //     return InteractionResult.FAIL;
++            // CamwenPurpur end
+         } else {
+             player.startUsingItem(hand);
+             return InteractionResult.CONSUME;
+diff --git a/net/minecraft/world/item/enchantment/Enchantments.java b/net/minecraft/world/item/enchantment/Enchantments.java
+index 5eb11c5893f3ea64d6d97155f29b1273937251d1..e9e760cf676a69e67f0d90b11866a34af1e14e9f 100644
+--- a/net/minecraft/world/item/enchantment/Enchantments.java
++++ b/net/minecraft/world/item/enchantment/Enchantments.java
+@@ -509,7 +509,7 @@ public class Enchantments {
+                         new EnchantmentAttributeEffect(
+                             ResourceLocation.withDefaultNamespace("enchantment.soul_speed"),
+                             Attributes.MOVEMENT_SPEED,
+-                            LevelBasedValue.perLevel(0.0405F, 0.0105F),
++                            LevelBasedValue.perLevel(0.0405F / 35, 0.0105F), // CamwenPurpur -> should be camwenPurpurVanilla probably
+                             AttributeModifier.Operation.ADD_VALUE
+                         ),
+                         new EnchantmentAttributeEffect(
+diff --git a/net/minecraft/world/level/block/Block.java b/net/minecraft/world/level/block/Block.java
+index d9d3566971d5de25dfd926fac4dd90dd0c48680f..ead9088c501fa3305fa0cbfd0fd8bc1ce6d26789 100644
+--- a/net/minecraft/world/level/block/Block.java
++++ b/net/minecraft/world/level/block/Block.java
+@@ -428,7 +428,7 @@ public class Block extends BlockBehaviour implements ItemLike {
+     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool, boolean includeDrops, boolean dropExp) {
+     // Paper end - fix drops not preventing stats/food exhaustion
+         player.awardStat(Stats.BLOCK_MINED.get(this));
+-        player.causeFoodExhaustion(0.005F, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED); // CraftBukkit - EntityExhaustionEvent
++        player.causeFoodExhaustion(0.025F, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED); // CraftBukkit - EntityExhaustionEvent//0.005F, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED); // CraftBukkit - EntityExhaustionEvent
+         if (includeDrops) { // Paper - fix drops not preventing stats/food exhaustion
+         Block.dropResources(state, level, pos, blockEntity, player, tool, dropExp); // Paper - Properly handle xp dropping
+         } // Paper - fix drops not preventing stats/food exhaustion
+diff --git a/net/minecraft/world/level/block/BushBlock.java b/net/minecraft/world/level/block/BushBlock.java
+index 8f2eebc60d655d5a2c233e2b931cdca2c6a5e768..69e1a17c03cfdf7e2b7e50a8a6e9de592be72c3d 100644
+--- a/net/minecraft/world/level/block/BushBlock.java
++++ b/net/minecraft/world/level/block/BushBlock.java
+@@ -65,7 +65,7 @@ public abstract class BushBlock extends Block {
+     // Purpur start - Ability for hoe to replant crops
+     public void playerDestroyAndReplant(net.minecraft.world.level.Level world, net.minecraft.world.entity.player.Player player, BlockPos pos, BlockState state, @javax.annotation.Nullable net.minecraft.world.level.block.entity.BlockEntity blockEntity, net.minecraft.world.item.ItemStack itemInHand, net.minecraft.world.level.ItemLike itemToReplant) {
+         player.awardStat(net.minecraft.stats.Stats.BLOCK_MINED.get(this));
+-        player.causeFoodExhaustion(0.005F, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED);
++        player.causeFoodExhaustion(0.025F, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED);//0.005F, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED);
+         java.util.List<net.minecraft.world.item.ItemStack> dropList = Block.getDrops(state, (net.minecraft.server.level.ServerLevel) world, pos, blockEntity, player, itemInHand);
+ 
+         boolean planted = false;
